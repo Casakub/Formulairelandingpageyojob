@@ -1,4 +1,5 @@
 import { Context } from "npm:hono";
+import { getApiKey } from "./settings.tsx";
 
 interface AnalysisRequest {
   responses: any[];
@@ -18,12 +19,17 @@ interface AnalysisRequest {
 
 export async function analyzeWithClaude(c: Context) {
   try {
-    const apiKey = Deno.env.get("ANTHROPIC_API_KEY");
+    // Try to get API key from database first, fallback to env var
+    let apiKey = await getApiKey();
+    
+    if (!apiKey) {
+      apiKey = Deno.env.get("ANTHROPIC_API_KEY") || null;
+    }
     
     if (!apiKey) {
       return c.json({
         success: false,
-        error: "ANTHROPIC_API_KEY not configured. Please add your API key in the environment variables."
+        error: "ANTHROPIC_API_KEY not configured. Please add your API key in the Settings panel."
       }, 500);
     }
 

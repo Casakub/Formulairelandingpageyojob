@@ -18,6 +18,7 @@ import { QuestionManager } from './components/dashboard/QuestionManager';
 import { IntegrationManager } from './components/dashboard/IntegrationManager';
 import { ExportImportManager } from './components/dashboard/ExportImportManager';
 import { ResultsOverview } from './components/dashboard/ResultsOverview';
+import { SettingsPanel } from './components/dashboard/SettingsPanel';
 
 type TabType = 'overview' | 'questions' | 'results' | 'integrations' | 'settings' | 'export';
 
@@ -177,16 +178,7 @@ export default function DashboardApp({ onBackToSurvey }: DashboardAppProps = {})
             <IntegrationManager key="integrations" />
           )}
           {activeTab === 'settings' && (
-            <motion.div
-              key="settings"
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -20 }}
-              className="bg-white/10 backdrop-blur-xl rounded-3xl border border-white/20 p-8"
-            >
-              <h2 className="text-white mb-4">Paramètres</h2>
-              <p className="text-white/60">Section en cours de développement...</p>
-            </motion.div>
+            <SettingsPanel key="settings" />
           )}
         </AnimatePresence>
       </main>

@@ -3,6 +3,7 @@ import { cors } from "npm:hono/cors";
 import { logger } from "npm:hono/logger";
 import * as kv from "./kv_store.tsx";
 import { analyzeWithClaude } from "./ai-analysis.tsx";
+import { getApiKeyStatus, saveApiKey, deleteApiKey, testApiKey } from "./settings.tsx";
 
 const app = new Hono();
 
@@ -28,5 +29,11 @@ app.get("/make-server-10092a63/health", (c) => {
 
 // AI Analysis endpoint
 app.post("/make-server-10092a63/ai-analysis", analyzeWithClaude);
+
+// Settings endpoints
+app.get("/make-server-10092a63/settings/anthropic-key", getApiKeyStatus);
+app.post("/make-server-10092a63/settings/anthropic-key", saveApiKey);
+app.delete("/make-server-10092a63/settings/anthropic-key", deleteApiKey);
+app.post("/make-server-10092a63/settings/test-anthropic", testApiKey);
 
 Deno.serve(app.fetch);

@@ -50,7 +50,9 @@
 - Policies RLS activées
 - Indexes configurés
 
-### 2. API Key Anthropic ⏳ EN ATTENTE
+### 2. API Key Anthropic ⏳ À CONFIGURER (2 minutes)
+
+**Statut :** ✅ Panneau Paramètres intégré dans le Dashboard
 
 **Action requise :**
 
@@ -59,12 +61,18 @@
    - Créez un compte
    - Générez une API key (`sk-ant-api03-...`)
 
-2. **Configurez dans Figma Make**
-   - La variable `ANTHROPIC_API_KEY` a été créée
-   - Collez votre clé dans le modal qui s'est affiché
-   - Si le modal est fermé, reconfigurez manuellement
+2. **Configurez via le Dashboard** ✨ NOUVEAU
+   - Connectez-vous au Dashboard Admin
+   - Allez dans l'onglet **"Paramètres"** ⚙️
+   - Collez votre clé dans le champ prévu
+   - Cliquez sur **"Sauvegarder"**
+   - Testez la connexion avec le bouton **"Tester"** ✅
+
+**✨ Plus besoin de gérer manuellement les variables d'environnement !**
 
 **💰 Budget recommandé :** $10-20 pour démarrer (~1000 analyses)
+
+**→ Guide détaillé : `⚙️_SETTINGS_GUIDE.md`**
 
 ### 3. Liens Croisés ⏳ À FAIRE
 
