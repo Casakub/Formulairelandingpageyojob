@@ -62,11 +62,41 @@ export function AIAnalysisPanel({ responses, stats, onClose }: AIAnalysisPanelPr
     setIsAnalyzing(true);
     
     try {
-      // Dans une vraie app, on utiliserait discover_tools puis run_mcp_tool
-      // Pour l'instant, simulation de l'analyse
+      // Call backend AI analysis endpoint
+      const { projectId, publicAnonKey } = await import('../../utils/supabase/info');
       
-      await new Promise(resolve => setTimeout(resolve, 3000));
+      const response = await fetch(
+        `https://${projectId}.supabase.co/functions/v1/make-server-10092a63/ai-analysis`,
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${publicAnonKey}`
+          },
+          body: JSON.stringify({
+            responses,
+            stats
+          })
+        }
+      );
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Failed to analyze data');
+      }
+
+      const result = await response.json();
       
+      if (!result.success) {
+        throw new Error(result.error || 'Analysis failed');
+      }
+
+      setAnalysis(result.analysis);
+      
+    } catch (error) {
+      console.error('AI Analysis Error:', error);
+      
+      // Fallback to mock analysis if API fails
       const mockAnalysis = `# 📊 Analyse de Marché - YOJOB Plateforme ETT Européenne
 
 ## 🎯 Synthèse Exécutive
@@ -264,8 +294,8 @@ ${responses
 `;
 
       setAnalysis(mockAnalysis);
-    } catch (error) {
-      alert('❌ Erreur lors de l\'analyse. Veuillez réessayer.');
+      
+      alert('⚠️ Analyse IA non disponible. Mode démo activé.\n\n' + (error instanceof Error ? error.message : 'Erreur inconnue'));
     } finally {
       setIsAnalyzing(false);
     }

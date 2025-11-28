@@ -2,6 +2,8 @@ import { Hono } from "npm:hono";
 import { cors } from "npm:hono/cors";
 import { logger } from "npm:hono/logger";
 import * as kv from "./kv_store.tsx";
+import { analyzeWithClaude } from "./ai-analysis.tsx";
+
 const app = new Hono();
 
 // Enable logger
@@ -23,5 +25,8 @@ app.use(
 app.get("/make-server-10092a63/health", (c) => {
   return c.json({ status: "ok" });
 });
+
+// AI Analysis endpoint
+app.post("/make-server-10092a63/ai-analysis", analyzeWithClaude);
 
 Deno.serve(app.fetch);
