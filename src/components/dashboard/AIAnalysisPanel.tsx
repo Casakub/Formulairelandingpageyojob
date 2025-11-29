@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { motion } from 'motion/react';
+import { toast } from 'sonner@2.0.3';
 import {
   X,
   Sparkles,
@@ -82,19 +83,54 @@ export function AIAnalysisPanel({ responses, stats, onClose }: AIAnalysisPanelPr
 
       if (!response.ok) {
         const errorData = await response.json();
+        
+        // Check if it's a credit balance error
+        if (errorData.needsCredit || errorData.error?.includes('crédits') || errorData.error?.includes('credit balance')) {
+          toast.error('💳 Crédits Anthropic insuffisants', {
+            description: 'Votre compte Anthropic n\'a plus de crédits. Rechargez votre compte pour utiliser l\'analyse IA.',
+            duration: 10000,
+            action: {
+              label: 'Recharger →',
+              onClick: () => window.open('https://console.anthropic.com/settings/plans', '_blank')
+            }
+          });
+          throw new Error('Crédits insuffisants');
+        }
+        
         throw new Error(errorData.error || 'Failed to analyze data');
       }
 
       const result = await response.json();
       
       if (!result.success) {
+        if (result.needsCredit || result.error?.includes('crédits') || result.error?.includes('credit balance')) {
+          toast.error('💳 Crédits Anthropic insuffisants', {
+            description: result.error || 'Veuillez recharger votre compte Anthropic.',
+            duration: 10000,
+            action: {
+              label: 'Recharger →',
+              onClick: () => window.open('https://console.anthropic.com/settings/plans', '_blank')
+            }
+          });
+          throw new Error('Crédits insuffisants');
+        }
         throw new Error(result.error || 'Analysis failed');
       }
 
       setAnalysis(result.analysis);
+      toast.success('✅ Analyse IA terminée !', {
+        description: 'L\'analyse complète est disponible ci-dessous.'
+      });
       
     } catch (error) {
       console.error('AI Analysis Error:', error);
+      
+      // Only show generic error if not already handled
+      if (!(error instanceof Error && error.message === 'Crédits insuffisants')) {
+        toast.error('❌ Erreur d\'analyse', {
+          description: error instanceof Error ? error.message : 'Une erreur est survenue lors de l\'analyse.'
+        });
+      }
       
       // Fallback to mock analysis if API fails
       const mockAnalysis = `# 📊 Analyse de Marché - YOJOB Plateforme ETT Européenne

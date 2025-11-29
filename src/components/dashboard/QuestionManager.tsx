@@ -63,6 +63,34 @@ export function QuestionManager() {
     setFilteredQuestions(questions);
   }, [questions]);
 
+  // Load question data when editing
+  useEffect(() => {
+    if (editingId) {
+      const questionToEdit = questions.find(q => q.id === editingId);
+      if (questionToEdit) {
+        setNewQuestion({
+          code: questionToEdit.code,
+          label: questionToEdit.label,
+          type: questionToEdit.type,
+          section: questionToEdit.section,
+          placeholder: questionToEdit.placeholder,
+          required: questionToEdit.required,
+          visible: questionToEdit.visible,
+          options: questionToEdit.options
+        });
+      }
+    } else {
+      // Reset form when not editing
+      setNewQuestion({
+        section: 1,
+        type: 'text',
+        required: false,
+        visible: true,
+        options: []
+      });
+    }
+  }, [editingId, questions]);
+
   // Drag & Drop sensors
   const sensors = useSensors(
     useSensor(PointerSensor),
@@ -87,27 +115,44 @@ export function QuestionManager() {
     }
   };
 
-  const handleSaveNew = () => {
+  const handleSave = () => {
     if (!newQuestion.label || !newQuestion.code) {
       alert('Le label et le code sont requis');
       return;
     }
 
-    const newQ: Question = {
-      id: Date.now().toString(),
-      section: newQuestion.section || 1,
-      order: questions.filter(q => q.section === newQuestion.section).length + 1,
-      code: newQuestion.code || '',
-      type: newQuestion.type || 'text',
-      label: newQuestion.label || '',
-      placeholder: newQuestion.placeholder,
-      required: newQuestion.required || false,
-      visible: newQuestion.visible !== false,
-      options: newQuestion.options
-    };
+    if (editingId) {
+      // Update existing question
+      updateQuestion(editingId, {
+        code: newQuestion.code,
+        label: newQuestion.label,
+        type: newQuestion.type,
+        section: newQuestion.section,
+        placeholder: newQuestion.placeholder,
+        required: newQuestion.required,
+        visible: newQuestion.visible,
+        options: newQuestion.options
+      });
+      setEditingId(null);
+    } else {
+      // Create new question
+      const newQ: Question = {
+        id: Date.now().toString(),
+        section: newQuestion.section || 1,
+        order: questions.filter(q => q.section === newQuestion.section).length + 1,
+        code: newQuestion.code || '',
+        type: newQuestion.type || 'text',
+        label: newQuestion.label || '',
+        placeholder: newQuestion.placeholder,
+        required: newQuestion.required || false,
+        visible: newQuestion.visible !== false,
+        options: newQuestion.options
+      };
 
-    addQuestion(newQ);
-    setIsCreating(false);
+      addQuestion(newQ);
+      setIsCreating(false);
+    }
+
     setNewQuestion({
       section: 1,
       type: 'text',
@@ -380,11 +425,11 @@ export function QuestionManager() {
               {/* Actions */}
               <div className="flex gap-3 mt-8">
                 <Button
-                  onClick={handleSaveNew}
+                  onClick={handleSave}
                   className="flex-1 bg-gradient-to-r from-cyan-500 to-violet-500 hover:from-cyan-400 hover:to-violet-400 text-white"
                 >
                   <Save className="w-4 h-4 mr-2" />
-                  Enregistrer
+                  {editingId ? 'Mettre à jour' : 'Enregistrer'}
                 </Button>
                 <Button
                   variant="outline"

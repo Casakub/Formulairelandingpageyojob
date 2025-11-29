@@ -4,7 +4,7 @@ import { Button } from '../ui/button';
 import { Input } from '../ui/input';
 import { Label } from '../ui/label';
 import { Badge } from '../ui/badge';
-import { Settings, Key, CheckCircle2, XCircle, Loader2, Sparkles, DollarSign, Info, AlertCircle, Zap, Shield, ExternalLink, Target, Users, TrendingUp } from 'lucide-react';
+import { Settings, Key, CheckCircle2, XCircle, Loader2, Sparkles, DollarSign, Info, AlertCircle, Zap, Shield, ExternalLink, Target, Users, TrendingUp, CreditCard } from 'lucide-react';
 import { motion } from 'motion/react';
 import { toast } from 'sonner';
 
@@ -115,10 +115,21 @@ export function SettingsPanel() {
 
       if (result.success) {
         toast.success('✅ Connexion Claude réussie !', {
-          description: `Modèle: ${result.model || 'claude-3-5-sonnet-20241022'}`
+          description: `Modèle: ${result.model || 'claude-3-5-sonnet-20241022'}`,
+          duration: 5000
         });
       } else {
-        toast.error('❌ Test échoué: ' + result.error);
+        // Check if it's a credit balance error
+        const isCreditError = result.error?.includes('credit balance') || result.error?.includes('crédits');
+        
+        toast.error('❌ Test échoué', {
+          description: result.error || 'Erreur inconnue',
+          duration: isCreditError ? 10000 : 6000, // Longer duration for credit errors
+          action: isCreditError ? {
+            label: 'Recharger →',
+            onClick: () => window.open('https://console.anthropic.com/settings/plans', '_blank')
+          } : undefined
+        });
       }
       
     } catch (error) {
@@ -514,6 +525,93 @@ export function SettingsPanel() {
                     Carte bleue requise
                   </p>
                 </div>
+              </CardContent>
+            </Card>
+          </motion.div>
+
+          {/* Recharger les crédits */}
+          <motion.div
+            initial={{ opacity: 0, x: 20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ delay: 0.4 }}
+            whileHover={{ y: -4, scale: 1.02 }}
+          >
+            <Card className="bg-gradient-to-br from-orange-50 to-amber-50 border-orange-200 shadow-lg hover:shadow-xl hover:border-orange-300 transition-all duration-300">
+              <CardHeader className="border-b border-orange-100">
+                <CardTitle className="text-slate-900 flex items-center gap-2">
+                  <CreditCard className="w-5 h-5 text-orange-500" />
+                  Recharger vos crédits
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="pt-6 space-y-4">
+                <div className="flex items-start gap-3 p-3 rounded-xl bg-white/50 border border-orange-200">
+                  <AlertCircle className="w-5 h-5 text-orange-600 flex-shrink-0 mt-0.5" />
+                  <div>
+                    <p className="text-sm text-slate-700 mb-1">
+                      Si vous voyez l'erreur <span className="font-mono text-xs bg-red-100 text-red-700 px-1.5 py-0.5 rounded">credit balance is too low</span>
+                    </p>
+                    <p className="text-xs text-slate-600">
+                      Votre compte Anthropic n'a plus de crédits suffisants.
+                    </p>
+                  </div>
+                </div>
+
+                <div className="space-y-3">
+                  <div className="flex items-start gap-3">
+                    <div className="flex-shrink-0 w-6 h-6 rounded-full bg-gradient-to-br from-orange-500 to-amber-500 text-white flex items-center justify-center text-xs">
+                      1
+                    </div>
+                    <p className="text-slate-700 text-sm pt-0.5">
+                      Allez sur{' '}
+                      <a 
+                        href="https://console.anthropic.com/settings/plans" 
+                        target="_blank" 
+                        rel="noopener noreferrer"
+                        className="text-orange-600 hover:text-orange-700 underline inline-flex items-center gap-1"
+                      >
+                        Plans & Billing
+                        <ExternalLink className="w-3 h-3" />
+                      </a>
+                    </p>
+                  </div>
+
+                  <div className="flex items-start gap-3">
+                    <div className="flex-shrink-0 w-6 h-6 rounded-full bg-gradient-to-br from-orange-500 to-amber-500 text-white flex items-center justify-center text-xs">
+                      2
+                    </div>
+                    <p className="text-slate-700 text-sm pt-0.5">
+                      Cliquez sur "Buy credits" ou "Add payment method"
+                    </p>
+                  </div>
+
+                  <div className="flex items-start gap-3">
+                    <div className="flex-shrink-0 w-6 h-6 rounded-full bg-gradient-to-br from-orange-500 to-amber-500 text-white flex items-center justify-center text-xs">
+                      3
+                    </div>
+                    <p className="text-slate-700 text-sm pt-0.5">
+                      Ajoutez des crédits (recommandé : $10 minimum)
+                    </p>
+                  </div>
+
+                  <div className="flex items-start gap-3">
+                    <div className="flex-shrink-0 w-6 h-6 rounded-full bg-gradient-to-br from-orange-500 to-amber-500 text-white flex items-center justify-center text-xs">
+                      4
+                    </div>
+                    <p className="text-slate-700 text-sm pt-0.5">
+                      Revenez ici et testez à nouveau la connexion
+                    </p>
+                  </div>
+                </div>
+
+                <Button
+                  variant="default"
+                  className="w-full bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 text-white shadow-lg hover:shadow-xl transition-all"
+                  onClick={() => window.open('https://console.anthropic.com/settings/plans', '_blank')}
+                >
+                  <CreditCard className="w-4 h-4 mr-2" />
+                  Ouvrir Plans & Billing
+                  <ExternalLink className="w-4 h-4 ml-2" />
+                </Button>
               </CardContent>
             </Card>
           </motion.div>

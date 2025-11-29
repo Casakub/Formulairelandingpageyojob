@@ -10,7 +10,9 @@ import {
   X,
   ArrowLeft,
   Download,
-  BarChart3
+  BarChart3,
+  ChevronLeft,
+  ChevronRight
 } from 'lucide-react';
 import { Button } from './components/ui/button';
 import { DashboardOverview } from './components/dashboard/DashboardOverview';
@@ -28,38 +30,29 @@ interface DashboardAppProps {
 
 export default function DashboardApp({ onBackToSurvey }: DashboardAppProps = {}) {
   const [activeTab, setActiveTab] = useState<TabType>('overview');
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const tabs = [
-    { id: 'overview' as TabType, label: 'Vue d\'ensemble', icon: LayoutDashboard },
-    { id: 'results' as TabType, label: 'Résultats', icon: BarChart3 },
-    { id: 'questions' as TabType, label: 'Questions', icon: FileEdit },
-    { id: 'export' as TabType, label: 'Export/Import', icon: Download },
-    { id: 'integrations' as TabType, label: 'Intégrations', icon: Plug },
-    { id: 'settings' as TabType, label: 'Paramètres', icon: Settings }
+    { id: 'overview' as TabType, label: 'Vue d\'ensemble', icon: LayoutDashboard, color: 'from-blue-500 to-cyan-500' },
+    { id: 'results' as TabType, label: 'Résultats', icon: BarChart3, color: 'from-cyan-500 to-teal-500' },
+    { id: 'questions' as TabType, label: 'Questions', icon: FileEdit, color: 'from-violet-500 to-purple-500' },
+    { id: 'export' as TabType, label: 'Export', icon: Download, color: 'from-green-500 to-emerald-500' },
+    { id: 'integrations' as TabType, label: 'Intégrations', icon: Plug, color: 'from-orange-500 to-amber-500' },
+    { id: 'settings' as TabType, label: 'Paramètres', icon: Settings, color: 'from-slate-500 to-gray-500' }
   ];
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-cyan-50">
-      {/* Background effects - Version claire */}
+      {/* Background effects */}
       <div className="fixed inset-0 pointer-events-none">
-        <div className="absolute top-20 left-10 w-96 h-96 bg-cyan-200/30 rounded-full blur-3xl animate-pulse" />
-        <div className="absolute bottom-20 right-10 w-96 h-96 bg-violet-200/30 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '1s' }} />
-        
-        {/* Grid pattern subtil */}
-        <svg className="absolute inset-0 w-full h-full opacity-[0.03]">
-          <defs>
-            <pattern id="grid-light" width="40" height="40" patternUnits="userSpaceOnUse">
-              <path d="M 40 0 L 0 0 0 40" fill="none" stroke="currentColor" strokeWidth="1" className="text-slate-900" />
-            </pattern>
-          </defs>
-          <rect width="100%" height="100%" fill="url(#grid-light)" />
-        </svg>
+        <div className="absolute top-20 left-10 w-96 h-96 bg-cyan-200/20 rounded-full blur-3xl animate-pulse" />
+        <div className="absolute bottom-20 right-10 w-96 h-96 bg-violet-200/20 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '1s' }} />
       </div>
 
-      {/* Header */}
-      <header className="relative z-50 bg-white/80 backdrop-blur-xl border-b border-slate-200 shadow-lg">
-        <div className="max-w-7xl mx-auto px-4 py-4">
+      {/* Mobile Header */}
+      <header className="lg:hidden relative z-50 bg-white/90 backdrop-blur-xl border-b border-slate-200 shadow-sm">
+        <div className="px-4 py-4">
           <div className="flex items-center justify-between">
             {/* Logo */}
             <div className="flex items-center gap-3">
@@ -67,63 +60,20 @@ export default function DashboardApp({ onBackToSurvey }: DashboardAppProps = {})
                 <span className="text-white text-xl">Y</span>
               </div>
               <div>
-                <h1 className="text-slate-900">YoJob Dashboard</h1>
-                <p className="text-cyan-600 text-sm">Administration de l'étude</p>
+                <h1 className="text-slate-900">YoJob</h1>
+                <p className="text-cyan-600 text-xs">Dashboard</p>
               </div>
             </div>
 
-            {/* Desktop Navigation */}
-            <nav className="hidden lg:flex items-center gap-2">
-              {tabs.map((tab) => (
-                <Button
-                  key={tab.id}
-                  variant="ghost"
-                  onClick={() => setActiveTab(tab.id)}
-                  className={`flex items-center gap-2 transition-all ${
-                    activeTab === tab.id
-                      ? 'bg-gradient-to-r from-cyan-500/10 to-violet-500/10 text-slate-900 border border-cyan-400'
-                      : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
-                  }`}
-                >
-                  <tab.icon className="w-4 h-4" />
-                  {tab.label}
-                </Button>
-              ))}
-            </nav>
-
-            {/* Actions */}
-            <div className="flex items-center gap-3">
-              {onBackToSurvey && (
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={onBackToSurvey}
-                  className="hidden md:flex text-slate-600 hover:text-slate-900 hover:bg-slate-100"
-                >
-                  <ArrowLeft className="w-4 h-4 mr-2" />
-                  Retour au formulaire
-                </Button>
-              )}
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => window.location.href = '/'}
-                className="hidden md:flex text-slate-600 hover:text-slate-900 hover:bg-slate-100"
-              >
-                <LogOut className="w-4 h-4 mr-2" />
-                Retour au site
-              </Button>
-
-              {/* Mobile menu button */}
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-                className="lg:hidden text-slate-900"
-              >
-                {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
-              </Button>
-            </div>
+            {/* Mobile menu button */}
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+              className="text-slate-900"
+            >
+              {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+            </Button>
           </div>
 
           {/* Mobile Navigation */}
@@ -133,54 +83,208 @@ export default function DashboardApp({ onBackToSurvey }: DashboardAppProps = {})
                 initial={{ opacity: 0, height: 0 }}
                 animate={{ opacity: 1, height: 'auto' }}
                 exit={{ opacity: 0, height: 0 }}
-                className="lg:hidden mt-4 space-y-2"
+                className="mt-4 space-y-2"
               >
                 {tabs.map((tab) => (
-                  <Button
+                  <motion.button
                     key={tab.id}
-                    variant="ghost"
                     onClick={() => {
                       setActiveTab(tab.id);
                       setMobileMenuOpen(false);
                     }}
-                    className={`w-full justify-start flex items-center gap-2 ${
+                    className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all ${
                       activeTab === tab.id
-                        ? 'bg-gradient-to-r from-cyan-500/20 to-violet-500/20 text-white border border-cyan-400/50'
-                        : 'text-white/70 hover:text-white hover:bg-white/10'
+                        ? 'bg-gradient-to-r from-white to-slate-50 shadow-md border border-slate-200'
+                        : 'hover:bg-slate-50'
                     }`}
+                    whileTap={{ scale: 0.98 }}
                   >
-                    <tab.icon className="w-4 h-4" />
-                    {tab.label}
-                  </Button>
+                    <div className={`w-8 h-8 rounded-lg bg-gradient-to-br ${tab.color} flex items-center justify-center shadow-sm`}>
+                      <tab.icon className="w-4 h-4 text-white" />
+                    </div>
+                    <span className={activeTab === tab.id ? 'text-slate-900' : 'text-slate-600'}>{tab.label}</span>
+                  </motion.button>
                 ))}
+
+                <div className="h-px bg-slate-200 my-4" />
+
+                {onBackToSurvey && (
+                  <button
+                    onClick={onBackToSurvey}
+                    className="w-full flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-slate-50 text-slate-600"
+                  >
+                    <ArrowLeft className="w-4 h-4" />
+                    <span>Retour au formulaire</span>
+                  </button>
+                )}
+
+                <button
+                  onClick={() => window.location.href = '/'}
+                  className="w-full flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-red-50 text-red-600"
+                >
+                  <LogOut className="w-4 h-4" />
+                  <span>Déconnexion</span>
+                </button>
               </motion.div>
             )}
           </AnimatePresence>
         </div>
       </header>
 
+      {/* Desktop Sidebar */}
+      <motion.aside
+        animate={{ width: sidebarCollapsed ? '80px' : '280px' }}
+        className="hidden lg:flex fixed left-0 top-0 h-screen bg-white/90 backdrop-blur-xl border-r border-slate-200 shadow-xl flex-col z-50"
+      >
+        {/* Logo */}
+        <div className="p-6 border-b border-slate-200">
+          <div className="flex items-center gap-3">
+            <motion.div 
+              className="w-12 h-12 rounded-xl bg-gradient-to-br from-blue-600 to-cyan-500 flex items-center justify-center shadow-lg shadow-blue-500/30"
+              whileHover={{ scale: 1.05, rotate: 5 }}
+            >
+              <span className="text-white text-2xl">Y</span>
+            </motion.div>
+            {!sidebarCollapsed && (
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+              >
+                <h1 className="text-slate-900">YoJob</h1>
+                <p className="text-cyan-600 text-xs">Dashboard Admin</p>
+              </motion.div>
+            )}
+          </div>
+        </div>
+
+        {/* Navigation */}
+        <nav className="flex-1 p-4 space-y-2 overflow-y-auto">
+          {tabs.map((tab, index) => (
+            <motion.button
+              key={tab.id}
+              onClick={() => setActiveTab(tab.id)}
+              className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all group relative ${
+                activeTab === tab.id
+                  ? 'bg-gradient-to-r from-slate-50 to-slate-100 shadow-md'
+                  : 'hover:bg-slate-50'
+              }`}
+              whileHover={{ x: 4 }}
+              whileTap={{ scale: 0.98 }}
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ delay: index * 0.05 }}
+            >
+              {/* Active indicator */}
+              {activeTab === tab.id && (
+                <motion.div
+                  layoutId="activeTab"
+                  className={`absolute left-0 w-1 h-8 rounded-r-full bg-gradient-to-b ${tab.color}`}
+                  transition={{ type: "spring", stiffness: 500, damping: 30 }}
+                />
+              )}
+
+              {/* Icon */}
+              <div className={`w-9 h-9 rounded-lg flex items-center justify-center ${
+                activeTab === tab.id
+                  ? `bg-gradient-to-br ${tab.color} shadow-lg`
+                  : 'bg-slate-100 group-hover:bg-slate-200'
+              } transition-all`}>
+                <tab.icon className={`w-5 h-5 ${
+                  activeTab === tab.id ? 'text-white' : 'text-slate-600'
+                }`} />
+              </div>
+
+              {/* Label */}
+              {!sidebarCollapsed && (
+                <motion.span
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  className={`flex-1 text-left ${
+                    activeTab === tab.id ? 'text-slate-900' : 'text-slate-600'
+                  }`}
+                >
+                  {tab.label}
+                </motion.span>
+              )}
+
+              {/* Tooltip for collapsed state */}
+              {sidebarCollapsed && (
+                <div className="absolute left-full ml-2 px-3 py-1.5 bg-slate-900 text-white text-sm rounded-lg opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap z-50 shadow-xl">
+                  {tab.label}
+                </div>
+              )}
+            </motion.button>
+          ))}
+        </nav>
+
+        {/* Bottom Actions */}
+        <div className="p-4 border-t border-slate-200 space-y-2">
+          {onBackToSurvey && (
+            <button
+              onClick={onBackToSurvey}
+              className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-slate-50 text-slate-600 transition-all ${
+                sidebarCollapsed ? 'justify-center' : ''
+              }`}
+            >
+              <ArrowLeft className="w-5 h-5" />
+              {!sidebarCollapsed && <span className="text-sm">Retour formulaire</span>}
+            </button>
+          )}
+
+          <button
+            onClick={() => window.location.href = '/'}
+            className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-red-50 text-red-600 transition-all ${
+              sidebarCollapsed ? 'justify-center' : ''
+            }`}
+          >
+            <LogOut className="w-5 h-5" />
+            {!sidebarCollapsed && <span className="text-sm">Déconnexion</span>}
+          </button>
+
+          {/* Collapse button */}
+          <button
+            onClick={() => setSidebarCollapsed(!sidebarCollapsed)}
+            className="w-full flex items-center justify-center gap-2 px-4 py-2 rounded-xl hover:bg-slate-100 text-slate-500 transition-all"
+          >
+            {sidebarCollapsed ? (
+              <ChevronRight className="w-5 h-5" />
+            ) : (
+              <>
+                <ChevronLeft className="w-5 h-5" />
+                <span className="text-xs">Réduire</span>
+              </>
+            )}
+          </button>
+        </div>
+      </motion.aside>
+
       {/* Main Content */}
-      <main className="relative z-10 max-w-7xl mx-auto px-4 py-8">
-        <AnimatePresence mode="wait">
-          {activeTab === 'overview' && (
-            <DashboardOverview key="overview" />
-          )}
-          {activeTab === 'results' && (
-            <ResultsOverview key="results" />
-          )}
-          {activeTab === 'questions' && (
-            <QuestionManager key="questions" />
-          )}
-          {activeTab === 'export' && (
-            <ExportImportManager key="export" />
-          )}
-          {activeTab === 'integrations' && (
-            <IntegrationManager key="integrations" />
-          )}
-          {activeTab === 'settings' && (
-            <SettingsPanel key="settings" />
-          )}
-        </AnimatePresence>
+      <main className={`relative z-10 transition-all ${
+        sidebarCollapsed ? 'lg:ml-20' : 'lg:ml-[280px]'
+      }`}>
+        <div className="max-w-7xl mx-auto px-4 py-8">
+          <AnimatePresence mode="wait">
+            {activeTab === 'overview' && (
+              <DashboardOverview key="overview" />
+            )}
+            {activeTab === 'results' && (
+              <ResultsOverview key="results" />
+            )}
+            {activeTab === 'questions' && (
+              <QuestionManager key="questions" />
+            )}
+            {activeTab === 'export' && (
+              <ExportImportManager key="export" />
+            )}
+            {activeTab === 'integrations' && (
+              <IntegrationManager key="integrations" />
+            )}
+            {activeTab === 'settings' && (
+              <SettingsPanel key="settings" />
+            )}
+          </AnimatePresence>
+        </div>
       </main>
     </div>
   );

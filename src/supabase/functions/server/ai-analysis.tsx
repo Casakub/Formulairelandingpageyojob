@@ -122,11 +122,43 @@ ${JSON.stringify(dataForAnalysis, null, 2)}
     });
 
     if (!response.ok) {
-      const error = await response.text();
-      console.error("Claude API Error:", error);
+      const errorText = await response.text();
+      console.error("Claude API Error:", errorText);
+      
+      // Parse error for better user feedback
+      let errorMessage = `Claude API error: ${response.status}`;
+      let userFriendlyMessage = '';
+      
+      try {
+        const errorData = JSON.parse(errorText);
+        
+        // Check for specific error types
+        if (errorData.error?.type === 'invalid_request_error') {
+          if (errorData.error.message?.includes('credit balance is too low')) {
+            userFriendlyMessage = '💳 Solde de crédits Anthropic insuffisant. Veuillez recharger votre compte sur console.anthropic.com (Plans & Billing) pour continuer à utiliser l\'analyse IA automatique.';
+          } else if (errorData.error.message?.includes('Invalid API Key')) {
+            userFriendlyMessage = '🔑 Clé API invalide. Veuillez la reconfigurer dans les Paramètres du Dashboard.';
+          } else {
+            userFriendlyMessage = errorData.error.message;
+          }
+        } else if (errorData.error?.type === 'authentication_error') {
+          userFriendlyMessage = '🔐 Erreur d\'authentification. Veuillez vérifier votre clé API dans les Paramètres.';
+        } else if (errorData.error?.type === 'rate_limit_error') {
+          userFriendlyMessage = '⏱️ Limite de requêtes atteinte. Veuillez réessayer dans quelques instants.';
+        } else {
+          userFriendlyMessage = errorData.error?.message || errorText;
+        }
+        
+        errorMessage = userFriendlyMessage || errorText;
+      } catch {
+        errorMessage = errorText;
+      }
+      
       return c.json({
         success: false,
-        error: `Claude API error: ${response.status} - ${error}`
+        error: errorMessage,
+        details: errorText,
+        needsCredit: errorMessage.includes('crédits') || errorMessage.includes('credit balance')
       }, response.status);
     }
 

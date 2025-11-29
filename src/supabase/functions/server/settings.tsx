@@ -127,11 +127,40 @@ export async function testApiKey(c: Context) {
     });
 
     if (!response.ok) {
-      const error = await response.text();
-      console.error("Claude API test error:", error);
+      const errorText = await response.text();
+      console.error("Claude API test error:", errorText);
+      
+      // Parse error for better user feedback
+      let errorMessage = `API test failed: ${response.status}`;
+      let userFriendlyMessage = '';
+      
+      try {
+        const errorData = JSON.parse(errorText);
+        
+        // Check for specific error types
+        if (errorData.error?.type === 'invalid_request_error') {
+          if (errorData.error.message?.includes('credit balance is too low')) {
+            userFriendlyMessage = '💳 Votre solde de crédits Anthropic est insuffisant. Veuillez recharger votre compte sur console.anthropic.com (Plans & Billing) ou acheter des crédits supplémentaires.';
+          } else if (errorData.error.message?.includes('Invalid API Key')) {
+            userFriendlyMessage = '🔑 Clé API invalide. Vérifiez que vous avez copié la clé complète depuis console.anthropic.com';
+          } else {
+            userFriendlyMessage = errorData.error.message;
+          }
+        } else if (errorData.error?.type === 'authentication_error') {
+          userFriendlyMessage = '🔐 Erreur d\'authentification. Vérifiez votre clé API ou créez-en une nouvelle sur console.anthropic.com';
+        } else {
+          userFriendlyMessage = errorData.error?.message || errorText;
+        }
+        
+        errorMessage = userFriendlyMessage || errorText;
+      } catch {
+        errorMessage = errorText;
+      }
+      
       return c.json({
         success: false,
-        error: `API test failed: ${response.status} - ${error}`
+        error: errorMessage,
+        details: errorText
       }, response.status);
     }
 
