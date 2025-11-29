@@ -13,7 +13,8 @@ import {
   BarChart3,
   ChevronLeft,
   ChevronRight,
-  Languages
+  Languages,
+  User
 } from 'lucide-react';
 import { Button } from './components/ui/button';
 import { DashboardOverview } from './components/dashboard/DashboardOverview';
@@ -23,6 +24,9 @@ import { ExportImportManager } from './components/dashboard/ExportImportManager'
 import { ResultsOverview } from './components/dashboard/ResultsOverview';
 import { SettingsPanel } from './components/dashboard/SettingsPanel';
 import { TranslationManager } from './components/dashboard/TranslationManager';
+import { TranslationProvider } from './contexts/TranslationContext';
+import { useAuth } from './hooks/useAuth';
+import { Badge } from './components/ui/badge';
 
 type TabType = 'overview' | 'questions' | 'results' | 'integrations' | 'translations' | 'settings' | 'export';
 
@@ -34,6 +38,7 @@ export default function DashboardApp({ onBackToSurvey }: DashboardAppProps = {})
   const [activeTab, setActiveTab] = useState<TabType>('overview');
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const { user, logout, isLoading } = useAuth();
 
   const tabs = [
     { id: 'overview' as TabType, label: 'Vue d\'ensemble', icon: LayoutDashboard, color: 'from-blue-500 to-cyan-500' },
@@ -62,9 +67,13 @@ export default function DashboardApp({ onBackToSurvey }: DashboardAppProps = {})
               <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-600 to-cyan-500 flex items-center justify-center shadow-lg shadow-blue-500/30">
                 <span className="text-white text-xl">Y</span>
               </div>
-              <div>
+              <div className="flex-1 min-w-0">
                 <h1 className="text-slate-900">YoJob</h1>
-                <p className="text-cyan-600 text-xs">Dashboard</p>
+                {user ? (
+                  <p className="text-cyan-600 text-xs truncate">{user.email}</p>
+                ) : (
+                  <p className="text-cyan-600 text-xs">Dashboard</p>
+                )}
               </div>
             </div>
 
@@ -122,8 +131,8 @@ export default function DashboardApp({ onBackToSurvey }: DashboardAppProps = {})
                 )}
 
                 <button
-                  onClick={() => window.location.href = '/'}
-                  className="w-full flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-red-50 text-red-600"
+                  onClick={logout}
+                  className="w-full flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-red-50 text-red-600 transition-colors"
                 >
                   <LogOut className="w-4 h-4" />
                   <span>Déconnexion</span>
@@ -153,9 +162,16 @@ export default function DashboardApp({ onBackToSurvey }: DashboardAppProps = {})
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
+                className="flex-1 min-w-0"
               >
                 <h1 className="text-slate-900">YoJob</h1>
-                <p className="text-cyan-600 text-xs">Dashboard Admin</p>
+                {user ? (
+                  <p className="text-cyan-600 text-xs truncate" title={user.email}>
+                    {user.email}
+                  </p>
+                ) : (
+                  <p className="text-cyan-600 text-xs">Dashboard Admin</p>
+                )}
               </motion.div>
             )}
           </div>
@@ -223,6 +239,34 @@ export default function DashboardApp({ onBackToSurvey }: DashboardAppProps = {})
 
         {/* Bottom Actions */}
         <div className="p-4 border-t border-slate-200 space-y-2">
+          {/* User info card */}
+          {!sidebarCollapsed && user && (
+            <motion.div 
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="mb-3 p-3 rounded-xl bg-gradient-to-br from-blue-50 to-cyan-50 border border-blue-100"
+            >
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-600 to-cyan-500 flex items-center justify-center text-white shadow-lg shadow-blue-500/30">
+                  <User className="w-5 h-5" />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="text-slate-900 text-sm truncate" title={user.name || user.email}>
+                    {user.name || 'Admin'}
+                  </p>
+                  <p className="text-cyan-600 text-xs truncate" title={user.email}>
+                    {user.email}
+                  </p>
+                </div>
+              </div>
+              {user.role && (
+                <Badge className="mt-2 bg-gradient-to-r from-blue-600 to-cyan-500 text-white border-0 text-xs">
+                  {user.role}
+                </Badge>
+              )}
+            </motion.div>
+          )}
+
           {onBackToSurvey && (
             <button
               onClick={onBackToSurvey}
@@ -236,8 +280,9 @@ export default function DashboardApp({ onBackToSurvey }: DashboardAppProps = {})
           )}
 
           <button
-            onClick={() => window.location.href = '/'}
-            className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-red-50 text-red-600 transition-all ${
+            onClick={logout}
+            disabled={isLoading}
+            className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-red-50 text-red-600 transition-all disabled:opacity-50 disabled:cursor-not-allowed ${
               sidebarCollapsed ? 'justify-center' : ''
             }`}
           >
@@ -278,7 +323,9 @@ export default function DashboardApp({ onBackToSurvey }: DashboardAppProps = {})
               <QuestionManager key="questions" />
             )}
             {activeTab === 'translations' && (
-              <TranslationManager key="translations" />
+              <TranslationProvider>
+                <TranslationManager key="translations" />
+              </TranslationProvider>
             )}
             {activeTab === 'export' && (
               <ExportImportManager key="export" />

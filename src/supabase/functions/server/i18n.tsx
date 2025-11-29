@@ -322,6 +322,78 @@ app.post('/country-languages/bulk', async (c) => {
 
 // ========== TRANSLATION UTILITIES ==========
 
+// GET available languages with completion stats
+app.get('/available-languages', async (c) => {
+  try {
+    // Get all question translations
+    const questionTranslations = await kv.getByPrefix('i18n:question:');
+    const totalQuestions = questionTranslations.length;
+    
+    // Get all UI text translations
+    const uiTranslations = await kv.getByPrefix('i18n:ui:');
+    const totalUITexts = uiTranslations.length;
+    
+    const totalItems = totalQuestions + totalUITexts;
+    
+    // Count translations per language
+    const languageStats: Record<string, { count: number; questions: number; ui: number }> = {};
+    
+    // Count question translations
+    questionTranslations.forEach((item: any) => {
+      if (item.value.translations) {
+        Object.keys(item.value.translations).forEach((lang) => {
+          if (!languageStats[lang]) {
+            languageStats[lang] = { count: 0, questions: 0, ui: 0 };
+          }
+          if (item.value.translations[lang]?.text) {
+            languageStats[lang].count++;
+            languageStats[lang].questions++;
+          }
+        });
+      }
+    });
+    
+    // Count UI text translations
+    uiTranslations.forEach((item: any) => {
+      if (item.value.translations) {
+        Object.keys(item.value.translations).forEach((lang) => {
+          if (!languageStats[lang]) {
+            languageStats[lang] = { count: 0, questions: 0, ui: 0 };
+          }
+          if (item.value.translations[lang]?.text) {
+            languageStats[lang].count++;
+            languageStats[lang].ui++;
+          }
+        });
+      }
+    });
+    
+    // Build response with completion percentage
+    const languages = Object.entries(languageStats).map(([code, stats]) => ({
+      code,
+      totalTranslations: stats.count,
+      questions: stats.questions,
+      ui: stats.ui,
+      completion: totalItems > 0 ? Math.round((stats.count / totalItems) * 100) : 0
+    }))
+    .filter(lang => lang.totalTranslations > 0) // Only languages with at least 1 translation
+    .sort((a, b) => b.completion - a.completion); // Sort by completion DESC
+    
+    return c.json({
+      success: true,
+      languages,
+      stats: {
+        totalQuestions,
+        totalUITexts,
+        totalItems
+      }
+    });
+  } catch (error: any) {
+    console.error('Error fetching available languages:', error);
+    return c.json({ success: false, error: error.message }, 500);
+  }
+});
+
 // GET translation by language for frontend
 app.get('/translate/:lang', async (c) => {
   try {
@@ -369,20 +441,166 @@ app.get('/translate/:lang', async (c) => {
 app.post('/auto-translate', async (c) => {
   try {
     const body = await c.req.json();
-    const { sourceText, sourceLang, targetLang, method } = body;
+    const { 
+      sourceText, 
+      sourceLang, 
+      targetLang, 
+      method,
+      mcpSettings = {} // Optional MCP settings from frontend
+    } = body;
     
     if (!sourceText || !targetLang || !method) {
       return c.json({ success: false, error: 'Missing required fields' }, 400);
     }
     
-    // Here you would call MCP or external API
-    // For now, we'll return a mock translation
-    const translatedText = `[${method.toUpperCase()}] ${sourceText}`;
+    let translatedText = '';
+    
+    if (method === 'mcp') {
+      // Get API Key from environment
+      const apiKey = Deno.env.get('ANTHROPIC_API_KEY');
+      
+      if (!apiKey) {
+        return c.json({
+          success: false,
+          error: 'ANTHROPIC_API_KEY not configured. Please add your API key in Supabase environment variables.',
+          needsApiKey: true
+        }, 500);
+      }
+      
+      // Extract MCP settings with defaults
+      const {
+        model = 'claude-3-5-sonnet-20241022',
+        temperature = 0.3,
+        maxTokens = 1000,
+        preserveFormatting = true,
+        customPrompt = '',
+        contextWindow = []
+      } = mcpSettings;
+      
+      // Build prompt for translation
+      let prompt = `Tu es un traducteur professionnel spécialisé dans les contenus RH et recrutement.
+
+**TÂCHE :** Traduis le texte suivant du ${getLanguageName(sourceLang)} vers le ${getLanguageName(targetLang)}.
+
+**TEXTE À TRADUIRE :**
+"${sourceText}"`;
+
+      // Add context if provided
+      if (contextWindow && contextWindow.length > 0) {
+        prompt += `\n\n**CONTEXTE (traductions précédentes pour cohérence terminologique) :**\n`;
+        contextWindow.forEach((ctx: any, idx: number) => {
+          prompt += `${idx + 1}. "${ctx.source}" → "${ctx.target}"\n`;
+        });
+      }
+
+      // Add formatting instruction
+      if (preserveFormatting) {
+        prompt += `\n**IMPORTANT :** Préserve exactement la structure, ponctuation et formatage du texte original.`;
+      }
+
+      // Add custom instructions if provided
+      if (customPrompt) {
+        prompt += `\n\n**INSTRUCTIONS ADDITIONNELLES :**\n${customPrompt}`;
+      }
+
+      prompt += `\n\n**RÈGLES :**
+1. Traduis UNIQUEMENT le texte, sans ajouter d'explications
+2. Utilise un vocabulaire professionnel adapté au recrutement européen
+3. Adapte les expressions idiomatiques au contexte local
+4. Maintiens le même niveau de formalité que l'original
+5. Réponds UNIQUEMENT avec la traduction, rien d'autre
+
+**TRADUCTION (${getLanguageName(targetLang)}) :**`;
+
+      console.log('🤖 Calling Claude API for translation:', {
+        model,
+        temperature,
+        maxTokens,
+        sourceLang,
+        targetLang,
+        textLength: sourceText.length
+      });
+
+      // Call Claude API
+      const response = await fetch('https://api.anthropic.com/v1/messages', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-api-key': apiKey,
+          'anthropic-version': '2023-06-01'
+        },
+        body: JSON.stringify({
+          model,
+          max_tokens: maxTokens,
+          temperature,
+          messages: [
+            {
+              role: 'user',
+              content: prompt
+            }
+          ]
+        })
+      });
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error('❌ Claude API Error:', errorText);
+        
+        // Parse error for user-friendly message
+        let userMessage = `Claude API error: ${response.status}`;
+        try {
+          const errorData = JSON.parse(errorText);
+          if (errorData.error?.message?.includes('credit balance')) {
+            userMessage = '💳 Solde de crédits Anthropic insuffisant. Rechargez votre compte sur console.anthropic.com';
+          } else if (errorData.error?.message?.includes('Invalid API Key')) {
+            userMessage = '🔑 Clé API invalide. Vérifiez ANTHROPIC_API_KEY dans les variables d\'environnement Supabase.';
+          } else if (errorData.error?.type === 'rate_limit_error') {
+            userMessage = '⏱️ Limite de requêtes atteinte. Réessayez dans quelques instants.';
+          } else {
+            userMessage = errorData.error?.message || errorText;
+          }
+        } catch {
+          // Keep generic message
+        }
+        
+        return c.json({
+          success: false,
+          error: userMessage,
+          details: errorText
+        }, response.status);
+      }
+
+      const result = await response.json();
+      translatedText = result.content[0].text.trim();
+      
+      // Remove quotes if Claude added them
+      if (translatedText.startsWith('"') && translatedText.endsWith('"')) {
+        translatedText = translatedText.slice(1, -1);
+      }
+      
+      console.log('✅ Translation successful:', {
+        inputLength: sourceText.length,
+        outputLength: translatedText.length,
+        usage: result.usage
+      });
+      
+    } else if (method === 'api') {
+      // Placeholder for external API (DeepL, Google Translate, etc.)
+      // This will be implemented in Sprint 2 when API provider is chosen
+      translatedText = `[API-TODO] ${sourceText}`;
+      console.log('⚠️ External API translation not yet implemented');
+    } else {
+      return c.json({ 
+        success: false, 
+        error: 'Invalid method. Use "mcp" or "api"' 
+      }, 400);
+    }
     
     return c.json({
       success: true,
       translation: {
         sourceText,
+        sourceLang,
         targetLang,
         translatedText,
         method,
@@ -390,10 +608,45 @@ app.post('/auto-translate', async (c) => {
       }
     });
   } catch (error: any) {
-    console.error('Error auto-translating:', error);
-    return c.json({ success: false, error: error.message }, 500);
+    console.error('❌ Error auto-translating:', error);
+    return c.json({ 
+      success: false, 
+      error: error.message || 'Internal server error' 
+    }, 500);
   }
 });
+
+// Helper function to get language names
+function getLanguageName(code: string): string {
+  const names: Record<string, string> = {
+    'fr': 'français',
+    'en': 'anglais',
+    'de': 'allemand',
+    'es': 'espagnol',
+    'it': 'italien',
+    'pt': 'portugais',
+    'nl': 'néerlandais',
+    'pl': 'polonais',
+    'ro': 'roumain',
+    'cs': 'tchèque',
+    'hu': 'hongrois',
+    'bg': 'bulgare',
+    'sv': 'suédois',
+    'da': 'danois',
+    'fi': 'finnois',
+    'no': 'norvégien',
+    'sk': 'slovaque',
+    'sl': 'slovène',
+    'hr': 'croate',
+    'lt': 'lituanien',
+    'lv': 'letton',
+    'et': 'estonien',
+    'el': 'grec',
+    'mt': 'maltais',
+    'ga': 'irlandais'
+  };
+  return names[code] || code;
+}
 
 // Export stats
 app.get('/stats', async (c) => {

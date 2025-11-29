@@ -3,14 +3,16 @@ import { motion, AnimatePresence } from 'motion/react';
 import { AlertCircle, X, Languages } from 'lucide-react';
 import { Button } from '../ui/button';
 import { Badge } from '../ui/badge';
-import { useI18n, SUPPORTED_LANGUAGES } from '../../hooks/useI18n';
+import { useI18n } from '../../hooks/useI18n';
+import { useAvailableLanguages } from '../../hooks/useAvailableLanguages';
 
 export function TranslationMissingBanner() {
   const { currentLang, setCurrentLang } = useI18n();
+  const { availableLanguages } = useAvailableLanguages();
   const [isDismissed, setIsDismissed] = useState(false);
   const [showBanner, setShowBanner] = useState(false);
 
-  const currentLanguageData = SUPPORTED_LANGUAGES.find(l => l.code === currentLang);
+  const currentLanguageData = availableLanguages.find(l => l.code === currentLang);
 
   useEffect(() => {
     // Only show banner for non-French languages and if not previously dismissed

@@ -4,6 +4,11 @@ import { QuestionTranslation } from './QuestionTranslation';
 import { CountryLanguageManager } from './CountryLanguageManager';
 import { UITextTranslation } from './UITextTranslation';
 import { TranslationExport } from './TranslationExport';
+import { TranslationStatistics } from './TranslationStatistics';
+import { TranslationSyncBar } from './TranslationSyncBar';
+import { TranslationDebugPanel } from './TranslationDebugPanel';
+import { MCPAdvancedSettings } from './MCPAdvancedSettings';
+import { useTranslationContext } from '../../contexts/TranslationContext';
 import { 
   Globe, 
   Languages, 
@@ -16,7 +21,8 @@ import {
   Save,
   Loader2,
   RefreshCw,
-  Info
+  Info,
+  BarChart3
 } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../ui/card';
 import { Button } from '../ui/button';
@@ -70,20 +76,32 @@ const API_PROVIDERS: APIProvider[] = [
 ];
 
 export function TranslationManager() {
+  // Translation context from Supabase
+  const {
+    hasUnsavedChanges,
+    saving,
+    lastSyncTime,
+    error,
+    saveAll,
+    loadAll,
+  } = useTranslationContext();
+
   const [activeMode, setActiveMode] = useState<TranslationMode>('manual');
   const [selectedProvider, setSelectedProvider] = useState('deepl');
   const [apiKey, setApiKey] = useState('');
   const [mcpEnabled, setMcpEnabled] = useState(false);
-  const [saving, setSaving] = useState(false);
+  const [savingApiKey, setSavingApiKey] = useState(false);
   const [showQuestionTranslation, setShowQuestionTranslation] = useState(false);
   const [showCountryLanguages, setShowCountryLanguages] = useState(false);
   const [showUITextTranslation, setShowUITextTranslation] = useState(false);
+  const [showStatistics, setShowStatistics] = useState(false);
+  const [showMCPSettings, setShowMCPSettings] = useState(false);
 
   const handleSaveApiKey = async () => {
-    setSaving(true);
+    setSavingApiKey(true);
     // Simulate API call
     await new Promise(resolve => setTimeout(resolve, 1500));
-    setSaving(false);
+    setSavingApiKey(false);
     console.log('API Key saved for provider:', selectedProvider);
   };
 
@@ -107,14 +125,39 @@ export function TranslationManager() {
     return <UITextTranslation onBack={() => setShowUITextTranslation(false)} />;
   }
 
+  // Show TranslationStatistics screen if active
+  if (showStatistics) {
+    return (
+      <TranslationStatistics 
+        onBack={() => setShowStatistics(false)} 
+        onSelectLanguage={(code) => {
+          console.log('Selected language:', code);
+          setShowStatistics(false);
+          setShowQuestionTranslation(true);
+        }}
+      />
+    );
+  }
+
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      exit={{ opacity: 0, y: -20 }}
-      transition={{ duration: 0.3 }}
-      className="space-y-6"
-    >
+    <>
+      {/* Sync Bar */}
+      <TranslationSyncBar
+        hasUnsavedChanges={hasUnsavedChanges}
+        saving={saving}
+        lastSyncTime={lastSyncTime}
+        error={error}
+        onSave={saveAll}
+        onReload={loadAll}
+      />
+
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        exit={{ opacity: 0, y: -20 }}
+        transition={{ duration: 0.3 }}
+        className="space-y-6"
+      >
       {/* Header */}
       <div>
         <div className="flex items-center gap-3 mb-2">
@@ -131,7 +174,7 @@ export function TranslationManager() {
       </div>
 
       {/* Quick Actions */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         <Card className="border-blue-200 bg-gradient-to-br from-blue-50 to-cyan-50 hover:shadow-lg transition-all cursor-pointer" onClick={() => setShowQuestionTranslation(true)}>
           <CardContent className="p-6">
             <div className="flex items-center gap-4">
@@ -173,6 +216,21 @@ export function TranslationManager() {
                 <p className="text-sm text-slate-600">Mapping européen</p>
               </div>
               <ExternalLink className="w-5 h-5 text-cyan-500" />
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card className="border-violet-200 bg-gradient-to-br from-violet-50 to-purple-50 hover:shadow-lg transition-all cursor-pointer" onClick={() => setShowStatistics(true)}>
+          <CardContent className="p-6">
+            <div className="flex items-center gap-4">
+              <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-violet-500 to-purple-500 flex items-center justify-center shadow-lg">
+                <BarChart3 className="w-6 h-6 text-white" />
+              </div>
+              <div className="flex-1">
+                <h3 className="text-slate-900 mb-1">Statistiques</h3>
+                <p className="text-sm text-slate-600">Progression & qualité</p>
+              </div>
+              <ExternalLink className="w-5 h-5 text-violet-500" />
             </div>
           </CardContent>
         </Card>
@@ -369,7 +427,7 @@ export function TranslationManager() {
                     </Button>
                     <Button 
                       className="bg-gradient-to-r from-violet-500 to-purple-500 hover:from-violet-600 hover:to-purple-600 text-white shadow-lg"
-                      onClick={() => console.log('Configure MCP settings')}
+                      onClick={() => setShowMCPSettings(true)}
                     >
                       Paramètres avancés
                       <ExternalLink className="w-4 h-4 ml-2" />
@@ -468,10 +526,10 @@ export function TranslationManager() {
                   />
                   <Button
                     onClick={handleSaveApiKey}
-                    disabled={!apiKey || saving}
+                    disabled={!apiKey || savingApiKey}
                     className="bg-gradient-to-r from-cyan-500 to-teal-500 hover:from-cyan-600 hover:to-teal-600 text-white"
                   >
-                    {saving ? (
+                    {savingApiKey ? (
                       <Loader2 className="w-4 h-4 animate-spin" />
                     ) : (
                       <>
@@ -536,8 +594,21 @@ export function TranslationManager() {
         </TabsContent>
       </Tabs>
 
-      {/* Import/Export Section */}
-      <TranslationExport />
-    </motion.div>
+        {/* Debug Panel - Development only */}
+        {process.env.NODE_ENV === 'development' && (
+          <TranslationDebugPanel />
+        )}
+
+        {/* Import/Export Section */}
+        <TranslationExport />
+      </motion.div>
+
+      {/* MCP Advanced Settings Modal */}
+      <AnimatePresence>
+        {showMCPSettings && (
+          <MCPAdvancedSettings onClose={() => setShowMCPSettings(false)} />
+        )}
+      </AnimatePresence>
+    </>
   );
 }

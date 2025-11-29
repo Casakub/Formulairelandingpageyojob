@@ -23,33 +23,11 @@ import { Checkbox } from '../ui/checkbox';
 import { Alert, AlertDescription } from '../ui/alert';
 import { ScrollArea } from '../ui/scroll-area';
 import { saveCountryLanguageMapping, bulkSaveCountryLanguageMappings, fetchCountryLanguageMappings } from '../../lib/i18n-api';
+import { useTranslationContext } from '../../contexts/TranslationContext';
+import { EUROPEAN_LANGUAGES } from '../../lib/languages';
 
-// ISO 639-1 language codes
-const AVAILABLE_LANGUAGES = [
-  { code: 'fr', name: 'Français', flag: '🇫🇷', nativeName: 'Français' },
-  { code: 'en', name: 'English', flag: '🇬🇧', nativeName: 'English' },
-  { code: 'de', name: 'Deutsch', flag: '🇩🇪', nativeName: 'Deutsch' },
-  { code: 'es', name: 'Español', flag: '🇪🇸', nativeName: 'Español' },
-  { code: 'it', name: 'Italiano', flag: '🇮🇹', nativeName: 'Italiano' },
-  { code: 'nl', name: 'Nederlands', flag: '🇳🇱', nativeName: 'Nederlands' },
-  { code: 'pt', name: 'Português', flag: '🇵🇹', nativeName: 'Português' },
-  { code: 'pl', name: 'Polski', flag: '🇵🇱', nativeName: 'Polski' },
-  { code: 'cs', name: 'Čeština', flag: '🇨🇿', nativeName: 'Čeština' },
-  { code: 'sk', name: 'Slovenčina', flag: '🇸🇰', nativeName: 'Slovenčina' },
-  { code: 'hu', name: 'Magyar', flag: '🇭🇺', nativeName: 'Magyar' },
-  { code: 'ro', name: 'Română', flag: '🇷🇴', nativeName: 'Română' },
-  { code: 'bg', name: 'Български', flag: '🇧🇬', nativeName: 'Български' },
-  { code: 'hr', name: 'Hrvatski', flag: '🇭🇷', nativeName: 'Hrvatski' },
-  { code: 'sl', name: 'Slovenščina', flag: '🇸🇮', nativeName: 'Slovenščina' },
-  { code: 'et', name: 'Eesti', flag: '🇪🇪', nativeName: 'Eesti' },
-  { code: 'lv', name: 'Latviešu', flag: '🇱🇻', nativeName: 'Latviešu' },
-  { code: 'lt', name: 'Lietuvių', flag: '🇱🇹', nativeName: 'Lietuvių' },
-  { code: 'el', name: 'Ελληνικά', flag: '🇬🇷', nativeName: 'Ελληνικά' },
-  { code: 'sv', name: 'Svenska', flag: '🇸🇪', nativeName: 'Svenska' },
-  { code: 'da', name: 'Dansk', flag: '🇩🇰', nativeName: 'Dansk' },
-  { code: 'fi', name: 'Suomi', flag: '🇫🇮', nativeName: 'Suomi' },
-  { code: 'no', name: 'Norsk', flag: '🇳🇴', nativeName: 'Norsk' },
-];
+// Use centralized language list
+const AVAILABLE_LANGUAGES = EUROPEAN_LANGUAGES;
 
 interface Country {
   code: string;

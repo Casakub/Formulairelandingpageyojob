@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { ArrowLeft, LayoutDashboard, Globe, Check } from 'lucide-react';
+import { ArrowLeft, LayoutDashboard, Globe, Check, Loader2 } from 'lucide-react';
 import { Button } from '../ui/button';
 import {
   Tooltip,
@@ -8,7 +8,8 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from '../ui/tooltip';
-import { useI18n, SUPPORTED_LANGUAGES } from '../../hooks/useI18n';
+import { useI18n } from '../../hooks/useI18n';
+import { useAvailableLanguages, getCompletionColor } from '../../hooks/useAvailableLanguages';
 
 interface HeaderProps {
   currentSection: number;
@@ -20,6 +21,7 @@ export function Header({ currentSection, progress, onDashboardClick }: HeaderPro
   const [isScrolled, setIsScrolled] = useState(false);
   const [isLangMenuOpen, setIsLangMenuOpen] = useState(false);
   const { currentLang, setCurrentLang, t } = useI18n();
+  const { availableLanguages, loading: languagesLoading } = useAvailableLanguages();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -101,13 +103,18 @@ export function Header({ currentSection, progress, onDashboardClick }: HeaderPro
                         ? 'text-gray-900 hover:text-cyan-600 hover:bg-cyan-50' 
                         : 'text-white hover:text-cyan-200 hover:bg-white/10'
                     }`}
+                    disabled={languagesLoading}
                   >
-                    <Globe className="w-4 h-4 mr-2" />
+                    {languagesLoading ? (
+                      <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                    ) : (
+                      <Globe className="w-4 h-4 mr-2" />
+                    )}
                     <span className="hidden md:inline uppercase">
                       {currentLang}
                     </span>
                     <span className="md:hidden">
-                      {SUPPORTED_LANGUAGES.find(l => l.code === currentLang)?.flag}
+                      {availableLanguages.find(l => l.code === currentLang)?.flag || '🌍'}
                     </span>
                   </Button>
 
@@ -119,41 +126,62 @@ export function Header({ currentSection, progress, onDashboardClick }: HeaderPro
                         animate={{ opacity: 1, y: 0, scale: 1 }}
                         exit={{ opacity: 0, y: -10, scale: 0.95 }}
                         transition={{ duration: 0.2 }}
-                        className="absolute right-0 top-full mt-2 w-56 bg-white/95 backdrop-blur-xl rounded-2xl border-2 border-white/20 shadow-2xl overflow-hidden z-50"
+                        className="absolute right-0 top-full mt-2 w-64 bg-white/95 backdrop-blur-xl rounded-2xl border-2 border-white/20 shadow-2xl overflow-hidden z-50"
                       >
-                        <div className="p-2">
-                          {SUPPORTED_LANGUAGES.map((lang) => (
-                            <motion.button
-                              key={lang.code}
-                              onClick={() => {
-                                setCurrentLang(lang.code);
-                                setIsLangMenuOpen(false);
-                              }}
-                              whileHover={{ x: 4 }}
-                              className={`w-full flex items-center justify-between px-4 py-3 rounded-xl transition-all ${
-                                currentLang === lang.code
-                                  ? 'bg-gradient-to-r from-cyan-500/10 to-violet-500/10 text-violet-600'
-                                  : 'hover:bg-slate-50 text-slate-700'
-                              }`}
-                            >
-                              <div className="flex items-center gap-3">
-                                <span className="text-xl">{lang.flag}</span>
-                                <div className="text-left">
-                                  <div className="text-sm">{lang.name}</div>
-                                  <div className="text-xs text-slate-500 uppercase">{lang.code}</div>
-                                </div>
-                              </div>
-                              {currentLang === lang.code && (
-                                <Check className="w-4 h-4 text-cyan-500" />
-                              )}
-                            </motion.button>
-                          ))}
-                        </div>
-                        <div className="px-4 py-3 bg-gradient-to-r from-cyan-50 to-violet-50 border-t border-slate-200">
-                          <p className="text-xs text-slate-600">
-                            💡 Langue détectée automatiquement
-                          </p>
-                        </div>
+                        {languagesLoading ? (
+                          <div className="p-8 flex flex-col items-center justify-center gap-3">
+                            <Loader2 className="w-6 h-6 animate-spin text-cyan-500" />
+                            <p className="text-sm text-slate-600">Chargement des langues...</p>
+                          </div>
+                        ) : availableLanguages.length === 0 ? (
+                          <div className="p-6 text-center">
+                            <p className="text-sm text-slate-600">
+                              Aucune traduction disponible pour le moment
+                            </p>
+                          </div>
+                        ) : (
+                          <>
+                            <div className="p-2 max-h-96 overflow-y-auto">
+                              {availableLanguages.map((lang) => (
+                                <motion.button
+                                  key={lang.code}
+                                  onClick={() => {
+                                    setCurrentLang(lang.code);
+                                    setIsLangMenuOpen(false);
+                                  }}
+                                  whileHover={{ x: 4 }}
+                                  className={`w-full flex items-center justify-between px-4 py-3 rounded-xl transition-all ${
+                                    currentLang === lang.code
+                                      ? 'bg-gradient-to-r from-cyan-500/10 to-violet-500/10 text-violet-600'
+                                      : 'hover:bg-slate-50 text-slate-700'
+                                  }`}
+                                >
+                                  <div className="flex items-center gap-3 flex-1">
+                                    <span className="text-xl">{lang.flag}</span>
+                                    <div className="text-left flex-1">
+                                      <div className="text-sm">{lang.name}</div>
+                                      <div className="flex items-center gap-2 text-xs text-slate-500">
+                                        <span className="uppercase">{lang.code}</span>
+                                        <span className="text-slate-300">•</span>
+                                        <span className={getCompletionColor(lang.completion)}>
+                                          {lang.completion}%
+                                        </span>
+                                      </div>
+                                    </div>
+                                  </div>
+                                  {currentLang === lang.code && (
+                                    <Check className="w-4 h-4 text-cyan-500" />
+                                  )}
+                                </motion.button>
+                              ))}
+                            </div>
+                            <div className="px-4 py-3 bg-gradient-to-r from-cyan-50 to-violet-50 border-t border-slate-200">
+                              <p className="text-xs text-slate-600">
+                                💡 {availableLanguages.length} {availableLanguages.length === 1 ? 'langue disponible' : 'langues disponibles'}
+                              </p>
+                            </div>
+                          </>
+                        )}
                       </motion.div>
                     )}
                   </AnimatePresence>

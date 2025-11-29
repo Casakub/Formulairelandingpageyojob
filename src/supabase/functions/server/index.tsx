@@ -40,4 +40,8 @@ app.post("/make-server-10092a63/settings/test-anthropic", testApiKey);
 // i18n endpoints
 app.route("/make-server-10092a63/i18n", i18nRoutes);
 
+// Import auth routes
+import authRoutes from "./auth.tsx";
+app.route("/make-server-10092a63/auth", authRoutes);
+
 Deno.serve(app.fetch);

@@ -187,3 +187,36 @@
 html {
   font-size: var(--font-size);
 }
+
+/* Custom scrollbar styles for translation tables */
+.scrollbar-thin {
+  scrollbar-width: thin;
+  scrollbar-color: rgb(203 213 225) rgb(241 245 249);
+}
+
+.scrollbar-thin::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+.scrollbar-thin::-webkit-scrollbar-track {
+  background: rgb(241 245 249);
+  border-radius: 4px;
+}
+
+.scrollbar-thin::-webkit-scrollbar-thumb {
+  background: rgb(203 213 225);
+  border-radius: 4px;
+}
+
+.scrollbar-thin::-webkit-scrollbar-thumb:hover {
+  background: rgb(148 163 184);
+}
+
+.scrollbar-thumb-slate-300::-webkit-scrollbar-thumb {
+  background: rgb(203 213 225);
+}
+
+.scrollbar-track-slate-100::-webkit-scrollbar-track {
+  background: rgb(241 245 249);
+}

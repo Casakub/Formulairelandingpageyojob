@@ -1,19 +1,11 @@
 import { useState, useEffect, createContext, useContext } from 'react';
 import { projectId, publicAnonKey } from '../utils/supabase/info';
+import { EUROPEAN_LANGUAGES, type Language } from '../lib/languages';
 
-// ISO 639-1 language codes
-export const SUPPORTED_LANGUAGES = [
-  { code: 'fr', name: 'Français', flag: '🇫🇷', nativeName: 'Français' },
-  { code: 'en', name: 'English', flag: '🇬🇧', nativeName: 'English' },
-  { code: 'de', name: 'Deutsch', flag: '🇩🇪', nativeName: 'Deutsch' },
-  { code: 'es', name: 'Español', flag: '🇪🇸', nativeName: 'Español' },
-  { code: 'it', name: 'Italiano', flag: '🇮🇹', nativeName: 'Italiano' },
-  { code: 'nl', name: 'Nederlands', flag: '🇳🇱', nativeName: 'Nederlands' },
-  { code: 'pt', name: 'Português', flag: '🇵🇹', nativeName: 'Português' },
-  { code: 'pl', name: 'Polski', flag: '🇵🇱', nativeName: 'Polski' },
-] as const;
+// Re-export from centralized languages
+export const SUPPORTED_LANGUAGES = EUROPEAN_LANGUAGES;
 
-export type LanguageCode = typeof SUPPORTED_LANGUAGES[number]['code'];
+export type LanguageCode = string;
 
 interface Translations {
   questions: Record<string, string>;

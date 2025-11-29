@@ -24,17 +24,11 @@ import { Label } from '../ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../ui/tabs';
 import { ScrollArea } from '../ui/scroll-area';
+import { useTranslationContext } from '../../contexts/TranslationContext';
+import { EUROPEAN_LANGUAGES } from '../../lib/languages';
 
-const LANGUAGES = [
-  { code: 'fr', name: 'Français', flag: '🇫🇷' },
-  { code: 'en', name: 'English', flag: '🇬🇧' },
-  { code: 'de', name: 'Deutsch', flag: '🇩🇪' },
-  { code: 'es', name: 'Español', flag: '🇪🇸' },
-  { code: 'it', name: 'Italiano', flag: '🇮🇹' },
-  { code: 'nl', name: 'Nederlands', flag: '🇳🇱' },
-  { code: 'pt', name: 'Português', flag: '🇵🇹' },
-  { code: 'pl', name: 'Polski', flag: '🇵🇱' },
-];
+// Use all European languages (23 languages)
+const LANGUAGES = EUROPEAN_LANGUAGES;
 
 type UITextCategory = 'buttons' | 'labels' | 'messages' | 'navigation';
 

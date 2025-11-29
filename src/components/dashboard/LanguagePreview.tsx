@@ -5,7 +5,8 @@ import { Card, CardContent, CardHeader, CardTitle } from '../ui/card';
 import { Button } from '../ui/button';
 import { Badge } from '../ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select';
-import { useI18n, SUPPORTED_LANGUAGES } from '../../hooks/useI18n';
+import { useI18n } from '../../hooks/useI18n';
+import { useAvailableLanguages } from '../../hooks/useAvailableLanguages';
 import { Separator } from '../ui/separator';
 
 interface LanguagePreviewProps {
@@ -14,6 +15,7 @@ interface LanguagePreviewProps {
 
 export function LanguagePreview({ onClose }: LanguagePreviewProps) {
   const { currentLang, setCurrentLang, t, tQuestion, loading } = useI18n();
+  const { availableLanguages } = useAvailableLanguages();
   const [previewLang, setPreviewLang] = useState(currentLang);
 
   // Sample questions IDs for preview
@@ -34,7 +36,7 @@ export function LanguagePreview({ onClose }: LanguagePreviewProps) {
     setCurrentLang(lang as any);
   };
 
-  const currentLanguageData = SUPPORTED_LANGUAGES.find(l => l.code === previewLang);
+  const currentLanguageData = availableLanguages.find(l => l.code === previewLang);
 
   return (
     <motion.div
@@ -79,17 +81,20 @@ export function LanguagePreview({ onClose }: LanguagePreviewProps) {
             <div className="mt-4 flex items-center gap-3">
               <Globe className="w-4 h-4 text-slate-600" />
               <Select value={previewLang} onValueChange={handleLanguageChange}>
-                <SelectTrigger className="w-[250px] bg-white">
+                <SelectTrigger className="w-[280px] bg-white">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  {SUPPORTED_LANGUAGES.map((lang) => (
+                  {availableLanguages.map((lang) => (
                     <SelectItem key={lang.code} value={lang.code}>
                       <div className="flex items-center gap-2">
                         <span>{lang.flag}</span>
                         <span>{lang.name}</span>
                         <Badge variant="outline" className="ml-2 text-xs">
                           {lang.code.toUpperCase()}
+                        </Badge>
+                        <Badge className="bg-green-100 text-green-700 text-xs">
+                          {lang.completion}%
                         </Badge>
                       </div>
                     </SelectItem>

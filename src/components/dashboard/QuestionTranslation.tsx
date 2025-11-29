@@ -1,5 +1,6 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
+import { toast } from 'sonner@2.0.3';
 import { 
   ArrowLeft,
   Search, 
@@ -25,22 +26,16 @@ import { Badge } from '../ui/badge';
 import { Textarea } from '../ui/textarea';
 import { Label } from '../ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select';
-import { ScrollArea } from '../ui/scroll-area';
 import { useQuestions } from '../../context/QuestionsContext';
+import { HorizontalScrollHint } from './HorizontalScrollHint';
+import { TranslationKeyboardShortcuts } from './TranslationKeyboardShortcuts';
+import { CharacterCounter } from './CharacterCounter';
+import { QuickTranslationExport } from './QuickTranslationExport';
+import { useTranslationContext } from '../../contexts/TranslationContext';
+import { EUROPEAN_LANGUAGES } from '../../lib/languages';
 
-// ISO 639-1 language codes
-const LANGUAGES = [
-  { code: 'fr', name: 'Français', flag: '🇫🇷' },
-  { code: 'en', name: 'English', flag: '🇬🇧' },
-  { code: 'de', name: 'Deutsch', flag: '🇩🇪' },
-  { code: 'es', name: 'Español', flag: '🇪🇸' },
-  { code: 'it', name: 'Italiano', flag: '🇮🇹' },
-  { code: 'nl', name: 'Nederlands', flag: '🇳🇱' },
-  { code: 'pt', name: 'Português', flag: '🇵🇹' },
-  { code: 'pl', name: 'Polski', flag: '🇵🇱' },
-  { code: 'hu', name: 'Magyar', flag: '🇭🇺' },
-  { code: 'ro', name: 'Română', flag: '🇷🇴' },
-];
+// Use all European languages (23 languages)
+const LANGUAGES = EUROPEAN_LANGUAGES;
 
 type TranslationStatus = 'missing' | 'auto-mcp' | 'auto-api' | 'validated';
 
@@ -61,6 +56,8 @@ interface QuestionTranslationProps {
 
 export function QuestionTranslation({ onBack }: QuestionTranslationProps) {
   const { questions } = useQuestions();
+  const { questionTranslations, updateQuestionTranslation } = useTranslationContext();
+  const searchInputRef = useRef<HTMLInputElement>(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedSection, setSelectedSection] = useState<string>('all');
   const [selectedLanguage, setSelectedLanguage] = useState<string>('all');
@@ -68,24 +65,33 @@ export function QuestionTranslation({ onBack }: QuestionTranslationProps) {
   const [editingCell, setEditingCell] = useState<{ questionId: string; langCode: string } | null>(null);
   const [translations, setTranslations] = useState<QuestionTranslations>({});
   const [editValue, setEditValue] = useState('');
-  const [saving, setSaving] = useState(false);
   const [generatingAll, setGeneratingAll] = useState(false);
 
-  // Initialize translations with source language (French)
+  // Sync translations from context
   useEffect(() => {
-    const initialTranslations: QuestionTranslations = {};
+    const syncedTranslations: QuestionTranslations = {};
+    
     questions.forEach((q) => {
-      initialTranslations[q.id] = {
-        fr: { text: q.label, status: 'validated' },
-        // Initialize other languages as missing
-        ...LANGUAGES.slice(1).reduce((acc, lang) => ({
-          ...acc,
-          [lang.code]: { text: '', status: 'missing' as TranslationStatus }
-        }), {})
-      };
+      const contextTranslation = questionTranslations.find(qt => qt.questionId === q.id);
+      
+      if (contextTranslation) {
+        // Use translations from Supabase
+        syncedTranslations[q.id] = contextTranslation.translations;
+      } else {
+        // Initialize with French as source
+        syncedTranslations[q.id] = {
+          fr: { text: q.label, status: 'validated' },
+          // Initialize other languages as missing
+          ...LANGUAGES.slice(1).reduce((acc, lang) => ({
+            ...acc,
+            [lang.code]: { text: '', status: 'missing' as TranslationStatus }
+          }), {})
+        };
+      }
     });
-    setTranslations(initialTranslations);
-  }, [questions]);
+    
+    setTranslations(syncedTranslations);
+  }, [questions, questionTranslations]);
 
   const filteredQuestions = questions.filter((q) => {
     const matchesSearch = q.label.toLowerCase().includes(searchTerm.toLowerCase()) || 
@@ -117,22 +123,28 @@ export function QuestionTranslation({ onBack }: QuestionTranslationProps) {
   const handleSaveEdit = () => {
     if (!editingCell) return;
     
-    setSaving(true);
-    setTimeout(() => {
-      setTranslations(prev => ({
-        ...prev,
-        [editingCell.questionId]: {
-          ...prev[editingCell.questionId],
-          [editingCell.langCode]: {
-            text: editValue,
-            status: 'validated'
-          }
+    // Update translation in context (will be synced to Supabase)
+    updateQuestionTranslation(
+      editingCell.questionId,
+      editingCell.langCode,
+      editValue,
+      'validated'
+    );
+    
+    // Update local state for immediate UI feedback
+    setTranslations(prev => ({
+      ...prev,
+      [editingCell.questionId]: {
+        ...prev[editingCell.questionId],
+        [editingCell.langCode]: {
+          text: editValue,
+          status: 'validated'
         }
-      }));
-      setEditingCell(null);
-      setEditValue('');
-      setSaving(false);
-    }, 500);
+      }
+    }));
+    
+    setEditingCell(null);
+    setEditValue('');
   };
 
   const handleCancelEdit = () => {
@@ -140,41 +152,220 @@ export function QuestionTranslation({ onBack }: QuestionTranslationProps) {
     setEditValue('');
   };
 
-  const handleGenerateTranslation = (questionId: string, langCode: string, method: 'mcp' | 'api') => {
+  const handleGenerateTranslation = async (questionId: string, langCode: string, method: 'mcp' | 'api') => {
     const sourceText = translations[questionId]?.fr?.text || '';
-    // Simulate AI translation
-    const autoTranslated = `[${method.toUpperCase()}] ${sourceText}`;
     
-    setTranslations(prev => ({
-      ...prev,
-      [questionId]: {
-        ...prev[questionId],
-        [langCode]: {
-          text: autoTranslated,
-          status: method === 'mcp' ? 'auto-mcp' : 'auto-api'
-        }
+    if (!sourceText) {
+      toast.error('Pas de texte source', {
+        description: 'Impossible de traduire sans texte français',
+      });
+      return;
+    }
+
+    try {
+      // Load MCP settings if method is MCP
+      let mcpSettings = {};
+      if (method === 'mcp') {
+        const settingsJson = localStorage.getItem('mcp_settings');
+        mcpSettings = settingsJson ? JSON.parse(settingsJson) : {};
       }
-    }));
+
+      // Build context window (previous 5 translations for coherence)
+      const contextWindow: Array<{ source: string; target: string }> = [];
+      const allQuestions = Object.keys(translations);
+      const currentIndex = allQuestions.indexOf(questionId);
+      if (currentIndex > 0) {
+        const prevQuestions = allQuestions.slice(Math.max(0, currentIndex - 5), currentIndex);
+        prevQuestions.forEach(qId => {
+          const sourceTxt = translations[qId]?.fr?.text;
+          const targetTxt = translations[qId]?.[langCode]?.text;
+          if (sourceTxt && targetTxt) {
+            contextWindow.push({ source: sourceTxt, target: targetTxt });
+          }
+        });
+      }
+
+      console.log('🤖 Generating translation:', {
+        questionId,
+        langCode,
+        method,
+        contextSize: contextWindow.length,
+      });
+
+      // Import autoTranslate function
+      const { autoTranslate } = await import('../../services/translationService');
+      
+      const result = await autoTranslate(
+        sourceText,
+        langCode,
+        method,
+        'fr',
+        mcpSettings,
+        contextWindow
+      );
+
+      // Update local state for immediate UI feedback
+      setTranslations(prev => ({
+        ...prev,
+        [questionId]: {
+          ...prev[questionId],
+          [langCode]: {
+            text: result.translatedText,
+            status: result.status
+          }
+        }
+      }));
+
+      // Update context for Supabase sync
+      updateQuestionTranslation(
+        questionId,
+        langCode,
+        result.translatedText,
+        result.status
+      );
+
+      toast.success('Traduction générée !', {
+        description: `${result.translatedText.substring(0, 60)}...`,
+        duration: 3000,
+      });
+
+    } catch (error: any) {
+      console.error('❌ Error generating translation:', error);
+      
+      let errorMessage = 'Erreur de génération';
+      let errorDescription = error.message || 'Impossible de générer la traduction';
+
+      if (error.message?.includes('ANTHROPIC_API_KEY')) {
+        errorMessage = 'Clé API non configurée';
+        errorDescription = 'Configurez ANTHROPIC_API_KEY dans Supabase';
+      } else if (error.message?.includes('crédits') || error.message?.includes('credit balance')) {
+        errorMessage = 'Crédits insuffisants';
+        errorDescription = 'Rechargez votre compte Anthropic';
+      }
+
+      toast.error(errorMessage, {
+        description: errorDescription,
+        duration: 5000,
+      });
+    }
   };
 
   const handleGenerateAllMissing = async () => {
     setGeneratingAll(true);
-    await new Promise(resolve => setTimeout(resolve, 2000));
-    
-    const updated = { ...translations };
-    questions.forEach((q) => {
-      LANGUAGES.forEach((lang) => {
-        if (lang.code !== 'fr' && (!updated[q.id][lang.code]?.text || updated[q.id][lang.code].status === 'missing')) {
-          updated[q.id][lang.code] = {
-            text: `[AUTO-MCP] ${q.label}`,
-            status: 'auto-mcp'
-          };
-        }
+
+    try {
+      // Load MCP settings
+      const settingsJson = localStorage.getItem('mcp_settings');
+      const mcpSettings = settingsJson ? JSON.parse(settingsJson) : {};
+
+      // Import autoTranslate
+      const { autoTranslate } = await import('../../services/translationService');
+
+      let generatedCount = 0;
+      let errorCount = 0;
+
+      // Find all missing translations
+      const missingTranslations: Array<{ questionId: string; langCode: string; sourceText: string }> = [];
+      
+      questions.forEach((q) => {
+        const sourceText = translations[q.id]?.fr?.text || '';
+        if (!sourceText) return;
+
+        LANGUAGES.forEach((lang) => {
+          if (lang.code !== 'fr') {
+            const current = translations[q.id][lang.code];
+            if (!current?.text || current.status === 'missing') {
+              missingTranslations.push({
+                questionId: q.id,
+                langCode: lang.code,
+                sourceText,
+              });
+            }
+          }
+        });
       });
-    });
-    
-    setTranslations(updated);
-    setGeneratingAll(false);
+
+      toast.info(`Génération de ${missingTranslations.length} traductions...`, {
+        description: 'Cette opération peut prendre quelques minutes',
+        duration: 5000,
+      });
+
+      // Generate translations (with rate limiting to avoid API throttling)
+      for (let i = 0; i < missingTranslations.length; i++) {
+        const { questionId, langCode, sourceText } = missingTranslations[i];
+
+        try {
+          // Build context window
+          const contextWindow: Array<{ source: string; target: string }> = [];
+          const allQIds = Object.keys(translations);
+          const currentIdx = allQIds.indexOf(questionId);
+          if (currentIdx > 0) {
+            const prevQIds = allQIds.slice(Math.max(0, currentIdx - 5), currentIdx);
+            prevQIds.forEach(qId => {
+              const srcTxt = translations[qId]?.fr?.text;
+              const tgtTxt = translations[qId]?.[langCode]?.text;
+              if (srcTxt && tgtTxt) {
+                contextWindow.push({ source: srcTxt, target: tgtTxt });
+              }
+            });
+          }
+
+          const result = await autoTranslate(
+            sourceText,
+            langCode,
+            'mcp',
+            'fr',
+            mcpSettings,
+            contextWindow
+          );
+
+          // Update local state
+          setTranslations(prev => ({
+            ...prev,
+            [questionId]: {
+              ...prev[questionId],
+              [langCode]: {
+                text: result.translatedText,
+                status: result.status
+              }
+            }
+          }));
+
+          // Update context for Supabase
+          updateQuestionTranslation(
+            questionId,
+            langCode,
+            result.translatedText,
+            result.status
+          );
+
+          generatedCount++;
+
+          // Rate limiting: Wait 500ms between requests to avoid throttling
+          if (i < missingTranslations.length - 1) {
+            await new Promise(resolve => setTimeout(resolve, 500));
+          }
+
+        } catch (error: any) {
+          console.error(`❌ Error generating translation for ${questionId} (${langCode}):`, error);
+          errorCount++;
+        }
+      }
+
+      toast.success(`Génération terminée !`, {
+        description: `${generatedCount} traductions générées${errorCount > 0 ? `, ${errorCount} erreurs` : ''}`,
+        duration: 5000,
+      });
+
+    } catch (error: any) {
+      console.error('❌ Error in batch generation:', error);
+      toast.error('Erreur de génération', {
+        description: error.message || 'Impossible de générer les traductions',
+        duration: 5000,
+      });
+    } finally {
+      setGeneratingAll(false);
+    }
   };
 
   const getStatusBadge = (status: TranslationStatus) => {
@@ -214,6 +405,35 @@ export function QuestionTranslation({ onBack }: QuestionTranslationProps) {
   };
 
   const stats = getStats();
+
+  // Keyboard shortcuts handler
+  const handleKeyboardShortcut = (action: string) => {
+    switch (action) {
+      case 'save':
+        if (editingCell) {
+          handleSaveEdit();
+        }
+        break;
+      case 'search':
+        searchInputRef.current?.focus();
+        break;
+      case 'cancel':
+        if (editingCell) {
+          handleCancelEdit();
+        }
+        break;
+      case 'generate-mcp':
+        if (editingCell) {
+          handleGenerateTranslation(editingCell.questionId, editingCell.langCode, 'mcp');
+        }
+        break;
+      case 'generate-api':
+        if (editingCell) {
+          handleGenerateTranslation(editingCell.questionId, editingCell.langCode, 'api');
+        }
+        break;
+    }
+  };
 
   return (
     <motion.div
@@ -327,7 +547,8 @@ export function QuestionTranslation({ onBack }: QuestionTranslationProps) {
               <div className="relative">
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
                 <Input
-                  placeholder="Question ou code..."
+                  ref={searchInputRef}
+                  placeholder="Question ou code... (Ctrl+K)"
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                   className="pl-9"
@@ -393,9 +614,15 @@ export function QuestionTranslation({ onBack }: QuestionTranslationProps) {
       <Card className="border-slate-200 bg-white/80 backdrop-blur-sm">
         <CardHeader>
           <div className="flex items-center justify-between">
-            <CardTitle className="text-slate-900">
-              {filteredQuestions.length} question{filteredQuestions.length > 1 ? 's' : ''}
-            </CardTitle>
+            <div>
+              <CardTitle className="text-slate-900">
+                {filteredQuestions.length} question{filteredQuestions.length > 1 ? 's' : ''}
+              </CardTitle>
+              <p className="text-xs text-slate-500 mt-1 flex items-center gap-1">
+                <span>↔️</span>
+                <span>Défilez horizontalement pour voir toutes les langues</span>
+              </p>
+            </div>
             <Button variant="outline" size="sm" className="text-slate-600">
               <Download className="w-4 h-4 mr-2" />
               Exporter
@@ -403,12 +630,13 @@ export function QuestionTranslation({ onBack }: QuestionTranslationProps) {
           </div>
         </CardHeader>
         <CardContent className="p-0">
-          <ScrollArea className="h-[600px]">
-            <div className="min-w-full">
+          {/* Wrapper avec scroll horizontal ET vertical */}
+          <div className="overflow-x-auto overflow-y-auto max-h-[600px] relative scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100">
+            <div className="min-w-max">
               {/* Table Header */}
               <div className="sticky top-0 z-10 bg-slate-50 border-b border-slate-200">
                 <div className="grid grid-cols-[200px_repeat(10,minmax(200px,1fr))] gap-px">
-                  <div className="p-3 bg-slate-100">
+                  <div className="p-3 bg-slate-100 sticky left-0 z-20 shadow-[2px_0_8px_rgba(0,0,0,0.06)]">
                     <p className="text-xs text-slate-600">Question (FR - source)</p>
                   </div>
                   {LANGUAGES.slice(1).map((lang) => (
@@ -431,8 +659,8 @@ export function QuestionTranslation({ onBack }: QuestionTranslationProps) {
                   transition={{ delay: idx * 0.02 }}
                   className="grid grid-cols-[200px_repeat(10,minmax(200px,1fr))] gap-px border-b border-slate-100 hover:bg-slate-50/50"
                 >
-                  {/* Source Language (French) */}
-                  <div className="p-3 bg-blue-50/50">
+                  {/* Source Language (French) - Sticky Column */}
+                  <div className="p-3 bg-blue-50/50 sticky left-0 z-10 border-r border-slate-200 shadow-[2px_0_8px_rgba(0,0,0,0.06)]">
                     <p className="text-sm text-slate-900 mb-1">{translations[question.id]?.fr?.text || question.label}</p>
                     <p className="text-xs text-slate-500">{question.code}</p>
                     <Badge variant="outline" className="mt-1 text-xs border-blue-300 text-blue-700">Source</Badge>
@@ -452,6 +680,14 @@ export function QuestionTranslation({ onBack }: QuestionTranslationProps) {
                               onChange={(e) => setEditValue(e.target.value)}
                               className="min-h-[80px] text-sm"
                               autoFocus
+                            />
+                            {/* Character Counter */}
+                            <CharacterCounter
+                              current={editValue.length}
+                              max={500}
+                              recommended={200}
+                              sourceLength={translations[question.id]?.fr?.text?.length || 0}
+                              showComparison={true}
                             />
                             <div className="flex gap-2">
                               <Button
@@ -523,9 +759,18 @@ export function QuestionTranslation({ onBack }: QuestionTranslationProps) {
                 </motion.div>
               ))}
             </div>
-          </ScrollArea>
+          </div>
         </CardContent>
       </Card>
+
+      {/* Keyboard Shortcuts */}
+      <TranslationKeyboardShortcuts onShortcut={handleKeyboardShortcut} />
+
+      {/* Quick Export */}
+      <QuickTranslationExport questionCount={questions.length} />
+
+      {/* Horizontal Scroll Hint */}
+      <HorizontalScrollHint />
     </motion.div>
   );
 }

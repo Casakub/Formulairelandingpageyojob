@@ -1,45 +1,65 @@
 import { useState } from 'react';
 import { motion } from 'motion/react';
-import { Lock, Eye, EyeOff, ShieldCheck, AlertCircle } from 'lucide-react';
+import { Lock, Eye, EyeOff, ShieldCheck, AlertCircle, Mail } from 'lucide-react';
 import { Button } from '../ui/button';
 import { Input } from '../ui/input';
 import { Label } from '../ui/label';
 import { Card, CardContent } from '../ui/card';
+import { login } from '../../services/authService';
+import { FirstTimeSetup } from './FirstTimeSetup';
 
 interface AdminLoginProps {
   onLoginSuccess: () => void;
 }
 
 export function AdminLogin({ onLoginSuccess }: AdminLoginProps) {
+  const [email, setEmail] = useState('admin@yojob.com');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
-
-  // Pour la démo, le mot de passe est "yojob2024"
-  // Dans une vraie app, utiliser un backend sécurisé
-  const ADMIN_PASSWORD = 'yojob2024';
+  const [showSetup, setShowSetup] = useState(false);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
     setIsLoading(true);
 
-    // Simulate API call
-    await new Promise(resolve => setTimeout(resolve, 1000));
+    try {
+      const result = await login(email, password);
 
-    if (password === ADMIN_PASSWORD) {
-      // Store auth in localStorage
-      localStorage.setItem('yojob_admin_auth', 'true');
-      localStorage.setItem('yojob_admin_login_time', new Date().toISOString());
-      onLoginSuccess();
-    } else {
-      setError('Mot de passe incorrect');
-      setPassword('');
+      if (result.success) {
+        console.log('✅ Login successful:', result.user?.email);
+        onLoginSuccess();
+      } else {
+        // If user doesn't exist, suggest first-time setup
+        if (result.error?.includes('incorrect') || result.error?.includes('invalide')) {
+          setError(result.error || 'Email ou mot de passe incorrect');
+        } else {
+          setError(result.error || 'Erreur de connexion');
+        }
+        setPassword('');
+      }
+    } catch (err: any) {
+      console.error('Login error:', err);
+      setError('Erreur inattendue lors de la connexion');
+    } finally {
+      setIsLoading(false);
     }
-
-    setIsLoading(false);
   };
+
+  if (showSetup) {
+    return (
+      <FirstTimeSetup
+        onSetupComplete={() => {
+          setShowSetup(false);
+          // Auto-fill with created account
+          setPassword('');
+        }}
+        onBackToLogin={() => setShowSetup(false)}
+      />
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-900 via-violet-900 to-cyan-900 flex items-center justify-center p-4">
@@ -86,9 +106,32 @@ export function AdminLogin({ onLoginSuccess }: AdminLoginProps) {
 
             {/* Login Form */}
             <form onSubmit={handleLogin} className="space-y-6">
+              {/* Email */}
+              <div>
+                <Label htmlFor="email" className="text-white mb-2 block">
+                  Email administrateur
+                </Label>
+                <div className="relative">
+                  <div className="absolute left-3 top-1/2 -translate-y-1/2 text-white/50">
+                    <Mail className="w-5 h-5" />
+                  </div>
+                  <Input
+                    id="email"
+                    type="email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    placeholder="admin@yojob.com"
+                    className="pl-11 bg-white/10 border-white/20 text-white placeholder:text-white/40 focus:border-cyan-400 focus:ring-cyan-400/50"
+                    required
+                    autoComplete="email"
+                  />
+                </div>
+              </div>
+
+              {/* Password */}
               <div>
                 <Label htmlFor="password" className="text-white mb-2 block">
-                  Mot de passe administrateur
+                  Mot de passe
                 </Label>
                 <div className="relative">
                   <div className="absolute left-3 top-1/2 -translate-y-1/2 text-white/50">
@@ -103,6 +146,7 @@ export function AdminLogin({ onLoginSuccess }: AdminLoginProps) {
                     className="pl-11 pr-11 bg-white/10 border-white/20 text-white placeholder:text-white/40 focus:border-cyan-400 focus:ring-cyan-400/50"
                     required
                     autoFocus
+                    autoComplete="current-password"
                   />
                   <button
                     type="button"
@@ -133,7 +177,7 @@ export function AdminLogin({ onLoginSuccess }: AdminLoginProps) {
               {/* Submit Button */}
               <Button
                 type="submit"
-                disabled={isLoading || !password}
+                disabled={isLoading || !password || !email}
                 className="w-full bg-gradient-to-r from-cyan-500 to-violet-500 hover:from-cyan-400 hover:to-violet-400 text-white shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
                 size="lg"
               >
@@ -154,11 +198,15 @@ export function AdminLogin({ onLoginSuccess }: AdminLoginProps) {
                 )}
               </Button>
 
-              {/* Info */}
-              <div className="text-center">
-                <p className="text-white/60 text-sm">
-                  💡 Pour la démo, utilisez : <span className="font-mono text-cyan-400">yojob2024</span>
-                </p>
+              {/* First Time Setup Link */}
+              <div className="text-center pt-2">
+                <button
+                  type="button"
+                  onClick={() => setShowSetup(true)}
+                  className="text-cyan-400 hover:text-cyan-300 text-sm transition-colors"
+                >
+                  Première connexion ? Créer un compte →
+                </button>
               </div>
             </form>
 
@@ -167,7 +215,7 @@ export function AdminLogin({ onLoginSuccess }: AdminLoginProps) {
               <div className="flex items-start gap-2 text-white/50 text-xs">
                 <ShieldCheck className="w-4 h-4 flex-shrink-0 mt-0.5" />
                 <p>
-                  Cette page est protégée. L'accès est réservé aux administrateurs YOJOB.
+                  Cette page est protégée par Supabase Auth. L'accès est réservé aux administrateurs YOJOB.
                   Toutes les actions sont enregistrées.
                 </p>
               </div>

@@ -117,16 +117,27 @@ export default function App() {
 
   // Check authentication on mount & URL params for admin access
   useEffect(() => {
-    const auth = localStorage.getItem('yojob_admin_auth');
-    if (auth === 'true') {
-      setIsAuthenticated(true);
+    async function checkAuth() {
+      const { initAuth } = await import('./services/authService');
+      const { authenticated } = await initAuth();
+      
+      if (authenticated) {
+        setIsAuthenticated(true);
+      }
+
+      // Check for admin mode in URL
+      const params = new URLSearchParams(window.location.search);
+      if (params.get('mode') === 'admin') {
+        setViewMode('dashboard');
+      }
+
+      // Load debug tools in development
+      if (process.env.NODE_ENV === 'development' || window.location.hostname === 'localhost') {
+        import('./utils/auth-debug');
+      }
     }
 
-    // Check for admin mode in URL
-    const params = new URLSearchParams(window.location.search);
-    if (params.get('mode') === 'admin') {
-      setViewMode('dashboard');
-    }
+    checkAuth();
   }, []);
 
   const updateFormData = (updates: Partial<FormData>) => {
@@ -138,9 +149,9 @@ export default function App() {
     setViewMode('dashboard');
   };
 
-  const handleLogout = () => {
-    localStorage.removeItem('yojob_admin_auth');
-    localStorage.removeItem('yojob_admin_login_time');
+  const handleLogout = async () => {
+    const { logout } = await import('./services/authService');
+    await logout();
     setIsAuthenticated(false);
     setViewMode('survey');
   };
