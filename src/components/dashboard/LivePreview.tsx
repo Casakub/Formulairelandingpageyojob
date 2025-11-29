@@ -251,5 +251,6 @@ export function LivePreview({ isOpen, onClose }: LivePreviewProps) {
   );
 
   // Render using Portal to escape the dashboard layout hierarchy
+  if (typeof document === 'undefined') return null;
   return createPortal(modalContent, document.body);
 }

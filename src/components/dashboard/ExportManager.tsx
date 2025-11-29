@@ -327,5 +327,6 @@ Merci de structurer l'analyse de manière claire avec des chiffres clés et des 
     </motion.div>
   );
 
+  if (typeof document === 'undefined') return null;
   return createPortal(modalContent, document.body);
 }

@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'motion/react';
 import { 
@@ -200,6 +200,7 @@ export function IntegrationManager() {
     }
   ]);
 
+  const [isMounted, setIsMounted] = useState(false);
   const [isCreating, setIsCreating] = useState(false);
   const [selectedTemplate, setSelectedTemplate] = useState<typeof INTEGRATION_TEMPLATES[0] | null>(null);
   const [showApiKey, setShowApiKey] = useState(false);
@@ -210,6 +211,12 @@ export function IntegrationManager() {
     status: 'disconnected',
     config: {}
   });
+
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
+
+
 
   const handleSelectTemplate = (template: typeof INTEGRATION_TEMPLATES[0]) => {
     setSelectedTemplate(template);
@@ -407,8 +414,8 @@ export function IntegrationManager() {
       </Card>
 
       {/* Create/Edit Modal */}
-      <AnimatePresence>
-        {isCreating && createPortal(
+      {isMounted && isCreating && (() => {
+        return createPortal(
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -419,12 +426,12 @@ export function IntegrationManager() {
               setSelectedTemplate(null);
             }}
           >
-            <motion.div
+            <motion.div 
               initial={{ scale: 0.9, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.9, opacity: 0 }}
               onClick={(e) => e.stopPropagation()}
-              className="bg-white rounded-3xl border-2 border-slate-200 shadow-2xl p-8 max-w-5xl w-full max-h-[90vh] overflow-y-auto"
+              className="bg-white/95 backdrop-blur-xl rounded-3xl border-2 border-white/20 shadow-2xl p-8 max-w-5xl w-full max-h-[90vh] overflow-y-auto"
             >
               {!selectedTemplate ? (
                 <>
@@ -654,8 +661,8 @@ export function IntegrationManager() {
             </motion.div>
           </motion.div>,
           document.body
-        )}
-      </AnimatePresence>
+        );
+        })()}
 
       {/* Integrations List */}
       {integrations.length > 0 ? (

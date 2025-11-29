@@ -1005,5 +1005,6 @@ export function IntegrationDetails({ integration, onClose, onUpdate, onDelete }:
     </motion.div>
   );
 
+  if (typeof document === 'undefined') return null;
   return createPortal(modalContent, document.body);
 }

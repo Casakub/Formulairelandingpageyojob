@@ -54,10 +54,16 @@ export function QuestionManager() {
     toggleQuestionVisibility,
     reorderQuestions
   } = useQuestions();
+  const [isMounted, setIsMounted] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [isCreating, setIsCreating] = useState(false);
   const [filteredQuestions, setFilteredQuestions] = useState<Question[]>([]);
   const [showPreview, setShowPreview] = useState(false);
+
+  // Client-side only mount
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
 
   // Initialize filtered questions
   useEffect(() => {
@@ -252,7 +258,7 @@ export function QuestionManager() {
 
       {/* Create/Edit Modal */}
       <AnimatePresence>
-        {(isCreating || editingId) && createPortal(
+        {isMounted && (isCreating || editingId) && createPortal(
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
