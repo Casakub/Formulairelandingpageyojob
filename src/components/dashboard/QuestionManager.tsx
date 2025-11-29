@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'motion/react';
 import { 
   DndContext, 
@@ -251,12 +252,12 @@ export function QuestionManager() {
 
       {/* Create/Edit Modal */}
       <AnimatePresence>
-        {(isCreating || editingId) && (
+        {(isCreating || editingId) && createPortal(
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4"
+            className="fixed inset-0 bg-black/80 backdrop-blur-lg z-[99999] flex items-center justify-center p-4"
             onClick={() => {
               setIsCreating(false);
               setEditingId(null);
@@ -443,7 +444,8 @@ export function QuestionManager() {
                 </Button>
               </div>
             </motion.div>
-          </motion.div>
+          </motion.div>,
+          document.body
         )}
       </AnimatePresence>
 

@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'motion/react';
 import { 
   Plus, 
@@ -407,12 +408,12 @@ export function IntegrationManager() {
 
       {/* Create/Edit Modal */}
       <AnimatePresence>
-        {isCreating && (
+        {isCreating && createPortal(
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4"
+            className="fixed inset-0 bg-black/80 backdrop-blur-lg z-[99999] flex items-center justify-center p-4"
             onClick={() => {
               setIsCreating(false);
               setSelectedTemplate(null);
@@ -651,7 +652,8 @@ export function IntegrationManager() {
                 </>
               )}
             </motion.div>
-          </motion.div>
+          </motion.div>,
+          document.body
         )}
       </AnimatePresence>
 

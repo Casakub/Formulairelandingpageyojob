@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { createPortal } from 'react-dom';
 import { motion } from 'motion/react';
 import {
   X,
@@ -156,12 +157,12 @@ Merci de structurer l'analyse de manière claire avec des chiffres clés et des 
     setTimeout(() => setCopied(false), 2000);
   };
 
-  return (
+  const modalContent = (
     <motion.div
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4"
+      className="fixed inset-0 bg-black/80 backdrop-blur-lg z-[99999] flex items-center justify-center p-4"
       onClick={onClose}
     >
       <motion.div
@@ -325,4 +326,6 @@ Merci de structurer l'analyse de manière claire avec des chiffres clés et des 
       </motion.div>
     </motion.div>
   );
+
+  return createPortal(modalContent, document.body);
 }

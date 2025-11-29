@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { createPortal } from 'react-dom';
 import { motion } from 'motion/react';
 import { toast } from 'sonner@2.0.3';
 import {
@@ -359,12 +360,12 @@ ${responses
     }
   };
 
-  return (
+  const modalContent = (
     <motion.div
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4"
+      className="fixed inset-0 bg-black/80 backdrop-blur-lg z-[99999] flex items-center justify-center p-4"
       onClick={onClose}
     >
       <motion.div
@@ -626,4 +627,6 @@ ${responses
       </motion.div>
     </motion.div>
   );
+
+  return createPortal(modalContent, document.body);
 }
