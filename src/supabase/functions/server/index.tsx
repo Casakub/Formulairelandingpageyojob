@@ -44,4 +44,8 @@ app.route("/make-server-10092a63/i18n", i18nRoutes);
 import authRoutes from "./auth.tsx";
 app.route("/make-server-10092a63/auth", authRoutes);
 
+// Import database routes
+import databaseRoutes from "./database.tsx";
+app.route("/make-server-10092a63/database", databaseRoutes);
+
 Deno.serve(app.fetch);

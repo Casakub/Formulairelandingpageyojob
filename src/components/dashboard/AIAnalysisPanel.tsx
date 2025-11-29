@@ -24,9 +24,10 @@ interface AIAnalysisPanelProps {
   responses: any[];
   stats: any;
   onClose: () => void;
+  isDemoMode?: boolean;
 }
 
-export function AIAnalysisPanel({ responses, stats, onClose }: AIAnalysisPanelProps) {
+export function AIAnalysisPanel({ responses, stats, onClose, isDemoMode = false }: AIAnalysisPanelProps) {
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [analysis, setAnalysis] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
@@ -383,11 +384,20 @@ ${responses
                 <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-violet-500 to-purple-500 flex items-center justify-center">
                   <Sparkles className="w-5 h-5 text-white" />
                 </div>
-                <h2 className="text-slate-900 text-xl">Analyse IA des Résultats</h2>
+                <div>
+                  <div className="flex items-center gap-2">
+                    <h2 className="text-slate-900 text-xl">Analyse IA des Résultats</h2>
+                    {isDemoMode && (
+                      <Badge variant="outline" className="bg-orange-50 text-orange-700 border-orange-300">
+                        Mode Démo
+                      </Badge>
+                    )}
+                  </div>
+                  <p className="text-slate-600 text-sm">
+                    Analyse de {responses.length} réponses {isDemoMode && '(données de démonstration)'}
+                  </p>
+                </div>
               </div>
-              <p className="text-slate-600 text-sm">
-                Analyse automatique via modèle de langage avancé
-              </p>
             </div>
             <Button
               variant="ghost"

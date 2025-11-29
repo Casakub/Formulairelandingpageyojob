@@ -2192,6 +2192,10 @@
     background-color: var(--color-orange-50);
   }
 
+  .bg-orange-100 {
+    background-color: var(--color-orange-100);
+  }
+
   .bg-orange-500 {
     background-color: var(--color-orange-500);
   }
@@ -2729,6 +2733,12 @@
     .from-yellow-500\/10 {
       --tw-gradient-from: color-mix(in oklab, var(--color-yellow-500) 10%, transparent);
     }
+  }
+
+  .via-amber-50 {
+    --tw-gradient-via: var(--color-amber-50);
+    --tw-gradient-via-stops: var(--tw-gradient-position), var(--tw-gradient-from) var(--tw-gradient-from-position), var(--tw-gradient-via) var(--tw-gradient-via-position), var(--tw-gradient-to) var(--tw-gradient-to-position);
+    --tw-gradient-stops: var(--tw-gradient-via-stops);
   }
 
   .via-blue-50 {
@@ -4246,6 +4256,12 @@
   }
 
   @media (hover: hover) {
+    .hover\:bg-orange-50:hover {
+      background-color: var(--color-orange-50);
+    }
+  }
+
+  @media (hover: hover) {
     .hover\:bg-primary\/90:hover {
       background-color: var(--primary);
     }
@@ -4937,6 +4953,10 @@
 
   .data-\[state\=checked\]\:border-primary[data-state="checked"] {
     border-color: var(--primary);
+  }
+
+  .data-\[state\=checked\]\:bg-orange-500[data-state="checked"] {
+    background-color: var(--color-orange-500);
   }
 
   .data-\[state\=checked\]\:bg-primary[data-state="checked"] {

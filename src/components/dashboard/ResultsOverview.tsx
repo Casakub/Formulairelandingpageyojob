@@ -14,7 +14,8 @@ import {
   FileText,
   Zap,
   RefreshCw,
-  Database
+  Database,
+  Info
 } from 'lucide-react';
 import { Button } from '../ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '../ui/card';
@@ -26,6 +27,8 @@ import {
   SelectValue,
 } from '../ui/select';
 import { Badge } from '../ui/badge';
+import { Switch } from '../ui/switch';
+import { Label } from '../ui/label';
 import { ExportManager } from './ExportManager';
 import { AIAnalysisPanel } from './AIAnalysisPanel';
 import { getAllResponses, type MarketResearchResponse } from '../../lib/supabase';
@@ -181,15 +184,36 @@ export function ResultsOverview() {
   const [responses, setResponses] = useState<DisplayResponse[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [useMockData, setUseMockData] = useState(false);
+  const [forceDemoMode, setForceDemoMode] = useState(false);
+  const [hasRealData, setHasRealData] = useState(false);
 
   // Fetch responses from Supabase on mount
   useEffect(() => {
     loadResponses();
   }, []);
 
+  // Reload when forceDemoMode changes
+  useEffect(() => {
+    if (!isLoading) {
+      loadResponses();
+    }
+  }, [forceDemoMode]);
+
   const loadResponses = async () => {
     setIsLoading(true);
     try {
+      // If forceDemoMode is ON, use mock data directly
+      if (forceDemoMode) {
+        setResponses(mockResponses);
+        setUseMockData(true);
+        setIsLoading(false);
+        toast.info('Mode démonstration activé', {
+          description: 'Utilisation des données de démonstration'
+        });
+        return;
+      }
+
+      // Otherwise, try to fetch real data
       const result = await getAllResponses();
       
       if (result.success && result.data && result.data.length > 0) {
@@ -197,20 +221,23 @@ export function ResultsOverview() {
         const transformedData = transformSupabaseData(result.data);
         setResponses(transformedData);
         setUseMockData(false);
+        setHasRealData(true);
         toast.success(`${transformedData.length} réponses chargées depuis Supabase`);
       } else {
         // Fallback to mock data if no real data yet
         console.log('ℹ️ Aucune donnée Supabase, utilisation des données mock');
         setResponses(mockResponses);
         setUseMockData(true);
-        toast.info('Mode démonstration', {
-          description: 'Utilisation des données de démonstration'
+        setHasRealData(false);
+        toast.info('Mode démonstration (automatique)', {
+          description: 'Aucune réponse réelle disponible'
         });
       }
     } catch (error) {
       console.error('Erreur lors du chargement des réponses:', error);
       setResponses(mockResponses);
       setUseMockData(true);
+      setHasRealData(false);
       toast.warning('Données de démonstration', {
         description: 'Impossible de charger les vraies données'
       });
@@ -301,7 +328,43 @@ export function ResultsOverview() {
           </p>
         </div>
 
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-3 flex-wrap">
+          {/* Demo Mode Toggle - Always visible */}
+          <div className="flex items-center gap-3 px-4 py-2 rounded-lg border border-slate-200 bg-white shadow-sm">
+            <div className="flex flex-col">
+              <Label htmlFor="demo-mode" className="text-sm text-slate-700 cursor-pointer flex items-center gap-2">
+                {forceDemoMode ? (
+                  <>
+                    <Database className="w-4 h-4 text-orange-500" />
+                    Mode Démo
+                  </>
+                ) : (
+                  <>
+                    <Database className="w-4 h-4 text-green-500" />
+                    Données Réelles
+                  </>
+                )}
+              </Label>
+              <span className="text-xs text-slate-500 mt-0.5">
+                {forceDemoMode 
+                  ? `${mockResponses.length} réponses démo` 
+                  : hasRealData 
+                    ? `${responses.length} réponses réelles`
+                    : '0 réponse réelle'
+                }
+              </span>
+            </div>
+            <Switch
+              id="demo-mode"
+              checked={forceDemoMode}
+              onCheckedChange={(checked) => {
+                setForceDemoMode(checked);
+                toast.info(checked ? 'Passage en mode démonstration' : 'Passage en mode données réelles');
+              }}
+              className="data-[state=checked]:bg-orange-500"
+            />
+          </div>
+
           <Button
             onClick={loadResponses}
             disabled={isLoading}
@@ -336,6 +399,115 @@ export function ResultsOverview() {
             <p className="text-slate-600">Chargement des réponses...</p>
           </CardContent>
         </Card>
+      )}
+
+      {/* Demo Mode Info Banner */}
+      {!isLoading && forceDemoMode && (
+        <motion.div
+          initial={{ opacity: 0, y: -10 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="relative overflow-hidden"
+        >
+          <Card className="bg-gradient-to-r from-orange-50 via-amber-50 to-orange-50 border-orange-200 shadow-md">
+            <CardContent className="p-4">
+              <div className="flex items-start gap-3">
+                <div className="p-2 bg-orange-100 rounded-lg">
+                  <Database className="w-5 h-5 text-orange-600" />
+                </div>
+                <div className="flex-1">
+                  <h3 className="text-orange-900 mb-1">Mode Démonstration Activé</h3>
+                  <p className="text-orange-700 text-sm mb-3">
+                    Vous visualisez actuellement des données de démonstration pour tester les fonctionnalités. 
+                    {hasRealData 
+                      ? ' Désactivez le mode démo pour voir vos vraies données de réponses.'
+                      : ' Remplissez le formulaire pour créer de vraies réponses.'
+                    }
+                  </p>
+                  <div className="flex items-center gap-2 flex-wrap">
+                    {hasRealData ? (
+                      <>
+                        <Button
+                          onClick={() => setForceDemoMode(false)}
+                          size="sm"
+                          variant="outline"
+                          className="bg-white border-orange-300 text-orange-700 hover:bg-orange-50"
+                        >
+                          Voir les vraies données
+                        </Button>
+                        <span className="text-orange-600 text-sm">
+                          {mockResponses.length} réponses de démo • {responses.length} réponses réelles disponibles
+                        </span>
+                      </>
+                    ) : (
+                      <>
+                        <Button
+                          onClick={() => window.location.href = '/'}
+                          size="sm"
+                          variant="outline"
+                          className="bg-white border-cyan-300 text-cyan-700 hover:bg-cyan-50"
+                        >
+                          Remplir le formulaire
+                        </Button>
+                        <span className="text-orange-600 text-sm">
+                          {mockResponses.length} réponses de démonstration • 0 réponse réelle
+                        </span>
+                      </>
+                    )}
+                  </div>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </motion.div>
+      )}
+      
+      {/* No Real Data Info Banner */}
+      {!isLoading && !forceDemoMode && !hasRealData && (
+        <motion.div
+          initial={{ opacity: 0, y: -10 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="relative overflow-hidden"
+        >
+          <Card className="bg-gradient-to-r from-blue-50 via-cyan-50 to-blue-50 border-blue-200 shadow-md">
+            <CardContent className="p-4">
+              <div className="flex items-start gap-3">
+                <div className="p-2 bg-blue-100 rounded-lg">
+                  <Info className="w-5 h-5 text-blue-600" />
+                </div>
+                <div className="flex-1">
+                  <h3 className="text-blue-900 mb-1">Aucune Réponse Réelle Pour Le Moment</h3>
+                  <p className="text-blue-700 text-sm mb-3">
+                    Votre base de données est configurée mais ne contient aucune réponse pour l'instant. 
+                    Activez le mode démonstration pour explorer les fonctionnalités, ou remplissez le formulaire pour créer votre première réponse.
+                  </p>
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <Button
+                      onClick={() => setForceDemoMode(true)}
+                      size="sm"
+                      variant="outline"
+                      className="bg-white border-orange-300 text-orange-700 hover:bg-orange-50"
+                    >
+                      <Database className="w-4 h-4 mr-2" />
+                      Activer le mode démo
+                    </Button>
+                    <Button
+                      onClick={() => window.location.href = '/'}
+                      size="sm"
+                      variant="outline"
+                      className="bg-white border-cyan-300 text-cyan-700 hover:bg-cyan-50"
+                    >
+                      <FileText className="w-4 h-4 mr-2" />
+                      Remplir le formulaire
+                    </Button>
+                    <span className="text-blue-600 text-sm">
+                      0 réponse réelle • {mockResponses.length} réponses de démo disponibles
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </motion.div>
       )}
 
       {/* Filters */}
@@ -720,6 +892,7 @@ export function ResultsOverview() {
         <ExportManager
           responses={filteredResponses}
           onClose={() => setShowExportModal(false)}
+          isDemoMode={useMockData}
         />
       )}
 
@@ -729,6 +902,7 @@ export function ResultsOverview() {
           responses={filteredResponses}
           stats={stats}
           onClose={() => setShowAIPanel(false)}
+          isDemoMode={useMockData}
         />
       )}
     </motion.div>

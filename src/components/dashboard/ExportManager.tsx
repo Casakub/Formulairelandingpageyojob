@@ -18,9 +18,10 @@ import { Badge } from '../ui/badge';
 interface ExportManagerProps {
   responses: any[];
   onClose: () => void;
+  isDemoMode?: boolean;
 }
 
-export function ExportManager({ responses, onClose }: ExportManagerProps) {
+export function ExportManager({ responses, onClose, isDemoMode = false }: ExportManagerProps) {
   const [exportFormat, setExportFormat] = useState<'json' | 'csv' | 'ai' | null>(null);
   const [copied, setCopied] = useState(false);
 
@@ -62,9 +63,10 @@ export function ExportManager({ responses, onClose }: ExportManagerProps) {
     } else if (format === 'ai') {
       // Export formaté pour l'IA
       content = `# Étude de Marché YOJOB - Analyse des Agences ETT Européennes
-
+${isDemoMode ? '\n⚠️ **ATTENTION : Ces données sont des données de démonstration à des fins de test uniquement.**\n' : ''}
 ## 📊 Contexte
 Date d'export: ${new Date().toLocaleDateString('fr-FR', { dateStyle: 'full' })}
+Type de données: ${isDemoMode ? '🎭 Démonstration' : '✅ Réelles'}
 Nombre de réponses: ${responses.length}
 Période: ${new Date(responses[0].timestamp).toLocaleDateString('fr-FR')} - ${new Date(responses[responses.length - 1].timestamp).toLocaleDateString('fr-FR')}
 
@@ -176,9 +178,16 @@ Merci de structurer l'analyse de manière claire avec des chiffres clés et des 
         <div className="p-6 border-b border-slate-200 bg-gradient-to-r from-cyan-500/10 to-violet-500/10">
           <div className="flex items-start justify-between">
             <div>
-              <h2 className="text-slate-900 text-xl mb-1">📥 Exporter les Résultats</h2>
+              <div className="flex items-center gap-2 mb-1">
+                <h2 className="text-slate-900 text-xl">📥 Exporter les Résultats</h2>
+                {isDemoMode && (
+                  <Badge variant="outline" className="bg-orange-50 text-orange-700 border-orange-300">
+                    Mode Démo
+                  </Badge>
+                )}
+              </div>
               <p className="text-slate-600 text-sm">
-                {responses.length} réponses à exporter
+                {responses.length} réponses à exporter {isDemoMode && '(données de démonstration)'}
               </p>
             </div>
             <Button
