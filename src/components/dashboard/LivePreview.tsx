@@ -1,10 +1,11 @@
 import { useState } from 'react';
+import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'motion/react';
 import { Eye, X, Monitor, Smartphone, Tablet, RefreshCw } from 'lucide-react';
 import { Button } from '../ui/button';
 import { Card, CardContent } from '../ui/card';
 import { useQuestions } from '../../context/QuestionsContext';
-import { DynamicQuestionRenderer } from '../survey/DynamicQuestionRenderer';
+import { QuestionPreview } from './QuestionPreview';
 
 interface LivePreviewProps {
   isOpen: boolean;
@@ -45,23 +46,24 @@ export function LivePreview({ isOpen, onClose }: LivePreviewProps) {
 
   if (!isOpen) return null;
 
-  return (
+  const modalContent = (
     <AnimatePresence>
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
-        className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 overflow-y-auto"
+        className="fixed inset-0 left-0 top-0 right-0 bottom-0 bg-black/80 backdrop-blur-lg z-[99999] overflow-y-auto"
         onClick={onClose}
+        style={{ margin: 0, padding: 0 }}
       >
         <motion.div
           initial={{ scale: 0.9, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
           exit={{ scale: 0.9, opacity: 0 }}
           onClick={(e) => e.stopPropagation()}
-          className="min-h-screen p-4 flex items-start justify-center"
+          className="min-h-screen w-full p-6 flex items-start justify-center py-8"
         >
-          <div className="w-full max-w-7xl my-8">
+          <div className="w-full max-w-7xl my-4">
             {/* Header */}
             <Card className="bg-white border-slate-200 shadow-2xl mb-4">
               <CardContent className="p-4">
@@ -176,18 +178,13 @@ export function LivePreview({ isOpen, onClose }: LivePreviewProps) {
                   {visibleQuestions.length > 0 ? (
                     <div className="space-y-6">
                       {visibleQuestions.map((question, index) => (
-                        <motion.div
+                        <QuestionPreview
                           key={question.id}
-                          initial={{ opacity: 0, x: -20 }}
-                          animate={{ opacity: 1, x: 0 }}
-                          transition={{ delay: index * 0.1 }}
-                        >
-                          <DynamicQuestionRenderer
-                            question={question}
-                            value={formData[question.code]}
-                            onChange={(value) => handleFieldChange(question.code, value)}
-                          />
-                        </motion.div>
+                          question={question}
+                          value={formData[question.code]}
+                          onChange={(value) => handleFieldChange(question.code, value)}
+                          delay={index * 0.1}
+                        />
                       ))}
                     </div>
                   ) : (
@@ -252,4 +249,7 @@ export function LivePreview({ isOpen, onClose }: LivePreviewProps) {
       </motion.div>
     </AnimatePresence>
   );
+
+  // Render using Portal to escape the dashboard layout hierarchy
+  return createPortal(modalContent, document.body);
 }
