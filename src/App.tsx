@@ -17,10 +17,12 @@ import DashboardApp from './DashboardApp';
 import { QuestionsProvider } from './context/QuestionsContext';
 import { AdminLogin } from './components/auth/AdminLogin';
 import { saveResponse, extractCountry, getInterestLevel } from './lib/supabase';
+import { saveResponsePublic } from './lib/supabase-public';
 import { toast, Toaster } from 'sonner@2.0.3';
 import { SupabaseBanner } from './components/SupabaseBanner';
 import { I18nProvider } from './hooks/useI18n';
 import { TranslationMissingBanner } from './components/survey/TranslationMissingBanner';
+import './utils/diagnostic-supabase'; // Import diagnostic tool
 
 export interface FormData {
   // Section 1: Profil
@@ -211,8 +213,8 @@ export default function App() {
         referrer
       };
       
-      // Save to Supabase
-      const result = await saveResponse(responseData);
+      // Save to Supabase using PUBLIC client (no session possible)
+      const result = await saveResponsePublic(responseData);
       
       if (result.success) {
         console.log('✅ Réponse sauvegardée avec succès:', responseId);
@@ -225,7 +227,21 @@ export default function App() {
       } else {
         // Check if it's a configuration error
         const errorMessage = result.error?.message;
-        if (errorMessage === 'Supabase not configured') {
+        const errorCode = result.error?.code;
+        
+        // Detect RLS policy error
+        if (errorCode === '42501' || errorMessage?.includes('row-level security policy')) {
+          console.error('🚨 Erreur RLS détectée:', result.error);
+          toast.error('🚨 Erreur de Configuration Base de Données', {
+            description: 'La policy RLS bloque les insertions. Cliquez pour corriger.',
+            duration: 10000,
+            action: {
+              label: 'Corriger (2 min)',
+              onClick: () => window.location.href = '/fix-rls-v2'
+            }
+          });
+          throw new Error('Erreur RLS - Voir /fix-rls pour la solution');
+        } else if (errorMessage === 'Supabase not configured') {
           console.warn('⚠️ Mode démonstration : Supabase non configuré');
           toast.warning('Mode démonstration', {
             description: 'Configurez Supabase pour sauvegarder les réponses. Voir FIGMA_MAKE_ENV.md'
@@ -239,9 +255,17 @@ export default function App() {
       }
     } catch (error) {
       console.error('❌ Erreur lors de la soumission:', error);
-      toast.error('Erreur lors de l\'envoi', {
-        description: 'Veuillez réessayer ou contacter le support.'
-      });
+      
+      // Check if it's an RLS error in the caught exception
+      const errorString = error?.toString() || '';
+      if (errorString.includes('RLS') || errorString.includes('row-level security')) {
+        // Already shown toast above, just log
+        console.log('👉 Solution disponible sur /fix-rls');
+      } else {
+        toast.error('Erreur lors de l\'envoi', {
+          description: 'Veuillez réessayer ou contacter le support.'
+        });
+      }
     } finally {
       setIsSubmitting(false);
     }

@@ -17,10 +17,35 @@ if (credentialsConfigured) {
   console.warn('📖 See SETUP_DATABASE.md for instructions');
 }
 
-// Create Supabase client
+// Create Supabase client with explicit options
 export const supabase = credentialsConfigured 
-  ? createClient(supabaseUrl, supabaseAnonKey)
+  ? createClient(supabaseUrl, supabaseAnonKey, {
+      auth: {
+        persistSession: false, // Pas de session pour formulaire public
+        autoRefreshToken: false,
+        detectSessionInUrl: false, // Ne pas détecter de session dans l'URL
+        storage: undefined, // Pas de storage = pas de session cachée
+      },
+      db: {
+        schema: 'public'
+      },
+      global: {
+        headers: {
+          Authorization: `Bearer ${supabaseAnonKey}` // FORCER l'utilisation de la clé anon
+        }
+      }
+    })
   : null;
+
+// FORCE: Supprimer toute session au chargement
+if (supabase) {
+  supabase.auth.getSession().then(({ data }) => {
+    if (data.session) {
+      console.warn('⚠️ Session détectée sur formulaire public - Suppression...');
+      supabase.auth.signOut();
+    }
+  });
+}
 
 // Database types
 export interface MarketResearchResponse {

@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { motion } from 'motion/react';
 import { Button } from './ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from './ui/card';
-import { Database, CheckCircle, XCircle, Loader2, AlertCircle, Rocket, Copy, ExternalLink, FileCode } from 'lucide-react';
+import { Database, CheckCircle, XCircle, Loader2, AlertCircle, Rocket, Copy, ExternalLink, FileCode, Zap } from 'lucide-react';
 import { toast } from 'sonner@2.0.3';
 import { projectId, publicAnonKey } from '../utils/supabase/info';
 
@@ -115,23 +115,34 @@ export function DatabaseDeployer() {
 
           <CardContent className="p-6 space-y-6">
             {/* Fix RLS Warning Banner */}
-            <div className="bg-gradient-to-r from-green-50 to-emerald-50 p-4 rounded-lg border-2 border-green-200">
+            <div className="bg-gradient-to-r from-orange-50 to-red-50 p-4 rounded-lg border-2 border-orange-300">
               <div className="flex items-start gap-3">
-                <CheckCircle className="w-6 h-6 text-green-600 flex-shrink-0 mt-0.5" />
+                <AlertCircle className="w-6 h-6 text-orange-600 flex-shrink-0 mt-0.5" />
                 <div className="flex-1">
-                  <h3 className="font-semibold text-green-900 mb-1">✅ Version Corrigée (29 Nov 2024)</h3>
-                  <p className="text-sm text-green-700 mb-2">
-                    Cette version inclut le <strong>fix RLS pour les insertions publiques</strong>. Si vous avez déjà déployé une ancienne version et que le formulaire affiche une erreur "row-level security policy", consultez le guide de correction.
+                  <h3 className="font-semibold text-orange-900 mb-1">🚨 Erreur "row-level security policy" ?</h3>
+                  <p className="text-sm text-orange-700 mb-3">
+                    Si votre formulaire affiche une erreur lors de la soumission, c'est que vous avez déployé l'ancienne version de la base. 
+                    <strong> Appliquez le fix RLS en 2 minutes pour résoudre le problème.</strong>
                   </p>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    className="bg-white border-green-300 text-green-700 hover:bg-green-50 text-xs"
-                    onClick={() => window.open('/🚨_FIX_ERREUR_RLS.md', '_blank')}
-                  >
-                    <FileCode className="w-3 h-3 mr-1" />
-                    Voir le guide de correction
-                  </Button>
+                  <div className="flex gap-2 flex-wrap">
+                    <Button
+                      size="sm"
+                      className="bg-gradient-to-r from-red-500 to-orange-500 hover:from-red-400 hover:to-orange-400 text-white"
+                      onClick={() => window.location.href = '/fix-rls'}
+                    >
+                      <Zap className="w-4 h-4 mr-2" />
+                      Appliquer le Fix (2 min)
+                    </Button>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="bg-white border-orange-300 text-orange-700 hover:bg-orange-50"
+                      onClick={() => window.open('/🚨_FIX_ERREUR_RLS.md', '_blank')}
+                    >
+                      <FileCode className="w-3 h-3 mr-1" />
+                      Guide Détaillé
+                    </Button>
+                  </div>
                 </div>
               </div>
             </div>

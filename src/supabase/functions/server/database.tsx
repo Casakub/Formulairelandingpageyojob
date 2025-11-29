@@ -218,4 +218,124 @@ app.get("/sql", async (c) => {
   }
 });
 
+/**
+ * POST /database/fix-rls
+ * Applique le fix RLS pour autoriser les insertions publiques
+ * 
+ * Ce endpoint corrige l'erreur "new row violates row-level security policy"
+ * en ajoutant la clause TO anon, authenticated à la policy
+ */
+app.post("/fix-rls", async (c) => {
+  try {
+    console.log("[DATABASE] 🔧 Application du fix RLS...");
+
+    const supabaseUrl = Deno.env.get("SUPABASE_URL");
+    const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
+
+    if (!supabaseUrl || !supabaseServiceKey) {
+      console.error("[DATABASE] ❌ Credentials manquants");
+      return c.json(
+        {
+          success: false,
+          error: "Credentials Supabase manquants",
+        },
+        500
+      );
+    }
+
+    const supabase = createClient(supabaseUrl, supabaseServiceKey);
+
+    // Étape 1: Supprimer l'ancienne policy
+    console.log("[DATABASE] 🗑️ Suppression de l'ancienne policy...");
+    const { error: dropError } = await supabase.rpc('exec_sql', {
+      sql: 'DROP POLICY IF EXISTS "allow_public_inserts" ON market_research_responses'
+    });
+
+    if (dropError) {
+      console.warn("[DATABASE] ⚠️ Erreur lors de la suppression de la policy (peut-être normale):", dropError);
+    }
+
+    // Étape 2: Recréer la policy avec le fix
+    console.log("[DATABASE] ✨ Création de la nouvelle policy avec TO anon...");
+    const { error: createError } = await supabase.rpc('exec_sql', {
+      sql: `
+        CREATE POLICY "allow_public_inserts"
+          ON market_research_responses
+          FOR INSERT
+          TO anon, authenticated
+          WITH CHECK (true)
+      `
+    });
+
+    if (createError) {
+      console.error("[DATABASE] ❌ Erreur lors de la création de la policy:", createError);
+      return c.json({
+        success: false,
+        error: "Impossible de créer la policy",
+        details: createError,
+        manualFix: {
+          instructions: "Exécutez ce SQL manuellement dans Supabase SQL Editor",
+          sql: `
+DROP POLICY IF EXISTS "allow_public_inserts" ON market_research_responses;
+
+CREATE POLICY "allow_public_inserts"
+  ON market_research_responses
+  FOR INSERT
+  TO anon, authenticated
+  WITH CHECK (true);
+
+GRANT INSERT ON market_research_responses TO anon;
+          `
+        }
+      });
+    }
+
+    // Étape 3: Vérifier les GRANT
+    console.log("[DATABASE] 🔐 Vérification des permissions GRANT...");
+    const { error: grantError } = await supabase.rpc('exec_sql', {
+      sql: 'GRANT INSERT ON market_research_responses TO anon'
+    });
+
+    if (grantError) {
+      console.warn("[DATABASE] ⚠️ Erreur GRANT (peut-être déjà existant):", grantError);
+    }
+
+    console.log("[DATABASE] ✅ Fix RLS appliqué avec succès !");
+
+    return c.json({
+      success: true,
+      message: "Fix RLS appliqué avec succès",
+      details: {
+        policyDropped: !dropError,
+        policyCreated: !createError,
+        grantApplied: !grantError,
+      }
+    });
+  } catch (error) {
+    console.error("[DATABASE] ❌ Erreur inattendue:", error);
+    return c.json(
+      {
+        success: false,
+        error: "Erreur lors de l'application du fix",
+        details: error.message,
+        manualFix: {
+          instructions: "Exécutez ce SQL manuellement dans Supabase SQL Editor",
+          sql: `
+DROP POLICY IF EXISTS "allow_public_inserts" ON market_research_responses;
+
+CREATE POLICY "allow_public_inserts"
+  ON market_research_responses
+  FOR INSERT
+  TO anon, authenticated
+  WITH CHECK (true);
+
+GRANT INSERT ON market_research_responses TO anon;
+          `
+        }
+      },
+      500
+    );
+  }
+});
+
 export default app;
