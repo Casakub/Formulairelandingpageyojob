@@ -1,7 +1,14 @@
 import { useState, useEffect } from 'react';
-import { motion } from 'motion/react';
-import { ArrowLeft, LayoutDashboard } from 'lucide-react';
+import { motion, AnimatePresence } from 'motion/react';
+import { ArrowLeft, LayoutDashboard, Globe, Check } from 'lucide-react';
 import { Button } from '../ui/button';
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from '../ui/tooltip';
+import { useI18n, SUPPORTED_LANGUAGES } from '../../hooks/useI18n';
 
 interface HeaderProps {
   currentSection: number;
@@ -11,6 +18,8 @@ interface HeaderProps {
 
 export function Header({ currentSection, progress, onDashboardClick }: HeaderProps) {
   const [isScrolled, setIsScrolled] = useState(false);
+  const [isLangMenuOpen, setIsLangMenuOpen] = useState(false);
+  const { currentLang, setCurrentLang, t } = useI18n();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -19,6 +28,21 @@ export function Header({ currentSection, progress, onDashboardClick }: HeaderPro
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
+
+  // Close language menu on click outside
+  useEffect(() => {
+    if (!isLangMenuOpen) return;
+    
+    const handleClickOutside = (e: MouseEvent) => {
+      const target = e.target as HTMLElement;
+      if (!target.closest('.language-selector')) {
+        setIsLangMenuOpen(false);
+      }
+    };
+    
+    document.addEventListener('click', handleClickOutside);
+    return () => document.removeEventListener('click', handleClickOutside);
+  }, [isLangMenuOpen]);
 
   return (
     <motion.header
@@ -39,7 +63,7 @@ export function Header({ currentSection, progress, onDashboardClick }: HeaderPro
               YoJob
             </h1>
             <p className={`text-xs transition-colors ${isScrolled ? 'text-gray-600' : 'text-white/60'}`}>
-              Étude de marché
+              {t('header.subtitle', 'Étude de marché')}
             </p>
           </div>
         </div>
@@ -61,8 +85,87 @@ export function Header({ currentSection, progress, onDashboardClick }: HeaderPro
           </div>
         )}
 
-        {/* Actions */}
+        {/* Language Selector & Actions */}
         <div className="flex items-center gap-2">
+          {/* Language Selector */}
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <div className="relative language-selector">
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => setIsLangMenuOpen(!isLangMenuOpen)}
+                    className={`transition-colors ${
+                      isScrolled 
+                        ? 'text-gray-900 hover:text-cyan-600 hover:bg-cyan-50' 
+                        : 'text-white hover:text-cyan-200 hover:bg-white/10'
+                    }`}
+                  >
+                    <Globe className="w-4 h-4 mr-2" />
+                    <span className="hidden md:inline uppercase">
+                      {currentLang}
+                    </span>
+                    <span className="md:hidden">
+                      {SUPPORTED_LANGUAGES.find(l => l.code === currentLang)?.flag}
+                    </span>
+                  </Button>
+
+                  {/* Language Dropdown */}
+                  <AnimatePresence>
+                    {isLangMenuOpen && (
+                      <motion.div
+                        initial={{ opacity: 0, y: -10, scale: 0.95 }}
+                        animate={{ opacity: 1, y: 0, scale: 1 }}
+                        exit={{ opacity: 0, y: -10, scale: 0.95 }}
+                        transition={{ duration: 0.2 }}
+                        className="absolute right-0 top-full mt-2 w-56 bg-white/95 backdrop-blur-xl rounded-2xl border-2 border-white/20 shadow-2xl overflow-hidden z-50"
+                      >
+                        <div className="p-2">
+                          {SUPPORTED_LANGUAGES.map((lang) => (
+                            <motion.button
+                              key={lang.code}
+                              onClick={() => {
+                                setCurrentLang(lang.code);
+                                setIsLangMenuOpen(false);
+                              }}
+                              whileHover={{ x: 4 }}
+                              className={`w-full flex items-center justify-between px-4 py-3 rounded-xl transition-all ${
+                                currentLang === lang.code
+                                  ? 'bg-gradient-to-r from-cyan-500/10 to-violet-500/10 text-violet-600'
+                                  : 'hover:bg-slate-50 text-slate-700'
+                              }`}
+                            >
+                              <div className="flex items-center gap-3">
+                                <span className="text-xl">{lang.flag}</span>
+                                <div className="text-left">
+                                  <div className="text-sm">{lang.name}</div>
+                                  <div className="text-xs text-slate-500 uppercase">{lang.code}</div>
+                                </div>
+                              </div>
+                              {currentLang === lang.code && (
+                                <Check className="w-4 h-4 text-cyan-500" />
+                              )}
+                            </motion.button>
+                          ))}
+                        </div>
+                        <div className="px-4 py-3 bg-gradient-to-r from-cyan-50 to-violet-50 border-t border-slate-200">
+                          <p className="text-xs text-slate-600">
+                            💡 Langue détectée automatiquement
+                          </p>
+                        </div>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                </div>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>Changer de langue</p>
+                <p className="text-xs text-slate-400">Auto-détection activée</p>
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
+
           {onDashboardClick && (
             <Button
               variant="ghost"

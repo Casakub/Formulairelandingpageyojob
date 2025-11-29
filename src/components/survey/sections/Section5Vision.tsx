@@ -3,6 +3,7 @@ import { Sparkles } from 'lucide-react';
 import { SectionHeader } from '../SectionHeader';
 import { FormData } from '../../../App';
 import { DynamicQuestionRenderer } from '../DynamicQuestionRenderer';
+import { useI18n } from '../../../hooks/useI18n';
 
 interface Section5VisionProps {
   formData: FormData;
@@ -10,6 +11,8 @@ interface Section5VisionProps {
 }
 
 export function Section5Vision({ formData, updateFormData }: Section5VisionProps) {
+  const { t } = useI18n();
+
   return (
     <motion.div
       initial={{ opacity: 0 }}
@@ -19,8 +22,8 @@ export function Section5Vision({ formData, updateFormData }: Section5VisionProps
     >
       <SectionHeader
         icon={Sparkles}
-        title="Vision du futur"
-        description="2 questions • 1 min"
+        title={t('nav.section5', 'Vision du futur')}
+        description={t('section5.description', '2 questions • 1 min')}
         gradient="from-purple-500 to-pink-500"
       />
 

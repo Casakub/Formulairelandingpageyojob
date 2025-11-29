@@ -4,6 +4,7 @@ import { Label } from '../../ui/label';
 import { SectionHeader } from '../SectionHeader';
 import { FormData } from '../../../App';
 import { DynamicQuestionRenderer } from '../DynamicQuestionRenderer';
+import { useI18n } from '../../../hooks/useI18n';
 
 interface Section6ContactProps {
   formData: FormData;
@@ -11,6 +12,8 @@ interface Section6ContactProps {
 }
 
 export function Section6Contact({ formData, updateFormData }: Section6ContactProps) {
+  const { t } = useI18n();
+
   return (
     <motion.div
       initial={{ opacity: 0 }}
@@ -20,8 +23,8 @@ export function Section6Contact({ formData, updateFormData }: Section6ContactPro
     >
       <SectionHeader
         icon={Mail}
-        title="Restons en contact"
-        description="1 question • 1 min"
+        title={t('nav.section6', 'Restons en contact')}
+        description={t('section6.description', '1 question • 1 min')}
         gradient="from-green-500 to-emerald-500"
       />
 

@@ -1,9 +1,29 @@
+import { useState, useEffect } from 'react';
 import { motion } from 'motion/react';
-import { Users, TrendingUp, Star, CheckCircle, Calendar, Globe, Target, Award } from 'lucide-react';
+import { Users, TrendingUp, Star, CheckCircle, Calendar, Globe, Target, Award, Languages, Eye, Rocket } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '../ui/card';
 import { ScoreDistributionChart } from './ScoreDistributionChart';
+import { Button } from '../ui/button';
+import { Badge } from '../ui/badge';
+import { fetchI18nStats } from '../../lib/i18n-api';
+import { LanguagePreview } from './LanguagePreview';
 
 export function DashboardOverview() {
+  const [showLanguagePreview, setShowLanguagePreview] = useState(false);
+  const [i18nStats, setI18nStats] = useState<{
+    questions: { total: number; validated: number; progress: number };
+    ui: { total: number; validated: number; progress: number };
+    countries: number;
+  } | null>(null);
+
+  useEffect(() => {
+    async function loadI18nStats() {
+      const stats = await fetchI18nStats();
+      setI18nStats(stats);
+    }
+    loadI18nStats();
+  }, []);
+
   const stats = [
     {
       label: 'Réponses totales',
@@ -193,6 +213,90 @@ export function DashboardOverview() {
           </CardContent>
         </Card>
       </div>
+
+      {/* I18n Stats Widget */}
+      {i18nStats && (
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.5 }}
+          className="mt-8"
+        >
+          <Card className="bg-gradient-to-br from-blue-50 via-cyan-50 to-violet-50 border-blue-200 shadow-lg">
+            <CardHeader className="border-b border-blue-100">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-blue-500 to-cyan-500 flex items-center justify-center shadow-lg">
+                    <Languages className="w-5 h-5 text-white" />
+                  </div>
+                  <div>
+                    <CardTitle className="text-slate-900">Traductions multilingues</CardTitle>
+                    <p className="text-sm text-slate-600 mt-1">8 langues • {i18nStats.countries} pays configurés</p>
+                  </div>
+                </div>
+                <Button
+                  onClick={() => setShowLanguagePreview(true)}
+                  className="bg-gradient-to-r from-blue-500 to-cyan-500 text-white"
+                  size="sm"
+                >
+                  <Eye className="w-4 h-4 mr-2" />
+                  Prévisualiser
+                </Button>
+              </div>
+            </CardHeader>
+            <CardContent className="p-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {/* Questions Progress */}
+                <div className="space-y-3">
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm text-slate-600">Questions du formulaire</span>
+                    <Badge className="bg-blue-100 text-blue-700">
+                      {i18nStats.questions.validated}/{i18nStats.questions.total}
+                    </Badge>
+                  </div>
+                  <div className="h-3 bg-slate-200 rounded-full overflow-hidden">
+                    <motion.div
+                      initial={{ width: 0 }}
+                      animate={{ width: `${i18nStats.questions.progress}%` }}
+                      transition={{ duration: 1, ease: "easeOut" }}
+                      className="h-full bg-gradient-to-r from-blue-500 to-cyan-500 rounded-full"
+                    />
+                  </div>
+                  <div className="text-xs text-slate-500">
+                    {i18nStats.questions.progress}% complété
+                  </div>
+                </div>
+
+                {/* UI Texts Progress */}
+                <div className="space-y-3">
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm text-slate-600">Textes d'interface</span>
+                    <Badge className="bg-violet-100 text-violet-700">
+                      {i18nStats.ui.validated}/{i18nStats.ui.total}
+                    </Badge>
+                  </div>
+                  <div className="h-3 bg-slate-200 rounded-full overflow-hidden">
+                    <motion.div
+                      initial={{ width: 0 }}
+                      animate={{ width: `${i18nStats.ui.progress}%` }}
+                      transition={{ duration: 1, ease: "easeOut", delay: 0.2 }}
+                      className="h-full bg-gradient-to-r from-violet-500 to-purple-500 rounded-full"
+                    />
+                  </div>
+                  <div className="text-xs text-slate-500">
+                    {i18nStats.ui.progress}% complété
+                  </div>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </motion.div>
+      )}
+
+      {/* Language Preview Modal */}
+      {showLanguagePreview && (
+        <LanguagePreview onClose={() => setShowLanguagePreview(false)} />
+      )}
     </motion.div>
   );
 }

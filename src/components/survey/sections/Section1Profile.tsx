@@ -3,6 +3,7 @@ import { Building2 } from 'lucide-react';
 import { SectionHeader } from '../SectionHeader';
 import { FormData } from '../../../App';
 import { DynamicQuestionRenderer } from '../DynamicQuestionRenderer';
+import { useI18n } from '../../../hooks/useI18n';
 
 interface Section1ProfileProps {
   formData: FormData;
@@ -10,6 +11,8 @@ interface Section1ProfileProps {
 }
 
 export function Section1Profile({ formData, updateFormData }: Section1ProfileProps) {
+  const { t } = useI18n();
+
   return (
     <motion.div
       initial={{ opacity: 0 }}
@@ -19,8 +22,8 @@ export function Section1Profile({ formData, updateFormData }: Section1ProfilePro
     >
       <SectionHeader
         icon={Building2}
-        title="Profil de votre agence"
-        description="4 questions • 2 min"
+        title={t('nav.section1', 'Profil de votre agence')}
+        description={t('section1.description', '4 questions • 2 min')}
         gradient="from-blue-500 to-cyan-500"
       />
 

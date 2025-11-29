@@ -3,6 +3,7 @@ import { Briefcase } from 'lucide-react';
 import { SectionHeader } from '../SectionHeader';
 import { FormData } from '../../../App';
 import { DynamicQuestionRenderer } from '../DynamicQuestionRenderer';
+import { useI18n } from '../../../hooks/useI18n';
 
 interface Section3BesoinsProps {
   formData: FormData;
@@ -10,6 +11,8 @@ interface Section3BesoinsProps {
 }
 
 export function Section3Besoins({ formData, updateFormData }: Section3BesoinsProps) {
+  const { t } = useI18n();
+
   return (
     <motion.div
       initial={{ opacity: 0 }}
@@ -19,8 +22,8 @@ export function Section3Besoins({ formData, updateFormData }: Section3BesoinsPro
     >
       <SectionHeader
         icon={Briefcase}
-        title="Vos besoins"
-        description="6 questions • 2 min"
+        title={t('nav.section3', 'Vos besoins')}
+        description={t('section3.description', '6 questions • 2 min')}
         gradient="from-violet-500 to-purple-500"
       />
 

@@ -3,6 +3,7 @@ import { Globe } from 'lucide-react';
 import { SectionHeader } from '../SectionHeader';
 import { FormData } from '../../../App';
 import { DynamicQuestionRenderer } from '../DynamicQuestionRenderer';
+import { useI18n } from '../../../hooks/useI18n';
 
 interface Section2DetachementProps {
   formData: FormData;
@@ -10,6 +11,8 @@ interface Section2DetachementProps {
 }
 
 export function Section2Detachement({ formData, updateFormData }: Section2DetachementProps) {
+  const { t } = useI18n();
+
   return (
     <motion.div
       initial={{ opacity: 0 }}
@@ -19,8 +22,8 @@ export function Section2Detachement({ formData, updateFormData }: Section2Detach
     >
       <SectionHeader
         icon={Globe}
-        title="Détachement européen"
-        description="7 questions • 3 min"
+        title={t('nav.section2', 'Détachement européen')}
+        description={t('section2.description', '7 questions • 3 min')}
         gradient="from-cyan-500 to-blue-500"
       />
 

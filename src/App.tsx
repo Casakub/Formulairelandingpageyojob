@@ -19,6 +19,8 @@ import { AdminLogin } from './components/auth/AdminLogin';
 import { saveResponse, extractCountry, getInterestLevel } from './lib/supabase';
 import { toast, Toaster } from 'sonner@2.0.3';
 import { SupabaseBanner } from './components/SupabaseBanner';
+import { I18nProvider } from './hooks/useI18n';
+import { TranslationMissingBanner } from './components/survey/TranslationMissingBanner';
 
 export interface FormData {
   // Section 1: Profil
@@ -297,7 +299,8 @@ function AppContent({
   isSubmitting
 }: AppContentProps) {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-900 via-violet-900 to-cyan-900 relative overflow-hidden">
+    <I18nProvider>
+      <div className="min-h-screen bg-gradient-to-br from-blue-900 via-violet-900 to-cyan-900 relative overflow-hidden">
       {/* Background effects */}
       <div className="fixed inset-0 pointer-events-none">
         <div className="absolute top-20 left-10 w-96 h-96 bg-cyan-500/20 rounded-full blur-3xl animate-pulse" />
@@ -320,6 +323,9 @@ function AppContent({
         progress={progress} 
         onDashboardClick={() => setViewMode('dashboard')}
       />
+
+      {/* Translation Missing Banner */}
+      <TranslationMissingBanner />
 
       {/* Main Content */}
       <AnimatePresence mode="wait">
@@ -461,5 +467,6 @@ function AppContent({
         )}
       </AnimatePresence>
     </div>
+    </I18nProvider>
   );
 }

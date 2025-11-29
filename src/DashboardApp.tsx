@@ -12,7 +12,8 @@ import {
   Download,
   BarChart3,
   ChevronLeft,
-  ChevronRight
+  ChevronRight,
+  Languages
 } from 'lucide-react';
 import { Button } from './components/ui/button';
 import { DashboardOverview } from './components/dashboard/DashboardOverview';
@@ -21,8 +22,9 @@ import { IntegrationManager } from './components/dashboard/IntegrationManager';
 import { ExportImportManager } from './components/dashboard/ExportImportManager';
 import { ResultsOverview } from './components/dashboard/ResultsOverview';
 import { SettingsPanel } from './components/dashboard/SettingsPanel';
+import { TranslationManager } from './components/dashboard/TranslationManager';
 
-type TabType = 'overview' | 'questions' | 'results' | 'integrations' | 'settings' | 'export';
+type TabType = 'overview' | 'questions' | 'results' | 'integrations' | 'translations' | 'settings' | 'export';
 
 interface DashboardAppProps {
   onBackToSurvey?: () => void;
@@ -37,6 +39,7 @@ export default function DashboardApp({ onBackToSurvey }: DashboardAppProps = {})
     { id: 'overview' as TabType, label: 'Vue d\'ensemble', icon: LayoutDashboard, color: 'from-blue-500 to-cyan-500' },
     { id: 'results' as TabType, label: 'Résultats', icon: BarChart3, color: 'from-cyan-500 to-teal-500' },
     { id: 'questions' as TabType, label: 'Questions', icon: FileEdit, color: 'from-violet-500 to-purple-500' },
+    { id: 'translations' as TabType, label: 'Traductions', icon: Languages, color: 'from-indigo-500 to-blue-500' },
     { id: 'export' as TabType, label: 'Export', icon: Download, color: 'from-green-500 to-emerald-500' },
     { id: 'integrations' as TabType, label: 'Intégrations', icon: Plug, color: 'from-orange-500 to-amber-500' },
     { id: 'settings' as TabType, label: 'Paramètres', icon: Settings, color: 'from-slate-500 to-gray-500' }
@@ -273,6 +276,9 @@ export default function DashboardApp({ onBackToSurvey }: DashboardAppProps = {})
             )}
             {activeTab === 'questions' && (
               <QuestionManager key="questions" />
+            )}
+            {activeTab === 'translations' && (
+              <TranslationManager key="translations" />
             )}
             {activeTab === 'export' && (
               <ExportImportManager key="export" />
