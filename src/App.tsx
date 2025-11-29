@@ -442,7 +442,7 @@ function AppContent({
                   <Button
                     onClick={handlePrevSection}
                     variant="outline"
-                    className="flex-1 h-12 border-white/20 text-white hover:bg-white/10 rounded-xl"
+                    className="flex-1 h-12 bg-white/10 backdrop-blur-sm border-white/30 text-white hover:bg-white/20 hover:border-white/50 rounded-xl transition-all duration-300"
                   >
                     <ChevronLeft className="w-5 h-5 mr-2" />
                     Précédent

@@ -114,6 +114,28 @@ export function DatabaseDeployer() {
           </CardHeader>
 
           <CardContent className="p-6 space-y-6">
+            {/* Fix RLS Warning Banner */}
+            <div className="bg-gradient-to-r from-green-50 to-emerald-50 p-4 rounded-lg border-2 border-green-200">
+              <div className="flex items-start gap-3">
+                <CheckCircle className="w-6 h-6 text-green-600 flex-shrink-0 mt-0.5" />
+                <div className="flex-1">
+                  <h3 className="font-semibold text-green-900 mb-1">✅ Version Corrigée (29 Nov 2024)</h3>
+                  <p className="text-sm text-green-700 mb-2">
+                    Cette version inclut le <strong>fix RLS pour les insertions publiques</strong>. Si vous avez déjà déployé une ancienne version et que le formulaire affiche une erreur "row-level security policy", consultez le guide de correction.
+                  </p>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="bg-white border-green-300 text-green-700 hover:bg-green-50 text-xs"
+                    onClick={() => window.open('/🚨_FIX_ERREUR_RLS.md', '_blank')}
+                  >
+                    <FileCode className="w-3 h-3 mr-1" />
+                    Voir le guide de correction
+                  </Button>
+                </div>
+              </div>
+            </div>
+
             {/* Status Check */}
             <div className="bg-gray-50 p-4 rounded-lg border">
               <div className="flex items-center justify-between mb-3">

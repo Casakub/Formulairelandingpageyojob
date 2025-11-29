@@ -217,6 +217,7 @@ ALTER TABLE market_research_responses ENABLE ROW LEVEL SECURITY;
 CREATE POLICY "allow_public_inserts"
   ON market_research_responses
   FOR INSERT
+  TO anon, authenticated
   WITH CHECK (true);
 
 -- Policy 2: Lecture réservée aux utilisateurs authentifiés (dashboard)
