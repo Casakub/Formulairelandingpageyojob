@@ -83,5 +83,6 @@ export const getByPrefix = async (prefix: string): Promise<any[]> => {
   if (error) {
     throw new Error(error.message);
   }
-  return data?.map((d) => d.value) ?? [];
+  // Return both key and value instead of just value
+  return data?.map((d) => ({ key: d.key, value: d.value })) ?? [];
 };

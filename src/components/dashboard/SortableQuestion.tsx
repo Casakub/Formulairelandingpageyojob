@@ -93,7 +93,10 @@ export function SortableQuestion({
                   <Button
                     variant="ghost"
                     size="sm"
-                    onClick={() => onEdit(question.id)}
+                    onClick={() => {
+                      console.log('🖊️ Edit clicked for question:', question.id);
+                      onEdit(question.id);
+                    }}
                     className="text-cyan-600 hover:text-cyan-700"
                   >
                     <Edit className="w-4 h-4" />

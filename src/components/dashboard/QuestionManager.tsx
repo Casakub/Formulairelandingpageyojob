@@ -72,8 +72,10 @@ export function QuestionManager() {
 
   // Load question data when editing
   useEffect(() => {
+    console.log('📝 editingId changed:', editingId);
     if (editingId) {
       const questionToEdit = questions.find(q => q.id === editingId);
+      console.log('🔍 Question to edit:', questionToEdit);
       if (questionToEdit) {
         setNewQuestion({
           code: questionToEdit.code,
@@ -257,19 +259,22 @@ export function QuestionManager() {
       </div> */}
 
       {/* Create/Edit Modal */}
-      <AnimatePresence>
-        {isMounted && (isCreating || editingId) && createPortal(
+      {isMounted && (isCreating || editingId !== null) && createPortal(
+        <AnimatePresence mode="wait">
           <motion.div
+            key="modal-backdrop"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             className="fixed inset-0 bg-black/80 backdrop-blur-lg z-[99999] flex items-center justify-center p-4"
             onClick={() => {
+              console.log('🚫 Closing modal');
               setIsCreating(false);
               setEditingId(null);
             }}
           >
             <motion.div
+              key="modal-content"
               initial={{ scale: 0.9, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.9, opacity: 0 }}
@@ -301,7 +306,7 @@ export function QuestionManager() {
                   </Label>
                   <Input
                     id="code"
-                    value={newQuestion.code}
+                    value={newQuestion.code || ''}
                     onChange={(e) => setNewQuestion({ ...newQuestion, code: e.target.value })}
                     placeholder="Ex: q26_nouvelle_question"
                     className="bg-slate-50 border-slate-200 text-slate-900 placeholder:text-slate-400"
@@ -315,7 +320,7 @@ export function QuestionManager() {
                   </Label>
                   <Input
                     id="label"
-                    value={newQuestion.label}
+                    value={newQuestion.label || ''}
                     onChange={(e) => setNewQuestion({ ...newQuestion, label: e.target.value })}
                     placeholder="Ex: Quelle est votre principale motivation ?"
                     className="bg-slate-50 border-slate-200 text-slate-900 placeholder:text-slate-400"
@@ -450,10 +455,10 @@ export function QuestionManager() {
                 </Button>
               </div>
             </motion.div>
-          </motion.div>,
-          document.body
-        )}
-      </AnimatePresence>
+          </motion.div>
+        </AnimatePresence>,
+        document.body
+      )}
 
       {/* Questions List with Drag & Drop */}
       <DndContext
