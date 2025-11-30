@@ -148,6 +148,37 @@ export async function saveResponsePublic(data: MarketResearchResponse) {
     console.log('✅ Réponse sauvegardée avec succès !');
     console.log('   → ID:', response?.id);
     
+    // 🔗 DÉCLENCHER LES INTÉGRATIONS (Google Sheets, n8n, Notion, etc.)
+    try {
+      console.log('🔗 Déclenchement des intégrations...');
+      
+      const integrationsResponse = await fetch(
+        `${supabaseUrl}/functions/v1/make-server-10092a63/integrations/trigger`,
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${supabaseAnonKey}`
+          },
+          body: JSON.stringify({
+            responseData: response,
+            responseId: response.id
+          })
+        }
+      );
+      
+      if (integrationsResponse.ok) {
+        const integrationResults = await integrationsResponse.json();
+        console.log('✅ Intégrations déclenchées:', integrationResults);
+        console.log(`   → ${integrationResults.successful}/${integrationResults.triggered} réussies`);
+      } else {
+        console.warn('⚠️ Erreur lors du déclenchement des intégrations (non bloquant)');
+      }
+    } catch (integrationError) {
+      // Les erreurs d'intégration ne doivent pas bloquer la soumission du formulaire
+      console.warn('⚠️ Intégrations non déclenchées (non bloquant):', integrationError);
+    }
+    
     return { success: true, data: response };
   } catch (error: any) {
     console.error('❌ Erreur lors de la soumission:', error);

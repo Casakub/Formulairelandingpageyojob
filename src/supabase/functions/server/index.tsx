@@ -5,6 +5,7 @@ import * as kv from "./kv_store.tsx";
 import { analyzeWithClaude } from "./ai-analysis.tsx";
 import { getApiKeyStatus, saveApiKey, deleteApiKey, testApiKey } from "./settings.tsx";
 import i18nRoutes from "./i18n.tsx";
+import { triggerAllIntegrations, testIntegration } from "./integrations.ts";
 
 const app = new Hono();
 
@@ -47,5 +48,41 @@ app.route("/make-server-10092a63/auth", authRoutes);
 // Import database routes
 import databaseRoutes from "./database.tsx";
 app.route("/make-server-10092a63/database", databaseRoutes);
+
+// Integrations endpoints
+app.post("/make-server-10092a63/integrations/trigger", async (c) => {
+  try {
+    const { responseData, responseId } = await c.req.json();
+    
+    if (!responseData || !responseId) {
+      return c.json({ error: 'Missing responseData or responseId' }, 400);
+    }
+    
+    const results = await triggerAllIntegrations(responseData, responseId);
+    
+    return c.json({ 
+      success: true, 
+      results,
+      triggered: results.length,
+      successful: results.filter(r => r.success).length
+    });
+  } catch (error: any) {
+    console.error('Error triggering integrations:', error);
+    return c.json({ error: error.message }, 500);
+  }
+});
+
+app.post("/make-server-10092a63/integrations/test", async (c) => {
+  try {
+    const integration = await c.req.json();
+    
+    const result = await testIntegration(integration);
+    
+    return c.json({ success: true, result });
+  } catch (error: any) {
+    console.error('Error testing integration:', error);
+    return c.json({ error: error.message }, 500);
+  }
+});
 
 Deno.serve(app.fetch);

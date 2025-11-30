@@ -35,40 +35,15 @@ import {
   SelectValue,
 } from '../ui/select';
 import { IntegrationDetails } from './IntegrationDetails';
-
-interface Integration {
-  id: string;
-  name: string;
-  type: 'api' | 'mcp' | 'webhook' | 'database';
-  status: 'connected' | 'disconnected' | 'error';
-  icon: string;
-  description: string;
-  config: {
-    url?: string;
-    apiKey?: string;
-    method?: string;
-    headers?: Record<string, string>;
-    retryEnabled?: boolean;
-    maxRetries?: number;
-    rateLimit?: number;
-    timeout?: number;
-  };
-  oauth?: {
-    provider: string;
-    accessToken?: string;
-    refreshToken?: string;
-    expiresAt?: string;
-    scopes?: string[];
-  };
-  stats: {
-    totalCalls: number;
-    successCalls: number;
-    errorCalls: number;
-    avgResponseTime: number;
-    lastCallAt?: string;
-  };
-  lastSync?: string;
-}
+import { 
+  getAllIntegrations, 
+  createIntegration, 
+  updateIntegration, 
+  deleteIntegration,
+  testIntegration as testIntegrationAPI,
+  type Integration 
+} from '../../lib/integrations';
+import { toast } from 'sonner@2.0.3';
 
 const INTEGRATION_TEMPLATES = [
   {
@@ -172,33 +147,8 @@ const INTEGRATION_TEMPLATES = [
 ];
 
 export function IntegrationManager() {
-  const [integrations, setIntegrations] = useState<Integration[]>([
-    {
-      id: '1',
-      name: 'Google Sheets',
-      type: 'api',
-      status: 'connected',
-      icon: '📊',
-      description: 'Envoyer automatiquement les réponses vers Google Sheets',
-      config: {
-        url: 'https://sheets.googleapis.com/v4/spreadsheets/abc123',
-        apiKey: '••••••••••••',
-        method: 'POST',
-        retryEnabled: true,
-        maxRetries: 3,
-        rateLimit: 100,
-        timeout: 30000
-      },
-      stats: {
-        totalCalls: 156,
-        successCalls: 142,
-        errorCalls: 14,
-        avgResponseTime: 245,
-        lastCallAt: new Date(Date.now() - 2 * 60000).toISOString()
-      },
-      lastSync: '2024-11-28T14:30:00Z'
-    }
-  ]);
+  const [integrations, setIntegrations] = useState<Integration[]>([]);
+  const [loading, setLoading] = useState(true);
 
   const [isMounted, setIsMounted] = useState(false);
   const [isCreating, setIsCreating] = useState(false);
@@ -212,11 +162,24 @@ export function IntegrationManager() {
     config: {}
   });
 
+  // Charger les intégrations depuis Supabase au démarrage
   useEffect(() => {
     setIsMounted(true);
+    loadIntegrations();
   }, []);
 
-
+  const loadIntegrations = async () => {
+    try {
+      setLoading(true);
+      const data = await getAllIntegrations();
+      setIntegrations(data);
+    } catch (error) {
+      console.error('Error loading integrations:', error);
+      toast.error('Erreur lors du chargement des intégrations');
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handleSelectTemplate = (template: typeof INTEGRATION_TEMPLATES[0]) => {
     setSelectedTemplate(template);
@@ -230,7 +193,7 @@ export function IntegrationManager() {
     });
   };
 
-  const handleSave = () => {
+  const handleSave = async () => {
     if (!newIntegration.name) {
       alert('Le nom est requis');
       return;
@@ -258,7 +221,15 @@ export function IntegrationManager() {
       }
     };
 
-    setIntegrations([...integrations, integration]);
+    try {
+      await createIntegration(integration);
+      setIntegrations([...integrations, integration]);
+      toast.success('Intégration créée avec succès');
+    } catch (error) {
+      console.error('Error creating integration:', error);
+      toast.error('Erreur lors de la création de l\'intégration');
+    }
+
     setIsCreating(false);
     setSelectedTemplate(null);
     setNewIntegration({ type: 'api', status: 'disconnected', config: {} });
@@ -269,16 +240,28 @@ export function IntegrationManager() {
     if (!integration) return;
 
     // Simulate API test
-    setIntegrations(integrations.map(i => 
-      i.id === id ? { ...i, status: 'connected' as const, lastSync: new Date().toISOString() } : i
-    ));
-
-    alert(`✅ Connexion réussie avec ${integration.name}!\n\nLes réponses seront automatiquement envoyées.`);
+    try {
+      await testIntegrationAPI(id);
+      setIntegrations(integrations.map(i => 
+        i.id === id ? { ...i, status: 'connected' as const, lastSync: new Date().toISOString() } : i
+      ));
+      toast.success(`Connexion réussie avec ${integration.name} !`);
+    } catch (error) {
+      console.error('Error testing integration:', error);
+      toast.error(`Erreur lors du test de ${integration.name}`);
+    }
   };
 
-  const handleDelete = (id: string) => {
+  const handleDelete = async (id: string) => {
     if (confirm('Êtes-vous sûr de vouloir supprimer cette intégration ?')) {
-      setIntegrations(integrations.filter(i => i.id !== id));
+      try {
+        await deleteIntegration(id);
+        setIntegrations(integrations.filter(i => i.id !== id));
+        toast.success('Intégration supprimée avec succès');
+      } catch (error) {
+        console.error('Error deleting integration:', error);
+        toast.error('Erreur lors de la suppression de l\'intégration');
+      }
     }
   };
 
