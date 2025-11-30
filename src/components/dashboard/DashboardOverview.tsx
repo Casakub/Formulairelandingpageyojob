@@ -34,9 +34,13 @@ export function DashboardOverview() {
     setLoading(true);
     try {
       // Charger les réponses
-      const responsesData = await getAllResponses();
-      // S'assurer que c'est un tableau
-      setResponses(Array.isArray(responsesData) ? responsesData : []);
+      const responsesResult = await getAllResponses();
+      // getAllResponses retourne { success, data, error }
+      if (responsesResult.success && responsesResult.data) {
+        setResponses(Array.isArray(responsesResult.data) ? responsesResult.data : []);
+      } else {
+        setResponses([]);
+      }
 
       // Charger les stats i18n
       const i18n = await fetchI18nStats();

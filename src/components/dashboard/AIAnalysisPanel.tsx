@@ -1,33 +1,17 @@
-import { useState } from 'react';
-import { createPortal } from 'react-dom';
-import { motion } from 'motion/react';
-import { toast } from 'sonner@2.0.3';
-import {
-  X,
-  Sparkles,
-  Brain,
-  TrendingUp,
-  Target,
-  Lightbulb,
-  AlertCircle,
-  Loader2,
-  Copy,
-  Check,
-  Download,
-  Zap
-} from 'lucide-react';
 import { Button } from '../ui/button';
 import { Card, CardContent } from '../ui/card';
 import { Badge } from '../ui/badge';
+import { Question } from '../../config/questions';
 
 interface AIAnalysisPanelProps {
   responses: any[];
-  stats: any;
+  stats?: any;
   onClose: () => void;
   isDemoMode?: boolean;
+  questions?: Question[]; // Questions optionnelles pour analyse dynamique
 }
 
-export function AIAnalysisPanel({ responses, stats, onClose, isDemoMode = false }: AIAnalysisPanelProps) {
+export function AIAnalysisPanel({ responses, stats, onClose, isDemoMode = false, questions }: AIAnalysisPanelProps) {
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [analysis, setAnalysis] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);

@@ -14,14 +14,16 @@ import {
 import { Button } from '../ui/button';
 import { Card, CardContent } from '../ui/card';
 import { Badge } from '../ui/badge';
+import { Question } from '../../config/questions';
 
 interface ExportManagerProps {
   responses: any[];
   onClose: () => void;
   isDemoMode?: boolean;
+  questions?: Question[]; // Questions optionnelles pour export dynamique
 }
 
-export function ExportManager({ responses, onClose, isDemoMode = false }: ExportManagerProps) {
+export function ExportManager({ responses, onClose, isDemoMode = false, questions }: ExportManagerProps) {
   const [exportFormat, setExportFormat] = useState<'json' | 'csv' | 'ai' | null>(null);
   const [copied, setCopied] = useState(false);
 

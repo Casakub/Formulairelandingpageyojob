@@ -1,27 +1,27 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { 
-  LayoutDashboard, 
-  FileEdit, 
-  Plug, 
-  Settings, 
-  LogOut,
+import {
+  LayoutDashboard,
+  BarChart3,
+  FileEdit,
+  Settings,
   Menu,
   X,
+  LogOut,
+  User,
   ArrowLeft,
-  Download,
-  BarChart3,
   ChevronLeft,
   ChevronRight,
-  Languages,
-  User
+  Download,
+  Plug,
+  Languages
 } from 'lucide-react';
 import { Button } from './components/ui/button';
 import { DashboardOverview } from './components/dashboard/DashboardOverview';
 import { QuestionManager } from './components/dashboard/QuestionManager';
 import { IntegrationManager } from './components/dashboard/IntegrationManager';
 import { ExportImportManager } from './components/dashboard/ExportImportManager';
-import { ResultsOverview } from './components/dashboard/ResultsOverview';
+import { DynamicResultsOverview } from './components/dashboard/DynamicResultsOverview';
 import { SettingsPanel } from './components/dashboard/SettingsPanel';
 import { TranslationManager } from './components/dashboard/TranslationManager';
 import { TranslationProvider } from './contexts/TranslationContext';
@@ -317,7 +317,7 @@ export default function DashboardApp({ onBackToSurvey }: DashboardAppProps = {})
               <DashboardOverview key="overview" />
             )}
             {activeTab === 'results' && (
-              <ResultsOverview key="results" />
+              <DynamicResultsOverview key="results" />
             )}
             {activeTab === 'questions' && (
               <QuestionManager key="questions" />
