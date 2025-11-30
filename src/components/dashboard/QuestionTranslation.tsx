@@ -690,7 +690,7 @@ export function QuestionTranslation({ onBack }: QuestionTranslationProps) {
                       return (
                         <td 
                           key={lang.code} 
-                          className="p-4 relative group border-r border-slate-200 bg-white align-top"
+                          className="p-4 relative border-r border-slate-200 bg-white align-top"
                           style={{ minWidth: '300px', maxWidth: '300px' }}
                         >
                           {isEditing ? (
@@ -729,22 +729,23 @@ export function QuestionTranslation({ onBack }: QuestionTranslationProps) {
                               </div>
                             </div>
                           ) : (
-                            <>
+                            <div className="space-y-3">
+                              {/* Affichage de la traduction */}
                               {translation?.text ? (
                                 <div className="space-y-2">
-                                  <p className="text-sm text-slate-700 line-clamp-2">{translation.text}</p>
+                                  <p className="text-sm text-slate-700 line-clamp-3">{translation.text}</p>
                                   {getStatusBadge(translation.status)}
                                 </div>
                               ) : (
-                                <div className="text-xs text-slate-400 italic">Non traduit</div>
+                                <div className="text-xs text-slate-400 italic py-2">Non traduit</div>
                               )}
 
-                              {/* Hover Actions */}
-                              <div className="absolute inset-0 bg-slate-900/5 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
+                              {/* Action Buttons - Toujours visibles */}
+                              <div className="flex flex-wrap gap-2 pt-2 border-t border-slate-100">
                                 <Button
                                   size="sm"
                                   variant="outline"
-                                  className="bg-white shadow-lg"
+                                  className="flex-1 min-w-[80px] hover:bg-blue-50 hover:border-blue-300 transition-colors"
                                   onClick={() => handleStartEdit(question.id, lang.code)}
                                 >
                                   <Edit2 className="w-3 h-3 mr-1" />
@@ -754,7 +755,7 @@ export function QuestionTranslation({ onBack }: QuestionTranslationProps) {
                                   <>
                                     <Button
                                       size="sm"
-                                      className="bg-gradient-to-r from-violet-500 to-purple-500 text-white shadow-lg"
+                                      className="flex-1 min-w-[70px] bg-gradient-to-r from-violet-500 to-purple-500 hover:from-violet-600 hover:to-purple-600 text-white"
                                       onClick={() => handleGenerateTranslation(question.id, lang.code, 'mcp')}
                                     >
                                       <Sparkles className="w-3 h-3 mr-1" />
@@ -762,7 +763,7 @@ export function QuestionTranslation({ onBack }: QuestionTranslationProps) {
                                     </Button>
                                     <Button
                                       size="sm"
-                                      className="bg-gradient-to-r from-cyan-500 to-teal-500 text-white shadow-lg"
+                                      className="flex-1 min-w-[70px] bg-gradient-to-r from-cyan-500 to-teal-500 hover:from-cyan-600 hover:to-teal-600 text-white"
                                       onClick={() => handleGenerateTranslation(question.id, lang.code, 'api')}
                                     >
                                       <RefreshCw className="w-3 h-3 mr-1" />
@@ -771,7 +772,7 @@ export function QuestionTranslation({ onBack }: QuestionTranslationProps) {
                                   </>
                                 )}
                               </div>
-                            </>
+                            </div>
                           )}
                         </td>
                       );

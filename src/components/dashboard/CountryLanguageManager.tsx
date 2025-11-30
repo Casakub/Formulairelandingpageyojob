@@ -84,7 +84,14 @@ export function CountryLanguageManager({ onBack }: CountryLanguageManagerProps) 
       [country.code]: country.defaultLanguages
     }), {})
   );
+  const [countryAgencies, setCountryAgencies] = useState<Record<string, number>>(
+    EUROPEAN_COUNTRIES.reduce((acc, country) => ({
+      ...acc,
+      [country.code]: country.agencies
+    }), {})
+  );
   const [tempLanguages, setTempLanguages] = useState<string[]>([]);
+  const [tempAgencies, setTempAgencies] = useState<number>(0);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
 
@@ -116,6 +123,7 @@ export function CountryLanguageManager({ onBack }: CountryLanguageManagerProps) 
   const handleStartEdit = (countryCode: string) => {
     setEditingCountry(countryCode);
     setTempLanguages(countryLanguages[countryCode] || []);
+    setTempAgencies(countryAgencies[countryCode] || 0);
   };
 
   const handleSaveEdit = async () => {
@@ -131,11 +139,19 @@ export function CountryLanguageManager({ onBack }: CountryLanguageManagerProps) 
           ...prev,
           [editingCountry]: tempLanguages
         }));
+        
+        // Sauvegarder le nombre d'agences localement
+        setCountryAgencies(prev => ({
+          ...prev,
+          [editingCountry]: tempAgencies
+        }));
+        
         toast.success('Configuration sauvegardée', {
-          description: `Les langues pour ${EUROPEAN_COUNTRIES.find(c => c.code === editingCountry)?.name} ont été mises à jour.`
+          description: `${EUROPEAN_COUNTRIES.find(c => c.code === editingCountry)?.name} : ${tempAgencies} agences, ${tempLanguages.length} langues.`
         });
         setEditingCountry(null);
         setTempLanguages([]);
+        setTempAgencies(0);
       } else {
         toast.error('Erreur de sauvegarde', {
           description: 'Impossible de sauvegarder la configuration. Veuillez réessayer.'
@@ -154,6 +170,7 @@ export function CountryLanguageManager({ onBack }: CountryLanguageManagerProps) 
   const handleCancelEdit = () => {
     setEditingCountry(null);
     setTempLanguages([]);
+    setTempAgencies(0);
   };
 
   const toggleLanguage = (langCode: string) => {
@@ -308,7 +325,7 @@ export function CountryLanguageManager({ onBack }: CountryLanguageManagerProps) 
                       <div>
                         <CardTitle className="text-slate-900">{country.name}</CardTitle>
                         <CardDescription className="text-xs mt-1">
-                          {country.population} • {country.agencies} agences
+                          {country.population} • {countryAgencies[country.code] || country.agencies} agences
                         </CardDescription>
                       </div>
                     </div>
@@ -327,6 +344,21 @@ export function CountryLanguageManager({ onBack }: CountryLanguageManagerProps) 
                 <CardContent>
                   {isEditing ? (
                     <div className="space-y-4">
+                      {/* Édition du nombre d'agences */}
+                      <div>
+                        <Label className="text-xs text-slate-600 mb-2 block">
+                          Nombre d'agences
+                        </Label>
+                        <Input
+                          type="number"
+                          min="0"
+                          value={tempAgencies}
+                          onChange={(e) => setTempAgencies(parseInt(e.target.value) || 0)}
+                          placeholder="Ex: 85"
+                          className="w-full"
+                        />
+                      </div>
+                      
                       <div>
                         <Label className="text-xs text-slate-600 mb-2 block">
                           Sélectionnez les langues disponibles
