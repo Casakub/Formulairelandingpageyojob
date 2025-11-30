@@ -2,51 +2,101 @@ import { motion } from 'motion/react';
 import { BarChart, Bar, Cell, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, PieChart, Pie, RadialBarChart, RadialBar } from 'recharts';
 import { Card, CardContent, CardHeader, CardTitle } from '../ui/card';
 import { Award, TrendingUp, Users, Star } from 'lucide-react';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { getAllResponses, type MarketResearchResponse } from '../../lib/supabase';
 
 export function ScoreDistributionChart() {
   const [chartType, setChartType] = useState<'bar' | 'pie' | 'radial'>('radial');
+  const [responses, setResponses] = useState<MarketResearchResponse[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  const scoreData = [
-    { 
-      range: '9-10', 
-      label: 'Ambassadeurs', 
-      percentage: 42, 
-      count: 523,
-      color: '#10B981',
-      icon: '🌟',
-      description: 'Très intéressés, prêts à tester'
-    },
-    { 
-      range: '7-8', 
-      label: 'Intéressés', 
-      percentage: 31,
-      count: 387,
-      color: '#06B6D4',
-      icon: '👍',
-      description: 'Intérêt confirmé'
-    },
-    { 
-      range: '5-6', 
-      label: 'Modérés', 
-      percentage: 18,
-      count: 224,
-      color: '#F59E0B',
-      icon: '🤔',
-      description: 'Attentistes'
-    },
-    { 
-      range: '1-4', 
-      label: 'Peu intéressés', 
-      percentage: 9,
-      count: 113,
-      color: '#EF4444',
-      icon: '😐',
-      description: 'Pas prioritaire'
+  useEffect(() => {
+    loadData();
+  }, []);
+
+  const loadData = async () => {
+    setLoading(true);
+    try {
+      const result = await getAllResponses();
+      if (result.success && result.data) {
+        setResponses(result.data);
+      }
+    } catch (error) {
+      console.error('Error loading score data:', error);
+    } finally {
+      setLoading(false);
     }
-  ];
+  };
 
-  const totalResponses = scoreData.reduce((sum, item) => sum + item.count, 0);
+  // Calculer dynamiquement la distribution des scores
+  const calculateScoreDistribution = () => {
+    if (responses.length === 0) {
+      return [];
+    }
+
+    const totalResponses = responses.length;
+    
+    // Compter les scores par catégorie
+    const ambassadors = responses.filter(r => r.q18_score >= 9).length;
+    const interested = responses.filter(r => r.q18_score >= 7 && r.q18_score < 9).length;
+    const moderate = responses.filter(r => r.q18_score >= 5 && r.q18_score < 7).length;
+    const low = responses.filter(r => r.q18_score < 5).length;
+
+    return [
+      { 
+        range: '9-10', 
+        label: 'Ambassadeurs', 
+        percentage: Math.round((ambassadors / totalResponses) * 100),
+        count: ambassadors,
+        color: '#10B981',
+        icon: '🌟',
+        description: 'Très intéressés, prêts à tester'
+      },
+      { 
+        range: '7-8', 
+        label: 'Intéressés', 
+        percentage: Math.round((interested / totalResponses) * 100),
+        count: interested,
+        color: '#06B6D4',
+        icon: '👍',
+        description: 'Intérêt confirmé'
+      },
+      { 
+        range: '5-6', 
+        label: 'Modérés', 
+        percentage: Math.round((moderate / totalResponses) * 100),
+        count: moderate,
+        color: '#F59E0B',
+        icon: '🤔',
+        description: 'Attentistes'
+      },
+      { 
+        range: '1-4', 
+        label: 'Peu intéressés', 
+        percentage: Math.round((low / totalResponses) * 100),
+        count: low,
+        color: '#EF4444',
+        icon: '😐',
+        description: 'Pas prioritaire'
+      }
+    ];
+  };
+
+  const scoreData = calculateScoreDistribution();
+  const totalResponses = responses.length;
+  
+  // Calculer les insights dynamiques
+  const averageScore = responses.length > 0
+    ? (responses.reduce((sum, r) => sum + (r.q18_score || 0), 0) / responses.length).toFixed(1)
+    : '0.0';
+  
+  const ambassadorsCount = scoreData.find(s => s.label === 'Ambassadeurs')?.count || 0;
+  const ambassadorsPercentage = scoreData.find(s => s.label === 'Ambassadeurs')?.percentage || 0;
+  
+  const highScoreCount = responses.filter(r => r.q18_score >= 7).length;
+  const highScorePercentage = responses.length > 0 
+    ? Math.round((highScoreCount / responses.length) * 100)
+    : 0;
 
   // Custom tooltip
   const CustomTooltip = ({ active, payload }: any) => {
@@ -66,6 +116,31 @@ export function ScoreDistributionChart() {
     }
     return null;
   };
+
+  if (loading) {
+    return (
+      <Card className="bg-white border-slate-200 shadow-md">
+        <CardContent className="p-12 text-center">
+          <div className="animate-pulse">
+            <div className="h-8 bg-slate-200 rounded w-1/3 mx-auto mb-4"></div>
+            <div className="h-64 bg-slate-100 rounded"></div>
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
+
+  if (responses.length === 0) {
+    return (
+      <Card className="bg-white border-slate-200 shadow-md">
+        <CardContent className="p-12 text-center">
+          <Award className="w-16 h-16 text-slate-300 mx-auto mb-4" />
+          <p className="text-slate-600">Aucune donnée de score disponible</p>
+          <p className="text-slate-500 text-sm mt-2">Remplissez le formulaire pour voir les statistiques</p>
+        </CardContent>
+      </Card>
+    );
+  }
 
   return (
     <div className="space-y-6">
@@ -271,9 +346,9 @@ export function ScoreDistributionChart() {
               <Star className="w-5 h-5 text-green-600" />
               <h4 className="text-slate-900">Score Moyen</h4>
             </div>
-            <div className="text-3xl text-green-600 mb-1">7.8/10</div>
+            <div className="text-3xl text-green-600 mb-1">{averageScore}/10</div>
             <p className="text-slate-600 text-sm">
-              73% des agences sont intéressées (score ≥ 7)
+              {highScorePercentage}% des agences sont intéressées (score ≥ 7)
             </p>
           </CardContent>
         </Card>
@@ -284,9 +359,9 @@ export function ScoreDistributionChart() {
               <Users className="w-5 h-5 text-cyan-600" />
               <h4 className="text-slate-900">Ambassadeurs</h4>
             </div>
-            <div className="text-3xl text-cyan-600 mb-1">523</div>
+            <div className="text-3xl text-cyan-600 mb-1">{ambassadorsCount}</div>
             <p className="text-slate-600 text-sm">
-              42% prêts à tester le MVP immédiatement
+              {ambassadorsPercentage}% prêts à tester le MVP immédiatement
             </p>
           </CardContent>
         </Card>
@@ -297,7 +372,7 @@ export function ScoreDistributionChart() {
               <TrendingUp className="w-5 h-5 text-violet-600" />
               <h4 className="text-slate-900">Potentiel</h4>
             </div>
-            <div className="text-3xl text-violet-600 mb-1">910</div>
+            <div className="text-3xl text-violet-600 mb-1">{highScoreCount}</div>
             <p className="text-slate-600 text-sm">
               Agences avec score ≥ 7 (cible prioritaire)
             </p>
