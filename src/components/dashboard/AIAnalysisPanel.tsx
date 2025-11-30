@@ -1,3 +1,20 @@
+import { useState } from 'react';
+import { createPortal } from 'react-dom';
+import { motion } from 'motion/react';
+import { 
+  Sparkles, 
+  X, 
+  Brain, 
+  TrendingUp, 
+  Target, 
+  Lightbulb, 
+  Zap, 
+  Copy, 
+  Download, 
+  Check, 
+  Loader2 
+} from 'lucide-react';
+import { toast } from 'sonner@2.0.3';
 import { Button } from '../ui/button';
 import { Card, CardContent } from '../ui/card';
 import { Badge } from '../ui/badge';
@@ -17,20 +34,33 @@ export function AIAnalysisPanel({ responses, stats, onClose, isDemoMode = false,
   const [copied, setCopied] = useState(false);
   const [selectedModel, setSelectedModel] = useState<'claude' | 'gpt' | 'mcp'>('mcp');
 
+  // Safe stats with defaults
+  const safeStats = stats || {
+    withExperience: 0,
+    veryInterested: 0,
+    avgEmployees: 0,
+    avgWorkers: 0,
+    experienceRate: 0,
+    interestRate: 0,
+    countriesCount: {},
+    sectorsCount: {},
+    budgetCount: {}
+  };
+
   const prepareDataForAI = () => {
     return {
       summary: {
         totalResponses: responses.length,
-        withExperience: stats.withExperience,
-        veryInterested: stats.veryInterested,
-        averageEmployees: stats.avgEmployees,
-        averageWorkers: stats.avgWorkers,
-        experienceRate: stats.experienceRate,
-        interestRate: stats.interestRate
+        withExperience: safeStats.withExperience,
+        veryInterested: safeStats.veryInterested,
+        averageEmployees: safeStats.avgEmployees,
+        averageWorkers: safeStats.avgWorkers,
+        experienceRate: safeStats.experienceRate,
+        interestRate: safeStats.interestRate
       },
-      countriesDistribution: stats.countriesCount,
-      sectorsDistribution: stats.sectorsCount,
-      budgetDistribution: stats.budgetCount,
+      countriesDistribution: safeStats.countriesCount,
+      sectorsDistribution: safeStats.sectorsCount,
+      budgetDistribution: safeStats.budgetCount,
       detailedResponses: responses.map(r => ({
         country: r.country,
         sector: r.sector,
@@ -126,20 +156,19 @@ export function AIAnalysisPanel({ responses, stats, onClose, isDemoMode = false,
 L'étude révèle un **marché mature et réceptif** avec ${responses.length} réponses d'agences ETT européennes. 
 
 ### Points Clés
-- **${stats.experienceRate}%** des agences ont déjà l'expérience du détachement international
-- **${stats.interestRate}%** sont **très intéressées** par la plateforme YOJOB
-- Taille moyenne des agences : **${stats.avgEmployees} employés**
-- Volume moyen de détachements : **${stats.avgWorkers} travailleurs/an**
+- **${safeStats.experienceRate}%** des agences ont déjà l'expérience du détachement international
+- **${safeStats.interestRate}%** sont **très intéressées** par la plateforme YOJOB
+- Taille moyenne des agences : **${safeStats.avgEmployees} employés**
+- Volume moyen de détachements : **${safeStats.avgWorkers} travailleurs/an**
 
 ---
 
 ## 🌍 Analyse Géographique
 
 ### Pays les Plus Actifs
-${Object.entries(stats.countriesCount)
+${Object.entries(safeStats.countriesCount)
   .sort((a: any, b: any) => b[1] - a[1])
-  .map(([country, count]: [string, any]) => `- **${country}** : ${count} agences (${((count / responses.length) * 100).toFixed(1)}%)`)
-  .join('\n')}
+  .map(([country, count]: [string, any]) => `- **${country}** : ${count} agences (${((count / responses.length) * 100).toFixed(1)}%)`).join('\\n')}
 
 ### Insight Géographique
 Les pays d'Europe de l'Ouest (France, Allemagne, Belgique) dominent le marché, représentant la majorité des réponses. Cela suggère une maturité du marché du détachement dans ces zones.
@@ -149,10 +178,9 @@ Les pays d'Europe de l'Ouest (France, Allemagne, Belgique) dominent le marché, 
 ## 🏭 Segmentation Sectorielle
 
 ### Répartition
-${Object.entries(stats.sectorsCount)
+${Object.entries(safeStats.sectorsCount)
   .sort((a: any, b: any) => b[1] - a[1])
-  .map(([sector, count]: [string, any]) => `- **${sector}** : ${count} agences (${((count / responses.length) * 100).toFixed(1)}%)`)
-  .join('\n')}
+  .map(([sector, count]: [string, any]) => `- **${sector}** : ${count} agences (${((count / responses.length) * 100).toFixed(1)}%)`).join('\\n')}
 
 ### Opportunités Sectorielles
 Le BTP et l'Industrie sont les secteurs les plus représentés, reflétant les besoins traditionnels en main-d'œuvre mobile. Les secteurs Tech et Hôtellerie montrent un potentiel de croissance.
@@ -162,12 +190,11 @@ Le BTP et l'Industrie sont les secteurs les plus représentés, reflétant les b
 ## 💰 Analyse Budgétaire
 
 ### Distribution des Budgets
-${Object.entries(stats.budgetCount)
-  .map(([budget, count]: [string, any]) => `- **${budget}** : ${count} agences (${((count / responses.length) * 100).toFixed(1)}%)`)
-  .join('\n')}
+${Object.entries(safeStats.budgetCount)
+  .map(([budget, count]: [string, any]) => `- **${budget}** : ${count} agences (${((count / responses.length) * 100).toFixed(1)}%)`).join('\\n')}
 
 ### Potentiel de Revenus
-- **Segment Premium** (>10K€) : ${((Object.values(stats.budgetCount).filter((c: any, i: number) => Object.keys(stats.budgetCount)[i].includes('10000')) as any).reduce((a: number, b: number) => a + b, 0) / responses.length * 100).toFixed(1)}%
+- **Segment Premium** (>10K€) : ${((Object.values(safeStats.budgetCount).filter((c: any, i: number) => Object.keys(safeStats.budgetCount)[i].includes('10000')) as any).reduce((a: number, b: number) => a + b, 0) / responses.length * 100).toFixed(1)}%
 - **Segment Standard** (1-10K€) : Majorité du marché
 - **Segment Entry** (<1K€) : Agences découvrant le détachement
 
@@ -175,14 +202,14 @@ ${Object.entries(stats.budgetCount)
 
 ## 🎯 Personas Identifiés
 
-### 1. L'Expert International (${stats.withExperience} agences)
+### 1. L'Expert International (${safeStats.withExperience} agences)
 - ✅ Expérience confirmée en détachement
-- ✅ Détache régulièrement (${stats.avgWorkers} travailleurs/an)
+- ✅ Détache régulièrement (${safeStats.avgWorkers} travailleurs/an)
 - ✅ Cherche à simplifier et scale
 - 💰 Budget : 5-10K€+
 - 🎯 Priorité : Efficacité, conformité, réseau étendu
 
-### 2. Le Découvreur (${responses.length - stats.withExperience} agences)
+### 2. Le Découvreur (${responses.length - safeStats.withExperience} agences)
 - 🆕 Pas encore d'expérience en détachement
 - 🎓 Veut se lancer dans l'international
 - 💡 Besoin d'accompagnement et formation
@@ -206,7 +233,7 @@ ${Object.entries(stats.budgetCount)
 
 ### 3. Go-to-Market
 **Phase 1 - Early Adopters** (3 mois)
-- Cibler les ${stats.veryInterested} agences "très intéressées"
+- Cibler les ${safeStats.veryInterested} agences "très intéressées"
 - Offre de lancement : -50% la première année
 - Focus sur France, Allemagne, Belgique
 
@@ -266,9 +293,7 @@ ${Object.entries(stats.budgetCount)
 ## 🎓 Insights Qualitatifs
 
 ### Difficultés Principales Mentionnées
-${responses
-  .map(r => `- "${r.difficulties}" (${r.country} - ${r.sector})`)
-  .join('\n')}
+${responses.map(r => `- "${r.difficulties}" (${r.country} - ${r.sector})`).join('\\n')}
 
 ### Patterns Identifiés
 1. **Conformité juridique** : Pain point #1 transverse à tous les pays
@@ -281,7 +306,7 @@ ${responses
 ## 💡 Prochaines Actions
 
 ### Immédiat (J+0 à J+30)
-1. ✅ Contacter les ${stats.veryInterested} agences "très intéressées" pour interviews approfondies
+1. ✅ Contacter les ${safeStats.veryInterested} agences "très intéressées" pour interviews approfondies
 2. ✅ Créer MVP de la plateforme (version beta)
 3. ✅ Préparer pitch deck investisseurs avec ces données
 4. ✅ Sécuriser partenariats juridiques (1 cabinet par pays cible)
@@ -303,8 +328,8 @@ ${responses
 ## 🏆 Conclusion
 
 **Le marché est MÛR pour YOJOB.** Les signaux sont au vert :
-- ✅ ${stats.interestRate}% d'intérêt fort = forte demande
-- ✅ ${stats.experienceRate}% avec expérience = marché mature
+- ✅ ${safeStats.interestRate}% d'intérêt fort = forte demande
+- ✅ ${safeStats.experienceRate}% avec expérience = marché mature
 - ✅ Pain points clairs = product-market fit évident
 - ✅ Budgets alloués = willingness to pay confirmée
 
@@ -501,15 +526,15 @@ ${responses
                     </div>
                     <div className="flex items-center justify-between p-3 bg-slate-50 rounded-lg">
                       <span className="text-slate-700">Taux d'expérience</span>
-                      <Badge variant="outline">{stats.experienceRate}%</Badge>
+                      <Badge variant="outline">{safeStats.experienceRate}%</Badge>
                     </div>
                     <div className="flex items-center justify-between p-3 bg-slate-50 rounded-lg">
                       <span className="text-slate-700">Taux d'intérêt</span>
-                      <Badge variant="outline">{stats.interestRate}%</Badge>
+                      <Badge variant="outline">{safeStats.interestRate}%</Badge>
                     </div>
                     <div className="flex items-center justify-between p-3 bg-slate-50 rounded-lg">
                       <span className="text-slate-700">Pays couverts</span>
-                      <Badge variant="outline">{Object.keys(stats.countriesCount).length}</Badge>
+                      <Badge variant="outline">{Object.keys(safeStats.countriesCount).length}</Badge>
                     </div>
                   </div>
                 </CardContent>
