@@ -182,12 +182,20 @@ export function QuestionManager() {
   };
 
   const handleDuplicate = (question: Question) => {
+    console.log('🔄 Duplicating question:', question);
+    
+    // Calculate the correct order for the duplicated question
+    const sectionQuestions = questions.filter(q => q.section === question.section);
+    const maxOrder = Math.max(...sectionQuestions.map(q => q.order), 0);
+    
     const duplicated: Question = {
       ...question,
       id: Date.now().toString(),
       code: `${question.code}_copy`,
-      label: `${question.label} (Copie)`
+      label: `${question.label} (Copie)`,
+      order: maxOrder + 1
     };
+    console.log('✨ Created duplicate:', duplicated);
     addQuestion(duplicated);
   };
 

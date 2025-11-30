@@ -19,7 +19,12 @@ export function QuestionsProvider({ children }: { children: ReactNode }) {
   const [questions, setQuestions] = useState<Question[]>(DEFAULT_QUESTIONS);
 
   const addQuestion = (question: Question) => {
-    setQuestions(prev => [...prev, question]);
+    console.log('➕ Adding question to context:', question);
+    setQuestions(prev => {
+      const newQuestions = [...prev, question];
+      console.log('✅ Questions after add:', newQuestions.length);
+      return newQuestions;
+    });
   };
 
   const updateQuestion = (id: string, updates: Partial<Question>) => {

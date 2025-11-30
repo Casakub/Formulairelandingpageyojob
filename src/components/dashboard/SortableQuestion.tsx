@@ -84,7 +84,10 @@ export function SortableQuestion({
                   <Button
                     variant="ghost"
                     size="sm"
-                    onClick={() => onDuplicate(question)}
+                    onClick={() => {
+                      console.log('📋 Duplicate clicked for question:', question.id);
+                      onDuplicate(question);
+                    }}
                     className="text-slate-600 hover:text-slate-900"
                     title="Dupliquer"
                   >
