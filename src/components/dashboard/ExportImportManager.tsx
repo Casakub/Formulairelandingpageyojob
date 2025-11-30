@@ -1,3 +1,5 @@
+import { copyToClipboard } from '../../lib/clipboard';
+import { toast } from 'sonner@2.0.3';
 import { useState } from 'react';
 import { motion } from 'motion/react';
 import { Download, Upload, FileJson, CheckCircle, AlertCircle, FileText, Copy } from 'lucide-react';
@@ -142,14 +144,8 @@ export function ExportImportManager() {
   // Copy JSON to Clipboard
   const handleCopyJSON = () => {
     const dataStr = JSON.stringify(questions, null, 2);
-    navigator.clipboard.writeText(dataStr);
-    setImportStatus('success');
-    setImportMessage('✅ JSON copié dans le presse-papier !');
-    
-    setTimeout(() => {
-      setImportStatus('idle');
-      setImportMessage('');
-    }, 3000);
+    copyToClipboard(dataStr);
+    toast.success('JSON copié dans le presse-papier !');
   };
 
   const exportStats = {

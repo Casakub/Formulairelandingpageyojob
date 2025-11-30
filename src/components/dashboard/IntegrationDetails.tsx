@@ -1,3 +1,4 @@
+import { copyToClipboard } from '../../lib/clipboard';
 import { useState } from 'react';
 import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'motion/react';
@@ -243,11 +244,6 @@ export function IntegrationDetails({ integration, onClose, onUpdate, onDelete }:
     }, 1000);
   };
 
-  const handleCopyToClipboard = (text: string) => {
-    navigator.clipboard.writeText(text);
-    alert('✅ Copié dans le presse-papier !');
-  };
-
   const formatDuration = (ms?: number) => {
     if (!ms) return '-';
     return ms < 1000 ? `${ms}ms` : `${(ms / 1000).toFixed(2)}s`;
@@ -412,7 +408,7 @@ export function IntegrationDetails({ integration, onClose, onUpdate, onDelete }:
                     </Button>
 
                     <Button
-                      onClick={() => handleCopyToClipboard(integration.config.url || '')}
+                      onClick={() => copyToClipboard(integration.config.url || '')}
                       variant="outline"
                       className="border-slate-200"
                     >
@@ -612,7 +608,7 @@ export function IntegrationDetails({ integration, onClose, onUpdate, onDelete }:
                                     <Button
                                       size="sm"
                                       variant="ghost"
-                                      onClick={() => handleCopyToClipboard(JSON.stringify(log.payload, null, 2))}
+                                      onClick={() => copyToClipboard(JSON.stringify(log.payload, null, 2))}
                                     >
                                       <Copy className="w-4 h-4" />
                                     </Button>
@@ -629,7 +625,7 @@ export function IntegrationDetails({ integration, onClose, onUpdate, onDelete }:
                                       <Button
                                         size="sm"
                                         variant="ghost"
-                                        onClick={() => handleCopyToClipboard(JSON.stringify(log.response, null, 2))}
+                                        onClick={() => copyToClipboard(JSON.stringify(log.response, null, 2))}
                                       >
                                         <Copy className="w-4 h-4" />
                                       </Button>
@@ -718,7 +714,7 @@ export function IntegrationDetails({ integration, onClose, onUpdate, onDelete }:
                             <Button
                               size="sm"
                               variant="ghost"
-                              onClick={() => handleCopyToClipboard(integration.oauth?.accessToken || '')}
+                              onClick={() => copyToClipboard(integration.oauth?.accessToken || '')}
                             >
                               <Copy className="w-4 h-4" />
                             </Button>

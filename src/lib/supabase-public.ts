@@ -1,41 +1,53 @@
 /**
- * 🔓 CLIENT SUPABASE PUBLIC - FORMULAIRE SEULEMENT
+ * 🔒 SUPABASE CLIENT PUBLIC - SINGLETON
+ * ====================================
  * 
- * Ce client est SÉPARÉ du client principal et est configuré pour :
- * - ❌ AUCUNE session (jamais)
- * - ❌ AUCUN storage (pas de cache)
- * - ❌ AUCUNE authentification
- * - ✅ SEULEMENT le rôle anon
+ * ATTENTION: Ce client est strictement configuré pour le formulaire public.
+ * - Aucune authentification
+ * - Aucune session persistante
+ * - Row-level security (RLS) activé
  * 
  * Utilisé UNIQUEMENT pour les soumissions du formulaire public.
  */
 
-import { createClient } from '@supabase/supabase-js';
+import { createClient, SupabaseClient } from '@supabase/supabase-js';
 import { projectId, publicAnonKey } from '../utils/supabase/info';
 
 const supabaseUrl = `https://${projectId}.supabase.co`;
 const supabaseAnonKey = publicAnonKey;
 
-// Client PUBLIC dédié - Configuration ultra-stricte
-export const supabasePublic = createClient(supabaseUrl, supabaseAnonKey, {
+// SINGLETON: Create only ONE public Supabase client instance
+let supabasePublicInstance: SupabaseClient | null = null;
+
+function getSupabasePublicClient(): SupabaseClient {
+  // Return existing instance if already created
+  if (supabasePublicInstance) {
+    return supabasePublicInstance;
+  }
+  
+  // Create new instance only if it doesn't exist
+  supabasePublicInstance = createClient(supabaseUrl, supabaseAnonKey, {
   auth: {
     persistSession: false,
     autoRefreshToken: false,
     detectSessionInUrl: false,
-    storage: undefined, // Pas de storage = impossible d'avoir une session
+    storage: undefined
   },
   db: {
     schema: 'public'
   },
-  // CRITIQUE: Headers personnalisés pour forcer le rôle anon
   global: {
     headers: {
-      'apikey': supabaseAnonKey,
-      'Authorization': `Bearer ${supabaseAnonKey}`,
-      'Prefer': 'return=representation', // Pour récupérer la ligne insérée
+      'X-Client-Info': 'market-research-form-public'
     }
   }
 });
+  
+  return supabasePublicInstance;
+}
+
+// Export the singleton instance
+export const supabasePublic = getSupabasePublicClient();
 
 console.log('🔓 Client Supabase PUBLIC initialisé (formulaire seulement)');
 console.log('   → Authentification: DÉSACTIVÉE');

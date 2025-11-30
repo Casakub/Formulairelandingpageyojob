@@ -1,4 +1,4 @@
-import { createClient } from '@supabase/supabase-js';
+import { createClient, SupabaseClient } from '@supabase/supabase-js';
 import { projectId, publicAnonKey } from '../utils/supabase/info';
 
 // Supabase configuration using Figma Make's built-in Supabase
@@ -17,35 +17,50 @@ if (credentialsConfigured) {
   console.warn('📖 See SETUP_DATABASE.md for instructions');
 }
 
-// Create Supabase client with explicit options
-export const supabase = credentialsConfigured 
-  ? createClient(supabaseUrl, supabaseAnonKey, {
-      auth: {
-        persistSession: false, // Pas de session pour formulaire public
-        autoRefreshToken: false,
-        detectSessionInUrl: false, // Ne pas détecter de session dans l'URL
-        storage: undefined, // Pas de storage = pas de session cachée
-      },
-      db: {
-        schema: 'public'
-      },
-      global: {
-        headers: {
-          Authorization: `Bearer ${supabaseAnonKey}` // FORCER l'utilisation de la clé anon
-        }
-      }
-    })
-  : null;
+// SINGLETON: Create only ONE Supabase client instance
+let supabaseInstance: SupabaseClient | null = null;
 
-// FORCE: Supprimer toute session au chargement
-if (supabase) {
-  supabase.auth.getSession().then(({ data }) => {
-    if (data.session) {
-      console.warn('⚠️ Session détectée sur formulaire public - Suppression...');
-      supabase.auth.signOut();
+function getSupabaseClient(): SupabaseClient | null {
+  if (!credentialsConfigured) {
+    return null;
+  }
+  
+  // Return existing instance if already created
+  if (supabaseInstance) {
+    return supabaseInstance;
+  }
+  
+  // Create new instance only if it doesn't exist
+  supabaseInstance = createClient(supabaseUrl, supabaseAnonKey, {
+    auth: {
+      persistSession: false, // Pas de session pour formulaire public
+      autoRefreshToken: false,
+      detectSessionInUrl: false, // Ne pas détecter de session dans l'URL
+      storage: undefined, // Pas de storage = pas de session cachée
+    },
+    db: {
+      schema: 'public'
+    },
+    global: {
+      headers: {
+        Authorization: `Bearer ${supabaseAnonKey}` // FORCER l'utilisation de la clé anon
+      }
     }
   });
+  
+  // FORCE: Supprimer toute session au chargement
+  supabaseInstance.auth.getSession().then(({ data }) => {
+    if (data.session) {
+      console.warn('⚠️ Session détectée sur formulaire public - Suppression...');
+      supabaseInstance?.auth.signOut();
+    }
+  });
+  
+  return supabaseInstance;
 }
+
+// Export the singleton instance
+export const supabase = getSupabaseClient();
 
 // Database types
 export interface MarketResearchResponse {

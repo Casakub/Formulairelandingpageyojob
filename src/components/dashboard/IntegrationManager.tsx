@@ -1,3 +1,6 @@
+import { copyToClipboard } from '../../lib/clipboard';
+import { toast } from 'sonner@2.0.3';
+
 import { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'motion/react';
@@ -43,7 +46,6 @@ import {
   testIntegration as testIntegrationAPI,
   type Integration 
 } from '../../lib/integrations';
-import { toast } from 'sonner@2.0.3';
 
 const INTEGRATION_TEMPLATES = [
   {
@@ -265,9 +267,15 @@ export function IntegrationManager() {
     }
   };
 
-  const handleCopyWebhook = (url: string) => {
-    navigator.clipboard.writeText(url);
-    alert('✅ URL copiée dans le presse-papier !');
+  const handleCopyWebhook = async (url: string) => {
+    const success = await copyToClipboard(url);
+    if (success) {
+      toast.success('URL copiée dans le presse-papier !');
+    } else {
+      toast.error('Impossible de copier', {
+        description: 'Veuillez copier manuellement l\'URL'
+      });
+    }
   };
 
   const stats = {
