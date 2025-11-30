@@ -560,6 +560,88 @@ export function IntegrationManager() {
                       </div>
                     )}
 
+                    {/* n8n API Key (Webhook type but needs auth) */}
+                    {newIntegration.type === 'webhook' && selectedTemplate?.name === 'n8n' && (
+                      <div>
+                        <Label htmlFor="n8nApiKey" className="text-slate-900 mb-2 block flex items-center gap-2">
+                          <Key className="w-4 h-4 text-indigo-600" />
+                          Clé API n8n (optionnel)
+                        </Label>
+                        <div className="relative">
+                          <Input
+                            id="n8nApiKey"
+                            type={showApiKey ? 'text' : 'password'}
+                            value={newIntegration.config?.apiKey || ''}
+                            onChange={(e) => setNewIntegration({ 
+                              ...newIntegration, 
+                              config: { 
+                                ...newIntegration.config, 
+                                apiKey: e.target.value,
+                                headers: {
+                                  ...newIntegration.config?.headers,
+                                  'X-N8N-API-KEY': e.target.value
+                                }
+                              }
+                            })}
+                            placeholder="Votre clé API n8n..."
+                            className="bg-white border-slate-200 text-slate-900 font-mono text-sm pr-20"
+                          />
+                          <Button
+                            type="button"
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => setShowApiKey(!showApiKey)}
+                            className="absolute right-2 top-1/2 -translate-y-1/2 text-slate-600 hover:text-slate-900"
+                          >
+                            {showApiKey ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                          </Button>
+                        </div>
+                        <p className="text-xs text-slate-500 mt-2">
+                          💡 L'API key sera envoyée dans le header <code className="px-1 py-0.5 rounded bg-slate-100 text-indigo-600">X-N8N-API-KEY</code>
+                        </p>
+                      </div>
+                    )}
+
+                    {/* n8n Info Banner */}
+                    {selectedTemplate?.name === 'n8n' && (
+                      <Card className="bg-indigo-500/10 border-indigo-400/50">
+                        <CardContent className="p-4">
+                          <div className="flex items-start gap-3">
+                            <Info className="w-5 h-5 text-indigo-600 flex-shrink-0 mt-0.5" />
+                            <div>
+                              <h4 className="text-slate-900 text-sm mb-2">🤖 Configuration n8n</h4>
+                              <p className="text-slate-600 text-sm mb-3">
+                                Deux façons de se connecter à n8n :
+                              </p>
+                              <div className="space-y-2 text-sm">
+                                <div className="flex items-start gap-2">
+                                  <span className="text-green-600">✓</span>
+                                  <div>
+                                    <p className="text-slate-700"><strong>Mode Webhook</strong> (recommandé)</p>
+                                    <p className="text-slate-500 text-xs">Créez un workflow avec un node Webhook et utilisez l'URL du webhook</p>
+                                    <code className="text-xs bg-slate-100 px-2 py-0.5 rounded mt-1 inline-block">
+                                      https://uxomnia.cloud/webhook/your-webhook-id
+                                    </code>
+                                  </div>
+                                </div>
+                                <div className="flex items-start gap-2">
+                                  <span className="text-blue-600">✓</span>
+                                  <div>
+                                    <p className="text-slate-700"><strong>Mode API REST</strong> (avancé)</p>
+                                    <p className="text-slate-500 text-xs">Utilisez l'API pour déclencher des workflows existants</p>
+                                    <code className="text-xs bg-slate-100 px-2 py-0.5 rounded mt-1 inline-block">
+                                      https://uxomnia.cloud/api/v1/workflows/:id/execute
+                                    </code>
+                                    <p className="text-indigo-600 text-xs mt-1">⚠️ Nécessite une API key</p>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        </CardContent>
+                      </Card>
+                    )}
+
                     {/* Method */}
                     {(newIntegration.type === 'api' || newIntegration.type === 'webhook' || newIntegration.type === 'database') && (
                       <div>
