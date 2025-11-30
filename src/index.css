@@ -2266,6 +2266,16 @@
     background-color: var(--color-orange-50);
   }
 
+  .bg-orange-50\/50 {
+    background-color: color-mix(in srgb, oklch(.98 .016 73.684) 50%, transparent);
+  }
+
+  @supports (color: color-mix(in lab, red, red)) {
+    .bg-orange-50\/50 {
+      background-color: color-mix(in oklab, var(--color-orange-50) 50%, transparent);
+    }
+  }
+
   .bg-orange-500 {
     background-color: var(--color-orange-500);
   }
@@ -3042,6 +3052,11 @@
     .to-purple-500\/10 {
       --tw-gradient-to: color-mix(in oklab, var(--color-purple-500) 10%, transparent);
     }
+  }
+
+  .to-red-50 {
+    --tw-gradient-to: var(--color-red-50);
+    --tw-gradient-stops: var(--tw-gradient-via-stops, var(--tw-gradient-position), var(--tw-gradient-from) var(--tw-gradient-from-position), var(--tw-gradient-to) var(--tw-gradient-to-position));
   }
 
   .to-red-500 {
