@@ -66,6 +66,7 @@ export function QuestionTranslation({ onBack }: QuestionTranslationProps) {
   const [translations, setTranslations] = useState<QuestionTranslations>({});
   const [editValue, setEditValue] = useState('');
   const [generatingAll, setGeneratingAll] = useState(false);
+  const [saving, setSaving] = useState(false);
 
   // Sync translations from context
   useEffect(() => {
@@ -145,6 +146,7 @@ export function QuestionTranslation({ onBack }: QuestionTranslationProps) {
     
     setEditingCell(null);
     setEditValue('');
+    setSaving(false);
   };
 
   const handleCancelEdit = () => {
@@ -630,135 +632,154 @@ export function QuestionTranslation({ onBack }: QuestionTranslationProps) {
           </div>
         </CardHeader>
         <CardContent className="p-0">
-          {/* Wrapper avec scroll horizontal ET vertical */}
-          <div className="overflow-x-auto overflow-y-auto max-h-[600px] relative scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100">
-            <div className="min-w-max">
+          {/* Wrapper avec scroll horizontal */}
+          <div className="overflow-x-auto relative">
+            <table className="w-full border-collapse" style={{ minWidth: '100%' }}>
               {/* Table Header */}
-              <div className="sticky top-0 z-10 bg-slate-50 border-b border-slate-200">
-                <div className="grid grid-cols-[200px_repeat(10,minmax(200px,1fr))] gap-px">
-                  <div className="p-3 bg-slate-100 sticky left-0 z-20 shadow-[2px_0_8px_rgba(0,0,0,0.06)]">
-                    <p className="text-xs text-slate-600">Question (FR - source)</p>
-                  </div>
-                  {LANGUAGES.slice(1).map((lang) => (
-                    <div key={lang.code} className="p-3 bg-slate-100">
-                      <p className="text-xs text-slate-600 flex items-center gap-1">
-                        <span>{lang.flag}</span>
-                        <span>{lang.code.toUpperCase()}</span>
-                      </p>
+              <thead className="sticky top-0 z-10 bg-slate-50 border-b-2 border-slate-300">
+                <tr>
+                  {/* Colonne source (FR) - sticky à gauche */}
+                  <th className="sticky left-0 z-20 bg-slate-100 p-4 text-left border-r-2 border-slate-300 shadow-[2px_0_8px_rgba(0,0,0,0.1)]" style={{ minWidth: '250px', maxWidth: '250px' }}>
+                    <div className="flex items-center gap-2">
+                      <span className="text-xs text-slate-600">Question (FR - source)</span>
                     </div>
+                  </th>
+                  {/* Colonnes des langues cibles */}
+                  {LANGUAGES.slice(1).map((lang) => (
+                    <th 
+                      key={lang.code} 
+                      className="bg-slate-100 p-4 text-left border-r border-slate-200"
+                      style={{ minWidth: '300px', maxWidth: '300px' }}
+                    >
+                      <div className="flex items-center gap-2">
+                        <span className="text-xl">{lang.flag}</span>
+                        <div>
+                          <p className="text-xs text-slate-900">{lang.code.toUpperCase()}</p>
+                          <p className="text-xs text-slate-500">{lang.name}</p>
+                        </div>
+                      </div>
+                    </th>
                   ))}
-                </div>
-              </div>
+                </tr>
+              </thead>
 
               {/* Table Body */}
-              {filteredQuestions.map((question, idx) => (
-                <motion.div
-                  key={question.id}
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: idx * 0.02 }}
-                  className="grid grid-cols-[200px_repeat(10,minmax(200px,1fr))] gap-px border-b border-slate-100 hover:bg-slate-50/50"
-                >
-                  {/* Source Language (French) - Sticky Column */}
-                  <div className="p-3 bg-blue-50/50 sticky left-0 z-10 border-r border-slate-200 shadow-[2px_0_8px_rgba(0,0,0,0.06)]">
-                    <p className="text-sm text-slate-900 mb-1">{translations[question.id]?.fr?.text || question.label}</p>
-                    <p className="text-xs text-slate-500">{question.code}</p>
-                    <Badge variant="outline" className="mt-1 text-xs border-blue-300 text-blue-700">Source</Badge>
-                  </div>
-
-                  {/* Target Languages */}
-                  {LANGUAGES.slice(1).map((lang) => {
-                    const translation = translations[question.id]?.[lang.code];
-                    const isEditing = editingCell?.questionId === question.id && editingCell?.langCode === lang.code;
-
-                    return (
-                      <div key={lang.code} className="p-3 relative group">
-                        {isEditing ? (
-                          <div className="space-y-2">
-                            <Textarea
-                              value={editValue}
-                              onChange={(e) => setEditValue(e.target.value)}
-                              className="min-h-[80px] text-sm"
-                              autoFocus
-                            />
-                            {/* Character Counter */}
-                            <CharacterCounter
-                              current={editValue.length}
-                              max={500}
-                              recommended={200}
-                              sourceLength={translations[question.id]?.fr?.text?.length || 0}
-                              showComparison={true}
-                            />
-                            <div className="flex gap-2">
-                              <Button
-                                size="sm"
-                                onClick={handleSaveEdit}
-                                disabled={saving}
-                                className="flex-1 bg-gradient-to-r from-green-500 to-emerald-500 text-white"
-                              >
-                                {saving ? <RefreshCw className="w-3 h-3 animate-spin" /> : <Check className="w-3 h-3" />}
-                              </Button>
-                              <Button
-                                size="sm"
-                                variant="outline"
-                                onClick={handleCancelEdit}
-                                disabled={saving}
-                              >
-                                <X className="w-3 h-3" />
-                              </Button>
-                            </div>
-                          </div>
-                        ) : (
-                          <>
-                            {translation?.text ? (
-                              <div className="space-y-2">
-                                <p className="text-sm text-slate-700 line-clamp-2">{translation.text}</p>
-                                {getStatusBadge(translation.status)}
-                              </div>
-                            ) : (
-                              <div className="text-xs text-slate-400 italic">Non traduit</div>
-                            )}
-
-                            {/* Hover Actions */}
-                            <div className="absolute inset-0 bg-slate-900/5 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
-                              <Button
-                                size="sm"
-                                variant="outline"
-                                className="bg-white shadow-lg"
-                                onClick={() => handleStartEdit(question.id, lang.code)}
-                              >
-                                <Edit2 className="w-3 h-3 mr-1" />
-                                Éditer
-                              </Button>
-                              {(!translation?.text || translation.status === 'missing') && (
-                                <>
-                                  <Button
-                                    size="sm"
-                                    className="bg-gradient-to-r from-violet-500 to-purple-500 text-white shadow-lg"
-                                    onClick={() => handleGenerateTranslation(question.id, lang.code, 'mcp')}
-                                  >
-                                    <Sparkles className="w-3 h-3 mr-1" />
-                                    MCP
-                                  </Button>
-                                  <Button
-                                    size="sm"
-                                    className="bg-gradient-to-r from-cyan-500 to-teal-500 text-white shadow-lg"
-                                    onClick={() => handleGenerateTranslation(question.id, lang.code, 'api')}
-                                  >
-                                    <RefreshCw className="w-3 h-3 mr-1" />
-                                    API
-                                  </Button>
-                                </>
-                              )}
-                            </div>
-                          </>
-                        )}
+              <tbody>
+                {filteredQuestions.map((question, idx) => (
+                  <motion.tr
+                    key={question.id}
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    transition={{ delay: idx * 0.02 }}
+                    className="border-b border-slate-100 hover:bg-slate-50/50"
+                  >
+                    {/* Source Language (French) - Sticky Column */}
+                    <td className="sticky left-0 z-10 bg-blue-50/80 backdrop-blur-sm p-4 border-r-2 border-slate-300 shadow-[2px_0_8px_rgba(0,0,0,0.1)]" style={{ minWidth: '250px', maxWidth: '250px' }}>
+                      <p className="text-sm text-slate-900 mb-2 line-clamp-3">{translations[question.id]?.fr?.text || question.label}</p>
+                      <div className="flex items-center gap-2">
+                        <Badge variant="outline" className="text-xs border-slate-300 text-slate-600">{question.code}</Badge>
+                        <Badge variant="outline" className="text-xs border-blue-300 text-blue-700 bg-blue-50">Source</Badge>
                       </div>
-                    );
-                  })}
-                </motion.div>
-              ))}
-            </div>
+                    </td>
+
+                    {/* Target Languages */}
+                    {LANGUAGES.slice(1).map((lang) => {
+                      const translation = translations[question.id]?.[lang.code];
+                      const isEditing = editingCell?.questionId === question.id && editingCell?.langCode === lang.code;
+
+                      return (
+                        <td 
+                          key={lang.code} 
+                          className="p-4 relative group border-r border-slate-200 bg-white align-top"
+                          style={{ minWidth: '300px', maxWidth: '300px' }}
+                        >
+                          {isEditing ? (
+                            <div className="space-y-2">
+                              <Textarea
+                                value={editValue}
+                                onChange={(e) => setEditValue(e.target.value)}
+                                className="min-h-[80px] text-sm w-full"
+                                autoFocus
+                              />
+                              {/* Character Counter */}
+                              <CharacterCounter
+                                current={editValue.length}
+                                max={500}
+                                recommended={200}
+                                sourceLength={translations[question.id]?.fr?.text?.length || 0}
+                                showComparison={true}
+                              />
+                              <div className="flex gap-2">
+                                <Button
+                                  size="sm"
+                                  onClick={handleSaveEdit}
+                                  disabled={saving}
+                                  className="flex-1 bg-gradient-to-r from-green-500 to-emerald-500 text-white"
+                                >
+                                  {saving ? <RefreshCw className="w-3 h-3 animate-spin" /> : <Check className="w-3 h-3" />}
+                                </Button>
+                                <Button
+                                  size="sm"
+                                  variant="outline"
+                                  onClick={handleCancelEdit}
+                                  disabled={saving}
+                                >
+                                  <X className="w-3 h-3" />
+                                </Button>
+                              </div>
+                            </div>
+                          ) : (
+                            <>
+                              {translation?.text ? (
+                                <div className="space-y-2">
+                                  <p className="text-sm text-slate-700 line-clamp-2">{translation.text}</p>
+                                  {getStatusBadge(translation.status)}
+                                </div>
+                              ) : (
+                                <div className="text-xs text-slate-400 italic">Non traduit</div>
+                              )}
+
+                              {/* Hover Actions */}
+                              <div className="absolute inset-0 bg-slate-900/5 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
+                                <Button
+                                  size="sm"
+                                  variant="outline"
+                                  className="bg-white shadow-lg"
+                                  onClick={() => handleStartEdit(question.id, lang.code)}
+                                >
+                                  <Edit2 className="w-3 h-3 mr-1" />
+                                  Éditer
+                                </Button>
+                                {(!translation?.text || translation.status === 'missing') && (
+                                  <>
+                                    <Button
+                                      size="sm"
+                                      className="bg-gradient-to-r from-violet-500 to-purple-500 text-white shadow-lg"
+                                      onClick={() => handleGenerateTranslation(question.id, lang.code, 'mcp')}
+                                    >
+                                      <Sparkles className="w-3 h-3 mr-1" />
+                                      MCP
+                                    </Button>
+                                    <Button
+                                      size="sm"
+                                      className="bg-gradient-to-r from-cyan-500 to-teal-500 text-white shadow-lg"
+                                      onClick={() => handleGenerateTranslation(question.id, lang.code, 'api')}
+                                    >
+                                      <RefreshCw className="w-3 h-3 mr-1" />
+                                      API
+                                    </Button>
+                                  </>
+                                )}
+                              </div>
+                            </>
+                          )}
+                        </td>
+                      );
+                    })}
+                  </motion.tr>
+                ))}
+              </tbody>
+            </table>
           </div>
         </CardContent>
       </Card>
