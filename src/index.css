@@ -2062,10 +2062,6 @@
     background-color: var(--color-blue-100);
   }
 
-  .bg-blue-500 {
-    background-color: var(--color-blue-500);
-  }
-
   .bg-blue-500\/10 {
     background-color: color-mix(in srgb, oklch(.623 .214 259.815) 10%, transparent);
   }
@@ -2998,6 +2994,17 @@
   .to-red-500 {
     --tw-gradient-to: var(--color-red-500);
     --tw-gradient-stops: var(--tw-gradient-via-stops, var(--tw-gradient-position), var(--tw-gradient-from) var(--tw-gradient-from-position), var(--tw-gradient-to) var(--tw-gradient-to-position));
+  }
+
+  .to-red-500\/10 {
+    --tw-gradient-to: color-mix(in srgb, oklch(.637 .237 25.331) 10%, transparent);
+    --tw-gradient-stops: var(--tw-gradient-via-stops, var(--tw-gradient-position), var(--tw-gradient-from) var(--tw-gradient-from-position), var(--tw-gradient-to) var(--tw-gradient-to-position));
+  }
+
+  @supports (color: color-mix(in lab, red, red)) {
+    .to-red-500\/10 {
+      --tw-gradient-to: color-mix(in oklab, var(--color-red-500) 10%, transparent);
+    }
   }
 
   .to-rose-500 {
