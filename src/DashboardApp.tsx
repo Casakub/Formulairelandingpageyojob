@@ -148,33 +148,45 @@ export default function DashboardApp({ onBackToSurvey }: DashboardAppProps = {})
         animate={{ width: sidebarCollapsed ? '80px' : '280px' }}
         className="hidden lg:flex fixed left-0 top-0 h-screen bg-white/90 backdrop-blur-xl border-r border-slate-200 shadow-xl flex-col z-50"
       >
-        {/* Logo */}
+        {/* User Profile Header */}
         <div className="p-6 border-b border-slate-200">
-          <div className="flex items-center gap-3">
+          {!sidebarCollapsed && user ? (
             <motion.div 
-              className="w-12 h-12 rounded-xl bg-gradient-to-br from-blue-600 to-cyan-500 flex items-center justify-center shadow-lg shadow-blue-500/30"
-              whileHover={{ scale: 1.05, rotate: 5 }}
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="p-4 rounded-xl bg-gradient-to-br from-blue-50 to-cyan-50 border border-blue-100"
             >
-              <span className="text-white text-2xl">Y</span>
-            </motion.div>
-            {!sidebarCollapsed && (
-              <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                className="flex-1 min-w-0"
-              >
-                <h1 className="text-slate-900">YoJob</h1>
-                {user ? (
+              <div className="flex items-center gap-3">
+                <div className="w-12 h-12 rounded-full bg-gradient-to-br from-blue-600 to-cyan-500 flex items-center justify-center text-white shadow-lg shadow-blue-500/30">
+                  <User className="w-6 h-6" />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="text-slate-900 truncate" title={user.name || user.email}>
+                    {user.name || 'Admin'}
+                  </p>
                   <p className="text-cyan-600 text-xs truncate" title={user.email}>
                     {user.email}
                   </p>
-                ) : (
-                  <p className="text-cyan-600 text-xs">Dashboard Admin</p>
-                )}
-              </motion.div>
-            )}
-          </div>
+                </div>
+              </div>
+              {user.role && (
+                <Badge className="mt-3 bg-gradient-to-r from-blue-600 to-cyan-500 text-white border-0 text-xs">
+                  {user.role}
+                </Badge>
+              )}
+            </motion.div>
+          ) : sidebarCollapsed ? (
+            <motion.div 
+              whileHover={{ scale: 1.05 }}
+              className="w-12 h-12 rounded-full bg-gradient-to-br from-blue-600 to-cyan-500 flex items-center justify-center text-white shadow-lg shadow-blue-500/30 mx-auto"
+            >
+              <User className="w-6 h-6" />
+            </motion.div>
+          ) : (
+            <div className="p-4 rounded-xl bg-slate-50 border border-slate-200">
+              <p className="text-slate-600 text-sm text-center">Chargement...</p>
+            </div>
+          )}
         </div>
 
         {/* Navigation */}
@@ -239,34 +251,6 @@ export default function DashboardApp({ onBackToSurvey }: DashboardAppProps = {})
 
         {/* Bottom Actions */}
         <div className="p-4 border-t border-slate-200 space-y-2">
-          {/* User info card */}
-          {!sidebarCollapsed && user && (
-            <motion.div 
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              className="mb-3 p-3 rounded-xl bg-gradient-to-br from-blue-50 to-cyan-50 border border-blue-100"
-            >
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-600 to-cyan-500 flex items-center justify-center text-white shadow-lg shadow-blue-500/30">
-                  <User className="w-5 h-5" />
-                </div>
-                <div className="flex-1 min-w-0">
-                  <p className="text-slate-900 text-sm truncate" title={user.name || user.email}>
-                    {user.name || 'Admin'}
-                  </p>
-                  <p className="text-cyan-600 text-xs truncate" title={user.email}>
-                    {user.email}
-                  </p>
-                </div>
-              </div>
-              {user.role && (
-                <Badge className="mt-2 bg-gradient-to-r from-blue-600 to-cyan-500 text-white border-0 text-xs">
-                  {user.role}
-                </Badge>
-              )}
-            </motion.div>
-          )}
-
           {onBackToSurvey && (
             <button
               onClick={onBackToSurvey}
