@@ -59,6 +59,7 @@ export function QuestionManager() {
   const [isCreating, setIsCreating] = useState(false);
   const [filteredQuestions, setFilteredQuestions] = useState<Question[]>([]);
   const [showPreview, setShowPreview] = useState(false);
+  const [renderKey, setRenderKey] = useState(0);
 
   // Client-side only mount
   useEffect(() => {
@@ -77,7 +78,7 @@ export function QuestionManager() {
       const questionToEdit = questions.find(q => q.id === editingId);
       console.log('🔍 Question to edit:', questionToEdit);
       if (questionToEdit) {
-        setNewQuestion({
+        const formData = {
           code: questionToEdit.code,
           label: questionToEdit.label,
           type: questionToEdit.type,
@@ -86,7 +87,9 @@ export function QuestionManager() {
           required: questionToEdit.required,
           visible: questionToEdit.visible,
           options: questionToEdit.options
-        });
+        };
+        console.log('📋 Setting form data:', formData);
+        setNewQuestion(formData);
       }
     } else {
       // Reset form when not editing
@@ -270,7 +273,7 @@ export function QuestionManager() {
       {isMounted && (isCreating || editingId !== null) && createPortal(
         <AnimatePresence mode="wait">
           <motion.div
-            key="modal-backdrop"
+            key={`modal-${editingId || 'create'}`}
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
@@ -282,7 +285,7 @@ export function QuestionManager() {
             }}
           >
             <motion.div
-              key="modal-content"
+              key={`modal-content-${editingId || 'create'}`}
               initial={{ scale: 0.9, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.9, opacity: 0 }}
@@ -340,23 +343,33 @@ export function QuestionManager() {
                   <Label htmlFor="type" className="text-slate-900 mb-2 block">
                     Type de question
                   </Label>
-                  <Select 
-                    value={newQuestion.type} 
-                    onValueChange={(value: any) => setNewQuestion({ ...newQuestion, type: value })}
-                  >
-                    <SelectTrigger className="bg-slate-50 border-slate-200 text-slate-900">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="text">Texte court</SelectItem>
-                      <SelectItem value="textarea">Texte long</SelectItem>
-                      <SelectItem value="number">Nombre</SelectItem>
-                      <SelectItem value="email">Email</SelectItem>
-                      <SelectItem value="radio">Choix unique</SelectItem>
-                      <SelectItem value="multi-select">Choix multiple</SelectItem>
-                      <SelectItem value="score">Score (1-10)</SelectItem>
-                    </SelectContent>
-                  </Select>
+                  <div className="relative">
+                    <select
+                      id="type"
+                      value={newQuestion.type}
+                      onChange={(e) => {
+                        console.log('🔄 Type changed to:', e.target.value);
+                        setNewQuestion({ ...newQuestion, type: e.target.value as any });
+                      }}
+                      className="w-full rounded-lg border border-slate-200 bg-slate-50 text-slate-900 px-3 py-2.5 pr-10 
+                                 focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:border-transparent
+                                 hover:border-cyan-300 transition-all duration-200 cursor-pointer
+                                 appearance-none"
+                    >
+                      <option value="text">Texte court</option>
+                      <option value="textarea">Texte long</option>
+                      <option value="number">Nombre</option>
+                      <option value="email">Email</option>
+                      <option value="radio">Choix unique</option>
+                      <option value="multi-select">Choix multiple</option>
+                      <option value="score">Score (1-10)</option>
+                    </select>
+                    <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-slate-400">
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                      </svg>
+                    </div>
+                  </div>
                 </div>
 
                 {/* Section */}
@@ -364,22 +377,32 @@ export function QuestionManager() {
                   <Label htmlFor="section" className="text-slate-900 mb-2 block">
                     Section
                   </Label>
-                  <Select 
-                    value={newQuestion.section?.toString()} 
-                    onValueChange={(value) => setNewQuestion({ ...newQuestion, section: parseInt(value) })}
-                  >
-                    <SelectTrigger className="bg-slate-50 border-slate-200 text-slate-900">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="1">Section 1 - Profil</SelectItem>
-                      <SelectItem value="2">Section 2 - Détachement</SelectItem>
-                      <SelectItem value="3">Section 3 - Besoins</SelectItem>
-                      <SelectItem value="4">Section 4 - Intérêt</SelectItem>
-                      <SelectItem value="5">Section 5 - Vision</SelectItem>
-                      <SelectItem value="6">Section 6 - Contact</SelectItem>
-                    </SelectContent>
-                  </Select>
+                  <div className="relative">
+                    <select
+                      id="section"
+                      value={newQuestion.section?.toString()}
+                      onChange={(e) => {
+                        console.log('🔄 Section changed to:', e.target.value);
+                        setNewQuestion({ ...newQuestion, section: parseInt(e.target.value) });
+                      }}
+                      className="w-full rounded-lg border border-slate-200 bg-slate-50 text-slate-900 px-3 py-2.5 pr-10
+                                 focus:outline-none focus:ring-2 focus:ring-violet-500 focus:border-transparent
+                                 hover:border-violet-300 transition-all duration-200 cursor-pointer
+                                 appearance-none"
+                    >
+                      <option value="1">Section 1 - Profil</option>
+                      <option value="2">Section 2 - Détachement</option>
+                      <option value="3">Section 3 - Besoins</option>
+                      <option value="4">Section 4 - Intérêt</option>
+                      <option value="5">Section 5 - Vision</option>
+                      <option value="6">Section 6 - Contact</option>
+                    </select>
+                    <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-slate-400">
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                      </svg>
+                    </div>
+                  </div>
                 </div>
 
                 {/* Placeholder */}
