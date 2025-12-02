@@ -119,6 +119,14 @@ export async function saveUITextTranslation(
 export async function bulkSaveUITextTranslations(
   translations: UITextTranslation[]
 ): Promise<{ success: boolean; count: number }> {
+  console.log('📤 Bulk saving UI text translations:', translations.length);
+  
+  // If empty array, return success
+  if (translations.length === 0) {
+    console.log('⚠️ No UI text translations to save, skipping...');
+    return { success: true, count: 0 };
+  }
+  
   return apiCall('/ui-texts/bulk', {
     method: 'POST',
     body: JSON.stringify({ translations }),

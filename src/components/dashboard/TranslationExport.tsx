@@ -150,27 +150,42 @@ export function TranslationExport() {
       const promises = [];
       const types: string[] = [];
 
+      console.log('📊 Import data structure:', {
+        questionsCount: importData.data.questions?.length || 0,
+        uiTextsCount: importData.data.uiTexts?.length || 0,
+        countriesCount: importData.data.countries?.length || 0
+      });
+
       if (importData.data.questions?.length > 0) {
+        console.log('➕ Adding questions import');
         promises.push(bulkSaveQuestionTranslations(importData.data.questions));
         types.push('questions');
       }
 
       if (importData.data.uiTexts?.length > 0) {
+        console.log('➕ Adding UI texts import');
         promises.push(bulkSaveUITextTranslations(importData.data.uiTexts));
         types.push('uiTexts');
+      } else {
+        console.log('⏭️ Skipping UI texts import (empty array)');
       }
 
       if (importData.data.countries?.length > 0) {
+        console.log('➕ Adding countries import');
         promises.push(bulkSaveCountryLanguageMappings(importData.data.countries));
         types.push('countries');
       }
 
       const results = await Promise.allSettled(promises);
       
+      console.log('📋 Import results:', results);
+      
       const successCount = results.filter(r => r.status === 'fulfilled' && r.value === true).length;
       const failedTypes = results
         .map((r, i) => r.status === 'rejected' ? types[i] : null)
         .filter(Boolean);
+
+      console.log(`✅ Success count: ${successCount}/${results.length}`);
 
       if (successCount === results.length) {
         toast.success('✅ Import réussi', {

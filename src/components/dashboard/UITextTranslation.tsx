@@ -90,62 +90,65 @@ interface UITextTranslationProps {
 }
 
 export function UITextTranslation({ onBack }: UITextTranslationProps) {
-  const [activeCategory, setActiveCategory] = useState<UITextCategory>('buttons');
+  const { uiTextTranslations, saveUITextTranslation, loadAll } = useTranslationContext();
+  
+  const [activeCategory, setActiveCategory] = useState<UITextCategory | 'all'>('all');
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedLanguage, setSelectedLanguage] = useState<string>('en');
   const [editingText, setEditingText] = useState<string | null>(null);
   const [editValue, setEditValue] = useState('');
-  const [translations, setTranslations] = useState<UITextTranslations>({});
   const [saving, setSaving] = useState(false);
 
-  // Initialize translations
+  // Load UI text translations on mount
   useEffect(() => {
-    const initialTranslations: UITextTranslations = {};
-    UI_TEXTS.forEach((text) => {
-      initialTranslations[text.id] = {
-        fr: { text: text.sourceFr, status: 'validated' },
-        ...LANGUAGES.slice(1).reduce((acc, lang) => ({
-          ...acc,
-          [lang.code]: { text: '', status: 'missing' as TranslationStatus }
-        }), {})
-      };
-    });
-    setTranslations(initialTranslations);
-  }, []);
+    loadAll();
+  }, [loadAll]);
 
-  const filteredTexts = UI_TEXTS.filter((text) => {
-    const matchesCategory = text.category === activeCategory;
-    const matchesSearch = text.sourceFr.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         text.key.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         text.context.toLowerCase().includes(searchTerm.toLowerCase());
+  console.log('📝 UI Text Translations loaded:', uiTextTranslations.length);
+
+  // Filter UI texts from context
+  const filteredTexts = uiTextTranslations.filter((uiText) => {
+    const matchesCategory = activeCategory === 'all' || uiText.category === activeCategory;
+    const matchesSearch = !searchTerm || 
+                         uiText.key.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         uiText.textId.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         Object.values(uiText.translations).some(t => 
+                           t.text.toLowerCase().includes(searchTerm.toLowerCase())
+                         );
     return matchesCategory && matchesSearch;
   });
 
   const handleStartEdit = (textId: string) => {
     setEditingText(textId);
-    const currentTranslation = translations[textId]?.[selectedLanguage]?.text || '';
+    const uiText = uiTextTranslations.find(t => t.textId === textId);
+    const currentTranslation = uiText?.translations[selectedLanguage]?.text || '';
     setEditValue(currentTranslation);
   };
 
-  const handleSaveEdit = () => {
+  const handleSaveEdit = async () => {
     if (!editingText) return;
     
     setSaving(true);
-    setTimeout(() => {
-      setTranslations(prev => ({
-        ...prev,
-        [editingText]: {
-          ...prev[editingText],
-          [selectedLanguage]: {
-            text: editValue,
-            status: 'validated'
-          }
-        }
-      }));
+    try {
+      const uiText = uiTextTranslations.find(t => t.textId === editingText);
+      if (uiText) {
+        await saveUITextTranslation(
+          editingText,
+          selectedLanguage,
+          editValue,
+          'validated',
+          uiText.key,
+          uiText.category
+        );
+        console.log(`✅ Saved UI text: ${editingText} (${selectedLanguage})`);
+      }
       setEditingText(null);
       setEditValue('');
+    } catch (error) {
+      console.error('Error saving UI text:', error);
+    } finally {
       setSaving(false);
-    }, 500);
+    }
   };
 
   const handleCancelEdit = () => {
@@ -153,20 +156,24 @@ export function UITextTranslation({ onBack }: UITextTranslationProps) {
     setEditValue('');
   };
 
-  const handleGenerateTranslation = (textId: string, method: 'mcp' | 'api') => {
-    const sourceText = translations[textId]?.fr?.text || '';
+  const handleGenerateTranslation = async (textId: string, method: 'mcp' | 'api') => {
+    const uiText = uiTextTranslations.find(t => t.textId === textId);
+    if (!uiText) return;
+    
+    const sourceText = uiText.translations.fr?.text || '';
+    // TODO: Implement real translation via MCP or API
     const autoTranslated = `[${method.toUpperCase()}] ${sourceText}`;
     
-    setTranslations(prev => ({
-      ...prev,
-      [textId]: {
-        ...prev[textId],
-        [selectedLanguage]: {
-          text: autoTranslated,
-          status: method === 'mcp' ? 'auto-mcp' : 'auto-api'
-        }
-      }
-    }));
+    await saveUITextTranslation(
+      textId,
+      selectedLanguage,
+      autoTranslated,
+      method === 'mcp' ? 'auto-mcp' : 'auto-api',
+      uiText.key,
+      uiText.category
+    );
+    
+    console.log(`✅ Generated translation for ${textId} using ${method}`);
   };
 
   const getStatusBadge = (status: TranslationStatus) => {
@@ -201,7 +208,10 @@ export function UITextTranslation({ onBack }: UITextTranslationProps) {
   };
 
   const getStats = (category?: UITextCategory) => {
-    const textsToCount = category ? UI_TEXTS.filter(t => t.category === category) : UI_TEXTS;
+    const textsToCount = category 
+      ? uiTextTranslations.filter(t => t.category === category) 
+      : uiTextTranslations;
+    
     let total = 0;
     let missing = 0;
     let validated = 0;
@@ -209,8 +219,8 @@ export function UITextTranslation({ onBack }: UITextTranslationProps) {
     textsToCount.forEach((text) => {
       LANGUAGES.slice(1).forEach((lang) => {
         total++;
-        const translation = translations[text.id]?.[lang.code];
-        if (!translation || translation.status === 'missing') {
+        const translation = text.translations[lang.code];
+        if (!translation || translation.status === 'missing' || !translation.text) {
           missing++;
         } else if (translation.status === 'validated') {
           validated++;
@@ -315,9 +325,20 @@ export function UITextTranslation({ onBack }: UITextTranslationProps) {
       {/* Categories */}
       <Tabs value={activeCategory} onValueChange={(v) => setActiveCategory(v as UITextCategory)}>
         <TabsList className="grid w-full grid-cols-4 bg-white/50 backdrop-blur-sm p-1">
-          {(['buttons', 'labels', 'messages', 'navigation'] as UITextCategory[]).map((cat) => {
-            const Icon = getCategoryIcon(cat);
-            const stats = getStats(cat);
+          <TabsTrigger 
+            value="all"
+            className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-500 data-[state=active]:to-cyan-500 data-[state=active]:text-white"
+          >
+            <FileText className="w-4 h-4 mr-2" />
+            <span className="hidden sm:inline">Tous</span>
+            <Badge variant="secondary" className="ml-2 text-xs">{uiTextTranslations.length}</Badge>
+          </TabsTrigger>
+          {(['buttons', 'labels', 'messages', 'navigation', 'form', 'descriptions', 'headers', 'footer', 'validation', 'progress', 'main'] as const).map((cat) => {
+            const textsInCat = uiTextTranslations.filter(t => t.category === cat);
+            if (textsInCat.length === 0) return null;
+            
+            const Icon = getCategoryIcon(cat as UITextCategory) || FileText;
+            const stats = getStats(cat as UITextCategory);
             return (
               <TabsTrigger 
                 key={cat} 
@@ -326,7 +347,7 @@ export function UITextTranslation({ onBack }: UITextTranslationProps) {
               >
                 <Icon className="w-4 h-4 mr-2" />
                 <span className="hidden sm:inline">{cat.charAt(0).toUpperCase() + cat.slice(1)}</span>
-                <Badge variant="secondary" className="ml-2 text-xs">{stats.progress}%</Badge>
+                <Badge variant="secondary" className="ml-2 text-xs">{textsInCat.length}</Badge>
               </TabsTrigger>
             );
           })}
@@ -345,12 +366,13 @@ export function UITextTranslation({ onBack }: UITextTranslationProps) {
                 <ScrollArea className="h-[500px]">
                   <div className="space-y-2 p-4">
                     {filteredTexts.map((text, idx) => {
-                      const translation = translations[text.id]?.[selectedLanguage];
-                      const isEditing = editingText === text.id;
+                      const translation = text.translations[selectedLanguage];
+                      const sourceFr = text.translations.fr?.text || '';
+                      const isEditing = editingText === text.textId;
 
                       return (
                         <motion.div
-                          key={text.id}
+                          key={text.textId}
                           initial={{ opacity: 0, y: 10 }}
                           animate={{ opacity: 1, y: 0 }}
                           transition={{ delay: idx * 0.02 }}
@@ -365,14 +387,14 @@ export function UITextTranslation({ onBack }: UITextTranslationProps) {
                                       <Badge variant="outline" className="text-xs">{text.key}</Badge>
                                       {getStatusBadge(translation?.status || 'missing')}
                                     </div>
-                                    <p className="text-sm text-slate-500">{text.context}</p>
+                                    <p className="text-sm text-slate-500">{text.category}</p>
                                   </div>
                                 </div>
 
                                 {/* Source (French) */}
                                 <div className="p-3 bg-blue-50 rounded-lg border border-blue-100">
                                   <Label className="text-xs text-blue-700 mb-1 block">🇫🇷 Source (Français)</Label>
-                                  <p className="text-sm text-slate-900">{text.sourceFr}</p>
+                                  <p className="text-sm text-slate-900">{sourceFr}</p>
                                 </div>
 
                                 {/* Target Language */}
@@ -422,7 +444,7 @@ export function UITextTranslation({ onBack }: UITextTranslationProps) {
                                       <Button
                                         size="sm"
                                         variant="outline"
-                                        onClick={() => handleStartEdit(text.id)}
+                                        onClick={() => handleStartEdit(text.textId)}
                                       >
                                         <Edit2 className="w-3 h-3 mr-2" />
                                         Éditer
@@ -432,7 +454,7 @@ export function UITextTranslation({ onBack }: UITextTranslationProps) {
                                           <Button
                                             size="sm"
                                             className="bg-gradient-to-r from-violet-500 to-purple-500 text-white"
-                                            onClick={() => handleGenerateTranslation(text.id, 'mcp')}
+                                            onClick={() => handleGenerateTranslation(text.textId, 'mcp')}
                                           >
                                             <Sparkles className="w-3 h-3 mr-2" />
                                             MCP
@@ -440,7 +462,7 @@ export function UITextTranslation({ onBack }: UITextTranslationProps) {
                                           <Button
                                             size="sm"
                                             className="bg-gradient-to-r from-cyan-500 to-teal-500 text-white"
-                                            onClick={() => handleGenerateTranslation(text.id, 'api')}
+                                            onClick={() => handleGenerateTranslation(text.textId, 'api')}
                                           >
                                             <RefreshCw className="w-3 h-3 mr-2" />
                                             API

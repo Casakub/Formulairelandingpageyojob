@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test UI Text Import</title>
+    <style>
+        body { font-family: monospace; padding: 20px; background: #1a1a1a; color: #0f0; }
+        button { padding: 10px 20px; margin: 10px 0; font-size: 16px; cursor: pointer; }
+        pre { background: #000; padding: 15px; border-radius: 5px; overflow-x: auto; }
+        .success { color: #0f0; }
+        .error { color: #f00; }
+    </style>
+</head>
+<body>
+    <h1>🧪 Test UI Text Import API</h1>
+    
+    <button onclick="testSimpleImport()">Test avec 1 texte UI simple</button>
+    <button onclick="testFullImport()">Test avec 39 textes UI</button>
+    <button onclick="clearLogs()">Clear Logs</button>
+    
+    <div id="logs"></div>
+
+    <script>
+        // CONFIGURATION - Remplacez par vos vraies valeurs
+        const PROJECT_ID = 'mlafbamcdxdltcblljef'; // Remplacez par votre project ID
+        const ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1sYWZiYW1jZHhkbHRjYmxsamVmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzI5MDE0NjgsImV4cCI6MjA0ODQ3NzQ2OH0.c7nGbLcEzxR0yI-kYGvGWVfk6tEYQDpBZz6VjuWISsk'; // Remplacez
+        
+        const BASE_URL = `https://${PROJECT_ID}.supabase.co/functions/v1/make-server-10092a63/i18n`;
+        
+        function log(message, type = 'info') {
+            const logs = document.getElementById('logs');
+            const className = type === 'error' ? 'error' : type === 'success' ? 'success' : '';
+            logs.innerHTML += `<pre class="${className}">${new Date().toISOString().split('T')[1].split('.')[0]} | ${message}</pre>`;
+            logs.scrollTop = logs.scrollHeight;
+        }
+        
+        function clearLogs() {
+            document.getElementById('logs').innerHTML = '';
+        }
+
+        async function testSimpleImport() {
+            log('🚀 Testing simple import (1 UI text)...');
+            
+            const testData = {
+                translations: [
+                    {
+                        textId: "test.button.hello",
+                        key: "test.button.hello",
+                        category: "buttons",
+                        translations: {
+                            fr: { text: "Bonjour", status: "validated" },
+                            en: { text: "Hello", status: "validated" }
+                        }
+                    }
+                ]
+            };
+            
+            log('📦 Sending data: ' + JSON.stringify(testData, null, 2));
+            
+            try {
+                const response = await fetch(`${BASE_URL}/ui-texts/bulk`, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${ANON_KEY}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(testData)
+                });
+                
+                log(`📡 Response status: ${response.status} ${response.statusText}`);
+                
+                const responseText = await response.text();
+                log(`📥 Response body: ${responseText}`);
+                
+                if (response.ok) {
+                    const data = JSON.parse(responseText);
+                    log(`✅ SUCCESS: ${JSON.stringify(data, null, 2)}`, 'success');
+                } else {
+                    log(`❌ ERROR: ${responseText}`, 'error');
+                }
+            } catch (error) {
+                log(`❌ EXCEPTION: ${error.message}`, 'error');
+                log(error.stack, 'error');
+            }
+        }
+
+        async function testFullImport() {
+            log('🚀 Testing full import (39 UI texts)...');
+            log('⚠️ Fetching test JSON from public folder...');
+            
+            try {
+                // Load the test JSON file
+                const jsonResponse = await fetch('/test-ui-simple.json');
+                const jsonData = await jsonResponse.json();
+                
+                const testData = {
+                    translations: jsonData.data.uiTexts
+                };
+                
+                log(`📦 Loaded ${testData.translations.length} UI texts from JSON`);
+                log('📝 First item: ' + JSON.stringify(testData.translations[0], null, 2));
+                
+                const response = await fetch(`${BASE_URL}/ui-texts/bulk`, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${ANON_KEY}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(testData)
+                });
+                
+                log(`📡 Response status: ${response.status} ${response.statusText}`);
+                
+                const responseText = await response.text();
+                log(`📥 Response body: ${responseText}`);
+                
+                if (response.ok) {
+                    const data = JSON.parse(responseText);
+                    log(`✅ SUCCESS: ${JSON.stringify(data, null, 2)}`, 'success');
+                } else {
+                    log(`❌ ERROR: ${responseText}`, 'error');
+                }
+            } catch (error) {
+                log(`❌ EXCEPTION: ${error.message}`, 'error');
+                log(error.stack, 'error');
+            }
+        }
+        
+        log('✅ Test page ready. Click a button to start testing.');
+    </script>
+</body>
+</html>

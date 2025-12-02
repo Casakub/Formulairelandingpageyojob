@@ -1,0 +1,295 @@
+{
+  "version": "1.0",
+  "exportDate": "2025-12-02T10:30:00.000Z",
+  "description": "Textes manquants pour la page de formulaire YoJob",
+  "data": {
+    "questions": [],
+    "uiTexts": [
+      {
+        "textId": "form.page.title",
+        "key": "form.page.title",
+        "category": "main",
+        "translations": {
+          "fr": {
+            "text": "Étude de marché européenne - Agences de travail temporaire",
+            "status": "validated"
+          },
+          "en": {
+            "text": "European Market Study - Temporary Employment Agencies",
+            "status": "validated"
+          },
+          "de": {
+            "text": "Europäische Marktstudie - Zeitarbeitsfirmen",
+            "status": "validated"
+          },
+          "es": {
+            "text": "Estudio de mercado europeo - Empresas de trabajo temporal",
+            "status": "validated"
+          },
+          "it": {
+            "text": "Studio di mercato europeo - Agenzie di lavoro temporaneo",
+            "status": "validated"
+          },
+          "nl": {
+            "text": "Europese marktstudie - Uitzendbureaus",
+            "status": "validated"
+          },
+          "pl": {
+            "text": "Europejskie badanie rynku - Agencje pracy tymczasowej",
+            "status": "validated"
+          },
+          "pt": {
+            "text": "Estudo de mercado europeu - Agências de trabalho temporário",
+            "status": "validated"
+          }
+        }
+      },
+      {
+        "textId": "form.page.subtitle",
+        "key": "form.page.subtitle",
+        "category": "main",
+        "translations": {
+          "fr": {
+            "text": "Partagez votre expérience et vos besoins pour façonner l'avenir du recrutement européen",
+            "status": "validated"
+          },
+          "en": {
+            "text": "Share your experience and needs to shape the future of European recruitment",
+            "status": "validated"
+          },
+          "de": {
+            "text": "Teilen Sie Ihre Erfahrungen und Bedürfnisse, um die Zukunft der europäischen Rekrutierung zu gestalten",
+            "status": "validated"
+          },
+          "es": {
+            "text": "Comparta su experiencia y necesidades para dar forma al futuro del reclutamiento europeo",
+            "status": "validated"
+          },
+          "it": {
+            "text": "Condividete la vostra esperienza e le vostre esigenze per plasmare il futuro del reclutamento europeo",
+            "status": "validated"
+          },
+          "nl": {
+            "text": "Deel uw ervaring en behoeften om de toekomst van Europese werving vorm te geven",
+            "status": "validated"
+          },
+          "pl": {
+            "text": "Podziel się swoim doświadczeniem i potrzebami, aby kształtować przyszłość europejskiej rekrutacji",
+            "status": "validated"
+          },
+          "pt": {
+            "text": "Compartilhe sua experiência e necessidades para moldar o futuro do recrutamento europeu",
+            "status": "validated"
+          }
+        }
+      },
+      {
+        "textId": "form.welcome.title",
+        "key": "form.welcome.title",
+        "category": "main",
+        "translations": {
+          "fr": {
+            "text": "Bienvenue !",
+            "status": "validated"
+          },
+          "en": {
+            "text": "Welcome!",
+            "status": "validated"
+          },
+          "de": {
+            "text": "Willkommen!",
+            "status": "validated"
+          },
+          "es": {
+            "text": "¡Bienvenido!",
+            "status": "validated"
+          },
+          "it": {
+            "text": "Benvenuto!",
+            "status": "validated"
+          },
+          "nl": {
+            "text": "Welkom!",
+            "status": "validated"
+          },
+          "pl": {
+            "text": "Witamy!",
+            "status": "validated"
+          },
+          "pt": {
+            "text": "Bem-vindo!",
+            "status": "validated"
+          }
+        }
+      },
+      {
+        "textId": "form.welcome.description",
+        "key": "form.welcome.description",
+        "category": "main",
+        "translations": {
+          "fr": {
+            "text": "Cette enquête nous permettra de développer une plateforme adaptée à vos besoins réels. Vos réponses sont précieuses et resteront confidentielles.",
+            "status": "validated"
+          },
+          "en": {
+            "text": "This survey will enable us to develop a platform tailored to your real needs. Your answers are valuable and will remain confidential.",
+            "status": "validated"
+          },
+          "de": {
+            "text": "Diese Umfrage ermöglicht es uns, eine auf Ihre tatsächlichen Bedürfnisse zugeschnittene Plattform zu entwickeln. Ihre Antworten sind wertvoll und bleiben vertraulich.",
+            "status": "validated"
+          },
+          "es": {
+            "text": "Esta encuesta nos permitirá desarrollar una plataforma adaptada a sus necesidades reales. Sus respuestas son valiosas y permanecerán confidenciales.",
+            "status": "validated"
+          },
+          "it": {
+            "text": "Questo sondaggio ci permetterà di sviluppare una piattaforma adattata alle vostre esigenze reali. Le vostre risposte sono preziose e rimarranno confidenziali.",
+            "status": "validated"
+          },
+          "nl": {
+            "text": "Deze enquête zal ons in staat stellen een platform te ontwikkelen dat is afgestemd op uw echte behoeften. Uw antwoorden zijn waardevol en blijven vertrouwelijk.",
+            "status": "validated"
+          },
+          "pl": {
+            "text": "Ta ankieta pozwoli nam opracować platformę dostosowaną do Państwa rzeczywistych potrzeb. Państwa odpowiedzi są cenne i pozostaną poufne.",
+            "status": "validated"
+          },
+          "pt": {
+            "text": "Esta pesquisa nos permitirá desenvolver uma plataforma adaptada às suas necessidades reais. Suas respostas são valiosas e permanecerão confidenciais.",
+            "status": "validated"
+          }
+        }
+      },
+      {
+        "textId": "progress.section",
+        "key": "progress.section",
+        "category": "progress",
+        "translations": {
+          "fr": {
+            "text": "Section",
+            "status": "validated"
+          },
+          "en": {
+            "text": "Section",
+            "status": "validated"
+          },
+          "de": {
+            "text": "Abschnitt",
+            "status": "validated"
+          },
+          "es": {
+            "text": "Sección",
+            "status": "validated"
+          },
+          "it": {
+            "text": "Sezione",
+            "status": "validated"
+          },
+          "nl": {
+            "text": "Sectie",
+            "status": "validated"
+          },
+          "pl": {
+            "text": "Sekcja",
+            "status": "validated"
+          },
+          "pt": {
+            "text": "Seção",
+            "status": "validated"
+          }
+        }
+      },
+      {
+        "textId": "progress.of",
+        "key": "progress.of",
+        "category": "progress",
+        "translations": {
+          "fr": {
+            "text": "sur",
+            "status": "validated"
+          },
+          "en": {
+            "text": "of",
+            "status": "validated"
+          },
+          "de": {
+            "text": "von",
+            "status": "validated"
+          },
+          "es": {
+            "text": "de",
+            "status": "validated"
+          },
+          "it": {
+            "text": "di",
+            "status": "validated"
+          },
+          "nl": {
+            "text": "van",
+            "status": "validated"
+          },
+          "pl": {
+            "text": "z",
+            "status": "validated"
+          },
+          "pt": {
+            "text": "de",
+            "status": "validated"
+          }
+        }
+      },
+      {
+        "textId": "progress.completed",
+        "key": "progress.completed",
+        "category": "progress",
+        "translations": {
+          "fr": {
+            "text": "Terminé",
+            "status": "validated"
+          },
+          "en": {
+            "text": "Completed",
+            "status": "validated"
+          },
+          "de": {
+            "text": "Abgeschlossen",
+            "status": "validated"
+          },
+          "es": {
+            "text": "Completado",
+            "status": "validated"
+          },
+          "it": {
+            "text": "Completato",
+            "status": "validated"
+          },
+          "nl": {
+            "text": "Voltooid",
+            "status": "validated"
+          },
+          "pl": {
+            "text": "Ukończono",
+            "status": "validated"
+          },
+          "pt": {
+            "text": "Concluído",
+            "status": "validated"
+          }
+        }
+      }
+    ],
+    "countries": [
+      {
+        "countryCode": "FR",
+        "languages": ["fr", "en"]
+      }
+    ]
+  },
+  "stats": {
+    "questionsCount": 0,
+    "uiTextsCount": 7,
+    "countriesCount": 1,
+    "totalLanguages": 8
+  }
+}

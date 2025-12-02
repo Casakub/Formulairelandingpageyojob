@@ -4,10 +4,21 @@ import * as kv from './kv_store.tsx';
 
 const app = new Hono();
 
+const SERVER_VERSION = '2.0.0-debug'; // Version for debugging
+
 const supabase = createClient(
   Deno.env.get('SUPABASE_URL') ?? '',
   Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
 );
+
+// Version check endpoint
+app.get('/version', (c) => {
+  return c.json({ 
+    version: SERVER_VERSION,
+    timestamp: new Date().toISOString(),
+    message: 'I18N Server with detailed error messages'
+  });
+});
 
 // ========== TYPES ==========
 interface Translation {
@@ -219,7 +230,81 @@ app.get('/ui-texts', async (c) => {
   }
 });
 
-// POST/PUT UI text translation
+// POST bulk update UI text translations
+// ⚠️ IMPORTANT: This route MUST be declared BEFORE /ui-texts/:textId
+// Otherwise Hono will match "bulk" as a textId parameter!
+app.post('/ui-texts/bulk', async (c) => {
+  try {
+    console.log('🎯 [UI-TEXTS-BULK] Route handler started');
+    const body = await c.req.json();
+    console.log('📥 Received bulk UI texts request, body keys:', Object.keys(body));
+    console.log('📦 Full body:', JSON.stringify(body, null, 2));
+    
+    const { translations } = body;
+    
+    if (!translations) {
+      console.error('❌ [UI-TEXTS-BULK] Missing translations field in body');
+      return c.json({ success: false, error: '[UI-TEXTS-BULK] Missing translations field in request body' }, 400);
+    }
+    
+    if (!Array.isArray(translations)) {
+      console.error('❌ translations is not an array:', typeof translations);
+      return c.json({ success: false, error: 'Invalid translations format' }, 400);
+    }
+    
+    console.log(`📊 Received ${translations.length} UI text translations`);
+    console.log('📝 First translation sample:', JSON.stringify(translations[0], null, 2));
+    
+    // Validate each translation
+    for (let i = 0; i < translations.length; i++) {
+      const t = translations[i];
+      if (!t.textId || !t.key || !t.category || !t.translations) {
+        console.error(`❌ Invalid translation at index ${i}:`, t);
+        const missingFields = [];
+        if (!t.textId) missingFields.push('textId');
+        if (!t.key) missingFields.push('key');
+        if (!t.category) missingFields.push('category');
+        if (!t.translations) missingFields.push('translations');
+        
+        console.error(`  - textId: ${t.textId}`);
+        console.error(`  - key: ${t.key}`);
+        console.error(`  - category: ${t.category}`);
+        console.error(`  - translations: ${t.translations ? 'present' : 'MISSING'}`);
+        return c.json({ 
+          success: false, 
+          error: `[UI-TEXTS-BULK] UIText at index ${i} is missing fields: ${missingFields.join(', ')}`
+        }, 400);
+      }
+    }
+    
+    // Prepare KV store operations
+    const keys: string[] = [];
+    const values: any[] = [];
+    
+    translations.forEach((t: UITextTranslation) => {
+      keys.push(`i18n:ui:${t.textId}`);
+      values.push({
+        key: t.key,
+        category: t.category,
+        translations: t.translations
+      });
+    });
+    
+    // Batch save to KV store
+    await kv.mset(keys, values);
+    
+    return c.json({
+      success: true,
+      count: translations.length
+    });
+  } catch (error: any) {
+    console.error('Error bulk saving UI text translations:', error);
+    return c.json({ success: false, error: error.message }, 500);
+  }
+});
+
+// POST/PUT UI text translation (single)
+// ⚠️ IMPORTANT: This route MUST be declared AFTER /ui-texts/bulk
 app.post('/ui-texts/:textId', async (c) => {
   try {
     const textId = c.req.param('textId');
@@ -227,7 +312,7 @@ app.post('/ui-texts/:textId', async (c) => {
     const { langCode, text, status, key, category } = body;
     
     if (!langCode || !text) {
-      return c.json({ success: false, error: 'Missing required fields' }, 400);
+      return c.json({ success: false, error: '[UI-TEXT-SINGLE] Missing required fields (langCode or text)' }, 400);
     }
     
     // Get existing translations or initialize
@@ -255,42 +340,6 @@ app.post('/ui-texts/:textId', async (c) => {
     });
   } catch (error: any) {
     console.error('Error saving UI text translation:', error);
-    return c.json({ success: false, error: error.message }, 500);
-  }
-});
-
-// POST bulk update UI text translations
-app.post('/ui-texts/bulk', async (c) => {
-  try {
-    const body = await c.req.json();
-    const { translations } = body;
-    
-    if (!Array.isArray(translations)) {
-      return c.json({ success: false, error: 'Invalid translations format' }, 400);
-    }
-    
-    // Prepare KV store operations
-    const keys: string[] = [];
-    const values: any[] = [];
-    
-    translations.forEach((t: UITextTranslation) => {
-      keys.push(`i18n:ui:${t.textId}`);
-      values.push({
-        key: t.key,
-        category: t.category,
-        translations: t.translations
-      });
-    });
-    
-    // Batch save to KV store
-    await kv.mset(keys, values);
-    
-    return c.json({
-      success: true,
-      count: translations.length
-    });
-  } catch (error: any) {
-    console.error('Error bulk saving UI text translations:', error);
     return c.json({ success: false, error: error.message }, 500);
   }
 });
@@ -545,7 +594,7 @@ app.post('/auto-translate', async (c) => {
     } = body;
     
     if (!sourceText || !targetLang || !method) {
-      return c.json({ success: false, error: 'Missing required fields' }, 400);
+      return c.json({ success: false, error: '[AUTO-TRANSLATE] Missing required fields (sourceText, targetLang, or method)' }, 400);
     }
     
     let translatedText = '';

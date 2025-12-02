@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { QuestionTranslation } from './QuestionTranslation';
 import { CountryLanguageManager } from './CountryLanguageManager';
-import { UITextTranslation } from './UITextTranslation';
+import { UITextsList } from './UITextsList';
 import { TranslationExport } from './TranslationExport';
 import { TranslationStatistics } from './TranslationStatistics';
 import { TranslationSyncBar } from './TranslationSyncBar';
@@ -121,9 +121,9 @@ export function TranslationManager() {
     return <CountryLanguageManager onBack={() => setShowCountryLanguages(false)} />;
   }
 
-  // Show UITextTranslation screen if active
+  // Show UITextsList screen if active
   if (showUITextTranslation) {
-    return <UITextTranslation onBack={() => setShowUITextTranslation(false)} />;
+    return <UITextsList onBack={() => setShowUITextTranslation(false)} />;
   }
 
   // Show TranslationStatistics screen if active

@@ -166,6 +166,25 @@ export async function bulkSaveUITextTranslations(
   translations: UITextTranslationData[]
 ): Promise<boolean> {
   try {
+    console.log('📤 Sending UI text translations:', translations.length);
+    
+    // If empty array, just skip
+    if (translations.length === 0) {
+      console.log('⚠️ No UI text translations to save, skipping...');
+      return true; // Success because there's nothing to do
+    }
+    
+    // Log sample of what we're sending
+    console.log('📦 Sample translation being sent:', JSON.stringify(translations[0], null, 2));
+    console.log('📋 Translation structure check:', {
+      hasTextId: !!translations[0]?.textId,
+      hasKey: !!translations[0]?.key,
+      hasCategory: !!translations[0]?.category,
+      hasTranslations: !!translations[0]?.translations,
+      translationsType: typeof translations[0]?.translations,
+      translationsKeys: translations[0]?.translations ? Object.keys(translations[0].translations) : []
+    });
+    
     const response = await fetch(`${BASE_URL}/ui-texts/bulk`, {
       method: 'POST',
       headers,
@@ -173,14 +192,17 @@ export async function bulkSaveUITextTranslations(
     });
     
     if (!response.ok) {
-      throw new Error(`Failed to bulk save UI text translations: ${response.statusText}`);
+      const errorText = await response.text();
+      console.error('❌ Server response error:', errorText);
+      throw new Error(`Failed to bulk save UI text translations: ${response.statusText} - ${errorText}`);
     }
     
     const data = await response.json();
+    console.log('✅ UI text translations saved:', data);
     return data.success;
   } catch (error) {
-    console.error('Error bulk saving UI text translations:', error);
-    return false;
+    console.error('❌ Error bulk saving UI text translations:', error);
+    throw error; // Propagate error instead of returning false
   }
 }
 
