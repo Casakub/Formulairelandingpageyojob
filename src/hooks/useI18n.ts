@@ -7,8 +7,15 @@ export const SUPPORTED_LANGUAGES = EUROPEAN_LANGUAGES;
 
 export type LanguageCode = string;
 
+interface QuestionTranslation {
+  label: string;
+  placeholder?: string;
+  options?: Array<{ value: string; label: string; icon?: string }>;
+  status: string;
+}
+
 interface Translations {
-  questions: Record<string, string>;
+  questions: Record<string, QuestionTranslation>;
   ui: Record<string, string>;
 }
 
@@ -18,6 +25,8 @@ interface I18nContextType {
   translations: Translations;
   t: (key: string, fallback?: string) => string;
   tQuestion: (questionId: string, fallback?: string) => string;
+  tPlaceholder: (questionId: string, fallback?: string) => string;
+  tOptions: (questionId: string, fallbackOptions?: Array<{ value: string; label: string; icon?: string }>) => Array<{ value: string; label: string; icon?: string }>;
   loading: boolean;
 }
 
@@ -221,9 +230,25 @@ export function I18nProvider({ children, initialLang }: I18nProviderProps) {
     return translations.ui[key] || fallback || key;
   };
 
-  // Translate question by ID
+  // Translate question by ID - returns translated label
   const tQuestion = (questionId: string, fallback?: string): string => {
-    return translations.questions[questionId] || fallback || questionId;
+    const translation = translations.questions[questionId];
+    return translation?.label || fallback || questionId;
+  };
+
+  // Translate placeholder by question ID
+  const tPlaceholder = (questionId: string, fallback?: string): string => {
+    const translation = translations.questions[questionId];
+    return translation?.placeholder || fallback || '';
+  };
+
+  // Translate options by question ID
+  const tOptions = (
+    questionId: string, 
+    fallbackOptions?: Array<{ value: string; label: string; icon?: string }>
+  ): Array<{ value: string; label: string; icon?: string }> => {
+    const translation = translations.questions[questionId];
+    return translation?.options || fallbackOptions || [];
   };
 
   const value: I18nContextType = {
@@ -232,6 +257,8 @@ export function I18nProvider({ children, initialLang }: I18nProviderProps) {
     translations,
     t,
     tQuestion,
+    tPlaceholder,
+    tOptions,
     loading
   };
 

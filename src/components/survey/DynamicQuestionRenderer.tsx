@@ -7,6 +7,7 @@ import { Label } from '../ui/label';
 import { RadioCard } from './inputs/RadioCard';
 import { MultiSelectChips } from './inputs/MultiSelectChips';
 import { ScoreSelector } from './inputs/ScoreSelector';
+import { useI18n } from '../../hooks/useI18n';
 import { 
   Building2, 
   Calendar, 
@@ -40,6 +41,7 @@ export function DynamicQuestionRenderer({
   updateFormData
 }: DynamicQuestionRendererProps) {
   const { getVisibleQuestionsBySection } = useQuestions();
+  const { tQuestion, tPlaceholder, tOptions } = useI18n();
   const questions = getVisibleQuestionsBySection(sectionNumber);
 
   const shouldShowQuestion = (question: Question) => {
@@ -75,7 +77,7 @@ export function DynamicQuestionRenderer({
             transition={{ delay: baseDelay }}
           >
             <Label htmlFor={question.code} className="text-white mb-3 block">
-              {question.label}
+              {tQuestion(question.id, question.label)}
               {question.required && <span className="text-red-400 ml-1">*</span>}
             </Label>
             <div className="relative">
@@ -85,7 +87,7 @@ export function DynamicQuestionRenderer({
                 type={question.type}
                 value={value || ''}
                 onChange={(e) => onChange(e.target.value)}
-                placeholder={question.placeholder}
+                placeholder={tPlaceholder(question.id, question.placeholder)}
                 required={question.required}
                 min={question.type === 'number' ? 1900 : undefined}
                 max={question.type === 'number' ? 2025 : undefined}
@@ -104,7 +106,7 @@ export function DynamicQuestionRenderer({
             transition={{ delay: baseDelay }}
           >
             <Label htmlFor={question.code} className="text-white mb-3 block">
-              {question.label}
+              {tQuestion(question.id, question.label)}
               {question.required && <span className="text-red-400 ml-1">*</span>}
             </Label>
             <div className="relative">
@@ -114,7 +116,7 @@ export function DynamicQuestionRenderer({
                 type="email"
                 value={value || ''}
                 onChange={(e) => onChange(e.target.value)}
-                placeholder={question.placeholder}
+                placeholder={tPlaceholder(question.id, question.placeholder)}
                 required={question.required}
                 className="pl-12 bg-white/5 border-white/10 text-white placeholder:text-white/40 focus:border-cyan-400 focus:ring-cyan-400/20 rounded-xl h-12"
               />
@@ -131,14 +133,14 @@ export function DynamicQuestionRenderer({
             transition={{ delay: baseDelay }}
           >
             <Label htmlFor={question.code} className="text-white mb-3 block">
-              {question.label}
+              {tQuestion(question.id, question.label)}
               {question.required && <span className="text-red-400 ml-1">*</span>}
             </Label>
             <Textarea
               id={question.code}
               value={value || ''}
               onChange={(e) => onChange(e.target.value)}
-              placeholder={question.placeholder}
+              placeholder={tPlaceholder(question.id, question.placeholder)}
               required={question.required}
               rows={4}
               className="bg-white/5 border-white/10 text-white placeholder:text-white/40 focus:border-cyan-400 focus:ring-cyan-400/20 rounded-xl resize-none"
@@ -155,11 +157,11 @@ export function DynamicQuestionRenderer({
             transition={{ delay: baseDelay }}
           >
             <Label className="text-white mb-3 block">
-              {question.label}
+              {tQuestion(question.id, question.label)}
               {question.required && <span className="text-red-400 ml-1">*</span>}
             </Label>
             <div className="grid sm:grid-cols-2 gap-3">
-              {question.options?.map((option, optIndex) => (
+              {tOptions(question.id, question.options)?.map((option, optIndex) => (
                 <RadioCard
                   key={option.value}
                   value={option.value}
@@ -183,14 +185,14 @@ export function DynamicQuestionRenderer({
             transition={{ delay: baseDelay }}
           >
             <Label className="text-white mb-3 block">
-              {question.label}
+              {tQuestion(question.id, question.label)}
               {question.required && <span className="text-red-400 ml-1">*</span>}
             </Label>
             {question.code === 'q4_secteurs' && (
               <p className="text-white/60 text-sm mb-4">Sélectionnez jusqu'à 3 secteurs</p>
             )}
             <MultiSelectChips
-              options={question.options || []}
+              options={tOptions(question.id, question.options) || []}
               selected={value || []}
               onChange={onChange}
               maxSelections={question.code === 'q4_secteurs' ? 3 : undefined}
@@ -207,7 +209,7 @@ export function DynamicQuestionRenderer({
             transition={{ delay: baseDelay }}
           >
             <Label className="text-white mb-3 block">
-              {question.label}
+              {tQuestion(question.id, question.label)}
               {question.required && <span className="text-red-400 ml-1">*</span>}
             </Label>
             <ScoreSelector

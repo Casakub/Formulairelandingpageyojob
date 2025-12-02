@@ -488,15 +488,21 @@ app.get('/translate/:lang', async (c) => {
   try {
     const lang = c.req.param('lang');
     
-    // Get all question translations
+    // Get all question translations - return FULL translation object (label, placeholder, options)
     const questionTranslations = await kv.getByPrefix('i18n:question:');
-    const questions: Record<string, string> = {};
+    const questions: Record<string, any> = {};
     
     questionTranslations.forEach((item: any) => {
       const questionId = item.key.replace('i18n:question:', '');
       const translation = item.value.translations?.[lang];
       if (translation?.label) {
-        questions[questionId] = translation.label;
+        // Return full translation object with label, placeholder, options, status
+        questions[questionId] = {
+          label: translation.label,
+          placeholder: translation.placeholder || '',
+          options: translation.options || [],
+          status: translation.status || 'missing'
+        };
       }
     });
     
