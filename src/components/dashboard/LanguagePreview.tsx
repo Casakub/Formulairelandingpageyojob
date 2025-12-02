@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'motion/react';
 import { Eye, X, Globe, ChevronRight } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '../ui/card';
@@ -38,12 +39,12 @@ export function LanguagePreview({ onClose }: LanguagePreviewProps) {
 
   const currentLanguageData = availableLanguages.find(l => l.code === previewLang);
 
-  return (
+  const modalContent = (
     <motion.div
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4"
+      className="fixed inset-0 bg-black/50 backdrop-blur-sm z-[9999] flex items-center justify-center p-4"
       onClick={onClose}
     >
       <motion.div
@@ -51,7 +52,7 @@ export function LanguagePreview({ onClose }: LanguagePreviewProps) {
         animate={{ scale: 1, y: 0 }}
         exit={{ scale: 0.9, y: 20 }}
         onClick={(e) => e.stopPropagation()}
-        className="w-full max-w-4xl max-h-[90vh] overflow-hidden"
+        className="w-full max-w-4xl max-h-[90vh] overflow-hidden relative z-[9999]"
       >
         <Card className="border-slate-200 bg-white shadow-2xl">
           <CardHeader className="border-b border-slate-200 bg-gradient-to-r from-blue-50 to-cyan-50">
@@ -84,7 +85,7 @@ export function LanguagePreview({ onClose }: LanguagePreviewProps) {
                 <SelectTrigger className="w-[280px] bg-white">
                   <SelectValue />
                 </SelectTrigger>
-                <SelectContent>
+                <SelectContent className="z-[10000]">
                   {availableLanguages.map((lang) => (
                     <SelectItem key={lang.code} value={lang.code}>
                       <div className="flex items-center gap-2">
@@ -246,4 +247,6 @@ export function LanguagePreview({ onClose }: LanguagePreviewProps) {
       </motion.div>
     </motion.div>
   );
+
+  return createPortal(modalContent, document.body);
 }

@@ -279,28 +279,30 @@ export default function App() {
   }
 
   return (
-    <QuestionsProvider>
-      <SupabaseBanner />
-      <Toaster position="top-right" richColors />
-      {viewMode === 'dashboard' ? (
-        <DashboardApp onBackToSurvey={() => setViewMode('survey')} />
-      ) : (
-        <AppContent
-          currentSection={currentSection}
-          progress={progress}
-          formData={formData}
-          completedSections={completedSections}
-          setViewMode={setViewMode}
-          handleStartSurvey={handleStartSurvey}
-          setCurrentSection={setCurrentSection}
-          updateFormData={updateFormData}
-          handlePrevSection={handlePrevSection}
-          handleNextSection={handleNextSection}
-          handleSubmit={handleSubmit}
-          isSubmitting={isSubmitting}
-        />
-      )}
-    </QuestionsProvider>
+    <I18nProvider>
+      <QuestionsProvider>
+        <SupabaseBanner />
+        <Toaster position="top-right" richColors />
+        {viewMode === 'dashboard' ? (
+          <DashboardApp onBackToSurvey={() => setViewMode('survey')} />
+        ) : (
+          <AppContent
+            currentSection={currentSection}
+            progress={progress}
+            formData={formData}
+            completedSections={completedSections}
+            setViewMode={setViewMode}
+            handleStartSurvey={handleStartSurvey}
+            setCurrentSection={setCurrentSection}
+            updateFormData={updateFormData}
+            handlePrevSection={handlePrevSection}
+            handleNextSection={handleNextSection}
+            handleSubmit={handleSubmit}
+            isSubmitting={isSubmitting}
+          />
+        )}
+      </QuestionsProvider>
+    </I18nProvider>
   );
 }
 
@@ -334,8 +336,7 @@ function AppContent({
   isSubmitting
 }: AppContentProps) {
   return (
-    <I18nProvider>
-      <div className="min-h-screen bg-gradient-to-br from-blue-900 via-violet-900 to-cyan-900 relative overflow-hidden">
+    <div className="min-h-screen bg-gradient-to-br from-blue-900 via-violet-900 to-cyan-900 relative overflow-hidden">
       {/* Background effects */}
       <div className="fixed inset-0 pointer-events-none">
         <div className="absolute top-20 left-10 w-96 h-96 bg-cyan-500/20 rounded-full blur-3xl animate-pulse" />
@@ -502,6 +503,5 @@ function AppContent({
         )}
       </AnimatePresence>
     </div>
-    </I18nProvider>
   );
 }
