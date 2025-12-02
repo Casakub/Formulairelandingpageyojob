@@ -7,6 +7,7 @@ import { TranslationExport } from './TranslationExport';
 import { TranslationStatistics } from './TranslationStatistics';
 import { TranslationSyncBar } from './TranslationSyncBar';
 import { TranslationDebugPanel } from './TranslationDebugPanel';
+import { TranslationDiagnostic } from './TranslationDiagnostic';
 import { MCPAdvancedSettings } from './MCPAdvancedSettings';
 import { useTranslationContext } from '../../contexts/TranslationContext';
 import { 
@@ -601,6 +602,9 @@ export function TranslationManager() {
 
         {/* Import/Export Section */}
         <TranslationExport />
+
+        {/* Diagnostic Section */}
+        <TranslationDiagnostic />
       </motion.div>
 
       {/* MCP Advanced Settings Modal */}

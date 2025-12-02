@@ -76,8 +76,15 @@ export function QuestionTranslation({ onBack }: QuestionTranslationProps) {
       const contextTranslation = questionTranslations.find(qt => qt.questionId === q.id);
       
       if (contextTranslation) {
-        // Use translations from Supabase
-        syncedTranslations[q.id] = contextTranslation.translations;
+        // Use translations from Supabase - CONVERT .label to .text for UI compatibility
+        syncedTranslations[q.id] = {};
+        
+        Object.entries(contextTranslation.translations).forEach(([langCode, trans]) => {
+          syncedTranslations[q.id][langCode] = {
+            text: (trans as any).label || '', // Convert label → text
+            status: (trans as any).status || 'missing'
+          };
+        });
       } else {
         // Initialize with French as source
         syncedTranslations[q.id] = {

@@ -146,26 +146,34 @@ export function TranslationExport() {
         throw new Error('Format de fichier invalide');
       }
 
-      // Import translations
+      // Import translations with detailed error handling
       const promises = [];
+      const types: string[] = [];
 
       if (importData.data.questions?.length > 0) {
         promises.push(bulkSaveQuestionTranslations(importData.data.questions));
+        types.push('questions');
       }
 
       if (importData.data.uiTexts?.length > 0) {
         promises.push(bulkSaveUITextTranslations(importData.data.uiTexts));
+        types.push('uiTexts');
       }
 
       if (importData.data.countries?.length > 0) {
         promises.push(bulkSaveCountryLanguageMappings(importData.data.countries));
+        types.push('countries');
       }
 
-      const results = await Promise.all(promises);
-      const allSuccess = results.every(r => r === true);
+      const results = await Promise.allSettled(promises);
+      
+      const successCount = results.filter(r => r.status === 'fulfilled' && r.value === true).length;
+      const failedTypes = results
+        .map((r, i) => r.status === 'rejected' ? types[i] : null)
+        .filter(Boolean);
 
-      if (allSuccess) {
-        toast.success('Import réussi', {
+      if (successCount === results.length) {
+        toast.success('✅ Import réussi', {
           description: `${importData.stats?.questionsCount || 0 + importData.stats?.uiTextsCount || 0} traductions importées`
         });
         
@@ -173,19 +181,26 @@ export function TranslationExport() {
         setTimeout(() => {
           window.location.reload();
         }, 2000);
+      } else if (successCount > 0) {
+        toast.warning('⚠️ Import partiel', {
+          description: `${successCount}/${results.length} imports réussis. Échec: ${failedTypes.join(', ')}`
+        });
       } else {
-        toast.warning('Import partiel', {
-          description: 'Certaines traductions n\'ont pas pu être importées'
+        // Show detailed error from first failure
+        const firstError = results.find(r => r.status === 'rejected') as PromiseRejectedResult;
+        toast.error('❌ Erreur d\'import', {
+          description: firstError?.reason?.message || 'Toutes les importations ont échoué'
         });
       }
     } catch (error) {
       console.error('Import error:', error);
-      toast.error('Erreur d\'import', {
+      toast.error('❌ Erreur d\'import', {
         description: error instanceof Error ? error.message : 'Fichier invalide'
       });
     } finally {
       setImporting(false);
-      event.target.value = ''; // Reset input
+      // Reset input
+      event.target.value = '';
     }
   };
 

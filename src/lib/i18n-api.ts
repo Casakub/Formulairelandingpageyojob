@@ -15,10 +15,18 @@ export interface Translation {
   status: TranslationStatus;
 }
 
+// Nouvelle structure pour les questions complètes (avec label, placeholder, options)
+export interface QuestionFieldTranslation {
+  label: string;
+  placeholder?: string;
+  options?: Array<{ value: string; label: string; icon?: string }>;
+  status: TranslationStatus;
+}
+
 export interface QuestionTranslationData {
   questionId: string;
   translations: {
-    [langCode: string]: Translation;
+    [langCode: string]: QuestionFieldTranslation;
   };
 }
 
@@ -57,14 +65,16 @@ export async function fetchQuestionTranslations(): Promise<QuestionTranslationDa
 export async function saveQuestionTranslation(
   questionId: string,
   langCode: string,
-  text: string,
+  label: string,
+  placeholder?: string,
+  options?: Array<{ value: string; label: string; icon?: string }>,
   status: TranslationStatus = 'validated'
 ): Promise<boolean> {
   try {
     const response = await fetch(`${BASE_URL}/questions/${questionId}`, {
       method: 'POST',
       headers,
-      body: JSON.stringify({ langCode, text, status })
+      body: JSON.stringify({ langCode, label, placeholder, options, status })
     });
     
     if (!response.ok) {
@@ -83,6 +93,9 @@ export async function bulkSaveQuestionTranslations(
   translations: QuestionTranslationData[]
 ): Promise<boolean> {
   try {
+    console.log('🔄 Bulk saving question translations:', translations.length);
+    console.log('📋 Sample data being sent:', JSON.stringify(translations[0], null, 2));
+    
     const response = await fetch(`${BASE_URL}/questions/bulk`, {
       method: 'POST',
       headers,
@@ -90,14 +103,17 @@ export async function bulkSaveQuestionTranslations(
     });
     
     if (!response.ok) {
-      throw new Error(`Failed to bulk save question translations: ${response.statusText}`);
+      const errorText = await response.text();
+      console.error('❌ Server response error:', response.status, errorText);
+      throw new Error(`Failed to bulk save question translations: ${response.statusText} - ${errorText}`);
     }
     
     const data = await response.json();
+    console.log('✅ Bulk save response:', data);
     return data.success;
   } catch (error) {
     console.error('Error bulk saving question translations:', error);
-    return false;
+    throw error; // Re-throw to see the error in the caller
   }
 }
 
@@ -213,6 +229,9 @@ export async function bulkSaveCountryLanguageMappings(
   mappings: CountryLanguageMapping[]
 ): Promise<boolean> {
   try {
+    console.log('🔄 Bulk saving country-language mappings:', mappings.length);
+    console.log('📋 Sample mapping being sent:', JSON.stringify(mappings[0], null, 2));
+    
     const response = await fetch(`${BASE_URL}/country-languages/bulk`, {
       method: 'POST',
       headers,
@@ -220,14 +239,17 @@ export async function bulkSaveCountryLanguageMappings(
     });
     
     if (!response.ok) {
-      throw new Error(`Failed to bulk save country-language mappings: ${response.statusText}`);
+      const errorText = await response.text();
+      console.error('❌ Server response error:', response.status, errorText);
+      throw new Error(`Failed to bulk save country-language mappings: ${response.statusText} - ${errorText}`);
     }
     
     const data = await response.json();
+    console.log('✅ Bulk save response:', data);
     return data.success;
   } catch (error) {
     console.error('Error bulk saving country-language mappings:', error);
-    return false;
+    throw error; // Re-throw to see the error in the caller
   }
 }
 

@@ -15,10 +15,18 @@ interface Translation {
   status: 'missing' | 'auto-mcp' | 'auto-api' | 'validated';
 }
 
+// Nouvelle structure pour les questions complètes
+interface QuestionFieldTranslation {
+  label: string;
+  placeholder?: string;
+  options?: Array<{ value: string; label: string; icon?: string }>;
+  status: 'missing' | 'auto-mcp' | 'auto-api' | 'validated';
+}
+
 interface QuestionTranslation {
   questionId: string;
   translations: {
-    [langCode: string]: Translation;
+    [langCode: string]: QuestionFieldTranslation;
   };
 }
 
@@ -79,23 +87,99 @@ app.get('/questions/:questionId', async (c) => {
   }
 });
 
-// POST/PUT question translation
+// POST bulk update question translations (MUST BE BEFORE /questions/:questionId)
+app.post('/questions/bulk', async (c) => {
+  try {
+    const body = await c.req.json();
+    const { translations } = body;
+    
+    console.log('📥 Received bulk question translations request:', { 
+      count: translations?.length,
+      sample: translations?.[0] ? JSON.stringify(translations[0]).substring(0, 200) : 'none'
+    });
+    
+    if (!Array.isArray(translations)) {
+      console.error('❌ Translations is not an array:', typeof translations);
+      return c.json({ success: false, error: 'Invalid translations format' }, 400);
+    }
+    
+    console.log(`✅ Validation passed. Processing ${translations.length} question translations...`);
+    
+    // Validate each translation object
+    for (const t of translations) {
+      if (!t.questionId) {
+        console.error('❌ Missing questionId in:', t);
+        return c.json({ success: false, error: 'Missing required field: questionId' }, 400);
+      }
+      if (!t.translations || typeof t.translations !== 'object') {
+        console.error('❌ Invalid translations object in:', t);
+        return c.json({ success: false, error: 'Missing required field: translations' }, 400);
+      }
+      
+      // Validate each language translation has required fields
+      for (const [langCode, translation] of Object.entries(t.translations)) {
+        const trans = translation as any;
+        if (!trans.label) {
+          console.error('❌ Missing label for', t.questionId, langCode, ':', trans);
+          return c.json({ 
+            success: false, 
+            error: `Missing label for question ${t.questionId} in language ${langCode}` 
+          }, 400);
+        }
+        
+        // Add default status if not provided
+        if (!trans.status) {
+          trans.status = 'validated';
+        }
+      }
+    }
+    
+    console.log('✅ All validations passed, saving to KV store...');
+    
+    // Prepare KV store operations
+    const keys: string[] = [];
+    const values: any[] = [];
+    
+    translations.forEach((t: QuestionTranslation) => {
+      keys.push(`i18n:question:${t.questionId}`);
+      values.push({ translations: t.translations });
+    });
+    
+    // Batch save to KV store
+    await kv.mset(keys, values);
+    
+    return c.json({
+      success: true,
+      count: translations.length
+    });
+  } catch (error: any) {
+    console.error('Error bulk saving question translations:', error);
+    return c.json({ success: false, error: error.message }, 500);
+  }
+});
+
+// POST/PUT question translation (MUST BE AFTER /questions/bulk)
 app.post('/questions/:questionId', async (c) => {
   try {
     const questionId = c.req.param('questionId');
     const body = await c.req.json();
-    const { langCode, text, status } = body;
+    const { langCode, text, label, placeholder, options, status } = body;
     
-    if (!langCode || !text) {
-      return c.json({ success: false, error: 'Missing required fields' }, 400);
+    // Support both 'text' (from UI) and 'label' (from import) for backwards compatibility
+    const finalLabel = label || text;
+    
+    if (!langCode || !finalLabel) {
+      return c.json({ success: false, error: 'Missing required fields (langCode and text/label)' }, 400);
     }
     
     // Get existing translations or initialize
     const existing = await kv.get(`i18n:question:${questionId}`) || { translations: {} };
     
-    // Update the specific language translation
+    // Update the specific language translation - always use 'label' internally for consistency
     existing.translations[langCode] = {
-      text,
+      label: finalLabel,
+      placeholder,
+      options,
       status: status || 'validated'
     };
     
@@ -111,38 +195,6 @@ app.post('/questions/:questionId', async (c) => {
     });
   } catch (error: any) {
     console.error('Error saving question translation:', error);
-    return c.json({ success: false, error: error.message }, 500);
-  }
-});
-
-// POST bulk update question translations
-app.post('/questions/bulk', async (c) => {
-  try {
-    const body = await c.req.json();
-    const { translations } = body;
-    
-    if (!Array.isArray(translations)) {
-      return c.json({ success: false, error: 'Invalid translations format' }, 400);
-    }
-    
-    // Prepare KV store operations
-    const kvOperations: Record<string, any> = {};
-    
-    translations.forEach((t: QuestionTranslation) => {
-      kvOperations[`i18n:question:${t.questionId}`] = {
-        translations: t.translations
-      };
-    });
-    
-    // Batch save to KV store
-    await kv.mset(kvOperations);
-    
-    return c.json({
-      success: true,
-      count: translations.length
-    });
-  } catch (error: any) {
-    console.error('Error bulk saving question translations:', error);
     return c.json({ success: false, error: error.message }, 500);
   }
 });
@@ -218,18 +270,20 @@ app.post('/ui-texts/bulk', async (c) => {
     }
     
     // Prepare KV store operations
-    const kvOperations: Record<string, any> = {};
+    const keys: string[] = [];
+    const values: any[] = [];
     
     translations.forEach((t: UITextTranslation) => {
-      kvOperations[`i18n:ui:${t.textId}`] = {
+      keys.push(`i18n:ui:${t.textId}`);
+      values.push({
         key: t.key,
         category: t.category,
         translations: t.translations
-      };
+      });
     });
     
     // Batch save to KV store
-    await kv.mset(kvOperations);
+    await kv.mset(keys, values);
     
     return c.json({
       success: true,
@@ -261,7 +315,74 @@ app.get('/country-languages', async (c) => {
   }
 });
 
-// POST/PUT country-language mapping
+// POST bulk update country-language mappings (MUST BE BEFORE /:countryCode)
+app.post('/country-languages/bulk', async (c) => {
+  try {
+    const rawBody = await c.req.text();
+    console.log('📥 RAW BODY:', rawBody.substring(0, 500));
+    
+    const body = JSON.parse(rawBody);
+    const { mappings } = body;
+    
+    console.log('📥 Received bulk country-language mappings request:', {
+      count: mappings?.length,
+      sample: mappings?.[0],
+      sampleType: typeof mappings?.[0],
+      sampleLanguagesType: Array.isArray(mappings?.[0]?.languages) ? 'array' : typeof mappings?.[0]?.languages
+    });
+    
+    if (!Array.isArray(mappings)) {
+      return c.json({ success: false, error: 'Invalid mappings format' }, 400);
+    }
+    
+    // Validate each mapping object
+    for (let i = 0; i < mappings.length; i++) {
+      const m = mappings[i];
+      console.log(`🔍 Validating mapping ${i}:`, JSON.stringify(m));
+      console.log(`  - countryCode: "${m.countryCode}" (type: ${typeof m.countryCode})`);
+      console.log(`  - languages:`, m.languages);
+      console.log(`  - languages type: ${typeof m.languages}`);
+      console.log(`  - languages isArray: ${Array.isArray(m.languages)}`);
+      
+      if (!m.countryCode) {
+        console.error('❌ Missing countryCode in:', m);
+        return c.json({ success: false, error: 'Missing required field: countryCode' }, 400);
+      }
+      if (!Array.isArray(m.languages)) {
+        console.error('❌ Languages is not an array in:', m);
+        console.error('❌ Full mapping object:', JSON.stringify(m, null, 2));
+        return c.json({ success: false, error: `Languages must be an array (mapping ${i}, country: ${m.countryCode})` }, 400);
+      }
+      
+      // Early exit for testing - stop after first mapping
+      if (i === 0) {
+        console.log('✅ First mapping validated successfully!');
+      }
+    }
+    
+    // Prepare KV store operations
+    const keys: string[] = [];
+    const values: any[] = [];
+    
+    mappings.forEach((m: CountryLanguageMapping) => {
+      keys.push(`i18n:country:${m.countryCode}`);
+      values.push({ languages: m.languages });
+    });
+    
+    // Batch save to KV store
+    await kv.mset(keys, values);
+    
+    return c.json({
+      success: true,
+      count: mappings.length
+    });
+  } catch (error: any) {
+    console.error('Error bulk saving country-language mappings:', error);
+    return c.json({ success: false, error: error.message }, 500);
+  }
+});
+
+// POST/PUT country-language mapping (MUST BE AFTER /bulk)
 app.post('/country-languages/:countryCode', async (c) => {
   try {
     const countryCode = c.req.param('countryCode');
@@ -284,38 +405,6 @@ app.post('/country-languages/:countryCode', async (c) => {
     });
   } catch (error: any) {
     console.error('Error saving country-language mapping:', error);
-    return c.json({ success: false, error: error.message }, 500);
-  }
-});
-
-// POST bulk update country-language mappings
-app.post('/country-languages/bulk', async (c) => {
-  try {
-    const body = await c.req.json();
-    const { mappings } = body;
-    
-    if (!Array.isArray(mappings)) {
-      return c.json({ success: false, error: 'Invalid mappings format' }, 400);
-    }
-    
-    // Prepare KV store operations
-    const kvOperations: Record<string, any> = {};
-    
-    mappings.forEach((m: CountryLanguageMapping) => {
-      kvOperations[`i18n:country:${m.countryCode}`] = {
-        languages: m.languages
-      };
-    });
-    
-    // Batch save to KV store
-    await kv.mset(kvOperations);
-    
-    return c.json({
-      success: true,
-      count: mappings.length
-    });
-  } catch (error: any) {
-    console.error('Error bulk saving country-language mappings:', error);
     return c.json({ success: false, error: error.message }, 500);
   }
 });
@@ -345,7 +434,7 @@ app.get('/available-languages', async (c) => {
           if (!languageStats[lang]) {
             languageStats[lang] = { count: 0, questions: 0, ui: 0 };
           }
-          if (item.value.translations[lang]?.text) {
+          if (item.value.translations[lang]?.label) {
             languageStats[lang].count++;
             languageStats[lang].questions++;
           }
@@ -406,8 +495,8 @@ app.get('/translate/:lang', async (c) => {
     questionTranslations.forEach((item: any) => {
       const questionId = item.key.replace('i18n:question:', '');
       const translation = item.value.translations?.[lang];
-      if (translation?.text) {
-        questions[questionId] = translation.text;
+      if (translation?.label) {
+        questions[questionId] = translation.label;
       }
     });
     
