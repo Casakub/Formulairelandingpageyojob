@@ -1,0 +1,98 @@
+{
+  "name": "Survey Sections Titles",
+  "description": "Traductions des titres de sections du formulaire",
+  "version": "1.0.0",
+  "date": "2024-12-02",
+  "translations": [
+    {
+      "textId": "section.1.title",
+      "key": "section.1.title",
+      "category": "sections",
+      "translations": {
+        "fr": { "text": "Profil Agence", "status": "validated" },
+        "en": { "text": "Agency Profile", "status": "validated" },
+        "de": { "text": "Agentenprofil", "status": "validated" },
+        "es": { "text": "Perfil de la Agencia", "status": "validated" },
+        "it": { "text": "Profilo Agenzia", "status": "validated" },
+        "nl": { "text": "Agentschapsprofiel", "status": "validated" },
+        "pl": { "text": "Profil Agencji", "status": "validated" },
+        "pt": { "text": "Perfil da Agência", "status": "validated" }
+      }
+    },
+    {
+      "textId": "section.2.title",
+      "key": "section.2.title",
+      "category": "sections",
+      "translations": {
+        "fr": { "text": "Détachement", "status": "validated" },
+        "en": { "text": "Secondment", "status": "validated" },
+        "de": { "text": "Entsendung", "status": "validated" },
+        "es": { "text": "Desplazamiento", "status": "validated" },
+        "it": { "text": "Distacco", "status": "validated" },
+        "nl": { "text": "Detachering", "status": "validated" },
+        "pl": { "text": "Delegowanie", "status": "validated" },
+        "pt": { "text": "Destacamento", "status": "validated" }
+      }
+    },
+    {
+      "textId": "section.3.title",
+      "key": "section.3.title",
+      "category": "sections",
+      "translations": {
+        "fr": { "text": "Besoins", "status": "validated" },
+        "en": { "text": "Needs", "status": "validated" },
+        "de": { "text": "Bedürfnisse", "status": "validated" },
+        "es": { "text": "Necesidades", "status": "validated" },
+        "it": { "text": "Esigenze", "status": "validated" },
+        "nl": { "text": "Behoeften", "status": "validated" },
+        "pl": { "text": "Potrzeby", "status": "validated" },
+        "pt": { "text": "Necessidades", "status": "validated" }
+      }
+    },
+    {
+      "textId": "section.4.title",
+      "key": "section.4.title",
+      "category": "sections",
+      "translations": {
+        "fr": { "text": "Intérêt YoJob", "status": "validated" },
+        "en": { "text": "YoJob Interest", "status": "validated" },
+        "de": { "text": "YoJob Interesse", "status": "validated" },
+        "es": { "text": "Interés YoJob", "status": "validated" },
+        "it": { "text": "Interesse YoJob", "status": "validated" },
+        "nl": { "text": "YoJob Interesse", "status": "validated" },
+        "pl": { "text": "Zainteresowanie YoJob", "status": "validated" },
+        "pt": { "text": "Interesse YoJob", "status": "validated" }
+      }
+    },
+    {
+      "textId": "section.5.title",
+      "key": "section.5.title",
+      "category": "sections",
+      "translations": {
+        "fr": { "text": "Vision Future", "status": "validated" },
+        "en": { "text": "Future Vision", "status": "validated" },
+        "de": { "text": "Zukunftsvision", "status": "validated" },
+        "es": { "text": "Visión Futura", "status": "validated" },
+        "it": { "text": "Visione Futura", "status": "validated" },
+        "nl": { "text": "Toekomstvisie", "status": "validated" },
+        "pl": { "text": "Wizja Przyszłości", "status": "validated" },
+        "pt": { "text": "Visão Futura", "status": "validated" }
+      }
+    },
+    {
+      "textId": "section.6.title",
+      "key": "section.6.title",
+      "category": "sections",
+      "translations": {
+        "fr": { "text": "Contact", "status": "validated" },
+        "en": { "text": "Contact", "status": "validated" },
+        "de": { "text": "Kontakt", "status": "validated" },
+        "es": { "text": "Contacto", "status": "validated" },
+        "it": { "text": "Contatto", "status": "validated" },
+        "nl": { "text": "Contact", "status": "validated" },
+        "pl": { "text": "Kontakt", "status": "validated" },
+        "pt": { "text": "Contato", "status": "validated" }
+      }
+    }
+  ]
+}

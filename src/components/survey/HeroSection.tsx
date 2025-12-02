@@ -2,16 +2,40 @@ import { motion } from 'motion/react';
 import { ArrowRight, Globe, Users, Clock } from 'lucide-react';
 import { Button } from '../ui/button';
 import { Card, CardContent } from '../ui/card';
+import { useI18n } from '../../hooks/useI18n';
 
 interface HeroSectionProps {
   onStart: () => void;
 }
 
 export function HeroSection({ onStart }: HeroSectionProps) {
+  const { t } = useI18n();
+  
+  // Fallbacks en français si les traductions ne sont pas encore chargées
+  const getText = (key: string, fallback: string) => {
+    const translated = t(key);
+    return translated === key ? fallback : translated;
+  };
+  
   const stats = [
-    { icon: Globe, label: '27 pays couverts', color: 'from-cyan-400 to-blue-500' },
-    { icon: Users, label: '500+ agences partenaires', color: 'from-violet-400 to-purple-500' },
-    { icon: Clock, label: '8-10 min pour répondre', color: 'from-green-400 to-emerald-500' }
+    { 
+      icon: Globe, 
+      labelKey: 'hero.stat.countries',
+      fallback: '27 pays couverts',
+      color: 'from-cyan-400 to-blue-500' 
+    },
+    { 
+      icon: Users, 
+      labelKey: 'hero.stat.agencies',
+      fallback: '500+ agences partenaires',
+      color: 'from-violet-400 to-purple-500' 
+    },
+    { 
+      icon: Clock, 
+      labelKey: 'hero.stat.duration',
+      fallback: '8-10 min pour répondre',
+      color: 'from-green-400 to-emerald-500' 
+    }
   ];
 
   return (
@@ -31,7 +55,7 @@ export function HeroSection({ onStart }: HeroSectionProps) {
         >
           <div className="inline-flex items-center px-6 py-3 rounded-full bg-white/10 backdrop-blur-sm border border-white/20 shadow-lg">
             <span className="mr-2 text-2xl">📊</span>
-            <span className="text-white">Étude de marché européenne</span>
+            <span className="text-white">{getText('hero.badge', 'Étude de marché européenne')}</span>
           </div>
         </motion.div>
 
@@ -42,7 +66,7 @@ export function HeroSection({ onStart }: HeroSectionProps) {
           transition={{ delay: 0.3 }}
           className="text-white mb-6 px-4"
         >
-          Participez à l'avenir du détachement européen
+          {getText('hero.title', 'Participez à l\'avenir du détachement européen')}
         </motion.h1>
 
         {/* Subtitle */}
@@ -52,7 +76,7 @@ export function HeroSection({ onStart }: HeroSectionProps) {
           transition={{ delay: 0.4 }}
           className="text-cyan-100 text-xl mb-12 max-w-3xl mx-auto px-4"
         >
-          Votre avis façonne YoJob. 8 minutes pour transformer votre quotidien administratif.
+          {getText('hero.subtitle', 'Votre avis façonne YoJob. 8 minutes pour transformer votre quotidien administratif.')}
         </motion.p>
 
         {/* Stats Cards */}
@@ -75,7 +99,7 @@ export function HeroSection({ onStart }: HeroSectionProps) {
                   <div className={`w-14 h-14 rounded-xl bg-gradient-to-br ${stat.color} flex items-center justify-center shadow-lg`}>
                     <stat.icon className="w-7 h-7 text-white" />
                   </div>
-                  <p className="text-white">{stat.label}</p>
+                  <p className="text-white">{getText(stat.labelKey, stat.fallback)}</p>
                 </CardContent>
               </Card>
             </motion.div>
@@ -96,7 +120,7 @@ export function HeroSection({ onStart }: HeroSectionProps) {
             className="h-16 px-12 bg-white text-blue-900 hover:bg-cyan-50 rounded-full shadow-2xl hover:shadow-white/70 transition-all relative overflow-hidden group"
           >
             <span className="relative z-10 flex items-center gap-3 text-lg">
-              Commencer l'enquête
+              {getText('hero.cta.start', 'Commencer l\'enquête')}
               <ArrowRight className="w-6 h-6" />
             </span>
             <div className="absolute inset-0 -translate-x-full group-hover:translate-x-full transition-transform duration-700 bg-gradient-to-r from-transparent via-cyan-200/40 to-transparent" />
@@ -110,7 +134,7 @@ export function HeroSection({ onStart }: HeroSectionProps) {
           transition={{ delay: 1.1 }}
           className="text-white/60 text-sm mt-8"
         >
-          25 questions • Anonyme • Conforme RGPD
+          {getText('hero.footer.info', '25 questions • Anonyme • Conforme RGPD')}
         </motion.p>
       </div>
     </motion.section>

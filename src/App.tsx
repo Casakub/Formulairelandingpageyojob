@@ -20,7 +20,7 @@ import { saveResponse, extractCountry, getInterestLevel } from './lib/supabase';
 import { saveResponsePublic } from './lib/supabase-public';
 import { toast, Toaster } from 'sonner@2.0.3';
 import { SupabaseBanner } from './components/SupabaseBanner';
-import { I18nProvider } from './hooks/useI18n';
+import { I18nProvider, useI18n } from './hooks/useI18n';
 import { TranslationMissingBanner } from './components/survey/TranslationMissingBanner';
 import './utils/diagnostic-supabase'; // Import diagnostic tool
 
@@ -69,12 +69,12 @@ export interface FormData {
 }
 
 const SECTIONS = [
-  { id: 1, label: 'Profil Agence', icon: '👤', questions: 4, time: '2 min' },
-  { id: 2, label: 'Détachement', icon: '🌍', questions: 7, time: '3 min' },
-  { id: 3, label: 'Besoins', icon: '💼', questions: 6, time: '2 min' },
-  { id: 4, label: 'Intérêt YoJob', icon: '⭐', questions: 6, time: '3 min' },
-  { id: 5, label: 'Vision Future', icon: '🔮', questions: 2, time: '1 min' },
-  { id: 6, label: 'Contact', icon: '📧', questions: 1, time: '1 min' }
+  { id: 1, labelKey: 'section.1.title', labelFallback: 'Profil Agence', icon: '👤', questions: 4, time: '2 min' },
+  { id: 2, labelKey: 'section.2.title', labelFallback: 'Détachement', icon: '🌍', questions: 7, time: '3 min' },
+  { id: 3, labelKey: 'section.3.title', labelFallback: 'Besoins', icon: '💼', questions: 6, time: '2 min' },
+  { id: 4, labelKey: 'section.4.title', labelFallback: 'Intérêt YoJob', icon: '⭐', questions: 6, time: '3 min' },
+  { id: 5, labelKey: 'section.5.title', labelFallback: 'Vision Future', icon: '🔮', questions: 2, time: '1 min' },
+  { id: 6, labelKey: 'section.6.title', labelFallback: 'Contact', icon: '📧', questions: 1, time: '1 min' }
 ];
 
 export default function App() {
@@ -335,6 +335,8 @@ function AppContent({
   handleSubmit,
   isSubmitting
 }: AppContentProps) {
+  const { t } = useI18n();
+  
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-900 via-violet-900 to-cyan-900 relative overflow-hidden">
       {/* Background effects */}
@@ -409,7 +411,7 @@ function AppContent({
                   {completedSections.includes(section.id) && section.id !== currentSection && (
                     <CheckCircle className="w-3 h-3 inline mr-1" />
                   )}
-                  {section.icon} {section.label}
+                  {section.icon} {t(section.labelKey, section.labelFallback)}
                 </button>
               ))}
             </div>

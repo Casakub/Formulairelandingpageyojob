@@ -10,6 +10,7 @@ import { ScrollArea } from '../ui/scroll-area';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select';
 import { useTranslationContext } from '../../contexts/TranslationContext';
 import { EUROPEAN_LANGUAGES } from '../../lib/languages';
+import { UITextsImport } from './UITextsImport';
 
 interface UITextsListProps {
   onBack: () => void;
@@ -127,6 +128,9 @@ export function UITextsList({ onBack }: UITextsListProps) {
             <p className="text-sm text-slate-500">{uiTextTranslations.length} textes UI chargés</p>
           </div>
         </div>
+
+        {/* Import UI Texts */}
+        <UITextsImport onImportSuccess={() => loadAll()} />
 
         {/* Filters */}
         <Card className="border-slate-200 bg-white/80 backdrop-blur-sm">

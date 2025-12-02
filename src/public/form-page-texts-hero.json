@@ -1,0 +1,247 @@
+{
+  "version": "1.1",
+  "exportDate": "2025-12-02T11:00:00.000Z",
+  "description": "Textes complets pour la page de formulaire YoJob (incluant Hero Section)",
+  "data": {
+    "questions": [],
+    "uiTexts": [
+      {
+        "textId": "form.page.title",
+        "key": "form.page.title",
+        "category": "main",
+        "translations": {
+          "fr": { "text": "Étude de marché européenne - Agences de travail temporaire", "status": "validated" },
+          "en": { "text": "European Market Study - Temporary Employment Agencies", "status": "validated" },
+          "de": { "text": "Europäische Marktstudie - Zeitarbeitsfirmen", "status": "validated" },
+          "es": { "text": "Estudio de mercado europeo - Empresas de trabajo temporal", "status": "validated" },
+          "it": { "text": "Studio di mercato europeo - Agenzie di lavoro temporaneo", "status": "validated" },
+          "nl": { "text": "Europese marktstudie - Uitzendbureaus", "status": "validated" },
+          "pl": { "text": "Europejskie badanie rynku - Agencje pracy tymczasowej", "status": "validated" },
+          "pt": { "text": "Estudo de mercado europeu - Agências de trabalho temporário", "status": "validated" }
+        }
+      },
+      {
+        "textId": "form.page.subtitle",
+        "key": "form.page.subtitle",
+        "category": "main",
+        "translations": {
+          "fr": { "text": "Partagez votre expérience et vos besoins pour façonner l'avenir du recrutement européen", "status": "validated" },
+          "en": { "text": "Share your experience and needs to shape the future of European recruitment", "status": "validated" },
+          "de": { "text": "Teilen Sie Ihre Erfahrungen und Bedürfnisse, um die Zukunft der europäischen Rekrutierung zu gestalten", "status": "validated" },
+          "es": { "text": "Comparta su experiencia y necesidades para dar forma al futuro del reclutamiento europeo", "status": "validated" },
+          "it": { "text": "Condividete la vostra esperienza e le vostre esigenze per plasmare il futuro del reclutamento europeo", "status": "validated" },
+          "nl": { "text": "Deel uw ervaring en behoeften om de toekomst van Europese werving vorm te geven", "status": "validated" },
+          "pl": { "text": "Podziel się swoim doświadczeniem i potrzebami, aby kształtować przyszłość europejskiej rekrutacji", "status": "validated" },
+          "pt": { "text": "Compartilhe sua experiência e necessidades para moldar o futuro do recrutamento europeu", "status": "validated" }
+        }
+      },
+      {
+        "textId": "form.welcome.title",
+        "key": "form.welcome.title",
+        "category": "main",
+        "translations": {
+          "fr": { "text": "Bienvenue !", "status": "validated" },
+          "en": { "text": "Welcome!", "status": "validated" },
+          "de": { "text": "Willkommen!", "status": "validated" },
+          "es": { "text": "¡Bienvenido!", "status": "validated" },
+          "it": { "text": "Benvenuto!", "status": "validated" },
+          "nl": { "text": "Welkom!", "status": "validated" },
+          "pl": { "text": "Witamy!", "status": "validated" },
+          "pt": { "text": "Bem-vindo!", "status": "validated" }
+        }
+      },
+      {
+        "textId": "form.welcome.description",
+        "key": "form.welcome.description",
+        "category": "main",
+        "translations": {
+          "fr": { "text": "Cette enquête nous permettra de développer une plateforme adaptée à vos besoins réels. Vos réponses sont précieuses et resteront confidentielles.", "status": "validated" },
+          "en": { "text": "This survey will enable us to develop a platform tailored to your real needs. Your answers are valuable and will remain confidential.", "status": "validated" },
+          "de": { "text": "Diese Umfrage ermöglicht es uns, eine auf Ihre tatsächlichen Bedürfnisse zugeschnittene Plattform zu entwickeln. Ihre Antworten sind wertvoll und bleiben vertraulich.", "status": "validated" },
+          "es": { "text": "Esta encuesta nos permitirá desarrollar una plataforma adaptada a sus necesidades reales. Sus respuestas son valiosas y permanecerán confidenciales.", "status": "validated" },
+          "it": { "text": "Questo sondaggio ci permetterà di sviluppare una piattaforma adattata alle vostre esigenze reali. Le vostre risposte sono preziose e rimarranno confidenziali.", "status": "validated" },
+          "nl": { "text": "Deze enquête zal ons in staat stellen een platform te ontwikkelen dat is afgestemd op uw echte behoeften. Uw antwoorden zijn waardevol en blijven vertrouwelijk.", "status": "validated" },
+          "pl": { "text": "Ta ankieta pozwoli nam opracować platformę dostosowaną do Państwa rzeczywistych potrzeb. Państwa odpowiedzi są cenne i pozostaną poufne.", "status": "validated" },
+          "pt": { "text": "Esta pesquisa nos permitirá desenvolver uma plataforma adaptada às suas necessidades reais. Suas respostas são valiosas e permanecerão confidenciais.", "status": "validated" }
+        }
+      },
+      {
+        "textId": "progress.section",
+        "key": "progress.section",
+        "category": "progress",
+        "translations": {
+          "fr": { "text": "Section", "status": "validated" },
+          "en": { "text": "Section", "status": "validated" },
+          "de": { "text": "Abschnitt", "status": "validated" },
+          "es": { "text": "Sección", "status": "validated" },
+          "it": { "text": "Sezione", "status": "validated" },
+          "nl": { "text": "Sectie", "status": "validated" },
+          "pl": { "text": "Sekcja", "status": "validated" },
+          "pt": { "text": "Seção", "status": "validated" }
+        }
+      },
+      {
+        "textId": "progress.of",
+        "key": "progress.of",
+        "category": "progress",
+        "translations": {
+          "fr": { "text": "sur", "status": "validated" },
+          "en": { "text": "of", "status": "validated" },
+          "de": { "text": "von", "status": "validated" },
+          "es": { "text": "de", "status": "validated" },
+          "it": { "text": "di", "status": "validated" },
+          "nl": { "text": "van", "status": "validated" },
+          "pl": { "text": "z", "status": "validated" },
+          "pt": { "text": "de", "status": "validated" }
+        }
+      },
+      {
+        "textId": "progress.completed",
+        "key": "progress.completed",
+        "category": "progress",
+        "translations": {
+          "fr": { "text": "Terminé", "status": "validated" },
+          "en": { "text": "Completed", "status": "validated" },
+          "de": { "text": "Abgeschlossen", "status": "validated" },
+          "es": { "text": "Completado", "status": "validated" },
+          "it": { "text": "Completato", "status": "validated" },
+          "nl": { "text": "Voltooid", "status": "validated" },
+          "pl": { "text": "Ukończono", "status": "validated" },
+          "pt": { "text": "Concluído", "status": "validated" }
+        }
+      },
+      {
+        "textId": "hero.badge",
+        "key": "hero.badge",
+        "category": "hero",
+        "translations": {
+          "fr": { "text": "Étude de marché européenne", "status": "validated" },
+          "en": { "text": "European Market Study", "status": "validated" },
+          "de": { "text": "Europäische Marktstudie", "status": "validated" },
+          "es": { "text": "Estudio de mercado europeo", "status": "validated" },
+          "it": { "text": "Studio di mercato europeo", "status": "validated" },
+          "nl": { "text": "Europese marktstudie", "status": "validated" },
+          "pl": { "text": "Europejskie badanie rynku", "status": "validated" },
+          "pt": { "text": "Estudo de mercado europeu", "status": "validated" }
+        }
+      },
+      {
+        "textId": "hero.title",
+        "key": "hero.title",
+        "category": "hero",
+        "translations": {
+          "fr": { "text": "Participez à l'avenir du détachement européen", "status": "validated" },
+          "en": { "text": "Participate in the future of European secondment", "status": "validated" },
+          "de": { "text": "Beteiligen Sie sich an der Zukunft der europäischen Entsendung", "status": "validated" },
+          "es": { "text": "Participe en el futuro del desplazamiento europeo", "status": "validated" },
+          "it": { "text": "Partecipate al futuro del distacco europeo", "status": "validated" },
+          "nl": { "text": "Neem deel aan de toekomst van Europese detachering", "status": "validated" },
+          "pl": { "text": "Weź udział w przyszłości europejskiego delegowania", "status": "validated" },
+          "pt": { "text": "Participe no futuro do destacamento europeu", "status": "validated" }
+        }
+      },
+      {
+        "textId": "hero.subtitle",
+        "key": "hero.subtitle",
+        "category": "hero",
+        "translations": {
+          "fr": { "text": "Votre avis façonne YoJob. 8 minutes pour transformer votre quotidien administratif.", "status": "validated" },
+          "en": { "text": "Your opinion shapes YoJob. 8 minutes to transform your administrative daily life.", "status": "validated" },
+          "de": { "text": "Ihre Meinung formt YoJob. 8 Minuten, um Ihren Verwaltungsalltag zu transformieren.", "status": "validated" },
+          "es": { "text": "Su opinión da forma a YoJob. 8 minutos para transformar su rutina administrativa.", "status": "validated" },
+          "it": { "text": "La vostra opinione plasma YoJob. 8 minuti per trasformare il vostro quotidiano amministrativo.", "status": "validated" },
+          "nl": { "text": "Uw mening vormt YoJob. 8 minuten om uw administratieve dagelijkse leven te transformeren.", "status": "validated" },
+          "pl": { "text": "Twoja opinia kształtuje YoJob. 8 minut, aby zmienić codzienność administracyjną.", "status": "validated" },
+          "pt": { "text": "A sua opinião molda YoJob. 8 minutos para transformar o seu dia-a-dia administrativo.", "status": "validated" }
+        }
+      },
+      {
+        "textId": "hero.stat.countries",
+        "key": "hero.stat.countries",
+        "category": "hero",
+        "translations": {
+          "fr": { "text": "27 pays couverts", "status": "validated" },
+          "en": { "text": "27 countries covered", "status": "validated" },
+          "de": { "text": "27 Länder abgedeckt", "status": "validated" },
+          "es": { "text": "27 países cubiertos", "status": "validated" },
+          "it": { "text": "27 paesi coperti", "status": "validated" },
+          "nl": { "text": "27 landen gedekt", "status": "validated" },
+          "pl": { "text": "27 krajów objętych", "status": "validated" },
+          "pt": { "text": "27 países cobertos", "status": "validated" }
+        }
+      },
+      {
+        "textId": "hero.stat.agencies",
+        "key": "hero.stat.agencies",
+        "category": "hero",
+        "translations": {
+          "fr": { "text": "500+ agences partenaires", "status": "validated" },
+          "en": { "text": "500+ partner agencies", "status": "validated" },
+          "de": { "text": "500+ Partneragenturen", "status": "validated" },
+          "es": { "text": "500+ agencias asociadas", "status": "validated" },
+          "it": { "text": "500+ agenzie partner", "status": "validated" },
+          "nl": { "text": "500+ partnerbureaus", "status": "validated" },
+          "pl": { "text": "500+ agencji partnerskich", "status": "validated" },
+          "pt": { "text": "500+ agências parceiras", "status": "validated" }
+        }
+      },
+      {
+        "textId": "hero.stat.duration",
+        "key": "hero.stat.duration",
+        "category": "hero",
+        "translations": {
+          "fr": { "text": "8-10 min pour répondre", "status": "validated" },
+          "en": { "text": "8-10 min to complete", "status": "validated" },
+          "de": { "text": "8-10 Min. zum Ausfüllen", "status": "validated" },
+          "es": { "text": "8-10 min para completar", "status": "validated" },
+          "it": { "text": "8-10 min per completare", "status": "validated" },
+          "nl": { "text": "8-10 min om in te vullen", "status": "validated" },
+          "pl": { "text": "8-10 min do wypełnienia", "status": "validated" },
+          "pt": { "text": "8-10 min para completar", "status": "validated" }
+        }
+      },
+      {
+        "textId": "hero.cta.start",
+        "key": "hero.cta.start",
+        "category": "hero",
+        "translations": {
+          "fr": { "text": "Commencer l'enquête", "status": "validated" },
+          "en": { "text": "Start the survey", "status": "validated" },
+          "de": { "text": "Umfrage starten", "status": "validated" },
+          "es": { "text": "Iniciar la encuesta", "status": "validated" },
+          "it": { "text": "Inizia il sondaggio", "status": "validated" },
+          "nl": { "text": "Start de enquête", "status": "validated" },
+          "pl": { "text": "Rozpocznij ankietę", "status": "validated" },
+          "pt": { "text": "Iniciar a pesquisa", "status": "validated" }
+        }
+      },
+      {
+        "textId": "hero.footer.info",
+        "key": "hero.footer.info",
+        "category": "hero",
+        "translations": {
+          "fr": { "text": "25 questions • Anonyme • Conforme RGPD", "status": "validated" },
+          "en": { "text": "25 questions • Anonymous • GDPR compliant", "status": "validated" },
+          "de": { "text": "25 Fragen • Anonym • DSGVO-konform", "status": "validated" },
+          "es": { "text": "25 preguntas • Anónimo • Conforme RGPD", "status": "validated" },
+          "it": { "text": "25 domande • Anonimo • Conforme GDPR", "status": "validated" },
+          "nl": { "text": "25 vragen • Anoniem • AVG-conform", "status": "validated" },
+          "pl": { "text": "25 pytań • Anonimowo • Zgodne z RODO", "status": "validated" },
+          "pt": { "text": "25 perguntas • Anônimo • Conforme RGPD", "status": "validated" }
+        }
+      }
+    ],
+    "countries": [
+      {
+        "countryCode": "FR",
+        "languages": ["fr", "en"]
+      }
+    ]
+  },
+  "stats": {
+    "questionsCount": 0,
+    "uiTextsCount": 15,
+    "countriesCount": 1,
+    "totalLanguages": 8
+  }
+}
