@@ -6,6 +6,7 @@ import { Label } from '../ui/label';
 import { RadioCard } from '../survey/inputs/RadioCard';
 import { MultiSelectChips } from '../survey/inputs/MultiSelectChips';
 import { ScoreSelector } from '../survey/inputs/ScoreSelector';
+import { useI18n } from '../../hooks/useI18n';
 import { 
   Building2, 
   Calendar, 
@@ -34,6 +35,7 @@ const QUESTION_ICONS: Record<string, any> = {
 };
 
 export function QuestionPreview({ question, value, onChange, delay = 0 }: QuestionPreviewProps) {
+  const { t } = useI18n();
   const Icon = QUESTION_ICONS[question.code] || FileText;
 
   switch (question.type) {
@@ -172,7 +174,7 @@ export function QuestionPreview({ question, value, onChange, delay = 0 }: Questi
             {question.required && <span className="text-red-500 ml-1">*</span>}
           </Label>
           {question.code === 'q4_secteurs' && (
-            <p className="text-slate-500 text-sm">Sélectionnez jusqu'à 3 secteurs</p>
+            <p className="text-slate-500 text-sm">{t('helper.select_up_to_3', 'Sélectionnez jusqu\'à 3 secteurs')}</p>
           )}
           <div className="flex flex-wrap gap-2">
             {question.options?.map((option) => {

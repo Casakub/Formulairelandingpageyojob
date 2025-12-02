@@ -41,7 +41,7 @@ export function DynamicQuestionRenderer({
   updateFormData
 }: DynamicQuestionRendererProps) {
   const { getVisibleQuestionsBySection } = useQuestions();
-  const { tQuestion, tPlaceholder, tOptions } = useI18n();
+  const { t, tQuestion, tPlaceholder, tOptions } = useI18n();
   const questions = getVisibleQuestionsBySection(sectionNumber);
 
   const shouldShowQuestion = (question: Question) => {
@@ -189,7 +189,7 @@ export function DynamicQuestionRenderer({
               {question.required && <span className="text-red-400 ml-1">*</span>}
             </Label>
             {question.code === 'q4_secteurs' && (
-              <p className="text-white/60 text-sm mb-4">Sélectionnez jusqu'à 3 secteurs</p>
+              <p className="text-white/60 text-sm mb-4">{t('helper.select_up_to_3', 'Sélectionnez jusqu\'à 3 secteurs')}</p>
             )}
             <MultiSelectChips
               options={tOptions(question.id, question.options) || []}

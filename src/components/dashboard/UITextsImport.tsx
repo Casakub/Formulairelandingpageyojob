@@ -1,37 +1,33 @@
-import { useState, useRef } from 'react';
+import { useState } from 'react';
 import { motion } from 'motion/react';
-import { Upload, FileJson, CheckCircle, AlertCircle, Download, Info } from 'lucide-react';
+import { Upload, CheckCircle, AlertCircle, Languages, Sparkles } from 'lucide-react';
 import { Button } from '../ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '../ui/card';
 import { Alert, AlertDescription } from '../ui/alert';
+import { Badge } from '../ui/badge';
 import { projectId, publicAnonKey } from '../../utils/supabase/info';
+import { convertToSectionsFormat, convertToNavigationFormat } from '../../lib/ui-texts-all-languages';
 
-export function UITextsImport({ onImportSuccess }: { onImportSuccess?: () => void }) {
+interface UITextsImportProps {
+  onImportSuccess?: () => void;
+}
+
+export function UITextsImport({ onImportSuccess }: UITextsImportProps) {
   const [importing, setImporting] = useState(false);
   const [status, setStatus] = useState<'idle' | 'success' | 'error'>('idle');
   const [message, setMessage] = useState('');
-  const [importedCount, setImportedCount] = useState(0);
-  const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const handleImport = async (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (!file) return;
-
+  // Fonction générique pour importer des traductions
+  const importTranslations = async (
+    data: { translations: any[] },
+    description: string
+  ) => {
     setImporting(true);
     setStatus('idle');
 
     try {
-      const text = await file.text();
-      const data = JSON.parse(text);
+      console.log(`📦 ${description}...`);
 
-      // Validation du format
-      if (!data.translations || !Array.isArray(data.translations)) {
-        throw new Error('Format JSON invalide : champ "translations" manquant ou incorrect');
-      }
-
-      console.log(`📦 Importing ${data.translations.length} UI texts...`);
-
-      // Appel à l'API
       const response = await fetch(
         `https://${projectId}.supabase.co/functions/v1/make-server-10092a63/i18n/ui-texts/bulk`,
         {
@@ -40,7 +36,7 @@ export function UITextsImport({ onImportSuccess }: { onImportSuccess?: () => voi
             'Content-Type': 'application/json',
             Authorization: `Bearer ${publicAnonKey}`,
           },
-          body: JSON.stringify({ translations: data.translations }),
+          body: JSON.stringify(data),
         }
       );
 
@@ -51,405 +47,7 @@ export function UITextsImport({ onImportSuccess }: { onImportSuccess?: () => voi
       }
 
       setStatus('success');
-      setMessage(`${result.count} texte(s) importé(s) avec succès !`);
-      setImportedCount(result.count);
-
-      // Callback pour rafraîchir la liste
-      if (onImportSuccess) {
-        setTimeout(() => onImportSuccess(), 500);
-      }
-    } catch (error: any) {
-      console.error('❌ Import error:', error);
-      setStatus('error');
-      setMessage(error.message || 'Erreur lors de l\'import');
-    } finally {
-      setImporting(false);
-      // Reset file input
-      if (fileInputRef.current) {
-        fileInputRef.current.value = '';
-      }
-    }
-  };
-
-  const handleDownloadTemplate = () => {
-    // Générer le JSON d'exemple en mémoire
-    const heroTranslationsTemplate = {
-      name: "Hero Section Translations",
-      description: "Traductions pour la page d'accueil du formulaire (Hero Section)",
-      version: "1.0.0",
-      date: new Date().toISOString().split('T')[0],
-      translations: [
-        {
-          textId: "hero.badge",
-          key: "hero.badge",
-          category: "hero",
-          translations: {
-            fr: { text: "Étude de marché européenne", status: "validated" },
-            en: { text: "European Market Study", status: "validated" },
-            de: { text: "Europäische Marktstudie", status: "validated" },
-            es: { text: "Estudio de mercado europeo", status: "validated" },
-            it: { text: "Studio di mercato europeo", status: "validated" },
-            nl: { text: "Europese marktstudie", status: "validated" },
-            pl: { text: "Europejskie badanie rynku", status: "validated" },
-            pt: { text: "Estudo de mercado europeu", status: "validated" }
-          }
-        },
-        {
-          textId: "hero.title",
-          key: "hero.title",
-          category: "hero",
-          translations: {
-            fr: { text: "Participez à l'avenir du détachement européen", status: "validated" },
-            en: { text: "Participate in the future of European secondment", status: "validated" },
-            de: { text: "Beteiligen Sie sich an der Zukunft der europäischen Entsendung", status: "validated" },
-            es: { text: "Participe en el futuro del desplazamiento europeo", status: "validated" },
-            it: { text: "Partecipate al futuro del distacco europeo", status: "validated" },
-            nl: { text: "Neem deel aan de toekomst van Europese detachering", status: "validated" },
-            pl: { text: "Weź udział w przyszłości europejskiego delegowania", status: "validated" },
-            pt: { text: "Participe no futuro do destacamento europeu", status: "validated" }
-          }
-        },
-        {
-          textId: "hero.subtitle",
-          key: "hero.subtitle",
-          category: "hero",
-          translations: {
-            fr: { text: "Votre avis façonne YoJob. 8 minutes pour transformer votre quotidien administratif.", status: "validated" },
-            en: { text: "Your opinion shapes YoJob. 8 minutes to transform your administrative daily life.", status: "validated" },
-            de: { text: "Ihre Meinung formt YoJob. 8 Minuten, um Ihren Verwaltungsalltag zu transformieren.", status: "validated" },
-            es: { text: "Su opinión da forma a YoJob. 8 minutos para transformar su rutina administrativa.", status: "validated" },
-            it: { text: "La vostra opinione plasma YoJob. 8 minuti per trasformare il vostro quotidiano amministrativo.", status: "validated" },
-            nl: { text: "Uw mening vormt YoJob. 8 minuten om uw administratieve dagelijkse leven te transformeren.", status: "validated" },
-            pl: { text: "Twoja opinia kształtuje YoJob. 8 minut, aby zmienić codzienność administracyjną.", status: "validated" },
-            pt: { text: "A sua opinião molda YoJob. 8 minutos para transformar o seu dia-a-dia administrativo.", status: "validated" }
-          }
-        },
-        {
-          textId: "hero.stat.countries",
-          key: "hero.stat.countries",
-          category: "hero",
-          translations: {
-            fr: { text: "27 pays couverts", status: "validated" },
-            en: { text: "27 countries covered", status: "validated" },
-            de: { text: "27 Länder abgedeckt", status: "validated" },
-            es: { text: "27 países cubiertos", status: "validated" },
-            it: { text: "27 paesi coperti", status: "validated" },
-            nl: { text: "27 landen gedekt", status: "validated" },
-            pl: { text: "27 krajów objętych", status: "validated" },
-            pt: { text: "27 países cobertos", status: "validated" }
-          }
-        },
-        {
-          textId: "hero.stat.agencies",
-          key: "hero.stat.agencies",
-          category: "hero",
-          translations: {
-            fr: { text: "500+ agences partenaires", status: "validated" },
-            en: { text: "500+ partner agencies", status: "validated" },
-            de: { text: "500+ Partneragenturen", status: "validated" },
-            es: { text: "500+ agencias asociadas", status: "validated" },
-            it: { text: "500+ agenzie partner", status: "validated" },
-            nl: { text: "500+ partnerbureaus", status: "validated" },
-            pl: { text: "500+ agencji partnerskich", status: "validated" },
-            pt: { text: "500+ agências parceiras", status: "validated" }
-          }
-        },
-        {
-          textId: "hero.stat.duration",
-          key: "hero.stat.duration",
-          category: "hero",
-          translations: {
-            fr: { text: "8-10 min pour répondre", status: "validated" },
-            en: { text: "8-10 min to complete", status: "validated" },
-            de: { text: "8-10 Min. zum Ausfüllen", status: "validated" },
-            es: { text: "8-10 min para completar", status: "validated" },
-            it: { text: "8-10 min per completare", status: "validated" },
-            nl: { text: "8-10 min om in te vullen", status: "validated" },
-            pl: { text: "8-10 min do wypełnienia", status: "validated" },
-            pt: { text: "8-10 min para completar", status: "validated" }
-          }
-        },
-        {
-          textId: "hero.cta.start",
-          key: "hero.cta.start",
-          category: "hero",
-          translations: {
-            fr: { text: "Commencer l'enquête", status: "validated" },
-            en: { text: "Start the survey", status: "validated" },
-            de: { text: "Umfrage starten", status: "validated" },
-            es: { text: "Iniciar la encuesta", status: "validated" },
-            it: { text: "Inizia il sondaggio", status: "validated" },
-            nl: { text: "Start de enquête", status: "validated" },
-            pl: { text: "Rozpocznij ankietę", status: "validated" },
-            pt: { text: "Iniciar a pesquisa", status: "validated" }
-          }
-        },
-        {
-          textId: "hero.footer.info",
-          key: "hero.footer.info",
-          category: "hero",
-          translations: {
-            fr: { text: "25 questions • Anonyme • Conforme RGPD", status: "validated" },
-            en: { text: "25 questions • Anonymous • GDPR compliant", status: "validated" },
-            de: { text: "25 Fragen • Anonym • DSGVO-konform", status: "validated" },
-            es: { text: "25 preguntas • Anónimo • Conforme RGPD", status: "validated" },
-            it: { text: "25 domande • Anonimo • Conforme GDPR", status: "validated" },
-            nl: { text: "25 vragen • Anoniem • AVG-conform", status: "validated" },
-            pl: { text: "25 pytań • Anonimowo • Zgodne z RODO", status: "validated" },
-            pt: { text: "25 perguntas • Anônimo • Conforme RGPD", status: "validated" }
-          }
-        }
-      ]
-    };
-
-    // Créer et télécharger le blob JSON
-    const dataStr = JSON.stringify(heroTranslationsTemplate, null, 2);
-    const blob = new Blob([dataStr], { type: 'application/json' });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement('a');
-    link.href = url;
-    link.download = 'hero-section-translations.json';
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-    URL.revokeObjectURL(url);
-  };
-
-  const handleDownloadSectionsTemplate = () => {
-    const sectionsTranslationsTemplate = {
-      name: "Survey Sections Titles",
-      description: "Traductions des titres de sections du formulaire",
-      version: "1.0.0",
-      date: new Date().toISOString().split('T')[0],
-      translations: [
-        {
-          textId: "section.1.title",
-          key: "section.1.title",
-          category: "sections",
-          translations: {
-            fr: { text: "Profil Agence", status: "validated" },
-            en: { text: "Agency Profile", status: "validated" },
-            de: { text: "Agentenprofil", status: "validated" },
-            es: { text: "Perfil de la Agencia", status: "validated" },
-            it: { text: "Profilo Agenzia", status: "validated" },
-            nl: { text: "Agentschapsprofiel", status: "validated" },
-            pl: { text: "Profil Agencji", status: "validated" },
-            pt: { text: "Perfil da Agência", status: "validated" }
-          }
-        },
-        {
-          textId: "section.2.title",
-          key: "section.2.title",
-          category: "sections",
-          translations: {
-            fr: { text: "Détachement", status: "validated" },
-            en: { text: "Secondment", status: "validated" },
-            de: { text: "Entsendung", status: "validated" },
-            es: { text: "Desplazamiento", status: "validated" },
-            it: { text: "Distacco", status: "validated" },
-            nl: { text: "Detachering", status: "validated" },
-            pl: { text: "Delegowanie", status: "validated" },
-            pt: { text: "Destacamento", status: "validated" }
-          }
-        },
-        {
-          textId: "section.3.title",
-          key: "section.3.title",
-          category: "sections",
-          translations: {
-            fr: { text: "Besoins", status: "validated" },
-            en: { text: "Needs", status: "validated" },
-            de: { text: "Bedürfnisse", status: "validated" },
-            es: { text: "Necesidades", status: "validated" },
-            it: { text: "Esigenze", status: "validated" },
-            nl: { text: "Behoeften", status: "validated" },
-            pl: { text: "Potrzeby", status: "validated" },
-            pt: { text: "Necessidades", status: "validated" }
-          }
-        },
-        {
-          textId: "section.4.title",
-          key: "section.4.title",
-          category: "sections",
-          translations: {
-            fr: { text: "Intérêt YoJob", status: "validated" },
-            en: { text: "YoJob Interest", status: "validated" },
-            de: { text: "YoJob Interesse", status: "validated" },
-            es: { text: "Interés YoJob", status: "validated" },
-            it: { text: "Interesse YoJob", status: "validated" },
-            nl: { text: "YoJob Interesse", status: "validated" },
-            pl: { text: "Zainteresowanie YoJob", status: "validated" },
-            pt: { text: "Interesse YoJob", status: "validated" }
-          }
-        },
-        {
-          textId: "section.5.title",
-          key: "section.5.title",
-          category: "sections",
-          translations: {
-            fr: { text: "Vision Future", status: "validated" },
-            en: { text: "Future Vision", status: "validated" },
-            de: { text: "Zukunftsvision", status: "validated" },
-            es: { text: "Visión Futura", status: "validated" },
-            it: { text: "Visione Futura", status: "validated" },
-            nl: { text: "Toekomstvisie", status: "validated" },
-            pl: { text: "Wizja Przyszłości", status: "validated" },
-            pt: { text: "Visão Futura", status: "validated" }
-          }
-        },
-        {
-          textId: "section.6.title",
-          key: "section.6.title",
-          category: "sections",
-          translations: {
-            fr: { text: "Contact", status: "validated" },
-            en: { text: "Contact", status: "validated" },
-            de: { text: "Kontakt", status: "validated" },
-            es: { text: "Contacto", status: "validated" },
-            it: { text: "Contatto", status: "validated" },
-            nl: { text: "Contact", status: "validated" },
-            pl: { text: "Kontakt", status: "validated" },
-            pt: { text: "Contato", status: "validated" }
-          }
-        }
-      ]
-    };
-
-    const dataStr = JSON.stringify(sectionsTranslationsTemplate, null, 2);
-    const blob = new Blob([dataStr], { type: 'application/json' });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement('a');
-    link.href = url;
-    link.download = 'survey-sections-translations.json';
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-    URL.revokeObjectURL(url);
-  };
-
-  const handleImportSectionsDirect = async () => {
-    setImporting(true);
-    setStatus('idle');
-
-    try {
-      const sectionsData = {
-        translations: [
-          {
-            textId: "section.1.title",
-            key: "section.1.title",
-            category: "sections",
-            translations: {
-              fr: { text: "Profil Agence", status: "validated" },
-              en: { text: "Agency Profile", status: "validated" },
-              de: { text: "Agentenprofil", status: "validated" },
-              es: { text: "Perfil de la Agencia", status: "validated" },
-              it: { text: "Profilo Agenzia", status: "validated" },
-              nl: { text: "Agentschapsprofiel", status: "validated" },
-              pl: { text: "Profil Agencji", status: "validated" },
-              pt: { text: "Perfil da Agência", status: "validated" }
-            }
-          },
-          {
-            textId: "section.2.title",
-            key: "section.2.title",
-            category: "sections",
-            translations: {
-              fr: { text: "Détachement", status: "validated" },
-              en: { text: "Secondment", status: "validated" },
-              de: { text: "Entsendung", status: "validated" },
-              es: { text: "Desplazamiento", status: "validated" },
-              it: { text: "Distacco", status: "validated" },
-              nl: { text: "Detachering", status: "validated" },
-              pl: { text: "Delegowanie", status: "validated" },
-              pt: { text: "Destacamento", status: "validated" }
-            }
-          },
-          {
-            textId: "section.3.title",
-            key: "section.3.title",
-            category: "sections",
-            translations: {
-              fr: { text: "Besoins", status: "validated" },
-              en: { text: "Needs", status: "validated" },
-              de: { text: "Bedürfnisse", status: "validated" },
-              es: { text: "Necesidades", status: "validated" },
-              it: { text: "Esigenze", status: "validated" },
-              nl: { text: "Behoeften", status: "validated" },
-              pl: { text: "Potrzeby", status: "validated" },
-              pt: { text: "Necessidades", status: "validated" }
-            }
-          },
-          {
-            textId: "section.4.title",
-            key: "section.4.title",
-            category: "sections",
-            translations: {
-              fr: { text: "Intérêt YoJob", status: "validated" },
-              en: { text: "YoJob Interest", status: "validated" },
-              de: { text: "YoJob Interesse", status: "validated" },
-              es: { text: "Interés YoJob", status: "validated" },
-              it: { text: "Interesse YoJob", status: "validated" },
-              nl: { text: "YoJob Interesse", status: "validated" },
-              pl: { text: "Zainteresowanie YoJob", status: "validated" },
-              pt: { text: "Interesse YoJob", status: "validated" }
-            }
-          },
-          {
-            textId: "section.5.title",
-            key: "section.5.title",
-            category: "sections",
-            translations: {
-              fr: { text: "Vision Future", status: "validated" },
-              en: { text: "Future Vision", status: "validated" },
-              de: { text: "Zukunftsvision", status: "validated" },
-              es: { text: "Visión Futura", status: "validated" },
-              it: { text: "Visione Futura", status: "validated" },
-              nl: { text: "Toekomstvisie", status: "validated" },
-              pl: { text: "Wizja Przyszłości", status: "validated" },
-              pt: { text: "Visão Futura", status: "validated" }
-            }
-          },
-          {
-            textId: "section.6.title",
-            key: "section.6.title",
-            category: "sections",
-            translations: {
-              fr: { text: "Contact", status: "validated" },
-              en: { text: "Contact", status: "validated" },
-              de: { text: "Kontakt", status: "validated" },
-              es: { text: "Contacto", status: "validated" },
-              it: { text: "Contatto", status: "validated" },
-              nl: { text: "Contact", status: "validated" },
-              pl: { text: "Kontakt", status: "validated" },
-              pt: { text: "Contato", status: "validated" }
-            }
-          }
-        ]
-      };
-
-      console.log(`📦 Importing 6 section titles...`);
-
-      const response = await fetch(
-        `https://${projectId}.supabase.co/functions/v1/make-server-10092a63/i18n/ui-texts/bulk`,
-        {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${publicAnonKey}`,
-          },
-          body: JSON.stringify(sectionsData),
-        }
-      );
-
-      const result = await response.json();
-
-      if (!response.ok || !result.success) {
-        throw new Error(result.error || 'Erreur lors de l\'import');
-      }
-
-      setStatus('success');
-      setMessage(`✅ ${result.count} titre(s) de section importé(s) !`);
-      setImportedCount(result.count);
+      setMessage(`✅ ${result.count} traduction(s) importée(s) dans 24 langues !`);
 
       if (onImportSuccess) {
         setTimeout(() => onImportSuccess(), 500);
@@ -461,115 +59,144 @@ export function UITextsImport({ onImportSuccess }: { onImportSuccess?: () => voi
     } finally {
       setImporting(false);
     }
+  };
+
+  const handleImportSections = () => {
+    importTranslations(
+      { translations: convertToSectionsFormat() },
+      'Importing 6 section titles'
+    );
+  };
+
+  const handleImportNavigation = () => {
+    importTranslations(
+      { translations: convertToNavigationFormat() },
+      'Importing 7 navigation texts'
+    );
   };
 
   return (
     <Card className="bg-gradient-to-br from-cyan-50 to-blue-50 border-cyan-200">
       <CardHeader>
-        <CardTitle className="text-slate-900 flex items-center gap-2">
-          <Upload className="w-5 h-5 text-cyan-600" />
-          Importer des traductions UI
-        </CardTitle>
+        <div className="flex items-center justify-between">
+          <CardTitle className="text-slate-900 flex items-center gap-2">
+            <Upload className="w-5 h-5 text-cyan-600" />
+            Import rapide UI
+          </CardTitle>
+          <Badge className="bg-gradient-to-r from-violet-500 to-purple-500 text-white border-0 shadow-lg">
+            <Languages className="w-3 h-3 mr-1" />
+            24 langues
+          </Badge>
+        </div>
       </CardHeader>
-      <CardContent className="space-y-4">
-        <div className="flex items-start gap-3 p-3 bg-blue-50 border border-blue-200 rounded-lg">
-          <Info className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
-          <div className="text-sm text-slate-700">
-            <p className="mb-2">
-              Importez un fichier JSON contenant vos traductions d'interface utilisateur.
+      
+      <CardContent className="space-y-5">
+        {/* Info Banner */}
+        <div className="flex items-start gap-3 p-4 bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 rounded-xl">
+          <Sparkles className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
+          <div className="text-sm text-slate-700 space-y-1">
+            <p className="font-medium text-slate-900">
+              Import automatique dans les 24 langues européennes
             </p>
             <p className="text-xs text-slate-600">
-              Format attendu : <code className="bg-white px-1 py-0.5 rounded">{'{ "translations": [...] }'}</code>
+              Cliquez sur un bouton ci-dessous pour importer instantanément les traductions pré-configurées.
             </p>
           </div>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-          {/* Download Hero Template */}
+        {/* Quick Import Buttons */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <Button
-            onClick={handleDownloadTemplate}
-            variant="outline"
-            className="border-violet-300 hover:bg-violet-50"
+            onClick={handleImportSections}
+            disabled={importing}
+            size="lg"
+            className="h-auto py-4 bg-gradient-to-r from-green-500 to-emerald-500 text-white hover:from-green-600 hover:to-emerald-600 shadow-lg hover:shadow-xl transition-all"
           >
-            <Download className="w-4 h-4 mr-2" />
-            Hero (8 textes)
-          </Button>
-
-          {/* Download Sections Template */}
-          <Button
-            onClick={handleDownloadSectionsTemplate}
-            variant="outline"
-            className="border-green-300 hover:bg-green-50"
-          >
-            <Download className="w-4 h-4 mr-2" />
-            Sections (6 titres)
-          </Button>
-
-          {/* Upload */}
-          <div>
-            <input
-              ref={fileInputRef}
-              type="file"
-              accept=".json"
-              onChange={handleImport}
-              className="hidden"
-              id="ui-texts-import"
-            />
-            <label htmlFor="ui-texts-import">
-              <Button
-                type="button"
-                className="w-full bg-gradient-to-r from-cyan-500 to-blue-500 text-white hover:from-cyan-600 hover:to-blue-600"
-                disabled={importing}
-                onClick={() => fileInputRef.current?.click()}
-              >
+            <div className="flex flex-col items-center gap-2 w-full">
+              <div className="flex items-center gap-2">
                 {importing ? (
-                  <>
-                    <motion.div
-                      animate={{ rotate: 360 }}
-                      transition={{ duration: 1, repeat: Infinity, ease: 'linear' }}
-                      className="w-4 h-4 mr-2"
-                    >
-                      <FileJson className="w-4 h-4" />
-                    </motion.div>
-                    Importation...
-                  </>
+                  <motion.div
+                    animate={{ rotate: 360 }}
+                    transition={{ duration: 1, repeat: Infinity, ease: 'linear' }}
+                  >
+                    <Upload className="w-5 h-5" />
+                  </motion.div>
                 ) : (
-                  <>
-                    <Upload className="w-4 h-4 mr-2" />
-                    Sélectionner un JSON
-                  </>
+                  <CheckCircle className="w-5 h-5" />
                 )}
-              </Button>
-            </label>
-          </div>
+                <span className="font-semibold">6 Sections</span>
+              </div>
+              <span className="text-xs text-white/80">
+                Profil • Détachement • Besoins • etc.
+              </span>
+            </div>
+          </Button>
+
+          <Button
+            onClick={handleImportNavigation}
+            disabled={importing}
+            size="lg"
+            className="h-auto py-4 bg-gradient-to-r from-blue-500 to-indigo-500 text-white hover:from-blue-600 hover:to-indigo-600 shadow-lg hover:shadow-xl transition-all"
+          >
+            <div className="flex flex-col items-center gap-2 w-full">
+              <div className="flex items-center gap-2">
+                {importing ? (
+                  <motion.div
+                    animate={{ rotate: 360 }}
+                    transition={{ duration: 1, repeat: Infinity, ease: 'linear' }}
+                  >
+                    <Upload className="w-5 h-5" />
+                  </motion.div>
+                ) : (
+                  <CheckCircle className="w-5 h-5" />
+                )}
+                <span className="font-semibold">7 Navigation</span>
+              </div>
+              <span className="text-xs text-white/80">
+                Boutons • Helpers • Liens
+              </span>
+            </div>
+          </Button>
         </div>
 
-        {/* Quick Import Sections */}
-        <div className="border-t border-slate-200 pt-4">
-          <p className="text-sm text-slate-600 mb-3">⚡ Import rapide :</p>
-          <Button
-            onClick={handleImportSectionsDirect}
-            disabled={importing}
-            className="w-full bg-gradient-to-r from-green-500 to-emerald-500 text-white hover:from-green-600 hover:to-emerald-600"
-          >
-            {importing ? (
-              <>
-                <motion.div
-                  animate={{ rotate: 360 }}
-                  transition={{ duration: 1, repeat: Infinity, ease: 'linear' }}
-                  className="w-4 h-4 mr-2"
-                >
-                  <Upload className="w-4 h-4" />
-                </motion.div>
-                Importation...
-              </>
-            ) : (
-              <>
-                <CheckCircle className="w-4 h-4 mr-2" />
-                Importer les 6 titres de sections maintenant
-              </>
-            )}
-          </Button>
+        {/* Languages Grid */}
+        <div className="bg-white/50 backdrop-blur-sm rounded-xl p-4 border border-slate-200">
+          <p className="text-xs font-medium text-slate-600 mb-3">Langues supportées :</p>
+          <div className="flex flex-wrap gap-2">
+            {[
+              { code: 'FR', flag: '🇫🇷' },
+              { code: 'EN', flag: '🇬🇧' },
+              { code: 'DE', flag: '🇩🇪' },
+              { code: 'ES', flag: '🇪🇸' },
+              { code: 'IT', flag: '🇮🇹' },
+              { code: 'NL', flag: '🇳🇱' },
+              { code: 'PT', flag: '🇵🇹' },
+              { code: 'PL', flag: '🇵🇱' },
+              { code: 'CS', flag: '🇨🇿' },
+              { code: 'SK', flag: '🇸🇰' },
+              { code: 'HU', flag: '🇭🇺' },
+              { code: 'RO', flag: '🇷🇴' },
+              { code: 'BG', flag: '🇧🇬' },
+              { code: 'HR', flag: '🇭🇷' },
+              { code: 'SL', flag: '🇸🇮' },
+              { code: 'ET', flag: '🇪🇪' },
+              { code: 'LV', flag: '🇱🇻' },
+              { code: 'LT', flag: '🇱🇹' },
+              { code: 'EL', flag: '🇬🇷' },
+              { code: 'SV', flag: '🇸🇪' },
+              { code: 'DA', flag: '🇩🇰' },
+              { code: 'FI', flag: '🇫🇮' },
+              { code: 'NO', flag: '🇳🇴' },
+            ].map((lang) => (
+              <Badge
+                key={lang.code}
+                variant="outline"
+                className="text-xs bg-white border-slate-300 text-slate-700"
+              >
+                {lang.flag} {lang.code}
+              </Badge>
+            ))}
+          </div>
         </div>
 
         {/* Status Messages */}
@@ -581,7 +208,7 @@ export function UITextsImport({ onImportSuccess }: { onImportSuccess?: () => voi
             <Alert className="border-green-200 bg-green-50">
               <CheckCircle className="w-4 h-4 text-green-600" />
               <AlertDescription className="text-green-800">
-                <strong>✅ Succès !</strong> {message}
+                {message}
               </AlertDescription>
             </Alert>
           </motion.div>
@@ -595,7 +222,7 @@ export function UITextsImport({ onImportSuccess }: { onImportSuccess?: () => voi
             <Alert className="border-red-200 bg-red-50">
               <AlertCircle className="w-4 h-4 text-red-600" />
               <AlertDescription className="text-red-800">
-                <strong>❌ Erreur :</strong> {message}
+                <strong>Erreur :</strong> {message}
               </AlertDescription>
             </Alert>
           </motion.div>

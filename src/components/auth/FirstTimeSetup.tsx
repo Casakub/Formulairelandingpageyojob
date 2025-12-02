@@ -14,8 +14,8 @@ interface FirstTimeSetupProps {
 
 export function FirstTimeSetup({ onSetupComplete, onBackToLogin }: FirstTimeSetupProps) {
   const [formData, setFormData] = useState({
-    name: 'Admin YOJOB',
-    email: 'admin@yojob.com',
+    name: 'Antoine Auger',
+    email: 'a.auger@yojob.fr',
     password: '',
     confirmPassword: '',
   });
@@ -218,7 +218,7 @@ export function FirstTimeSetup({ onSetupComplete, onBackToLogin }: FirstTimeSetu
                     type="email"
                     value={formData.email}
                     onChange={(e) => handleChange('email', e.target.value)}
-                    placeholder="admin@yojob.com"
+                    placeholder="a.auger@yojob.fr"
                     className="pl-11 bg-white/10 border-white/20 text-white placeholder:text-white/40 focus:border-cyan-400 focus:ring-cyan-400/50"
                     required
                   />

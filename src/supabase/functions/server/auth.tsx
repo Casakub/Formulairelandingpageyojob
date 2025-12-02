@@ -497,4 +497,81 @@ app.get('/debug', async (c) => {
   }
 });
 
+/**
+ * POST /auth/force-reset-password
+ * 🚨 EMERGENCY: Force reset password for an existing user
+ * Body: { email: string, new_password: string }
+ */
+app.post('/force-reset-password', async (c) => {
+  try {
+    const body = await c.req.json();
+    const { email, new_password } = body;
+
+    console.log('🔧 Force password reset for:', email);
+
+    if (!email || !new_password) {
+      return c.json({ 
+        success: false, 
+        error: 'Email et nouveau mot de passe requis' 
+      }, 400);
+    }
+
+    if (new_password.length < 6) {
+      return c.json({ 
+        success: false, 
+        error: 'Le mot de passe doit contenir au moins 6 caractères' 
+      }, 400);
+    }
+
+    // Find user by email
+    const { data: users, error: listError } = await supabaseAdmin.auth.admin.listUsers();
+    
+    if (listError) {
+      console.error('Error listing users:', listError);
+      return c.json({ success: false, error: 'Erreur lors de la recherche de l\'utilisateur' }, 500);
+    }
+
+    const user = users?.users?.find((u) => u.email === email);
+
+    if (!user) {
+      return c.json({ 
+        success: false, 
+        error: 'Utilisateur introuvable avec cet email' 
+      }, 404);
+    }
+
+    console.log('✓ User found:', user.email);
+    console.log('  User ID:', user.id);
+
+    // Update password using admin API
+    const { data, error } = await supabaseAdmin.auth.admin.updateUserById(
+      user.id,
+      { password: new_password }
+    );
+
+    if (error) {
+      console.error('❌ Error updating password:', error);
+      return c.json({ 
+        success: false, 
+        error: `Erreur lors de la mise à jour du mot de passe: ${error.message}` 
+      }, 500);
+    }
+
+    console.log('✅ Password updated successfully for:', email);
+
+    return c.json({
+      success: true,
+      message: `Mot de passe mis à jour avec succès pour ${email}`,
+      user: {
+        id: data.user.id,
+        email: data.user.email,
+      }
+    });
+
+  } catch (error: any) {
+    console.error('❌ Error in force-reset-password:', error);
+    return c.json({ success: false, error: error.message }, 500);
+  }
+});
+
 export default app;

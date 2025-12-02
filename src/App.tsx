@@ -1,27 +1,28 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { ArrowRight, CheckCircle, ChevronLeft } from 'lucide-react';
+import { ArrowRight, ChevronLeft, CheckCircle } from 'lucide-react';
 import { Button } from './components/ui/button';
+import { toast } from 'sonner@2.0.3';
+import { Toaster } from './components/ui/sonner';
+import { I18nProvider, useI18n } from './hooks/useI18n';
+import { QuestionsProvider } from './context/QuestionsContext';
+import { TranslationMissingBanner } from './components/survey/TranslationMissingBanner';
+import { AutoImportTranslations } from './components/AutoImportTranslations';
+import { AdminLogin } from './components/auth/AdminLogin';
+import DashboardApp from './DashboardApp';
+import { SupabaseBanner } from './components/SupabaseBanner';
 import { Header } from './components/survey/Header';
 import { HeroSection } from './components/survey/HeroSection';
-import { ProgressBar } from './components/survey/ProgressBar';
-import { SectionHeader } from './components/survey/SectionHeader';
 import { ConfirmationScreen } from './components/survey/ConfirmationScreen';
+import { ProgressBar } from './components/survey/ProgressBar';
 import { Section1Profile } from './components/survey/sections/Section1Profile';
 import { Section2Detachement } from './components/survey/sections/Section2Detachement';
 import { Section3Besoins } from './components/survey/sections/Section3Besoins';
 import { Section4Interet } from './components/survey/sections/Section4Interet';
 import { Section5Vision } from './components/survey/sections/Section5Vision';
 import { Section6Contact } from './components/survey/sections/Section6Contact';
-import DashboardApp from './DashboardApp';
-import { QuestionsProvider } from './context/QuestionsContext';
-import { AdminLogin } from './components/auth/AdminLogin';
-import { saveResponse, extractCountry, getInterestLevel } from './lib/supabase';
-import { saveResponsePublic } from './lib/supabase-public';
-import { toast, Toaster } from 'sonner@2.0.3';
-import { SupabaseBanner } from './components/SupabaseBanner';
-import { I18nProvider, useI18n } from './hooks/useI18n';
-import { TranslationMissingBanner } from './components/survey/TranslationMissingBanner';
+import { saveResponsePublic } from './services/responseService';
+import { extractCountry, getInterestLevel } from './utils/helpers';
 import './utils/diagnostic-supabase'; // Import diagnostic tool
 
 export interface FormData {
@@ -281,6 +282,7 @@ export default function App() {
   return (
     <I18nProvider>
       <QuestionsProvider>
+        <AutoImportTranslations />
         <SupabaseBanner />
         <Toaster position="top-right" richColors />
         {viewMode === 'dashboard' ? (
@@ -472,7 +474,7 @@ function AppContent({
                     className="flex-1 h-12 bg-white/10 backdrop-blur-sm border-white/30 text-white hover:bg-white/20 hover:border-white/50 rounded-xl transition-all duration-300"
                   >
                     <ChevronLeft className="w-5 h-5 mr-2" />
-                    Précédent
+                    {t('button.previous', 'Précédent')}
                   </Button>
                 )}
                 
@@ -481,7 +483,7 @@ function AppContent({
                     onClick={handleNextSection}
                     className="flex-1 h-12 bg-gradient-to-r from-cyan-500 to-violet-500 hover:from-cyan-400 hover:to-violet-400 text-white rounded-xl shadow-lg shadow-cyan-500/30"
                   >
-                    Suivant
+                    {t('button.next', 'Suivant')}
                     <ArrowRight className="w-5 h-5 ml-2" />
                   </Button>
                 ) : (
@@ -491,7 +493,7 @@ function AppContent({
                     className="flex-1 h-12 bg-gradient-to-r from-cyan-500 to-violet-500 hover:from-cyan-400 hover:to-violet-400 text-white rounded-xl shadow-lg shadow-cyan-500/30 relative overflow-hidden disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     <span className="relative z-10 flex items-center justify-center gap-2">
-                      {isSubmitting ? 'Envoi en cours...' : 'Envoyer mes réponses'}
+                      {isSubmitting ? t('button.submitting', 'Envoi en cours...') : t('button.submit', 'Envoyer mes réponses')}
                       {!isSubmitting && <ArrowRight className="w-5 h-5" />}
                     </span>
                     {!isSubmitting && (

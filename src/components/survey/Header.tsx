@@ -206,7 +206,7 @@ export function Header({ currentSection, progress, onDashboardClick }: HeaderPro
               }`}
             >
               <LayoutDashboard className="w-4 h-4 mr-2" />
-              <span className="hidden sm:inline">Dashboard</span>
+              <span className="hidden sm:inline">{t('nav.dashboard', 'Dashboard')}</span>
             </Button>
           )}
           <Button
@@ -220,7 +220,7 @@ export function Header({ currentSection, progress, onDashboardClick }: HeaderPro
             }`}
           >
             <ArrowLeft className="w-4 h-4 mr-2" />
-            <span className="hidden sm:inline">Retour au site</span>
+            <span className="hidden sm:inline">{t('nav.back_to_site', 'Retour au site')}</span>
           </Button>
         </div>
       </div>

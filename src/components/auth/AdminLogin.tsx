@@ -7,18 +7,20 @@ import { Label } from '../ui/label';
 import { Card, CardContent } from '../ui/card';
 import { login } from '../../services/authService';
 import { FirstTimeSetup } from './FirstTimeSetup';
+import { PasswordResetHelper } from '../admin/PasswordResetHelper';
 
 interface AdminLoginProps {
   onLoginSuccess: () => void;
 }
 
 export function AdminLogin({ onLoginSuccess }: AdminLoginProps) {
-  const [email, setEmail] = useState('admin@yojob.com');
+  const [email, setEmail] = useState('a.auger@yojob.fr');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
   const [showSetup, setShowSetup] = useState(false);
+  const [showResetHelper, setShowResetHelper] = useState(false);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -32,9 +34,12 @@ export function AdminLogin({ onLoginSuccess }: AdminLoginProps) {
         console.log('✅ Login successful:', result.user?.email);
         onLoginSuccess();
       } else {
-        // If user doesn't exist, suggest first-time setup
-        if (result.error?.includes('incorrect') || result.error?.includes('invalide')) {
-          setError(result.error || 'Email ou mot de passe incorrect');
+        // Auto-detect if no account exists and switch to setup
+        if (result.error?.toLowerCase().includes('invalid') || 
+            result.error?.toLowerCase().includes('credentials') ||
+            result.error?.toLowerCase().includes('incorrect')) {
+          setError('Aucun compte trouvé. Créez votre compte ci-dessous. 👇');
+          // Don't auto-switch, let user click the link
         } else {
           setError(result.error || 'Erreur de connexion');
         }
@@ -58,6 +63,34 @@ export function AdminLogin({ onLoginSuccess }: AdminLoginProps) {
         }}
         onBackToLogin={() => setShowSetup(false)}
       />
+    );
+  }
+
+  if (showResetHelper) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-blue-900 via-violet-900 to-cyan-900 flex items-center justify-center p-4">
+        {/* Background effects */}
+        <div className="fixed inset-0 pointer-events-none">
+          <div className="absolute top-20 left-10 w-96 h-96 bg-cyan-500/20 rounded-full blur-3xl animate-pulse" />
+          <div className="absolute bottom-20 right-10 w-96 h-96 bg-violet-500/20 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '1s' }} />
+        </div>
+
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="w-full max-w-lg relative z-10 space-y-4"
+        >
+          <PasswordResetHelper />
+          
+          <Button
+            onClick={() => setShowResetHelper(false)}
+            variant="outline"
+            className="w-full bg-white/10 border-white/20 text-white hover:bg-white/20"
+          >
+            ← Retour à la connexion
+          </Button>
+        </motion.div>
+      </div>
     );
   }
 
@@ -120,7 +153,7 @@ export function AdminLogin({ onLoginSuccess }: AdminLoginProps) {
                     type="email"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    placeholder="admin@yojob.com"
+                    placeholder="a.auger@yojob.fr"
                     className="pl-11 bg-white/10 border-white/20 text-white placeholder:text-white/40 focus:border-cyan-400 focus:ring-cyan-400/50"
                     required
                     autoComplete="email"
@@ -198,15 +231,31 @@ export function AdminLogin({ onLoginSuccess }: AdminLoginProps) {
                 )}
               </Button>
 
-              {/* First Time Setup Link */}
-              <div className="text-center pt-2">
+              {/* First Time Setup Link & Reset Helper */}
+              <div className="text-center pt-2 space-y-2">
                 <button
                   type="button"
                   onClick={() => setShowSetup(true)}
-                  className="text-cyan-400 hover:text-cyan-300 text-sm transition-colors"
+                  className={`text-sm transition-all ${
+                    error 
+                      ? 'text-white bg-gradient-to-r from-cyan-500 to-violet-500 px-6 py-2 rounded-full hover:shadow-lg font-medium'
+                      : 'text-cyan-400 hover:text-cyan-300'
+                  }`}
                 >
-                  Première connexion ? Créer un compte →
+                  {error ? '✨ Créer mon compte maintenant' : 'Première connexion ? Créer un compte →'}
                 </button>
+
+                {error && error.toLowerCase().includes('incorrect') && (
+                  <div className="pt-1">
+                    <button
+                      type="button"
+                      onClick={() => setShowResetHelper(true)}
+                      className="text-xs text-red-300 hover:text-red-200 underline transition-colors"
+                    >
+                      🚨 Réinitialiser le mot de passe (urgence)
+                    </button>
+                  </div>
+                )}
               </div>
             </form>
 

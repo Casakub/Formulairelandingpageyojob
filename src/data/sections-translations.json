@@ -16,7 +16,22 @@
         "it": { "text": "Profilo Agenzia", "status": "validated" },
         "nl": { "text": "Agentschapsprofiel", "status": "validated" },
         "pl": { "text": "Profil Agencji", "status": "validated" },
-        "pt": { "text": "Perfil da Agência", "status": "validated" }
+        "pt": { "text": "Perfil da Agência", "status": "validated" },
+        "cs": { "text": "Profil agentury", "status": "validated" },
+        "sk": { "text": "Profil agentúry", "status": "validated" },
+        "hu": { "text": "Ügynökség profilja", "status": "validated" },
+        "ro": { "text": "Profil agenție", "status": "validated" },
+        "bg": { "text": "Профил на агенцията", "status": "validated" },
+        "hr": { "text": "Profil agencije", "status": "validated" },
+        "sl": { "text": "Profil agencije", "status": "validated" },
+        "et": { "text": "Agentuuri profiil", "status": "validated" },
+        "lv": { "text": "Aģentūras profils", "status": "validated" },
+        "lt": { "text": "Agentūros profilis", "status": "validated" },
+        "el": { "text": "Προφίλ πρακτορείου", "status": "validated" },
+        "sv": { "text": "Byråprofil", "status": "validated" },
+        "da": { "text": "Bureauets profil", "status": "validated" },
+        "fi": { "text": "Toimiston profiili", "status": "validated" },
+        "no": { "text": "Byråprofil", "status": "validated" }
       }
     },
     {
@@ -31,7 +46,22 @@
         "it": { "text": "Distacco", "status": "validated" },
         "nl": { "text": "Detachering", "status": "validated" },
         "pl": { "text": "Delegowanie", "status": "validated" },
-        "pt": { "text": "Destacamento", "status": "validated" }
+        "pt": { "text": "Destacamento", "status": "validated" },
+        "cs": { "text": "Vyslání", "status": "validated" },
+        "sk": { "text": "Vyslanie", "status": "validated" },
+        "hu": { "text": "Kirendelés", "status": "validated" },
+        "ro": { "text": "Detașare", "status": "validated" },
+        "bg": { "text": "Командироване", "status": "validated" },
+        "hr": { "text": "Upućivanje", "status": "validated" },
+        "sl": { "text": "Napotitev", "status": "validated" },
+        "et": { "text": "Lähetamine", "status": "validated" },
+        "lv": { "text": "Norīkošana", "status": "validated" },
+        "lt": { "text": "Komandiravimas", "status": "validated" },
+        "el": { "text": "Απόσπαση", "status": "validated" },
+        "sv": { "text": "Utstationering", "status": "validated" },
+        "da": { "text": "Udstationering", "status": "validated" },
+        "fi": { "text": "Lähettäminen", "status": "validated" },
+        "no": { "text": "Utstasjonering", "status": "validated" }
       }
     },
     {
@@ -46,7 +76,22 @@
         "it": { "text": "Esigenze", "status": "validated" },
         "nl": { "text": "Behoeften", "status": "validated" },
         "pl": { "text": "Potrzeby", "status": "validated" },
-        "pt": { "text": "Necessidades", "status": "validated" }
+        "pt": { "text": "Necessidades", "status": "validated" },
+        "cs": { "text": "Potřeby", "status": "validated" },
+        "sk": { "text": "Potreby", "status": "validated" },
+        "hu": { "text": "Igények", "status": "validated" },
+        "ro": { "text": "Nevoi", "status": "validated" },
+        "bg": { "text": "Нужди", "status": "validated" },
+        "hr": { "text": "Potrebe", "status": "validated" },
+        "sl": { "text": "Potrebe", "status": "validated" },
+        "et": { "text": "Vajadused", "status": "validated" },
+        "lv": { "text": "Vajadzības", "status": "validated" },
+        "lt": { "text": "Poreikiai", "status": "validated" },
+        "el": { "text": "Ανάγκες", "status": "validated" },
+        "sv": { "text": "Behov", "status": "validated" },
+        "da": { "text": "Behov", "status": "validated" },
+        "fi": { "text": "Tarpeet", "status": "validated" },
+        "no": { "text": "Behov", "status": "validated" }
       }
     },
     {
@@ -61,7 +106,22 @@
         "it": { "text": "Interesse YoJob", "status": "validated" },
         "nl": { "text": "YoJob Interesse", "status": "validated" },
         "pl": { "text": "Zainteresowanie YoJob", "status": "validated" },
-        "pt": { "text": "Interesse YoJob", "status": "validated" }
+        "pt": { "text": "Interesse YoJob", "status": "validated" },
+        "cs": { "text": "Zájem o YoJob", "status": "validated" },
+        "sk": { "text": "Záujem o YoJob", "status": "validated" },
+        "hu": { "text": "YoJob érdeklődés", "status": "validated" },
+        "ro": { "text": "Interes YoJob", "status": "validated" },
+        "bg": { "text": "Интерес към YoJob", "status": "validated" },
+        "hr": { "text": "Interes za YoJob", "status": "validated" },
+        "sl": { "text": "Interes za YoJob", "status": "validated" },
+        "et": { "text": "Huvi YoJob vastu", "status": "validated" },
+        "lv": { "text": "Interese par YoJob", "status": "validated" },
+        "lt": { "text": "Susidomėjimas YoJob", "status": "validated" },
+        "el": { "text": "Ενδιαφέρον για YoJob", "status": "validated" },
+        "sv": { "text": "YoJob intresse", "status": "validated" },
+        "da": { "text": "YoJob interesse", "status": "validated" },
+        "fi": { "text": "Kiinnostus YoJobiin", "status": "validated" },
+        "no": { "text": "YoJob interesse", "status": "validated" }
       }
     },
     {
@@ -76,7 +136,22 @@
         "it": { "text": "Visione Futura", "status": "validated" },
         "nl": { "text": "Toekomstvisie", "status": "validated" },
         "pl": { "text": "Wizja Przyszłości", "status": "validated" },
-        "pt": { "text": "Visão Futura", "status": "validated" }
+        "pt": { "text": "Visão Futura", "status": "validated" },
+        "cs": { "text": "Vize budoucnosti", "status": "validated" },
+        "sk": { "text": "Vízia budúcnosti", "status": "validated" },
+        "hu": { "text": "Jövőkép", "status": "validated" },
+        "ro": { "text": "Viziune viitoare", "status": "validated" },
+        "bg": { "text": "Бъдеща визия", "status": "validated" },
+        "hr": { "text": "Vizija budućnosti", "status": "validated" },
+        "sl": { "text": "Vizija prihodnosti", "status": "validated" },
+        "et": { "text": "Tulevikuvisioon", "status": "validated" },
+        "lv": { "text": "Nākotnes vīzija", "status": "validated" },
+        "lt": { "text": "Ateities vizija", "status": "validated" },
+        "el": { "text": "Όραμα μέλλοντος", "status": "validated" },
+        "sv": { "text": "Framtidsvision", "status": "validated" },
+        "da": { "text": "Fremtidsvision", "status": "validated" },
+        "fi": { "text": "Tulevaisuuden visio", "status": "validated" },
+        "no": { "text": "Fremtidsvisjon", "status": "validated" }
       }
     },
     {
@@ -91,7 +166,22 @@
         "it": { "text": "Contatto", "status": "validated" },
         "nl": { "text": "Contact", "status": "validated" },
         "pl": { "text": "Kontakt", "status": "validated" },
-        "pt": { "text": "Contato", "status": "validated" }
+        "pt": { "text": "Contato", "status": "validated" },
+        "cs": { "text": "Kontakt", "status": "validated" },
+        "sk": { "text": "Kontakt", "status": "validated" },
+        "hu": { "text": "Kapcsolat", "status": "validated" },
+        "ro": { "text": "Contact", "status": "validated" },
+        "bg": { "text": "Контакт", "status": "validated" },
+        "hr": { "text": "Kontakt", "status": "validated" },
+        "sl": { "text": "Kontakt", "status": "validated" },
+        "et": { "text": "Kontakt", "status": "validated" },
+        "lv": { "text": "Kontakti", "status": "validated" },
+        "lt": { "text": "Kontaktai", "status": "validated" },
+        "el": { "text": "Επικοινωνία", "status": "validated" },
+        "sv": { "text": "Kontakt", "status": "validated" },
+        "da": { "text": "Kontakt", "status": "validated" },
+        "fi": { "text": "Yhteystiedot", "status": "validated" },
+        "no": { "text": "Kontakt", "status": "validated" }
       }
     }
   ]
