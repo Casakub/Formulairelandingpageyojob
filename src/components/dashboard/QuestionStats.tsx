@@ -1,5 +1,5 @@
 import { motion } from 'motion/react';
-import { FileText, Eye, EyeOff, CheckCircle, AlertCircle } from 'lucide-react';
+import { FileText, Eye, EyeOff, CheckCircle, AlertCircle, Building2, Users, Target, Heart, Lightbulb, Mail } from 'lucide-react';
 import { Card, CardContent } from '../ui/card';
 import { useQuestions } from '../../context/QuestionsContext';
 
@@ -103,6 +103,17 @@ export function QuestionStats() {
                 'from-green-500 to-emerald-500'
               ];
 
+              const sectionIcons = [
+                Building2,  // Section 1: Profil
+                Users,      // Section 2: Détachement
+                Target,     // Section 3: Besoins
+                Heart,      // Section 4: Intérêt
+                Lightbulb,  // Section 5: Vision
+                Mail        // Section 6: Contact
+              ];
+
+              const Icon = sectionIcons[index];
+
               return (
                 <motion.div
                   key={index}
@@ -114,11 +125,20 @@ export function QuestionStats() {
                 >
                   <div className="bg-white/60 backdrop-blur-sm rounded-2xl p-4 border border-slate-200 
                                   hover:border-cyan-400 transition-all shadow-md hover:shadow-lg">
-                    {/* Number badge */}
+                    {/* Question count badge - top right */}
+                    <div className="absolute -top-2 -right-2 bg-white rounded-full shadow-lg border-2 border-slate-100 
+                                    w-9 h-9 flex items-center justify-center z-10
+                                    group-hover:scale-110 transition-transform">
+                      <span className={`bg-gradient-to-br ${gradients[index]} bg-clip-text text-transparent`}>
+                        {section.count}
+                      </span>
+                    </div>
+
+                    {/* Icon badge */}
                     <div className={`w-full aspect-square rounded-xl bg-gradient-to-br ${gradients[index]} 
                                      flex items-center justify-center mb-3 shadow-lg
                                      group-hover:shadow-xl group-hover:scale-105 transition-all`}>
-                      <span className="text-4xl text-white drop-shadow-lg">{section.count}</span>
+                      <Icon className="w-12 h-12 text-white drop-shadow-lg" strokeWidth={1.5} />
                     </div>
 
                     {/* Section info */}

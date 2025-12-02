@@ -582,6 +582,10 @@
     inset-block: calc(var(--spacing) * 0);
   }
 
+  .-top-2 {
+    top: calc(var(--spacing) * -2);
+  }
+
   .top-0 {
     top: calc(var(--spacing) * 0);
   }
@@ -596,6 +600,10 @@
 
   .top-full {
     top: 100%;
+  }
+
+  .-right-2 {
+    right: calc(var(--spacing) * -2);
   }
 
   .right-0 {
@@ -3224,6 +3232,10 @@
     --tw-gradient-stops: var(--tw-gradient-via-stops, var(--tw-gradient-position), var(--tw-gradient-from) var(--tw-gradient-from-position), var(--tw-gradient-to) var(--tw-gradient-to-position));
   }
 
+  .bg-clip-text {
+    background-clip: text;
+  }
+
   .fill-current {
     fill: currentColor;
   }
@@ -3744,6 +3756,10 @@
 
   .text-slate-900 {
     color: var(--color-slate-900);
+  }
+
+  .text-transparent {
+    color: #0000;
   }
 
   .text-violet-100 {
