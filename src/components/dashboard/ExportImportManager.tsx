@@ -7,6 +7,8 @@ import { Button } from '../ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '../ui/card';
 import { useQuestions } from '../../context/QuestionsContext';
 import { Question } from '../../config/questions';
+import { CMSExportSection } from './CMSExportSection';
+import { ExportGuideCard } from './ExportGuideCard';
 
 export function ExportImportManager() {
   const { questions, setQuestions } = useQuestions();
@@ -156,7 +158,43 @@ export function ExportImportManager() {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-8">
+      {/* Page Header */}
+      <div className="bg-gradient-to-br from-green-500 via-emerald-500 to-teal-500 rounded-2xl p-8 text-white shadow-xl">
+        <div className="flex items-center gap-4 mb-4">
+          <div className="w-16 h-16 bg-white/20 backdrop-blur-sm rounded-2xl flex items-center justify-center">
+            <Download className="w-8 h-8 text-white" />
+          </div>
+          <div>
+            <h1 className="text-white text-3xl mb-2">Export & Import</h1>
+            <p className="text-white/90">
+              Gérez vos données en toute simplicité : Questions du formulaire et Contenus de la landing page
+            </p>
+          </div>
+        </div>
+        
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-6">
+          <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4 border border-white/20">
+            <div className="text-2xl mb-1">📋</div>
+            <div className="text-sm text-white/80">Questions du formulaire</div>
+            <div className="text-white mt-1">{questions.length} questions</div>
+          </div>
+          <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4 border border-white/20">
+            <div className="text-2xl mb-1">🎨</div>
+            <div className="text-sm text-white/80">Contenu CMS</div>
+            <div className="text-white mt-1">Hero + Progress + UI</div>
+          </div>
+          <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4 border border-white/20">
+            <div className="text-2xl mb-1">🌍</div>
+            <div className="text-sm text-white/80">Formats disponibles</div>
+            <div className="text-white mt-1">JSON, CSV, Excel</div>
+          </div>
+        </div>
+      </div>
+
+      {/* Guide Card */}
+      <ExportGuideCard />
+
       {/* Status Message */}
       {importMessage && (
         <motion.div
@@ -179,6 +217,15 @@ export function ExportImportManager() {
           </div>
         </motion.div>
       )}
+
+      {/* Section Header: Questions du formulaire */}
+      <div className="flex items-center gap-3">
+        <div className="h-8 w-1 bg-gradient-to-b from-cyan-500 to-blue-500 rounded-full" />
+        <div>
+          <h2 className="text-slate-900">Questions du formulaire</h2>
+          <p className="text-slate-600 text-sm">Export/Import des 25 questions de l'étude de marché</p>
+        </div>
+      </div>
 
       {/* Export Section */}
       <Card className="bg-white border-slate-200 shadow-md">
@@ -360,6 +407,28 @@ export function ExportImportManager() {
           </div>
         </CardContent>
       </Card>
+
+      {/* Divider */}
+      <div className="relative my-12">
+        <div className="absolute inset-0 flex items-center">
+          <div className="w-full border-t-2 border-slate-200" />
+        </div>
+        <div className="relative flex justify-center">
+          <span className="px-4 bg-slate-50 text-slate-500 text-sm">Contenu Landing Page</span>
+        </div>
+      </div>
+
+      {/* Section Header: CMS Landing Page */}
+      <div className="flex items-center gap-3">
+        <div className="h-8 w-1 bg-gradient-to-b from-pink-500 to-rose-500 rounded-full" />
+        <div>
+          <h2 className="text-slate-900">Contenu CMS (Landing Page)</h2>
+          <p className="text-slate-600 text-sm">Export/Import des traductions Hero + Progress + UI</p>
+        </div>
+      </div>
+
+      {/* CMS Export/Import Section */}
+      <CMSExportSection />
     </div>
   );
 }

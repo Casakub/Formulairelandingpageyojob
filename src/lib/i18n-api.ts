@@ -1,4 +1,5 @@
 import { projectId, publicAnonKey } from '../utils/supabase/info';
+import { saveHistoryEntry } from './history-api';
 
 const BASE_URL = `https://${projectId}.supabase.co/functions/v1/make-server-10092a63/i18n`;
 
@@ -329,5 +330,70 @@ export async function fetchI18nStats(): Promise<{
   } catch (error) {
     console.error('Error fetching i18n stats:', error);
     return null;
+  }
+}
+
+// ========== CMS FUNCTIONS ==========
+
+// Structure pour les traductions récupérées depuis Supabase
+export interface Translation {
+  text_id: string;
+  language_code: string;
+  text_content: string;
+  category: string;
+  validation_status: string;
+}
+
+// Récupérer toutes les traductions d'une catégorie (hero, progress, ui)
+export async function getTranslationsByCategory(category: string): Promise<Translation[]> {
+  try {
+    const response = await fetch(`${BASE_URL}/translations?category=${category}`, { headers });
+    
+    if (!response.ok) {
+      throw new Error(`Failed to fetch translations by category: ${response.statusText}`);
+    }
+    
+    const data = await response.json();
+    return data.success ? data.translations : [];
+  } catch (error) {
+    console.error('Error fetching translations by category:', error);
+    return [];
+  }
+}
+
+// Mettre à jour une traduction individuelle
+export async function updateTranslation(
+  textId: string,
+  languageCode: string,
+  textContent: string,
+  oldContent?: string,
+  category?: string
+): Promise<boolean> {
+  try {
+    // Sauvegarder l'historique avant la modification (si oldContent fourni)
+    if (oldContent !== undefined && oldContent !== textContent && category) {
+      try {
+        await saveHistoryEntry(textId, languageCode, oldContent, textContent, category);
+      } catch (historyError) {
+        console.warn('Failed to save history entry, continuing with update:', historyError);
+        // Continue même si l'historique échoue
+      }
+    }
+
+    const response = await fetch(`${BASE_URL}/translations/update`, {
+      method: 'POST',
+      headers,
+      body: JSON.stringify({ textId, languageCode, textContent })
+    });
+    
+    if (!response.ok) {
+      throw new Error(`Failed to update translation: ${response.statusText}`);
+    }
+    
+    const data = await response.json();
+    return data.success;
+  } catch (error) {
+    console.error('Error updating translation:', error);
+    return false;
   }
 }

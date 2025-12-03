@@ -545,7 +545,7 @@ export function DashboardOverview() {
         className="mt-8"
       >
         <h2 className="text-slate-900 mb-4">Gestion des traductions</h2>
-        <div className="grid lg:grid-cols-3 gap-6">
+        <div className="grid md:grid-cols-2 xl:grid-cols-2 gap-8">
           <UploadHeroTranslations />
           <UploadProgressTranslations />
           <AutoUploadTranslations />

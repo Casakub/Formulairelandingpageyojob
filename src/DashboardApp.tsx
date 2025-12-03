@@ -14,7 +14,8 @@ import {
   ChevronRight,
   Download,
   Plug,
-  Languages
+  Languages,
+  FileType
 } from 'lucide-react';
 import { Button } from './components/ui/button';
 import { DashboardOverview } from './components/dashboard/DashboardOverview';
@@ -24,11 +25,12 @@ import { ExportImportManager } from './components/dashboard/ExportImportManager'
 import { DynamicResultsOverview } from './components/dashboard/DynamicResultsOverview';
 import { SettingsPanel } from './components/dashboard/SettingsPanel';
 import { TranslationManager } from './components/dashboard/TranslationManager';
+import { ContentCMS } from './components/dashboard/ContentCMS';
 import { TranslationProvider } from './contexts/TranslationContext';
 import { useAuth } from './hooks/useAuth';
 import { Badge } from './components/ui/badge';
 
-type TabType = 'overview' | 'questions' | 'results' | 'integrations' | 'translations' | 'settings' | 'export';
+type TabType = 'overview' | 'questions' | 'results' | 'integrations' | 'translations' | 'cms' | 'settings' | 'export';
 
 interface DashboardAppProps {
   onBackToSurvey?: () => void;
@@ -47,6 +49,7 @@ export default function DashboardApp({ onBackToSurvey }: DashboardAppProps = {})
     { id: 'translations' as TabType, label: 'Traductions', icon: Languages, color: 'from-indigo-500 to-blue-500' },
     { id: 'export' as TabType, label: 'Export', icon: Download, color: 'from-green-500 to-emerald-500' },
     { id: 'integrations' as TabType, label: 'Intégrations', icon: Plug, color: 'from-orange-500 to-amber-500' },
+    { id: 'cms' as TabType, label: 'CMS', icon: FileType, color: 'from-pink-500 to-rose-500' },
     { id: 'settings' as TabType, label: 'Paramètres', icon: Settings, color: 'from-slate-500 to-gray-500' }
   ];
 
@@ -316,6 +319,9 @@ export default function DashboardApp({ onBackToSurvey }: DashboardAppProps = {})
             )}
             {activeTab === 'integrations' && (
               <IntegrationManager key="integrations" />
+            )}
+            {activeTab === 'cms' && (
+              <ContentCMS key="cms" />
             )}
             {activeTab === 'settings' && (
               <SettingsPanel key="settings" />

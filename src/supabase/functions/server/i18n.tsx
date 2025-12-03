@@ -850,4 +850,101 @@ app.get('/stats', async (c) => {
   }
 });
 
+// ========== CMS ROUTES ==========
+
+// GET translations by category (for CMS editor)
+app.get('/translations', async (c) => {
+  try {
+    const category = c.req.query('category');
+    
+    if (!category) {
+      return c.json({ success: false, error: 'Missing category parameter' }, 400);
+    }
+    
+    const uiTranslations = await kv.getByPrefix('i18n:ui:');
+    const translations: any[] = [];
+    
+    uiTranslations.forEach((item: any) => {
+      if (item.value.category === category) {
+        const textId = item.key.replace('i18n:ui:', '');
+        
+        // Transform from KV format to flat structure
+        Object.entries(item.value.translations || {}).forEach(([langCode, trans]: [string, any]) => {
+          translations.push({
+            text_id: textId,
+            language_code: langCode,
+            text_content: trans.text || '',
+            category: item.value.category,
+            validation_status: trans.status || 'validated'
+          });
+        });
+      }
+    });
+    
+    return c.json({
+      success: true,
+      translations
+    });
+  } catch (error: any) {
+    console.error('Error fetching translations by category:', error);
+    return c.json({ success: false, error: error.message }, 500);
+  }
+});
+
+// POST update single translation (for CMS editor)
+app.post('/translations/update', async (c) => {
+  try {
+    const body = await c.req.json();
+    const { textId, languageCode, textContent } = body;
+    
+    console.log('🔄 Updating translation:', { textId, languageCode, textContentLength: textContent?.length });
+    
+    if (!textId || !languageCode || textContent === undefined) {
+      return c.json({ 
+        success: false, 
+        error: 'Missing required fields: textId, languageCode, textContent' 
+      }, 400);
+    }
+    
+    // Get existing UI text data
+    const existing = await kv.get(`i18n:ui:${textId}`);
+    
+    if (!existing) {
+      return c.json({ 
+        success: false, 
+        error: `Text ID "${textId}" not found` 
+      }, 404);
+    }
+    
+    // Update the specific language translation
+    if (!existing.translations) {
+      existing.translations = {};
+    }
+    
+    existing.translations[languageCode] = {
+      text: textContent,
+      status: 'validated'
+    };
+    
+    // Save back to KV store
+    await kv.set(`i18n:ui:${textId}`, existing);
+    
+    console.log('✅ Translation updated successfully');
+    
+    return c.json({
+      success: true,
+      translation: {
+        text_id: textId,
+        language_code: languageCode,
+        text_content: textContent,
+        category: existing.category,
+        validation_status: 'validated'
+      }
+    });
+  } catch (error: any) {
+    console.error('Error updating translation:', error);
+    return c.json({ success: false, error: error.message }, 500);
+  }
+});
+
 export default app;
