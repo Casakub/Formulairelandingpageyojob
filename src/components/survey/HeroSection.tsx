@@ -134,7 +134,7 @@ export function HeroSection({ onStart }: HeroSectionProps) {
           transition={{ delay: 1.1 }}
           className="text-white/60 text-sm mt-8"
         >
-          {getText('hero.footer.info', '25 questions • Anonyme • Conforme RGPD')}
+          {getText('hero.footer.info', '26 questions • Anonyme • Conforme RGPD')}
         </motion.p>
       </div>
     </motion.section>

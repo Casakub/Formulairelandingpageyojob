@@ -223,7 +223,7 @@ export function ExportImportManager() {
         <div className="h-8 w-1 bg-gradient-to-b from-cyan-500 to-blue-500 rounded-full" />
         <div>
           <h2 className="text-slate-900">Questions du formulaire</h2>
-          <p className="text-slate-600 text-sm">Export/Import des 25 questions de l'étude de marché</p>
+          <p className="text-slate-600 text-sm">Export/Import des {questions.length} questions de l'étude de marché</p>
         </div>
       </div>
 

@@ -1,0 +1,152 @@
+{
+  "version": "2.0",
+  "exportDate": "2024-12-03T12:00:00.000Z",
+  "source": "YOJOB CMS - ALL Missing Translations (Section 6 + Confirmation)",
+  "description": "17 textes UI manquants : 7 de Section 6 Contact + 10 de ConfirmationScreen. À traduire en 23 langues.",
+  "data": {
+    "hero": [],
+    "progress": [],
+    "ui": [
+      {
+        "text_id": "section6.consent.contact.title",
+        "category": "ui",
+        "translations": {
+          "fr": "J'autorise YoJob à me recontacter"
+        }
+      },
+      {
+        "text_id": "section6.consent.contact.description",
+        "category": "ui",
+        "translations": {
+          "fr": "Pour discuter de vos besoins et vous présenter notre solution"
+        }
+      },
+      {
+        "text_id": "section6.consent.report.title",
+        "category": "ui",
+        "translations": {
+          "fr": "Je souhaite recevoir le rapport de l'étude 2025"
+        }
+      },
+      {
+        "text_id": "section6.consent.report.description",
+        "category": "ui",
+        "translations": {
+          "fr": "Recevez en avant-première les insights du marché européen"
+        }
+      },
+      {
+        "text_id": "section6.rgpd",
+        "category": "ui",
+        "translations": {
+          "fr": "Vos données sont sécurisées et conformes au RGPD. Elles ne seront jamais vendues à des tiers."
+        }
+      },
+      {
+        "text_id": "confirmation.toast.title",
+        "category": "ui",
+        "translations": {
+          "fr": "Merci ! Votre réponse a été enregistrée."
+        }
+      },
+      {
+        "text_id": "confirmation.toast.description",
+        "category": "ui",
+        "translations": {
+          "fr": "Vous recevrez une analyse par email si vous avez coché l'option."
+        }
+      },
+      {
+        "text_id": "confirmation.title",
+        "category": "ui",
+        "translations": {
+          "fr": "Merci pour votre participation ! 🙏"
+        }
+      },
+      {
+        "text_id": "confirmation.description",
+        "category": "ui",
+        "translations": {
+          "fr": "Votre avis est précieux et contribue à façonner l'avenir de YoJob."
+        }
+      },
+      {
+        "text_id": "confirmation.reward.report.title",
+        "category": "ui",
+        "translations": {
+          "fr": "Rapport \"Tendances 2025\""
+        }
+      },
+      {
+        "text_id": "confirmation.reward.report.description",
+        "category": "ui",
+        "translations": {
+          "fr": "Envoyé sous 3 semaines"
+        }
+      },
+      {
+        "text_id": "confirmation.reward.earlyaccess.title",
+        "category": "ui",
+        "translations": {
+          "fr": "Early Access YoJob"
+        }
+      },
+      {
+        "text_id": "confirmation.reward.earlyaccess.description",
+        "category": "ui",
+        "translations": {
+          "fr": "Top 100 répondants"
+        }
+      },
+      {
+        "text_id": "confirmation.cta",
+        "category": "ui",
+        "translations": {
+          "fr": "Retour au site YoJob"
+        }
+      },
+      {
+        "text_id": "confirmation.thanks.title",
+        "category": "ui",
+        "translations": {
+          "fr": "🎁 En remerciement de votre participation :"
+        }
+      },
+      {
+        "text_id": "confirmation.thanks.item1",
+        "category": "ui",
+        "translations": {
+          "fr": "• Rapport exclusif \"Tendances du détachement 2025\""
+        }
+      },
+      {
+        "text_id": "confirmation.thanks.item2",
+        "category": "ui",
+        "translations": {
+          "fr": "• Top 100 répondants = 3 mois d'accès gratuit à YoJob (valeur 500€)"
+        }
+      }
+    ]
+  },
+  "stats": {
+    "heroCount": 0,
+    "progressCount": 0,
+    "uiCount": 17,
+    "totalTexts": 17,
+    "totalLanguages": 23,
+    "languages": ["fr", "en", "de", "es", "it", "nl", "pl", "pt", "el", "sv", "da", "fi", "cs", "hu", "ro", "bg", "sk", "sl", "hr", "lt", "lv", "et", "no"],
+    "breakdown": {
+      "section6": 5,
+      "confirmationToast": 2,
+      "confirmationScreen": 10
+    }
+  },
+  "translationStatus": {
+    "totalSlots": 391,
+    "existingTranslations": 17,
+    "missingTranslations": 374,
+    "completionRate": 4,
+    "notes": "17 textes UI au total : Section 6 Contact (5) + Toast (2) + Écran de confirmation (10)"
+  },
+  "aiPrompt": "Traduisez ces 17 textes UI en 22 langues européennes (toutes sauf FR). Contexte : formulaire B2B de recrutement européen avec page de remerciement. Gardez le ton professionnel mais chaleureux. Gardez les emojis 🙏 et 🎁. Respectez la structure JSON exacte."
+}

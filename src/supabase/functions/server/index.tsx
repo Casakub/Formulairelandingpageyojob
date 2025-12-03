@@ -7,6 +7,8 @@ import { getApiKeyStatus, saveApiKey, deleteApiKey, testApiKey } from "./setting
 import i18nRoutes from "./i18n.tsx";
 import { triggerAllIntegrations, testIntegration } from "./integrations.ts";
 import historyRoutes from "./history-routes.ts";
+import { seedMissingTranslations } from "./seed-translations.tsx";
+import { seedCompleteTranslations } from "./seed-complete-translations.tsx";
 
 const app = new Hono();
 
@@ -44,6 +46,12 @@ app.route("/make-server-10092a63/i18n", i18nRoutes);
 
 // History endpoints
 app.route("/make-server-10092a63/history", historyRoutes);
+
+// Seed missing translations endpoint
+app.post("/make-server-10092a63/seed-missing-translations", seedMissingTranslations);
+
+// Seed complete translations endpoint
+app.post("/make-server-10092a63/seed-complete-translations", seedCompleteTranslations);
 
 // Import auth routes
 import authRoutes from "./auth.tsx";

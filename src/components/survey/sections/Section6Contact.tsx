@@ -54,10 +54,10 @@ export function Section6Contact({ formData, updateFormData }: Section6ContactPro
             <div className="flex-1">
               <div className="text-white mb-1 flex items-center gap-2">
                 <Shield className="w-4 h-4 text-cyan-400" />
-                J'autorise YoJob à me recontacter
+                {t('section6.consent.contact.title', 'J\'autorise YoJob à me recontacter')}
               </div>
               <p className="text-white/60 text-sm">
-                Pour discuter de vos besoins et vous présenter notre solution
+                {t('section6.consent.contact.description', 'Pour discuter de vos besoins et vous présenter notre solution')}
               </p>
             </div>
           </label>
@@ -73,10 +73,10 @@ export function Section6Contact({ formData, updateFormData }: Section6ContactPro
             <div className="flex-1">
               <div className="text-white mb-1 flex items-center gap-2">
                 <FileText className="w-4 h-4 text-violet-400" />
-                Je souhaite recevoir le rapport de l'étude 2025
+                {t('section6.consent.report.title', 'Je souhaite recevoir le rapport de l\'étude 2025')}
               </div>
               <p className="text-white/60 text-sm">
-                Recevez en avant-première les insights du marché européen
+                {t('section6.consent.report.description', 'Recevez en avant-première les insights du marché européen')}
               </p>
             </div>
           </label>
@@ -91,7 +91,7 @@ export function Section6Contact({ formData, updateFormData }: Section6ContactPro
         >
           <p className="text-white/70 text-sm">
             <Shield className="w-4 h-4 inline mr-2 text-cyan-400" />
-            Vos données sont sécurisées et conformes au RGPD. Elles ne seront jamais vendues à des tiers.
+            {t('section6.rgpd', 'Vos données sont sécurisées et conformes au RGPD. Elles ne seront jamais vendues à des tiers.')}
           </p>
         </motion.div>
       </div>

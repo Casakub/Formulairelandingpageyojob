@@ -77,7 +77,7 @@ export function DashboardOverview() {
 
   // Calculer le taux de complétion moyen (basé sur les champs remplis)
   const calculateCompletionRate = (response: MarketResearchResponse) => {
-    const totalFields = 25; // 25 questions
+    const totalFields = 26; // 26 questions au total
     const filledFields = Object.values(response).filter(val => val !== null && val !== '' && val !== undefined).length;
     return (filledFields / totalFields) * 100;
   };

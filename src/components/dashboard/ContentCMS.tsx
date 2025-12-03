@@ -6,6 +6,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '../ui/tabs';
 import { HeroContentEditor } from './HeroContentEditor';
 import { ProgressContentEditor } from './ProgressContentEditor';
 import { UIContentEditor } from './UIContentEditor';
+import { SeedMissingTranslationsButton } from './SeedMissingTranslationsButton';
 import { Badge } from '../ui/badge';
 
 export function ContentCMS() {
@@ -56,6 +57,9 @@ export function ContentCMS() {
           </div>
         </CardContent>
       </Card>
+
+      {/* Seed Missing Translations Button */}
+      <SeedMissingTranslationsButton />
 
       {/* Tabs Navigation */}
       <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">

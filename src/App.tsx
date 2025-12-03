@@ -181,7 +181,7 @@ export default function App() {
     }
   };
 
-  const handleSubmit = async () => {
+  const handleSubmit = async (t: (key: string, fallback: string) => string) => {
     setIsSubmitting(true);
     
     try {
@@ -219,8 +219,8 @@ export default function App() {
       
       if (result.success) {
         console.log('✅ Réponse sauvegardée avec succès:', responseId);
-        toast.success('Merci ! Votre réponse a été enregistrée.', {
-          description: 'Vous recevrez une analyse par email si vous avez coché l\'option.'
+        toast.success(t('confirmation.toast.title', 'Merci ! Votre réponse a été enregistrée.'), {
+          description: t('confirmation.toast.description', 'Vous recevrez une analyse par email si vous avez coché l\'option.')
         });
         
         setCurrentSection(7); // Show confirmation screen
@@ -488,7 +488,7 @@ function AppContent({
                   </Button>
                 ) : (
                   <Button
-                    onClick={handleSubmit}
+                    onClick={() => handleSubmit(t)}
                     disabled={isSubmitting || !formData.email}
                     className="flex-1 h-12 bg-gradient-to-r from-cyan-500 to-violet-500 hover:from-cyan-400 hover:to-violet-400 text-white rounded-xl shadow-lg shadow-cyan-500/30 relative overflow-hidden disabled:opacity-50 disabled:cursor-not-allowed"
                   >

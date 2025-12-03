@@ -10,8 +10,10 @@ interface ProgressBarProps {
 export function ProgressBar({ currentSection, totalSections, progress }: ProgressBarProps) {
   const { t } = useI18n();
   
+  const questionsPerSection = [4, 7, 6, 6, 2, 1];
+  const totalQuestions = questionsPerSection.reduce((a, b) => a + b, 0); // 26
+  
   const currentQuestion = (() => {
-    const questionsPerSection = [4, 7, 6, 6, 2, 1];
     let total = 0;
     for (let i = 0; i < currentSection - 1; i++) {
       total += questionsPerSection[i];
@@ -31,7 +33,7 @@ export function ProgressBar({ currentSection, totalSections, progress }: Progres
       </div>
       <div className="flex justify-between items-center mt-3">
         <p className="text-white/60 text-sm">
-          {t('progress.section', 'Section')} {currentSection}/{totalSections} • {t('progress.question', 'Question')} {currentQuestion}/25
+          {t('progress.section', 'Section')} {currentSection}/{totalSections} • {t('progress.question', 'Question')} {currentQuestion}/{totalQuestions}
         </p>
         <p className="text-cyan-400 text-sm">
           {Math.round(progress)}%

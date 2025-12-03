@@ -760,6 +760,198 @@ app.post('/auto-translate', async (c) => {
   }
 });
 
+// POST auto-translate BATCH - Translate to multiple languages AND store automatically
+app.post('/auto-translate-batch', async (c) => {
+  try {
+    const body = await c.req.json();
+    const { 
+      textId,
+      sourceText, 
+      sourceLanguage = 'fr',
+      targetLanguages = [], // Array of language codes ['en', 'de', 'es', ...]
+      category = 'ui', // 'ui' or 'question'
+      autoStore = true // Automatically store translations
+    } = body;
+    
+    if (!textId || !sourceText || !targetLanguages || targetLanguages.length === 0) {
+      return c.json({ 
+        success: false, 
+        error: '[AUTO-TRANSLATE-BATCH] Missing required fields: textId, sourceText, or targetLanguages' 
+      }, 400);
+    }
+    
+    // Get API Key
+    const apiKey = Deno.env.get('ANTHROPIC_API_KEY');
+    if (!apiKey) {
+      return c.json({
+        success: false,
+        error: 'ANTHROPIC_API_KEY not configured in environment variables',
+        needsApiKey: true
+      }, 500);
+    }
+    
+    console.log(`🚀 [AUTO-TRANSLATE-BATCH] Starting batch translation for ${textId}:`, {
+      sourceLanguage,
+      targetLanguages,
+      targetCount: targetLanguages.length
+    });
+    
+    const results = {
+      textId,
+      sourceText,
+      sourceLanguage,
+      successful: [] as any[],
+      failed: [] as any[],
+      stored: autoStore
+    };
+    
+    // Translate to each target language
+    for (const targetLang of targetLanguages) {
+      try {
+        console.log(`  🔄 Translating ${textId} to ${targetLang}...`);
+        
+        // Build prompt
+        const prompt = `Tu es un traducteur professionnel spécialisé dans les contenus RH et recrutement européen.
+
+**TÂCHE :** Traduis le texte suivant du ${getLanguageName(sourceLanguage)} vers le ${getLanguageName(targetLang)}.
+
+**TEXTE À TRADUIRE :**
+"${sourceText}"
+
+**CONTEXTE :** Ce texte fait partie d'un formulaire d'étude de marché destiné aux agences de travail temporaire européennes.
+
+**RÈGLES :**
+1. Traduis UNIQUEMENT le texte, sans ajouter d'explications
+2. Utilise un vocabulaire professionnel adapté au recrutement européen
+3. Adapte les expressions au contexte culturel local
+4. Maintiens le même niveau de formalité que l'original
+5. Préserve exactement la structure et la ponctuation
+6. Réponds UNIQUEMENT avec la traduction, rien d'autre
+
+**TRADUCTION (${getLanguageName(targetLang)}) :**`;
+
+        // Call Claude API
+        const response = await fetch('https://api.anthropic.com/v1/messages', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'x-api-key': apiKey,
+            'anthropic-version': '2023-06-01'
+          },
+          body: JSON.stringify({
+            model: 'claude-3-5-sonnet-20241022',
+            max_tokens: 1000,
+            temperature: 0.3,
+            messages: [{
+              role: 'user',
+              content: prompt
+            }]
+          })
+        });
+
+        if (!response.ok) {
+          const errorText = await response.text();
+          console.error(`  ❌ Failed to translate to ${targetLang}:`, errorText);
+          
+          results.failed.push({
+            language: targetLang,
+            error: `API error: ${response.status}`
+          });
+          continue;
+        }
+
+        const result = await response.json();
+        let translatedText = result.content[0].text.trim();
+        
+        // Remove quotes if Claude added them
+        if (translatedText.startsWith('"') && translatedText.endsWith('"')) {
+          translatedText = translatedText.slice(1, -1);
+        }
+        
+        console.log(`  ✅ Translated to ${targetLang}: "${translatedText.substring(0, 50)}..."`);
+        
+        results.successful.push({
+          language: targetLang,
+          translatedText,
+          usage: result.usage
+        });
+        
+        // Store translation if autoStore is enabled
+        if (autoStore) {
+          try {
+            const key = category === 'question' 
+              ? `i18n:question:${textId}`
+              : `i18n:ui:${textId}`;
+            
+            // Fetch existing data
+            const existing = await kv.get(key) || {};
+            
+            // Update with new translation
+            const updatedData = {
+              ...existing,
+              textId,
+              key: textId,
+              category,
+              translations: {
+                ...(existing.translations || {}),
+                [targetLang]: {
+                  text: translatedText,
+                  status: 'auto-mcp'
+                }
+              }
+            };
+            
+            // Store back
+            await kv.set(key, updatedData);
+            console.log(`  💾 Stored translation for ${targetLang}`);
+            
+          } catch (storeError: any) {
+            console.error(`  ⚠️ Failed to store ${targetLang}:`, storeError.message);
+            // Don't fail the whole operation if storage fails
+          }
+        }
+        
+        // Small delay to avoid rate limiting
+        await new Promise(resolve => setTimeout(resolve, 300));
+        
+      } catch (error: any) {
+        console.error(`  ❌ Error translating to ${targetLang}:`, error);
+        results.failed.push({
+          language: targetLang,
+          error: error.message
+        });
+      }
+    }
+    
+    const successRate = (results.successful.length / targetLanguages.length) * 100;
+    
+    console.log(`✅ [AUTO-TRANSLATE-BATCH] Completed for ${textId}:`, {
+      successful: results.successful.length,
+      failed: results.failed.length,
+      successRate: `${successRate.toFixed(0)}%`
+    });
+    
+    return c.json({
+      success: results.failed.length === 0,
+      message: `Translated to ${results.successful.length}/${targetLanguages.length} languages`,
+      results,
+      stats: {
+        total: targetLanguages.length,
+        successful: results.successful.length,
+        failed: results.failed.length,
+        successRate: successRate.toFixed(1)
+      }
+    });
+    
+  } catch (error: any) {
+    console.error('❌ [AUTO-TRANSLATE-BATCH] Fatal error:', error);
+    return c.json({ 
+      success: false, 
+      error: error.message || 'Internal server error' 
+    }, 500);
+  }
+});
+
 // Helper function to get language names
 function getLanguageName(code: string): string {
   const names: Record<string, string> = {
@@ -857,10 +1049,27 @@ app.get('/translations', async (c) => {
   try {
     const category = c.req.query('category');
     
+    // If no category, return ALL translations (questions + UI) in the new format
     if (!category) {
-      return c.json({ success: false, error: 'Missing category parameter' }, 400);
+      const questionTranslations = await kv.getByPrefix('i18n:question:');
+      const uiTextTranslations = await kv.getByPrefix('i18n:ui:');
+      
+      return c.json({
+        success: true,
+        questionTranslations: questionTranslations.map((item: any) => ({
+          textId: item.key.replace('i18n:question:', ''),
+          category: 'question',
+          translations: item.value.translations || {}
+        })),
+        uiTextTranslations: uiTextTranslations.map((item: any) => ({
+          textId: item.key.replace('i18n:ui:', ''),
+          category: item.value.category || 'ui',
+          translations: item.value.translations || {}
+        }))
+      });
     }
     
+    // If category is provided, return filtered UI translations in flat format (for CMS editor)
     const uiTranslations = await kv.getByPrefix('i18n:ui:');
     const translations: any[] = [];
     

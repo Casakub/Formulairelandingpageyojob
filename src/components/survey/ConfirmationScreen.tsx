@@ -2,19 +2,22 @@ import { motion } from 'motion/react';
 import { CheckCircle, FileText, Gift } from 'lucide-react';
 import { Button } from '../ui/button';
 import { Card, CardContent } from '../ui/card';
+import { useI18n } from '../../hooks/useI18n';
 
 export function ConfirmationScreen() {
+  const { t } = useI18n();
+  
   const rewards = [
     {
       icon: FileText,
-      title: 'Rapport "Tendances 2025"',
-      description: 'Envoyé sous 3 semaines',
+      title: t('confirmation.reward.report.title', 'Rapport "Tendances 2025"'),
+      description: t('confirmation.reward.report.description', 'Envoyé sous 3 semaines'),
       color: 'text-cyan-400'
     },
     {
       icon: Gift,
-      title: 'Early Access YoJob',
-      description: 'Top 100 répondants',
+      title: t('confirmation.reward.earlyaccess.title', 'Early Access YoJob'),
+      description: t('confirmation.reward.earlyaccess.description', 'Top 100 répondants'),
       color: 'text-violet-400'
     }
   ];
@@ -44,7 +47,7 @@ export function ConfirmationScreen() {
           transition={{ delay: 0.3 }}
           className="text-white mb-4"
         >
-          Merci pour votre participation ! 🙏
+          {t('confirmation.title', 'Merci pour votre participation ! 🙏')}
         </motion.h2>
 
         {/* Description */}
@@ -54,7 +57,7 @@ export function ConfirmationScreen() {
           transition={{ delay: 0.4 }}
           className="text-white/80 text-lg mb-12"
         >
-          Votre avis est précieux et contribue à façonner l'avenir de YoJob.
+          {t('confirmation.description', 'Votre avis est précieux et contribue à façonner l\'avenir de YoJob.')}
         </motion.p>
 
         {/* Rewards Cards */}
@@ -97,7 +100,7 @@ export function ConfirmationScreen() {
             size="lg"
             className="border-2 border-white/50 bg-white/10 text-white hover:bg-white/20 hover:border-white/70 rounded-xl px-8 shadow-lg"
           >
-            Retour au site YoJob
+            {t('confirmation.cta', 'Retour au site YoJob')}
           </Button>
         </motion.div>
 
@@ -109,11 +112,11 @@ export function ConfirmationScreen() {
           className="mt-12 p-6 rounded-2xl bg-white/5 backdrop-blur-sm border border-white/10"
         >
           <p className="text-white/60 text-sm mb-3">
-            🎁 En remerciement de votre participation :
+            {t('confirmation.thanks.title', '🎁 En remerciement de votre participation :')}
           </p>
           <ul className="text-white/80 text-sm space-y-2">
-            <li>• Rapport exclusif "Tendances du détachement 2025"</li>
-            <li>• Top 100 répondants = 3 mois d'accès gratuit à YoJob (valeur 500€)</li>
+            <li>{t('confirmation.thanks.item1', '• Rapport exclusif "Tendances du détachement 2025"')}</li>
+            <li>{t('confirmation.thanks.item2', '• Top 100 répondants = 3 mois d\'accès gratuit à YoJob (valeur 500€)')}</li>
           </ul>
         </motion.div>
       </div>
