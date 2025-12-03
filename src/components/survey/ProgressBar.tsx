@@ -1,4 +1,5 @@
 import { motion } from 'motion/react';
+import { useI18n } from '../../hooks/useI18n';
 
 interface ProgressBarProps {
   currentSection: number;
@@ -7,6 +8,8 @@ interface ProgressBarProps {
 }
 
 export function ProgressBar({ currentSection, totalSections, progress }: ProgressBarProps) {
+  const { t } = useI18n();
+  
   const currentQuestion = (() => {
     const questionsPerSection = [4, 7, 6, 6, 2, 1];
     let total = 0;
@@ -28,7 +31,7 @@ export function ProgressBar({ currentSection, totalSections, progress }: Progres
       </div>
       <div className="flex justify-between items-center mt-3">
         <p className="text-white/60 text-sm">
-          Section {currentSection}/{totalSections} • Question {currentQuestion}/25
+          {t('progress.section', 'Section')} {currentSection}/{totalSections} • {t('progress.question', 'Question')} {currentQuestion}/25
         </p>
         <p className="text-cyan-400 text-sm">
           {Math.round(progress)}%

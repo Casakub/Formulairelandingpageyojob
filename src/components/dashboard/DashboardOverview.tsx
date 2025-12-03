@@ -10,6 +10,9 @@ import { LanguagePreview } from './LanguagePreview';
 import { getAllResponses, type MarketResearchResponse } from '../../lib/supabase';
 import { getIntegrationsStats } from '../../lib/integrations';
 import { toast } from 'sonner@2.0.3';
+import { AutoUploadTranslations } from './AutoUploadTranslations';
+import { UploadHeroTranslations } from './UploadHeroTranslations';
+import { UploadProgressTranslations } from './UploadProgressTranslations';
 
 export function DashboardOverview() {
   const [showLanguagePreview, setShowLanguagePreview] = useState(false);
@@ -533,6 +536,21 @@ export function DashboardOverview() {
       {showLanguagePreview && (
         <LanguagePreview onClose={() => setShowLanguagePreview(false)} />
       )}
+
+      {/* Upload Translations Section */}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.6 }}
+        className="mt-8"
+      >
+        <h2 className="text-slate-900 mb-4">Gestion des traductions</h2>
+        <div className="grid lg:grid-cols-3 gap-6">
+          <UploadHeroTranslations />
+          <UploadProgressTranslations />
+          <AutoUploadTranslations />
+        </div>
+      </motion.div>
     </motion.div>
   );
 }
