@@ -10,7 +10,11 @@ services:
       dockerfile: Dockerfile
       args:
         # Variables passées au build-time pour Vite
+        # Ajoutez ici les variables d'environnement spécifiques à la landing page
         - NODE_ENV=production
+        # Exemples (décommenter si nécessaire) :
+        # - VITE_API_URL=${VITE_API_URL}
+        # - VITE_GOOGLE_ANALYTICS_ID=${VITE_GOOGLE_ANALYTICS_ID}
     container_name: yojob-landing
     restart: unless-stopped
     networks:
