@@ -2,8 +2,8 @@
 # YOJOB Project - Hostinger Docker Compose
 # ==========================================
 #
-# Configuration Traefik pour Hostinger
-# À coller dans l'interface Hostinger Docker Compose
+# Configuration avec liens GitHub directs
+# Hostinger build directement depuis les repositories
 #
 
 services:
@@ -55,7 +55,7 @@ services:
   # ==========================================
   yojob-landing:
     build:
-      context: ./landing-page
+      context: https://github.com/Casakub/Newlandingpageyojob.git
       dockerfile: Dockerfile
       args:
         - NODE_ENV=production
@@ -92,7 +92,7 @@ services:
   # ==========================================
   yojob-survey:
     build:
-      context: ./survey-form
+      context: https://github.com/Casakub/Formulairelandingpageyojob.git#claude/form-website-integration-01TWk7DpCUHeuhHuv1tpg7VJ
       dockerfile: Dockerfile
       args:
         - VITE_SUPABASE_PROJECT_ID=${SUPABASE_PROJECT_ID}
