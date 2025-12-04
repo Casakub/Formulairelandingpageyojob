@@ -6,8 +6,6 @@
 # À coller dans l'interface Hostinger Docker Compose
 #
 
-version: '3.8'
-
 services:
   # ==========================================
   # Traefik - Reverse Proxy & SSL
@@ -57,7 +55,7 @@ services:
   # ==========================================
   yojob-landing:
     build:
-      context: https://github.com/Casakub/Newlandingpageyojob.git
+      context: ./landing-page
       dockerfile: Dockerfile
       args:
         - NODE_ENV=production
@@ -94,7 +92,7 @@ services:
   # ==========================================
   yojob-survey:
     build:
-      context: https://github.com/Casakub/Formulairelandingpageyojob.git#claude/form-website-integration-01TWk7DpCUHeuhHuv1tpg7VJ:survey-form
+      context: ./survey-form
       dockerfile: Dockerfile
       args:
         - VITE_SUPABASE_PROJECT_ID=${SUPABASE_PROJECT_ID}
