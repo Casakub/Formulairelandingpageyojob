@@ -1,9 +1,20 @@
 import { createClient, SupabaseClient } from '@supabase/supabase-js';
-import { projectId, publicAnonKey } from '../utils/supabase/info';
+import { projectId as fallbackProjectId, publicAnonKey as fallbackAnonKey } from '../utils/supabase/info';
 
-// Supabase configuration using Figma Make's built-in Supabase
+// Supabase configuration with environment variables (Docker) or fallback to Figma Make's file
+// Utiliser les variables d'environnement Vite avec fallback sur le fichier
+const projectId = import.meta.env.VITE_SUPABASE_PROJECT_ID || fallbackProjectId;
+const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY || fallbackAnonKey;
 const supabaseUrl = `https://${projectId}.supabase.co`;
-const supabaseAnonKey = publicAnonKey;
+
+// Log pour vérifier la source des credentials (dev uniquement)
+if (import.meta.env.DEV) {
+  console.log('🔧 Supabase Config:', {
+    projectId: projectId ? '✅' : '❌',
+    anonKey: supabaseAnonKey ? '✅' : '❌',
+    source: import.meta.env.VITE_SUPABASE_PROJECT_ID ? 'ENV VARIABLES' : 'FIGMA MAKE FILE'
+  });
+}
 
 // Check if credentials are configured
 const credentialsConfigured = Boolean(supabaseUrl && supabaseAnonKey && projectId);

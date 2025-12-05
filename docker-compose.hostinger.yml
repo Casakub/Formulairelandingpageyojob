@@ -1,0 +1,133 @@
+# ==========================================
+# YOJOB Project - Hostinger Docker Compose
+# ==========================================
+#
+# Configuration avec liens GitHub directs
+# Hostinger build directement depuis les repositories
+#
+
+services:
+  # ==========================================
+  # Traefik - Reverse Proxy & SSL
+  # ==========================================
+  traefik:
+    image: traefik:v3.6.1
+    restart: always
+    command:
+      - "--api.dashboard=true"
+      - "--providers.docker=true"
+      - "--providers.docker.exposedbydefault=false"
+      - "--entrypoints.web.address=:80"
+      - "--entrypoints.web.http.redirections.entryPoint.to=websecure"
+      - "--entrypoints.web.http.redirections.entryPoint.scheme=https"
+      - "--entrypoints.websecure.address=:443"
+      - "--certificatesresolvers.mytlschallenge.acme.tlschallenge=true"
+      - "--certificatesresolvers.mytlschallenge.acme.email=${SSL_EMAIL}"
+      - "--certificatesresolvers.mytlschallenge.acme.storage=/letsencrypt/acme.json"
+      - "--ping=true"
+      - "--log.level=INFO"
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - traefik_data:/letsencrypt
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    networks: [yojob-network]
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.traefik.rule=Host(`traefik.${DOMAIN_NAME}`)
+      - traefik.http.routers.traefik.entrypoints=websecure
+      - traefik.http.routers.traefik.tls=true
+      - traefik.http.routers.traefik.tls.certresolver=mytlschallenge
+      - traefik.http.routers.traefik.service=api@internal
+      - traefik.http.middlewares.traefik-auth.basicauth.users=${TRAEFIK_DASHBOARD_AUTH}
+      - traefik.http.middlewares.traefik-auth.basicauth.removeheader=true
+      - traefik.http.routers.traefik.middlewares=traefik-auth@docker
+      - traefik.docker.network=yojob-network
+    healthcheck:
+      test: ["CMD", "traefik", "healthcheck", "--ping"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # ==========================================
+  # Landing Page YOJOB (yojob.fr)
+  # ==========================================
+  yojob-landing:
+    build:
+      context: https://github.com/Casakub/Newlandingpageyojob.git
+      dockerfile: Dockerfile
+      args:
+        - NODE_ENV=production
+    container_name: yojob-landing
+    restart: always
+    networks: [yojob-network]
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.yojob-landing.rule=Host(`${DOMAIN_NAME}`) || Host(`www.${DOMAIN_NAME}`)
+      - traefik.http.routers.yojob-landing.entrypoints=websecure
+      - traefik.http.routers.yojob-landing.tls=true
+      - traefik.http.routers.yojob-landing.tls.certresolver=mytlschallenge
+      - traefik.http.services.yojob-landing.loadbalancer.server.port=80
+      - traefik.http.middlewares.yojob-redirect.redirectregex.regex=^https://www\\.${DOMAIN_NAME}/(.*)
+      - traefik.http.middlewares.yojob-redirect.redirectregex.replacement=https://${DOMAIN_NAME}/$${1}
+      - traefik.http.middlewares.yojob-headers.headers.SSLRedirect=true
+      - traefik.http.middlewares.yojob-headers.headers.STSSeconds=31536000
+      - traefik.http.middlewares.yojob-headers.headers.browserXSSFilter=true
+      - traefik.http.middlewares.yojob-headers.headers.contentTypeNosniff=true
+      - traefik.http.middlewares.yojob-headers.headers.forceSTSHeader=true
+      - traefik.http.middlewares.yojob-headers.headers.STSIncludeSubdomains=true
+      - traefik.http.middlewares.yojob-headers.headers.STSPreload=true
+      - traefik.http.routers.yojob-landing.middlewares=yojob-redirect@docker,yojob-headers@docker
+      - traefik.docker.network=yojob-network
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost/"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  # ==========================================
+  # Formulaire Étude (etude.yojob.fr)
+  # ==========================================
+  yojob-survey:
+    build:
+      context: https://github.com/Casakub/Formulairelandingpageyojob.git#claude/form-website-integration-01TWk7DpCUHeuhHuv1tpg7VJ
+      dockerfile: Dockerfile
+      args:
+        - VITE_SUPABASE_PROJECT_ID=${SUPABASE_PROJECT_ID}
+        - VITE_SUPABASE_ANON_KEY=${SUPABASE_ANON_KEY}
+        - NODE_ENV=production
+    container_name: yojob-survey
+    restart: always
+    networks: [yojob-network]
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.yojob-survey.rule=Host(`etude.${DOMAIN_NAME}`)
+      - traefik.http.routers.yojob-survey.entrypoints=websecure
+      - traefik.http.routers.yojob-survey.tls=true
+      - traefik.http.routers.yojob-survey.tls.certresolver=mytlschallenge
+      - traefik.http.services.yojob-survey.loadbalancer.server.port=80
+      - traefik.http.middlewares.yojob-survey-headers.headers.SSLRedirect=true
+      - traefik.http.middlewares.yojob-survey-headers.headers.STSSeconds=31536000
+      - traefik.http.middlewares.yojob-survey-headers.headers.browserXSSFilter=true
+      - traefik.http.middlewares.yojob-survey-headers.headers.contentTypeNosniff=true
+      - traefik.http.middlewares.yojob-survey-headers.headers.forceSTSHeader=true
+      - traefik.http.middlewares.yojob-survey-headers.headers.STSIncludeSubdomains=true
+      - traefik.http.middlewares.yojob-survey-headers.headers.STSPreload=true
+      - traefik.http.routers.yojob-survey.middlewares=yojob-survey-headers@docker
+      - traefik.docker.network=yojob-network
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost/"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+volumes:
+  traefik_data:
+    driver: local
+
+networks:
+  yojob-network:
+    driver: bridge

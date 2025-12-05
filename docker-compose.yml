@@ -1,0 +1,125 @@
+version: '3.8'
+
+services:
+  # ==========================================
+  # Landing Page YOJOB (yojob.fr)
+  # ==========================================
+  landing:
+    build:
+      context: ./landing-page
+      dockerfile: Dockerfile
+      args:
+        # Variables passées au build-time pour Vite
+        # Ajoutez ici les variables d'environnement spécifiques à la landing page
+        - NODE_ENV=production
+        # Exemples (décommenter si nécessaire) :
+        # - VITE_API_URL=${VITE_API_URL}
+        # - VITE_GOOGLE_ANALYTICS_ID=${VITE_GOOGLE_ANALYTICS_ID}
+    container_name: yojob-landing
+    restart: unless-stopped
+    networks:
+      - yojob-network
+    labels:
+      - "com.centurylinklabs.watchtower.enable=true"
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost/"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  # ==========================================
+  # Formulaire Étude de Marché (etude.yojob.fr)
+  # ==========================================
+  survey:
+    build:
+      context: ./survey-form
+      dockerfile: Dockerfile
+      args:
+        # IMPORTANT : Variables passées au BUILD-TIME (Vite les intègre dans le bundle)
+        - VITE_SUPABASE_PROJECT_ID=${SUPABASE_PROJECT_ID}
+        - VITE_SUPABASE_ANON_KEY=${SUPABASE_ANON_KEY}
+        - NODE_ENV=production
+    container_name: yojob-survey
+    restart: unless-stopped
+    networks:
+      - yojob-network
+    labels:
+      - "com.centurylinklabs.watchtower.enable=true"
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost/"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  # ==========================================
+  # Reverse Proxy Nginx
+  # ==========================================
+  nginx:
+    image: nginx:alpine
+    container_name: yojob-nginx
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./nginx/sites-enabled:/etc/nginx/sites-enabled:ro
+      - ./certbot/conf:/etc/letsencrypt:ro
+      - ./certbot/www:/var/www/certbot:ro
+      # Logs pour debugging
+      - ./nginx/logs:/var/log/nginx
+    depends_on:
+      landing:
+        condition: service_healthy
+      survey:
+        condition: service_healthy
+    networks:
+      - yojob-network
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost/health"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+
+  # ==========================================
+  # Certbot pour SSL Let's Encrypt
+  # ==========================================
+  certbot:
+    image: certbot/certbot:latest
+    container_name: yojob-certbot
+    restart: unless-stopped
+    volumes:
+      - ./certbot/conf:/etc/letsencrypt
+      - ./certbot/www:/var/www/certbot
+    # Renouvellement automatique tous les 12h
+    entrypoint: "/bin/sh -c 'trap exit TERM; while :; do certbot renew --quiet; sleep 12h & wait $${!}; done;'"
+    depends_on:
+      - nginx
+
+  # ==========================================
+  # Watchtower pour auto-update des conteneurs
+  # ==========================================
+  watchtower:
+    image: containrrr/watchtower:latest
+    container_name: yojob-watchtower
+    restart: unless-stopped
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    environment:
+      - WATCHTOWER_CLEANUP=true           # Supprimer les anciennes images
+      - WATCHTOWER_POLL_INTERVAL=300      # Vérifier toutes les 5 minutes
+      - WATCHTOWER_LABEL_ENABLE=true      # Surveiller uniquement les conteneurs avec label
+      - WATCHTOWER_INCLUDE_RESTARTING=true
+      - WATCHTOWER_ROLLING_RESTART=true   # Redémarrage progressif
+      - TZ=Europe/Paris
+    networks:
+      - yojob-network
+
+networks:
+  yojob-network:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.25.0.0/16
