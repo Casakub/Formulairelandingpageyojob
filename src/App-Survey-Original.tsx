@@ -21,8 +21,8 @@ import { Section3Besoins } from './components/survey/sections/Section3Besoins';
 import { Section4Interet } from './components/survey/sections/Section4Interet';
 import { Section5Vision } from './components/survey/sections/Section5Vision';
 import { Section6Contact } from './components/survey/sections/Section6Contact';
-import { saveResponsePublic } from './services/responseService';
-import { extractCountry, getInterestLevel } from './utils/helpers';
+import { saveResponsePublic } from './lib/supabase-public';
+import { extractCountry, getInterestLevel } from './lib/supabase';
 import './utils/diagnostic-supabase'; // Import diagnostic tool
 
 export interface FormData {
