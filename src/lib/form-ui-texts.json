@@ -1,0 +1,144 @@
+{
+  "version": "1.0",
+  "description": "Textes UI additionnels pour la page de formulaire YoJob",
+  "uiTexts": [
+    {
+      "textId": "form.main.title",
+      "key": "form.main.title",
+      "category": "main",
+      "translations": {
+        "fr": {
+          "text": "Partagez votre expérience avec YoJob",
+          "status": "validated"
+        },
+        "en": {
+          "text": "Share your experience with YoJob",
+          "status": "validated"
+        },
+        "de": {
+          "text": "Teilen Sie Ihre Erfahrungen mit YoJob",
+          "status": "validated"
+        },
+        "es": {
+          "text": "Comparta su experiencia con YoJob",
+          "status": "validated"
+        }
+      }
+    },
+    {
+      "textId": "form.main.subtitle",
+      "key": "form.main.subtitle",
+      "category": "main",
+      "translations": {
+        "fr": {
+          "text": "Aidez-nous à mieux comprendre vos besoins en recrutement européen",
+          "status": "validated"
+        },
+        "en": {
+          "text": "Help us better understand your European recruitment needs",
+          "status": "validated"
+        },
+        "de": {
+          "text": "Helfen Sie uns, Ihre europäischen Recruiting-Bedürfnisse besser zu verstehen",
+          "status": "validated"
+        },
+        "es": {
+          "text": "Ayúdenos a comprender mejor sus necesidades de reclutamiento europeo",
+          "status": "validated"
+        }
+      }
+    },
+    {
+      "textId": "form.welcome.title",
+      "key": "form.welcome.title",
+      "category": "main",
+      "translations": {
+        "fr": {
+          "text": "Bienvenue dans notre étude de marché européenne",
+          "status": "validated"
+        },
+        "en": {
+          "text": "Welcome to our European market study",
+          "status": "validated"
+        },
+        "de": {
+          "text": "Willkommen zu unserer europäischen Marktstudie",
+          "status": "validated"
+        },
+        "es": {
+          "text": "Bienvenido a nuestro estudio de mercado europeo",
+          "status": "validated"
+        }
+      }
+    },
+    {
+      "textId": "form.welcome.description",
+      "key": "form.welcome.description",
+      "category": "main",
+      "translations": {
+        "fr": {
+          "text": "Cette enquête nous permettra de développer une plateforme adaptée à vos besoins réels. Vos réponses sont précieuses.",
+          "status": "validated"
+        },
+        "en": {
+          "text": "This survey will enable us to develop a platform tailored to your real needs. Your answers are valuable.",
+          "status": "validated"
+        },
+        "de": {
+          "text": "Diese Umfrage ermöglicht es uns, eine auf Ihre tatsächlichen Bedürfnisse zugeschnittene Plattform zu entwickeln. Ihre Antworten sind wertvoll.",
+          "status": "validated"
+        },
+        "es": {
+          "text": "Esta encuesta nos permitirá desarrollar una plataforma adaptada a sus necesidades reales. Sus respuestas son valiosas.",
+          "status": "validated"
+        }
+      }
+    },
+    {
+      "textId": "progress.section",
+      "key": "progress.section",
+      "category": "progress",
+      "translations": {
+        "fr": {
+          "text": "Section",
+          "status": "validated"
+        },
+        "en": {
+          "text": "Section",
+          "status": "validated"
+        },
+        "de": {
+          "text": "Abschnitt",
+          "status": "validated"
+        },
+        "es": {
+          "text": "Sección",
+          "status": "validated"
+        }
+      }
+    },
+    {
+      "textId": "progress.of",
+      "key": "progress.of",
+      "category": "progress",
+      "translations": {
+        "fr": {
+          "text": "sur",
+          "status": "validated"
+        },
+        "en": {
+          "text": "of",
+          "status": "validated"
+        },
+        "de": {
+          "text": "von",
+          "status": "validated"
+        },
+        "es": {
+          "text": "de",
+          "status": "validated"
+        }
+      }
+    }
+  ]
+}
