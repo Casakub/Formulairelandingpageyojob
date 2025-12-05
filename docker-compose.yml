@@ -3,8 +3,6 @@
 # Configuration pour déploiement Hostinger
 # =============================================================================
 
-version: '3.8'
-
 services:
   # ---------------------------------------------------------------------------
   # Service principal : Application web
