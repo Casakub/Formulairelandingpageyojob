@@ -22,9 +22,9 @@ services:
         - VITE_APP_ENV=${VITE_APP_ENV:-production}
 
     # Port mapping : port_hote:port_container
-    # Hostinger expose généralement sur 80 ou via reverse proxy
+    # Hostinger utilise un reverse proxy, utiliser un port non-standard
     ports:
-      - "80:80"
+      - "3000:80"
 
     # Variables d'environnement runtime (pour nginx si besoin)
     environment:
