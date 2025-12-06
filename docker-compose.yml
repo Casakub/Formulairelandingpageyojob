@@ -1,0 +1,48 @@
+---
+services:
+  yojob-landing:
+    container_name: yojob-landing-page
+    build:
+      context: .
+      dockerfile: Dockerfile
+      # IMPORTANT: Ne JAMAIS passer SERVICE_ROLE_KEY ici !
+      # Les args de build sont exposés publiquement dans le bundle client.
+      args:
+        - VITE_SUPABASE_URL=${VITE_SUPABASE_URL}
+        - VITE_SUPABASE_ANON_KEY=${VITE_SUPABASE_ANON_KEY}
+        - VITE_APP_ENV=${VITE_APP_ENV:-production}
+    ports:
+      - 3000:80
+    environment:
+      - NODE_ENV=production
+      - TZ=Europe/Paris
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          cpus: "1.0"
+          memory: 512M
+        reservations:
+          cpus: "0.25"
+          memory: 128M
+    healthcheck:
+      test:
+        - CMD
+        - wget
+        - --no-verbose
+        - --tries=1
+        - --spider
+        - http://localhost:80/
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+    logging:
+      driver: json-file
+      options:
+        max-size: 10m
+        max-file: "3"
+networks:
+  default:
+    name: yojob-network
+    driver: bridge
