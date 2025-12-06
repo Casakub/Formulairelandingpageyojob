@@ -5,10 +5,11 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
+      # IMPORTANT: Ne JAMAIS passer SERVICE_ROLE_KEY ici !
+      # Les args de build sont exposés publiquement dans le bundle client.
       args:
         - VITE_SUPABASE_URL=${VITE_SUPABASE_URL}
         - VITE_SUPABASE_ANON_KEY=${VITE_SUPABASE_ANON_KEY}
-        - VITE_SUPABASE_SERVICE_ROLE_KEY=${VITE_SUPABASE_SERVICE_ROLE_KEY}
         - VITE_APP_ENV=${VITE_APP_ENV:-production}
     ports:
       - 3000:80
