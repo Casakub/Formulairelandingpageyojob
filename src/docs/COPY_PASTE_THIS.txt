@@ -1,0 +1,68 @@
+╔═══════════════════════════════════════════════════════════════════════════╗
+║                                                                           ║
+║  📋 FICHIER À COPIER-COLLER DANS HOSTINGER DOCKER COMPOSE                ║
+║                                                                           ║
+╚═══════════════════════════════════════════════════════════════════════════╝
+
+
+Dans ton interface Hostinger, section "Environment Variables" du Docker Compose,
+copie-colle EXACTEMENT ces 4 lignes (SANS guillemets, SANS espaces) :
+
+
+VITE_SUPABASE_URL=https://vhpbmckgxtdyxdwhmdxy.supabase.co
+VITE_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZocGJtY2tneHRkeXhkd2htZHh5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjQyNjE5ODUsImV4cCI6MjA3OTgzNzk4NX0.Vv0nIgRa91pi-trbK9drGTF6uoeCvvm4L2HEJ4UlyBo
+VITE_SUPABASE_SERVICE_ROLE_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZocGJtY2tneHRkeXhkd2htZHh5Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc2NDI2MTk4NSwiZXhwIjoyMDc5ODM3OTg1fQ.HB2lomdiGpf3g2fOnW6qFjPwQXJTxeP4S8wG4kXuZik
+VITE_APP_ENV=production
+
+
+╔═══════════════════════════════════════════════════════════════════════════╗
+║  ✅ ENSUITE, FAIRE CES 3 ACTIONS DANS SUPABASE DASHBOARD                 ║
+╚═══════════════════════════════════════════════════════════════════════════╝
+
+1️⃣ Autoriser l'IP temporaire
+   → https://supabase.com/dashboard/project/vhpbmckgxtdyxdwhmdxy
+   → Authentication → URL Configuration
+   → Site URL : http://72.65.161.3:3000
+   → Redirect URLs (ajouter une par une) :
+      http://72.65.161.3:3000
+      http://72.65.161.3:3000/**
+      http://72.65.161.3:3000/admin
+      http://72.65.161.3:3000/survey
+   → Cliquer "Save"
+
+2️⃣ Créer les tables
+   → SQL Editor
+   → New query
+   → Copier TOUT le fichier : /supabase/migrations/00_create_complete_database.sql
+   → Cliquer "Run"
+
+3️⃣ Créer le compte admin
+   → Authentication → Users → Add user
+   → Email : a.auger@yojob.fr
+   → Password : Adeole@33700
+   → ✅ Cocher "Auto Confirm User"
+   → Cliquer "Create user"
+
+
+╔═══════════════════════════════════════════════════════════════════════════╗
+║  🚀 ENFIN, REDÉMARRER DOCKER SUR HOSTINGER                                ║
+╚═══════════════════════════════════════════════════════════════════════════╝
+
+SSH : ssh root@72.65.161.3
+
+Commandes :
+docker-compose down
+docker-compose build --no-cache
+docker-compose up -d
+
+
+╔═══════════════════════════════════════════════════════════════════════════╗
+║  🎯 TESTER                                                                ║
+╚═══════════════════════════════════════════════════════════════════════════╝
+
+Landing : http://72.65.161.3:3000
+Survey  : http://72.65.161.3:3000/survey
+Admin   : http://72.65.161.3:3000/admin (a.auger@yojob.fr / Adeole@33700)
+
+
+C'EST TOUT ! ✅

@@ -22,7 +22,7 @@ export function ProgressBar({ currentSection, totalSections, progress }: Progres
   })();
 
   return (
-    <div className="mb-8">
+    <div className="mb-4 md:mb-8">
       <div className="relative h-2 bg-white/10 rounded-full overflow-hidden">
         <motion.div
           className="h-full bg-gradient-to-r from-cyan-400 to-violet-500 shadow-lg shadow-cyan-500/30"
@@ -31,11 +31,11 @@ export function ProgressBar({ currentSection, totalSections, progress }: Progres
           transition={{ duration: 0.5, ease: 'easeInOut' }}
         />
       </div>
-      <div className="flex justify-between items-center mt-3">
-        <p className="text-white/60 text-sm">
+      <div className="flex justify-between items-center mt-2 md:mt-3">
+        <p className="text-white/60 text-xs md:text-sm">
           {t('progress.section', 'Section')} {currentSection}/{totalSections} • {t('progress.question', 'Question')} {currentQuestion}/{totalQuestions}
         </p>
-        <p className="text-cyan-400 text-sm">
+        <p className="text-cyan-400 text-xs md:text-sm">
           {Math.round(progress)}%
         </p>
       </div>

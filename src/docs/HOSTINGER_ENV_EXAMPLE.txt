@@ -1,0 +1,18 @@
+=============================================================================
+FICHIER À COPIER DANS TON DOCKER COMPOSE SUR HOSTINGER
+=============================================================================
+
+Dans ton interface Hostinger Docker Compose, dans la section "Environment Variables",
+copie-colle EXACTEMENT ces 4 lignes :
+
+VITE_SUPABASE_URL=https://vhpbmckgxtdyxdwhmdxy.supabase.co
+VITE_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZocGJtY2tneHRkeXhkd2htZHh5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjQyNjE5ODUsImV4cCI6MjA3OTgzNzk4NX0.Vv0nIgRa91pi-trbK9drGTF6uoeCvvm4L2HEJ4UlyBo
+VITE_SUPABASE_SERVICE_ROLE_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZocGJtY2tneHRkeXhkd2htZHh5Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc2NDI2MTk4NSwiZXhwIjoyMDc5ODM3OTg1fQ.HB2lomdiGpf3g2fOnW6qFjPwQXJTxeP4S8wG4kXuZik
+VITE_APP_ENV=production
+
+=============================================================================
+⚠️ ATTENTION :
+- Ne mets PAS de guillemets autour des valeurs
+- Ne mets PAS d'espaces avant ou après le signe =
+- Copie EXACTEMENT comme c'est écrit
+=============================================================================

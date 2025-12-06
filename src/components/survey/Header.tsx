@@ -72,7 +72,7 @@ export function Header({ currentSection, progress, onDashboardClick }: HeaderPro
 
         {/* Progress indicator (only show when in form) */}
         {currentSection > 0 && currentSection < 7 && (
-          <div className="hidden md:flex items-center gap-3">
+          <div className="hidden">
             <div className="w-32 h-2 bg-white/10 rounded-full overflow-hidden">
               <motion.div
                 className="h-full bg-gradient-to-r from-cyan-400 to-violet-500"

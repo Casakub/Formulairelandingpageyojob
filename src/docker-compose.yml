@@ -3,8 +3,6 @@
 # Configuration pour déploiement Hostinger
 # =============================================================================
 
-version: '3.8'
-
 services:
   # ---------------------------------------------------------------------------
   # Service principal : Application web
@@ -17,16 +15,17 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-      # Arguments passés au Dockerfile pour le build Vite
+      # IMPORTANT: Ne JAMAIS passer SERVICE_ROLE_KEY ici !
+      # Les args de build sont exposés publiquement dans le bundle client.
       args:
         - VITE_SUPABASE_URL=${VITE_SUPABASE_URL}
         - VITE_SUPABASE_ANON_KEY=${VITE_SUPABASE_ANON_KEY}
         - VITE_APP_ENV=${VITE_APP_ENV:-production}
     
     # Port mapping : port_hote:port_container
-    # Hostinger expose généralement sur 80 ou via reverse proxy
+    # Port 3000 (au lieu de 80 car port 80 déjà utilisé sur Hostinger)
     ports:
-      - "80:80"
+      - "3000:80"
     
     # Variables d'environnement runtime (pour nginx si besoin)
     environment:

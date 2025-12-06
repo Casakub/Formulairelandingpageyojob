@@ -15,14 +15,15 @@ import { Header } from './components/survey/Header';
 import { HeroSection } from './components/survey/HeroSection';
 import { ConfirmationScreen } from './components/survey/ConfirmationScreen';
 import { ProgressBar } from './components/survey/ProgressBar';
+import { SectionNavigator } from './components/survey/SectionNavigator';
 import { Section1Profile } from './components/survey/sections/Section1Profile';
 import { Section2Detachement } from './components/survey/sections/Section2Detachement';
 import { Section3Besoins } from './components/survey/sections/Section3Besoins';
 import { Section4Interet } from './components/survey/sections/Section4Interet';
 import { Section5Vision } from './components/survey/sections/Section5Vision';
 import { Section6Contact } from './components/survey/sections/Section6Contact';
-import { saveResponsePublic } from './lib/supabase-public';
-import { extractCountry, getInterestLevel } from './lib/supabase';
+import { saveResponsePublic } from './services/responseService';
+import { extractCountry, getInterestLevel } from './utils/helpers';
 import './utils/diagnostic-supabase'; // Import diagnostic tool
 
 export interface FormData {
@@ -384,7 +385,7 @@ function AppContent({
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -20 }}
             transition={{ duration: 0.4 }}
-            className="relative z-10 max-w-4xl mx-auto px-4 py-8 mt-24"
+            className="relative z-10 max-w-4xl mx-auto px-4 py-8 mt-8 md:mt-24"
           >
             {/* Progress Bar */}
             <ProgressBar 
@@ -394,29 +395,12 @@ function AppContent({
             />
 
             {/* Section Steps */}
-            <div className="flex flex-wrap gap-2 mb-8 justify-center">
-              {SECTIONS.map((section) => (
-                <button
-                  key={section.id}
-                  onClick={() => section.id < currentSection && setCurrentSection(section.id)}
-                  disabled={section.id > currentSection}
-                  className={`px-3 py-1.5 rounded-full text-sm transition-all ${
-                    section.id === currentSection
-                      ? 'bg-gradient-to-r from-cyan-500 to-violet-500 text-white shadow-lg shadow-cyan-500/30'
-                      : completedSections.includes(section.id)
-                      ? 'bg-green-500/20 text-green-400 border border-green-500/30 cursor-pointer hover:bg-green-500/30'
-                      : section.id < currentSection
-                      ? 'bg-white/10 text-white/60 border border-white/20 cursor-pointer hover:bg-white/20'
-                      : 'bg-white/5 text-white/40 border border-white/10 cursor-not-allowed'
-                  }`}
-                >
-                  {completedSections.includes(section.id) && section.id !== currentSection && (
-                    <CheckCircle className="w-3 h-3 inline mr-1" />
-                  )}
-                  {section.icon} {t(section.labelKey, section.labelFallback)}
-                </button>
-              ))}
-            </div>
+            <SectionNavigator 
+              sections={SECTIONS}
+              currentSection={currentSection}
+              completedSections={completedSections}
+              setCurrentSection={setCurrentSection}
+            />
 
             {/* Form Card */}
             <div className="bg-white/10 backdrop-blur-xl rounded-3xl border border-white/20 p-6 md:p-10 shadow-2xl">
