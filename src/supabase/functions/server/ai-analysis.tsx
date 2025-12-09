@@ -109,7 +109,7 @@ ${JSON.stringify(dataForAnalysis, null, 2)}
         "anthropic-version": "2023-06-01"
       },
       body: JSON.stringify({
-        model: "claude-3-5-sonnet-20241022",
+        model: "claude-3-5-sonnet-20240620",
         max_tokens: 8000,
         temperature: 0.7,
         messages: [

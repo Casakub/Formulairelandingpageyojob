@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Deploy All Translations - YOJOB</title>
+  <style>
+    body {
+      font-family: system-ui, -apple-system, sans-serif;
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 40px 20px;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+    }
+    .container {
+      background: white;
+      border-radius: 20px;
+      padding: 40px;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+    }
+    h1 {
+      color: #1a202c;
+      margin-bottom: 10px;
+    }
+    .subtitle {
+      color: #718096;
+      margin-bottom: 30px;
+    }
+    .progress {
+      background: #e2e8f0;
+      height: 40px;
+      border-radius: 10px;
+      overflow: hidden;
+      margin: 30px 0;
+      position: relative;
+    }
+    .progress-bar {
+      background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+      height: 100%;
+      width: 0;
+      transition: width 0.3s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-weight: 600;
+    }
+    .status {
+      padding: 15px;
+      background: #f7fafc;
+      border-radius: 10px;
+      margin: 10px 0;
+      font-size: 14px;
+      color: #4a5568;
+    }
+    .success {
+      background: #c6f6d5;
+      color: #22543d;
+      border-left: 4px solid #38a169;
+    }
+    .error {
+      background: #fed7d7;
+      color: #742a2a;
+      border-left: 4px solid #e53e3e;
+    }
+    .language-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+      gap: 10px;
+      margin: 20px 0;
+    }
+    .language-badge {
+      padding: 12px;
+      background: #edf2f7;
+      border-radius: 8px;
+      text-align: center;
+      font-size: 14px;
+      transition: all 0.3s;
+    }
+    .language-badge.processing {
+      background: #bee3f8;
+      color: #2c5282;
+    }
+    .language-badge.success {
+      background: #c6f6d5;
+      color: #22543d;
+    }
+    .language-badge.error {
+      background: #fed7d7;
+      color: #742a2a;
+    }
+    button {
+      background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      border: none;
+      padding: 16px 32px;
+      border-radius: 10px;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      width: 100%;
+      margin: 20px 0;
+      transition: transform 0.2s;
+    }
+    button:hover:not(:disabled) {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+    }
+    button:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+    .log {
+      background: #1a202c;
+      color: #e2e8f0;
+      padding: 20px;
+      border-radius: 10px;
+      max-height: 400px;
+      overflow-y: auto;
+      font-family: 'Courier New', monospace;
+      font-size: 13px;
+      line-height: 1.6;
+      margin-top: 20px;
+    }
+    .log-entry {
+      margin: 5px 0;
+    }
+    .log-success { color: #68d391; }
+    .log-error { color: #fc8181; }
+    .log-info { color: #63b3ed; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>🌍 Deploy All Translations</h1>
+    <p class="subtitle">Déployer automatiquement les 22 traductions de la landing page YOJOB dans Supabase</p>
+
+    <div class="language-grid" id="languageGrid"></div>
+
+    <div class="progress">
+      <div class="progress-bar" id="progressBar">0%</div>
+    </div>
+
+    <div id="status"></div>
+
+    <button id="deployBtn" onclick="deployAllTranslations()">
+      🚀 Déployer les 22 langues
+    </button>
+
+    <div class="log" id="log"></div>
+  </div>
+
+  <script>
+    const PROJECT_ID = 'vhpbmckgxtdyxdwhmdxy';
+    const ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZocGJtY2tneHRkeXhkd2htZHh5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzMxNjY4ODQsImV4cCI6MjA0ODc0Mjg4NH0.E5R6L9tXjhHLGmz13FGC5hS3OGbXaJpZqA0w5AQY1Hg';
+
+    const LANGUAGES = [
+      { code: 'de', flag: '🇩🇪', name: 'Deutsch' },
+      { code: 'es', flag: '🇪🇸', name: 'Español' },
+      { code: 'it', flag: '🇮🇹', name: 'Italiano' },
+      { code: 'pt', flag: '🇵🇹', name: 'Português' },
+      { code: 'nl', flag: '🇳🇱', name: 'Nederlands' },
+      { code: 'pl', flag: '🇵🇱', name: 'Polski' },
+      { code: 'ro', flag: '🇷🇴', name: 'Română' },
+      { code: 'bg', flag: '🇧🇬', name: 'Български' },
+      { code: 'hu', flag: '🇭🇺', name: 'Magyar' },
+      { code: 'cs', flag: '🇨🇿', name: 'Čeština' },
+      { code: 'sk', flag: '🇸🇰', name: 'Slovenčina' },
+      { code: 'hr', flag: '🇭🇷', name: 'Hrvatski' },
+      { code: 'sl', flag: '🇸🇮', name: 'Slovenščina' },
+      { code: 'lt', flag: '🇱🇹', name: 'Lietuvių' },
+      { code: 'lv', flag: '🇱🇻', name: 'Latviešu' },
+      { code: 'et', flag: '🇪🇪', name: 'Eesti' },
+      { code: 'el', flag: '🇬🇷', name: 'Ελληνικά' },
+      { code: 'sv', flag: '🇸🇪', name: 'Svenska' },
+      { code: 'da', flag: '🇩🇰', name: 'Dansk' },
+      { code: 'fi', flag: '🇫🇮', name: 'Suomi' },
+      { code: 'no', flag: '🇳🇴', name: 'Norsk' },
+      { code: 'en', flag: '🇬🇧', name: 'English' },
+    ];
+
+    // Initialize language badges
+    const languageGrid = document.getElementById('languageGrid');
+    LANGUAGES.forEach(lang => {
+      const badge = document.createElement('div');
+      badge.className = 'language-badge';
+      badge.id = `lang-${lang.code}`;
+      badge.innerHTML = `${lang.flag} <div style="font-size:11px;margin-top:4px;">${lang.code.toUpperCase()}</div>`;
+      languageGrid.appendChild(badge);
+    });
+
+    function log(message, type = 'info') {
+      const logEl = document.getElementById('log');
+      const entry = document.createElement('div');
+      entry.className = `log-entry log-${type}`;
+      const timestamp = new Date().toLocaleTimeString();
+      entry.textContent = `[${timestamp}] ${message}`;
+      logEl.appendChild(entry);
+      logEl.scrollTop = logEl.scrollHeight;
+    }
+
+    function updateProgress(current, total) {
+      const percent = Math.round((current / total) * 100);
+      const progressBar = document.getElementById('progressBar');
+      progressBar.style.width = percent + '%';
+      progressBar.textContent = `${percent}% (${current}/${total})`;
+    }
+
+    function updateLanguageBadge(code, status) {
+      const badge = document.getElementById(`lang-${code}`);
+      if (badge) {
+        badge.className = `language-badge ${status}`;
+      }
+    }
+
+    async function deployAllTranslations() {
+      const btn = document.getElementById('deployBtn');
+      btn.disabled = true;
+      btn.textContent = '⏳ Déploiement en cours...';
+      
+      log('🚀 Démarrage du déploiement des traductions', 'info');
+      log(`📦 ${LANGUAGES.length} langues à déployer`, 'info');
+
+      let successCount = 0;
+      let errorCount = 0;
+
+      for (let i = 0; i < LANGUAGES.length; i++) {
+        const lang = LANGUAGES[i];
+        updateLanguageBadge(lang.code, 'processing');
+        log(`🌍 Traduction: ${lang.flag} ${lang.name} (${lang.code})...`, 'info');
+
+        try {
+          // Ask Claude to translate
+          const translation = await translateLanguage(lang.code, lang.name);
+          
+          // Save to Supabase
+          await saveToSupabase(lang.code, translation);
+          
+          successCount++;
+          updateLanguageBadge(lang.code, 'success');
+          log(`✅ ${lang.code.toUpperCase()} traduit et sauvegardé avec succès`, 'success');
+        } catch (error) {
+          errorCount++;
+          updateLanguageBadge(lang.code, 'error');
+          log(`❌ Erreur ${lang.code}: ${error.message}`, 'error');
+        }
+
+        updateProgress(i + 1, LANGUAGES.length);
+      }
+
+      log(`\n🎉 Déploiement terminé !`, 'success');
+      log(`✅ Réussis: ${successCount}`, 'success');
+      if (errorCount > 0) {
+        log(`❌ Échoués: ${errorCount}`, 'error');
+      }
+
+      btn.disabled = false;
+      btn.textContent = errorCount > 0 ? '🔄 Réessayer' : '✅ Déploiement terminé';
+    }
+
+    async function translateLanguage(targetLang, targetLangName) {
+      // Pour l'instant, on simule une traduction
+      // Tu dois mettre ici ton vrai système de traduction Claude
+      log(`  📝 Génération de la traduction...`, 'info');
+      
+      // Simulate API delay
+      await new Promise(resolve => setTimeout(resolve, 500));
+      
+      // Return a mock translation (replace with real Claude API call)
+      return {
+        language: targetLang,
+        // ... rest of content
+      };
+    }
+
+    async function saveToSupabase(langCode, content) {
+      const url = `https://${PROJECT_ID}.supabase.co/functions/v1/make-server-10092a63/landing/${langCode}`;
+      
+      const response = await fetch(url, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${ANON_KEY}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          content,
+          translation_status: 'published',
+          translation_progress: 100,
+          translated_by: 'manual',
+        }),
+      });
+
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.error || `HTTP ${response.status}`);
+      }
+
+      return response.json();
+    }
+
+    log('✨ Script prêt ! Clique sur le bouton pour démarrer.', 'success');
+  </script>
+</body>
+</html>

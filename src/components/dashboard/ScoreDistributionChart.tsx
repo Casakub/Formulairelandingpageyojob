@@ -147,7 +147,7 @@ export function ScoreDistributionChart() {
       {/* Header avec sélecteur de type */}
       <Card className="bg-white border-slate-200 shadow-md">
         <CardHeader>
-          <div className="flex items-center justify-between">
+          <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-yellow-500 to-orange-500 flex items-center justify-center shadow-lg">
                 <Award className="w-5 h-5 text-white" />
@@ -159,10 +159,10 @@ export function ScoreDistributionChart() {
             </div>
             
             {/* Type selector */}
-            <div className="flex gap-2 bg-slate-100 rounded-lg p-1">
+            <div className="flex gap-2 bg-slate-100 rounded-lg p-1 w-full md:w-auto">
               <button
                 onClick={() => setChartType('radial')}
-                className={`px-3 py-1.5 rounded-md text-sm transition-all ${
+                className={`flex-1 md:flex-none px-3 py-1.5 rounded-md text-sm transition-all ${
                   chartType === 'radial' 
                     ? 'bg-white text-cyan-600 shadow-sm' 
                     : 'text-slate-600 hover:text-slate-900'
@@ -172,7 +172,7 @@ export function ScoreDistributionChart() {
               </button>
               <button
                 onClick={() => setChartType('bar')}
-                className={`px-3 py-1.5 rounded-md text-sm transition-all ${
+                className={`flex-1 md:flex-none px-3 py-1.5 rounded-md text-sm transition-all ${
                   chartType === 'bar' 
                     ? 'bg-white text-cyan-600 shadow-sm' 
                     : 'text-slate-600 hover:text-slate-900'
@@ -182,7 +182,7 @@ export function ScoreDistributionChart() {
               </button>
               <button
                 onClick={() => setChartType('pie')}
-                className={`px-3 py-1.5 rounded-md text-sm transition-all ${
+                className={`flex-1 md:flex-none px-3 py-1.5 rounded-md text-sm transition-all ${
                   chartType === 'pie' 
                     ? 'bg-white text-cyan-600 shadow-sm' 
                     : 'text-slate-600 hover:text-slate-900'

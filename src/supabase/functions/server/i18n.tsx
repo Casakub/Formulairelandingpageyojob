@@ -613,7 +613,7 @@ app.post('/auto-translate', async (c) => {
       
       // Extract MCP settings with defaults
       const {
-        model = 'claude-3-5-sonnet-20241022',
+        model = 'claude-3-5-sonnet-20240620',
         temperature = 0.3,
         maxTokens = 1000,
         preserveFormatting = true,

@@ -12,7 +12,7 @@ export const SEED_QUESTION_TRANSLATIONS: QuestionTranslationData[] = [
       fr: { text: 'Dans quel pays est située votre agence ?', status: 'validated' },
       en: { text: 'In which country is your agency located?', status: 'validated' },
       de: { text: 'In welchem Land befindet sich Ihre Agentur?', status: 'validated' },
-      es: { text: '¿En qué país se encuentra su agencia?', status: 'validated' },
+      es: { text: '¿En qué país se encuentra su agence?', status: 'validated' },
       pl: { text: 'W jakim kraju znajduje się Państwa agencja?', status: 'validated' },
       it: { text: 'In quale paese si trova la vostra agenzia?', status: 'auto-mcp' },
       pt: { text: 'Em que país está localizada a sua agência?', status: 'auto-mcp' },
@@ -286,7 +286,7 @@ export const SEED_COUNTRY_LANGUAGES: CountryLanguageMapping[] = [
   { countryCode: 'SE', languages: ['en'] },
   { countryCode: 'DK', languages: ['en'] },
   { countryCode: 'FI', languages: ['en'] },
-  { countryCode: 'NO', languages: ['en'] },
+  { countryCode: 'NO', languages: ['en', 'no'] },
   { countryCode: 'IE', languages: ['en'] },
   { countryCode: 'LU', languages: ['fr', 'de', 'en'] }
 ];

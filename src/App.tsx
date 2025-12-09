@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import AppLanding from './App-Landing';
 import AppSurvey from './App-Survey-Original';
+import { Toaster } from './components/ui/sonner';
 
 export default function App() {
   const [currentPath, setCurrentPath] = useState(window.location.pathname);
@@ -44,23 +45,36 @@ export default function App() {
 
   // Route matching
   if (currentPath === '/' || currentPath === '') {
-    return <AppLanding />;
+    return (
+      <>
+        <AppLanding />
+        <Toaster position="top-right" />
+      </>
+    );
   }
 
   if (currentPath.startsWith('/survey') || currentPath.startsWith('/admin')) {
-    return <AppSurvey />;
+    return (
+      <>
+        <AppSurvey />
+        <Toaster position="top-right" />
+      </>
+    );
   }
 
   // 404
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50">
-      <div className="text-center">
-        <h1 className="text-4xl mb-4">404 - Page non trouvée</h1>
-        <p className="text-gray-600 mb-6">La page que vous recherchez n'existe pas.</p>
-        <a href="/" className="text-blue-600 hover:underline">
-          Retour à l'accueil
-        </a>
+    <>
+      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+        <div className="text-center">
+          <h1 className="text-4xl mb-4">404 - Page non trouvée</h1>
+          <p className="text-gray-600 mb-6">La page que vous recherchez n'existe pas.</p>
+          <a href="/" className="text-blue-600 hover:underline">
+            Retour à l'accueil
+          </a>
+        </div>
       </div>
-    </div>
+      <Toaster position="top-right" />
+    </>
   );
 }

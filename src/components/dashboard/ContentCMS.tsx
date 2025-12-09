@@ -1,12 +1,13 @@
 import { useState } from 'react';
 import { motion } from 'motion/react';
-import { FileText, Navigation, Type, AlertCircle } from 'lucide-react';
+import { FileText, Navigation, Type, AlertCircle, Globe } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '../ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../ui/tabs';
 import { HeroContentEditor } from './HeroContentEditor';
 import { ProgressContentEditor } from './ProgressContentEditor';
 import { UIContentEditor } from './UIContentEditor';
 import { SeedMissingTranslationsButton } from './SeedMissingTranslationsButton';
+import { ImportLandingTranslations } from './ImportLandingTranslations';
 import { Badge } from '../ui/badge';
 
 export function ContentCMS() {
@@ -60,6 +61,9 @@ export function ContentCMS() {
 
       {/* Seed Missing Translations Button */}
       <SeedMissingTranslationsButton />
+
+      {/* Import Landing Page Translations */}
+      <ImportLandingTranslations />
 
       {/* Tabs Navigation */}
       <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">

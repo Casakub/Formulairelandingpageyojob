@@ -9,11 +9,31 @@ import { triggerAllIntegrations, testIntegration } from "./integrations.ts";
 import historyRoutes from "./history-routes.ts";
 import { seedMissingTranslations } from "./seed-translations.tsx";
 import { seedCompleteTranslations } from "./seed-complete-translations.tsx";
+import { uploadAvatar, deleteAvatar, refreshSignedUrl } from "./storage.tsx";
+import landingRoutes from "./landing.tsx";
 
 const app = new Hono();
 
 // Enable logger
 app.use('*', logger(console.log));
+
+// Middleware global de gestion d'erreurs pour éviter les "broken pipe"
+app.onError((err, c) => {
+  console.error('🔴 Global error handler:', err);
+  
+  // Si l'erreur est un "broken pipe", on ne peut plus répondre
+  if (err.code === 'EPIPE' || err.message?.includes('broken pipe')) {
+    console.warn('⚠️ Client disconnected (broken pipe) - cannot send response');
+    // Ne pas essayer de répondre si la connexion est fermée
+    return new Response(null, { status: 499 }); // Client Closed Request
+  }
+  
+  // Pour les autres erreurs, retourner une réponse JSON
+  return c.json({
+    error: 'Internal server error',
+    message: err.message || 'Unknown error',
+  }, 500);
+});
 
 // Enable CORS for all routes and methods
 app.use(
@@ -46,6 +66,9 @@ app.route("/make-server-10092a63/i18n", i18nRoutes);
 
 // History endpoints
 app.route("/make-server-10092a63/history", historyRoutes);
+
+// Landing translations endpoints
+app.route("/make-server-10092a63/landing", landingRoutes);
 
 // Seed missing translations endpoint
 app.post("/make-server-10092a63/seed-missing-translations", seedMissingTranslations);
@@ -96,5 +119,10 @@ app.post("/make-server-10092a63/integrations/test", async (c) => {
     return c.json({ error: error.message }, 500);
   }
 });
+
+// Storage endpoints for avatar uploads
+app.post("/make-server-10092a63/storage/upload-avatar", uploadAvatar);
+app.delete("/make-server-10092a63/storage/delete-avatar", deleteAvatar);
+app.post("/make-server-10092a63/storage/refresh-url", refreshSignedUrl);
 
 Deno.serve(app.fetch);

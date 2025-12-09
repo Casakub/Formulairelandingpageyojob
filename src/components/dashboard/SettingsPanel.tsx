@@ -1,12 +1,7 @@
-import React, { useState, useEffect } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../ui/card';
-import { Button } from '../ui/button';
-import { Input } from '../ui/input';
-import { Label } from '../ui/label';
-import { Badge } from '../ui/badge';
-import { Settings, Key, CheckCircle2, XCircle, Loader2, Sparkles, DollarSign, Info, AlertCircle, Zap, Shield, ExternalLink, Target, Users, TrendingUp, CreditCard } from 'lucide-react';
 import { motion } from 'motion/react';
 import { toast } from 'sonner';
+import { MigrateLandingToSupabase } from './MigrateLandingToSupabase';
+import { QuickDiagnostic } from './QuickDiagnostic';
 
 export function SettingsPanel() {
   const [apiKey, setApiKey] = useState('');
@@ -246,6 +241,15 @@ export function SettingsPanel() {
         {/* Colonne gauche - Configuration principale */}
         <div className="lg:col-span-2 space-y-6">
           
+          {/* Diagnostic Rapide */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.01 }}
+          >
+            <QuickDiagnostic />
+          </motion.div>
+
           {/* Card principale - Configuration */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}

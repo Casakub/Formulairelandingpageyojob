@@ -127,7 +127,7 @@ export function HistoryViewer({ category, onRestore }: HistoryViewerProps) {
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               onClick={() => setIsOpen(false)}
-              className="fixed inset-0 bg-black/20 backdrop-blur-sm z-40"
+              className="fixed inset-0 bg-black/20 backdrop-blur-sm z-[9998]"
             />
 
             {/* Panel */}
@@ -136,7 +136,7 @@ export function HistoryViewer({ category, onRestore }: HistoryViewerProps) {
               animate={{ x: 0 }}
               exit={{ x: '100%' }}
               transition={{ type: 'spring', damping: 30, stiffness: 300 }}
-              className="fixed right-0 top-0 bottom-0 w-full md:w-[600px] bg-white shadow-2xl z-50 flex flex-col"
+              className="fixed right-0 top-0 bottom-0 w-full md:w-[600px] bg-white shadow-2xl z-[9999] flex flex-col"
             >
               {/* Header */}
               <div className={`bg-gradient-to-r ${categoryColors[category]} text-white p-6`}>

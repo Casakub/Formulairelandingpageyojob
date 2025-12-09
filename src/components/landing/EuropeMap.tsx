@@ -10,6 +10,7 @@ interface Country {
 
 interface EuropeMapProps {
   variant?: 'hero' | 'network';
+  agenciesLabel?: string; // "agences partenaires" / "partner agencies"
 }
 
 const countries: Country[] = [
@@ -177,7 +178,7 @@ const countries: Country[] = [
   }
 ];
 
-export function EuropeMap({ variant = 'hero' }: EuropeMapProps) {
+export function EuropeMap({ variant = 'hero', agenciesLabel = 'agences partenaires' }: EuropeMapProps) {
   const [hoveredCountry, setHoveredCountry] = useState<Country | null>(null);
 
   const handleMouseEnter = (country: Country) => {
@@ -355,7 +356,7 @@ export function EuropeMap({ variant = 'hero' }: EuropeMapProps) {
           >
             <div className={`${isNetwork ? 'text-lg' : 'text-base'} mb-1 drop-shadow-lg text-white`}>{hoveredCountry.name}</div>
             <div className={`bg-gradient-to-r from-cyan-300 to-violet-300 bg-clip-text text-transparent ${isNetwork ? 'text-base' : 'text-sm'} drop-shadow-md`}>
-              ✓ {hoveredCountry.agencies} agences partenaires
+              ✓ {hoveredCountry.agencies} {agenciesLabel}
             </div>
           </motion.div>
         )}

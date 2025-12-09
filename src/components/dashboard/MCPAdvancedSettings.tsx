@@ -29,7 +29,7 @@ interface MCPAdvancedSettingsProps {
 
 export function MCPAdvancedSettings({ onClose }: MCPAdvancedSettingsProps) {
   // États pour les paramètres
-  const [model, setModel] = useState('claude-3-5-sonnet-20241022');
+  const [model, setModel] = useState('claude-3-5-sonnet-20240620');
   const [temperature, setTemperature] = useState(0.3);
   const [maxTokens, setMaxTokens] = useState(1000);
   const [contextWindow, setContextWindow] = useState(5);
@@ -67,7 +67,7 @@ export function MCPAdvancedSettings({ onClose }: MCPAdvancedSettingsProps) {
   };
 
   const resetToDefaults = () => {
-    setModel('claude-3-5-sonnet-20241022');
+    setModel('claude-3-5-sonnet-20240620');
     setTemperature(0.3);
     setMaxTokens(1000);
     setContextWindow(5);
@@ -82,7 +82,7 @@ export function MCPAdvancedSettings({ onClose }: MCPAdvancedSettingsProps) {
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4"
+      className="fixed inset-0 bg-black/50 backdrop-blur-sm z-[9999] flex items-center justify-center p-4"
       onClick={onClose}
     >
       <motion.div
@@ -142,7 +142,7 @@ export function MCPAdvancedSettings({ onClose }: MCPAdvancedSettingsProps) {
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="claude-3-5-sonnet-20241022">
+                  <SelectItem value="claude-3-5-sonnet-20240620">
                     Claude 3.5 Sonnet (Recommandé)
                   </SelectItem>
                   <SelectItem value="claude-3-opus-20240229">

@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Upload 3 Traductions YOJOB</title>
+  <style>
+    body {
+      font-family: system-ui;
+      max-width: 800px;
+      margin: 50px auto;
+      padding: 20px;
+      background: linear-gradient(135deg, #667eea, #764ba2);
+    }
+    .card {
+      background: white;
+      padding: 40px;
+      border-radius: 20px;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+    }
+    h1 { color: #1a202c; margin-bottom: 10px; }
+    .subtitle { color: #718096; margin-bottom: 30px; }
+    button {
+      background: linear-gradient(90deg, #667eea, #764ba2);
+      color: white;
+      border: none;
+      padding: 16px 32px;
+      border-radius: 10px;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      width: 100%;
+      margin: 20px 0;
+    }
+    button:hover { transform: translateY(-2px); }
+    button:disabled { opacity: 0.6; cursor: not-allowed; }
+    .log {
+      background: #1a202c;
+      color: #e2e8f0;
+      padding: 20px;
+      border-radius: 10px;
+      max-height: 400px;
+      overflow-y: auto;
+      font-family: monospace;
+      font-size: 13px;
+      margin-top: 20px;
+    }
+    .success { color: #68d391; }
+    .error { color: #fc8181; }
+    .info { color: #63b3ed; }
+    .warning { color: #f6ad55; }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h1>🌍 Upload Traductions YOJOB</h1>
+    <p class="subtitle">Upload des traductions EN 🇬🇧, DE 🇩🇪, ES 🇪🇸 créées par Claude</p>
+    
+    <div style="background:#fef5e7;padding:16px;border-radius:8px;border-left:4px solid #f59e0b;margin:20px 0;">
+      <strong style="color:#92400e;">✨ Traductions par Claude</strong>
+      <p style="color:#78350f;font-size:14px;margin:8px 0 0 0;">
+        Ces traductions ont été créées manuellement par Claude. <strong>Aucun crédit Anthropic ne sera consommé.</strong>
+      </p>
+    </div>
+
+    <button onclick="uploadTranslations()">🚀 Upload EN + DE + ES</button>
+    
+    <div class="log" id="log"></div>
+  </div>
+
+  <script>
+    const PROJECT_ID = 'vhpbmckgxtdyxdwhmdxy';
+    const ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZocGJtY2tneHRkeXhkd2htZHh5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjQyNjE5ODUsImV4cCI6MjA3OTgzNzk4NX0.Vv0nIgRa91pi-trbK9drGTF6uoeCvvm4L2HEJ4UlyBo';
+
+    function log(msg, type = 'info') {
+      const el = document.getElementById('log');
+      const time = new Date().toLocaleTimeString();
+      el.innerHTML += `<div class="${type}">[${time}] ${msg}</div>`;
+      el.scrollTop = el.scrollHeight;
+    }
+
+    async function uploadTranslations() {
+      const btn = event.target;
+      btn.disabled = true;
+      btn.textContent = '⏳ Upload en cours...';
+
+      log('🚀 Démarrage de l\'upload...', 'info');
+
+      // Import les fichiers créés
+      try {
+        log('📦 Import EN...', 'info');
+        const enModule = await import('../content/landing/en.js');
+        await uploadLang('en', enModule.landingContentEN, '🇬🇧 English');
+
+        log('📦 Import DE...', 'info');
+        const deModule = await import('../content/landing/de.js');
+        await uploadLang('de', deModule.landingContentDE, '🇩🇪 Deutsch');
+
+        log('📦 Import ES...', 'info');
+        const esModule = await import('../content/landing/es.js');
+        await uploadLang('es', esModule.landingContentES, '🇪🇸 Español');
+
+        log('\n✅ UPLOAD TERMINÉ ! Toutes les traductions sont dans Supabase.', 'success');
+        btn.textContent = '✅ Upload réussi !';
+        
+      } catch (error) {
+        log(`❌ ERREUR: ${error.message}`, 'error');
+        btn.textContent = '❌ Échec - Réessayer';
+        btn.disabled = false;
+      }
+    }
+
+    async function uploadLang(code, content, name) {
+      log(`🌍 Upload ${name}...`, 'info');
+      
+      const response = await fetch(
+        `https://${PROJECT_ID}.supabase.co/functions/v1/make-server-10092a63/landing/${code}`,
+        {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${ANON_KEY}`,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            content,
+            translation_status: 'published',
+            translation_progress: 100,
+            translated_by: 'claude_manual',
+          }),
+        }
+      );
+
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(`${code}: ${error.error || response.status}`);
+      }
+
+      log(`✅ ${code.toUpperCase()} sauvegardé avec succès !`, 'success');
+    }
+
+    log('✨ Prêt ! Clique sur le bouton pour uploader les 3 langues.', 'success');
+  </script>
+</body>
+</html>
