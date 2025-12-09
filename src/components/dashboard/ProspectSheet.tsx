@@ -25,7 +25,7 @@ interface ProspectSheetProps {
     countryFlag: string;
     sector: string;
     status: string;
-    responsible: {
+    responsible?: {
       initials: string;
       color: string;
     };
@@ -103,17 +103,23 @@ const MOCK_PROSPECT_DETAILS = {
 export function ProspectSheet({ prospect, open, onClose }: ProspectSheetProps) {
   if (!prospect) return null;
 
+  // Valeurs par défaut pour responsible si undefined
+  const responsible = prospect.responsible || {
+    initials: prospect.name?.substring(0, 2).toUpperCase() || '??',
+    color: 'from-blue-600 to-cyan-600'
+  };
+
   return (
     <AnimatePresence>
       {open && (
         <>
-          {/* Backdrop */}
+          {/* Overlay */}
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             onClick={onClose}
-            className="fixed inset-0 bg-black/30 backdrop-blur-sm z-40"
+            className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50"
           />
 
           {/* Sheet */}
@@ -121,8 +127,8 @@ export function ProspectSheet({ prospect, open, onClose }: ProspectSheetProps) {
             initial={{ x: '100%' }}
             animate={{ x: 0 }}
             exit={{ x: '100%' }}
-            transition={{ type: 'spring', damping: 30, stiffness: 300 }}
-            className="fixed right-0 top-0 h-full w-full sm:w-[480px] bg-white shadow-2xl z-50 flex flex-col border-l border-slate-200"
+            transition={{ type: 'spring', damping: 25, stiffness: 200 }}
+            className="fixed right-0 top-0 h-full w-full md:w-[600px] lg:w-[700px] bg-white shadow-2xl z-50 flex flex-col"
           >
             {/* Header */}
             <div className="flex items-center justify-between px-6 py-5 border-b border-slate-200 bg-slate-50">
@@ -139,9 +145,9 @@ export function ProspectSheet({ prospect, open, onClose }: ProspectSheetProps) {
                 <CardContent className="p-4">
                   <div className="flex items-start gap-4">
                     <div
-                      className={`w-16 h-16 rounded-full bg-gradient-to-br ${prospect.responsible.color} flex items-center justify-center text-white text-xl flex-shrink-0 shadow-lg`}
+                      className={`w-16 h-16 rounded-full bg-gradient-to-br ${responsible.color} flex items-center justify-center text-white text-xl flex-shrink-0 shadow-lg`}
                     >
-                      {prospect.name.substring(0, 2).toUpperCase()}
+                      {responsible.initials}
                     </div>
                     <div className="flex-1 min-w-0">
                       <h3 className="text-slate-900 mb-1">{prospect.name}</h3>
@@ -158,7 +164,7 @@ export function ProspectSheet({ prospect, open, onClose }: ProspectSheetProps) {
                           Créé : {MOCK_PROSPECT_DETAILS.createdAt}
                         </Badge>
                         <Badge variant="outline" className="text-xs">
-                          Resp. : {prospect.responsible.initials}
+                          Resp. : {responsible.initials}
                         </Badge>
                       </div>
                     </div>
