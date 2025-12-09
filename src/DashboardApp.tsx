@@ -17,6 +17,7 @@ import {
   X,
   ChevronLeft,
   ChevronRight,
+  Users,
 } from 'lucide-react';
 import { Button } from './components/ui/button';
 import { TranslationProvider } from './contexts/TranslationContext';
@@ -28,10 +29,11 @@ import { ExportImportManager } from './components/dashboard/ExportImportManager'
 import { IntegrationManager } from './components/dashboard/IntegrationManager';
 import { ContentCMS } from './components/dashboard/ContentCMS';
 import { SettingsPanel } from './components/dashboard/SettingsPanel';
+import { ProspectsPage } from './components/dashboard/ProspectsPage';
 import { useAuth } from './hooks/useAuth';
 import { Badge } from './components/ui/badge';
 
-type TabType = 'overview' | 'questions' | 'results' | 'integrations' | 'translations' | 'cms' | 'settings' | 'export';
+type TabType = 'overview' | 'questions' | 'results' | 'integrations' | 'translations' | 'cms' | 'settings' | 'export' | 'prospects';
 
 interface DashboardAppProps {
   onBackToSurvey?: () => void;
@@ -51,7 +53,8 @@ export default function DashboardApp({ onBackToSurvey }: DashboardAppProps = {})
     { id: 'export' as TabType, label: 'Export', icon: Download, color: 'from-green-500 to-emerald-500' },
     { id: 'integrations' as TabType, label: 'Intégrations', icon: Plug, color: 'from-orange-500 to-amber-500' },
     { id: 'cms' as TabType, label: 'CMS Formulaire', icon: FileType, color: 'from-pink-500 to-rose-500' },
-    { id: 'settings' as TabType, label: 'Paramètres', icon: Settings, color: 'from-slate-500 to-gray-500' }
+    { id: 'settings' as TabType, label: 'Paramètres', icon: Settings, color: 'from-slate-500 to-gray-500' },
+    { id: 'prospects' as TabType, label: 'Prospects', icon: Users, color: 'from-green-500 to-emerald-500' }
   ];
 
   return (
@@ -326,6 +329,9 @@ export default function DashboardApp({ onBackToSurvey }: DashboardAppProps = {})
             )}
             {activeTab === 'settings' && (
               <SettingsPanel key="settings" />
+            )}
+            {activeTab === 'prospects' && (
+              <ProspectsPage key="prospects" />
             )}
           </AnimatePresence>
         </div>

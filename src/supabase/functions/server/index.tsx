@@ -11,6 +11,7 @@ import { seedMissingTranslations } from "./seed-translations.tsx";
 import { seedCompleteTranslations } from "./seed-complete-translations.tsx";
 import { uploadAvatar, deleteAvatar, refreshSignedUrl } from "./storage.tsx";
 import landingRoutes from "./landing.tsx";
+import prospectsRoutes from "./prospects.tsx";
 
 const app = new Hono();
 
@@ -124,5 +125,8 @@ app.post("/make-server-10092a63/integrations/test", async (c) => {
 app.post("/make-server-10092a63/storage/upload-avatar", uploadAvatar);
 app.delete("/make-server-10092a63/storage/delete-avatar", deleteAvatar);
 app.post("/make-server-10092a63/storage/refresh-url", refreshSignedUrl);
+
+// Prospects endpoints
+app.route("/make-server-10092a63/prospects", prospectsRoutes);
 
 Deno.serve(app.fetch);

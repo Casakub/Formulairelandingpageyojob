@@ -49,6 +49,7 @@ import { LanguageSelector } from './components/landing/LanguageSelector';
 import { useLandingTranslations } from './hooks/useLandingTranslations';
 import { SEOHead } from './components/SEOHead';
 import { getAllLanguageCodes } from './lib/languages';
+import { projectId, publicAnonKey } from './utils/supabase/info';
 
 // 🎨 Mapping des icônes : string → Composant React
 const ICON_MAP: Record<string, any> = {
@@ -222,28 +223,104 @@ export default function AppLanding() {
     return () => window.removeEventListener('landing-translations-updated', handleTranslationsUpdate);
   }, [refresh]);
 
-  const handleWaitlistSubmit = (e: React.FormEvent) => {
+  const handleWaitlistSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     console.log('Waitlist email:', waitlistEmail);
-    // Use translation if available, fallback to generic message
-    const successMsg = content.network?.waitlist?.successMessage || 
-                       (currentLanguage === 'fr' ? 'Merci ! Vous êtes inscrit à la liste d\'attente.' : 'Thank you! You are now on the waitlist.');
-    alert(successMsg);
-    setWaitlistEmail('');
+    
+    try {
+      // Envoyer au backend Prospects
+      const response = await fetch(
+        `https://${projectId}.supabase.co/functions/v1/make-server-10092a63/prospects/submit`,
+        {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${publicAnonKey}`,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            email: waitlistEmail,
+            source: 'landing_waitlist',
+            countryCode: navigator.language.split('-')[1] || 'FR',
+            languageCode: currentLanguage,
+            customFields: {
+              interested_in: 'marketplace',
+              notification_preferences: 'email',
+              subscribed_at: new Date().toISOString(),
+            },
+          }),
+        }
+      );
+
+      const data = await response.json();
+
+      if (data.success) {
+        const successMsg = content.network?.waitlist?.successMessage || 
+                           (currentLanguage === 'fr' ? 'Merci ! Vous êtes inscrit à la liste d\'attente.' : 'Thank you! You are now on the waitlist.');
+        alert(successMsg);
+        setWaitlistEmail('');
+        console.log('✅ Prospect waitlist créé:', data.prospectId);
+      } else {
+        throw new Error(data.error || 'Erreur lors de l\'inscription');
+      }
+    } catch (error) {
+      console.error('❌ Erreur waitlist submit:', error);
+      alert(currentLanguage === 'fr' ? 'Erreur lors de l\'inscription. Veuillez réessayer.' : 'Error during registration. Please try again.');
+    }
   };
 
-  const handleContactSubmit = (e: React.FormEvent) => {
+  const handleContactSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     console.log('Contact form:', formData);
-    alert(content.ctaForm.form.successMessage);
-    setFormData({
-      name: '',
-      email: '',
-      phone: '',
-      company: '',
-      needType: '',
-      message: '',
-    });
+    
+    try {
+      // Envoyer au backend Prospects
+      const response = await fetch(
+        `https://${projectId}.supabase.co/functions/v1/make-server-10092a63/prospects/submit`,
+        {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${publicAnonKey}`,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            name: formData.name,
+            email: formData.email,
+            phone: formData.phone,
+            company: formData.company,
+            needType: formData.needType,
+            message: formData.message,
+            source: 'landing_contact',
+            countryCode: navigator.language.split('-')[1] || 'FR',
+            languageCode: currentLanguage,
+            customFields: {
+              form_language: currentLanguage,
+              submitted_at: new Date().toISOString(),
+              user_agent: navigator.userAgent,
+            },
+          }),
+        }
+      );
+
+      const data = await response.json();
+
+      if (data.success) {
+        alert(content.ctaForm.form.successMessage);
+        setFormData({
+          name: '',
+          email: '',
+          phone: '',
+          company: '',
+          needType: '',
+          message: '',
+        });
+        console.log('✅ Prospect contact créé:', data.prospectId);
+      } else {
+        throw new Error(data.error || 'Erreur lors de l\'envoi');
+      }
+    } catch (error) {
+      console.error('❌ Erreur contact submit:', error);
+      alert(currentLanguage === 'fr' ? 'Erreur lors de l\'envoi. Veuillez réessayer.' : 'Error sending form. Please try again.');
+    }
   };
 
   const scrollToContact = () => {

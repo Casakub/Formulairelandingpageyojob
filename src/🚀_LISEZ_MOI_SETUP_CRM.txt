@@ -1,0 +1,45 @@
+═══════════════════════════════════════════════════════════════
+🚨 ACTION REQUISE - SETUP BASE DE DONNÉES PROSPECTS CRM 🚨
+═══════════════════════════════════════════════════════════════
+
+❌ ERREUR ACTUELLE :
+------------------
+"Could not find the table 'public.prospects' in the schema cache"
+
+✅ SOLUTION (2 MINUTES) :
+-------------------------
+
+1. Ouvrez https://supabase.com/dashboard
+2. Projet : vhpbmckgxtdyxdwhmdxy
+3. Menu → SQL Editor → + New Query
+4. Ouvrez SETUP_PROSPECTS_CRM.sql
+5. Copiez TOUT (Ctrl+A → Ctrl+C)
+6. Collez dans SQL Editor (Ctrl+V)
+7. Cliquez RUN ▶️
+8. Rechargez votre app (F5)
+
+📋 RÉSULTAT :
+------------
+✅ Table prospects créée (stockage)
+✅ Table prospect_actions créée (historique)
+✅ Table prospect_notes créée (notes)
+✅ Vue prospect_stats créée (KPI)
+✅ 3 prospects de test ajoutés
+
+🎯 FICHIERS D'AIDE :
+-------------------
+→ SETUP_PROSPECTS_CRM.sql   (Script SQL à exécuter)
+→ README_SETUP_CRM.md        (Guide détaillé)
+→ SETUP_PROSPECTS_CRM.md     (Instructions)
+
+💡 POURQUOI ?
+-------------
+Supabase ne permet pas de créer automatiquement des tables
+pour des raisons de sécurité. C'est une bonne pratique !
+
+🔒 SÉCURITÉ :
+-------------
+Le script peut être exécuté plusieurs fois sans risque
+(il utilise IF NOT EXISTS).
+
+═══════════════════════════════════════════════════════════════

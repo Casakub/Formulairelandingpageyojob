@@ -1,5 +1,28 @@
+import { useState, useEffect } from 'react';
 import { motion } from 'motion/react';
 import { toast } from 'sonner';
+import { 
+  Key, 
+  Sparkles, 
+  CheckCircle2, 
+  AlertCircle, 
+  Loader2, 
+  Info, 
+  Shield,
+  ExternalLink,
+  XCircle,
+  Zap,
+  DollarSign,
+  CreditCard,
+  Target,
+  Users,
+  TrendingUp,
+} from 'lucide-react';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../ui/card';
+import { Input } from '../ui/input';
+import { Label } from '../ui/label';
+import { Button } from '../ui/button';
+import { Badge } from '../ui/badge';
 import { MigrateLandingToSupabase } from './MigrateLandingToSupabase';
 import { QuickDiagnostic } from './QuickDiagnostic';
 
