@@ -220,3 +220,13 @@ html {
 .scrollbar-track-slate-100::-webkit-scrollbar-track {
   background: rgb(241 245 249);
 }
+
+/* Animation shimmer pour les onglets actifs */
+@keyframes shimmer {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(100%);
+  }
+}

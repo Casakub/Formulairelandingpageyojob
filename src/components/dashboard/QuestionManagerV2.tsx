@@ -265,10 +265,10 @@ export function QuestionManagerV2() {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex items-center justify-between flex-wrap gap-4">
-        <div>
-          <h2 className="text-slate-900 text-2xl mb-1">🎯 Gestion des Questions</h2>
-          <div className="flex items-center gap-3">
+      <div className="flex items-start sm:items-center justify-between flex-wrap gap-4">
+        <div className="flex-1">
+          <h2 className="text-slate-900 mb-2">🎯 Gestion des Questions</h2>
+          <div className="flex items-center flex-wrap gap-3">
             <p className="text-slate-600">Configurez les questions pour chaque type de profil</p>
             {hiddenQuestions.size > 0 && (
               <Badge variant="outline" className="bg-orange-50 text-orange-700 border-orange-300">
@@ -279,61 +279,113 @@ export function QuestionManagerV2() {
         </div>
         <Button
           onClick={handleAddQuestion}
-          className="bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-400 hover:to-blue-400 text-white shadow-lg"
+          className="relative overflow-hidden group bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-600 hover:to-blue-600 text-white shadow-lg hover:shadow-xl transition-all rounded-xl px-6 py-2.5"
         >
-          <Plus className="w-4 h-4 mr-2" />
-          Ajouter une question
+          <span className="relative z-10 flex items-center gap-2">
+            <Plus className="w-4 h-4" />
+            <span>Ajouter une question</span>
+          </span>
+          {/* Shimmer effect on hover */}
+          <div className="absolute inset-0 -translate-x-full group-hover:translate-x-full transition-transform duration-700 bg-gradient-to-r from-transparent via-white/30 to-transparent" />
         </Button>
       </div>
 
       {/* Profile Tabs */}
       <Tabs value={selectedProfile} onValueChange={(value) => setSelectedProfile(value as RespondentType)} className="w-full">
-        <TabsList className="grid w-full grid-cols-3 h-auto p-1 bg-slate-100 rounded-xl">
+        <TabsList className="grid w-full grid-cols-3 gap-4 p-1 bg-transparent h-auto">
+          {/* Agences ETT */}
           <TabsTrigger
             value="agency"
-            className="flex flex-col items-center gap-2 py-3 data-[state=active]:bg-white data-[state=active]:shadow-md rounded-lg transition-all"
+            className="relative flex flex-col items-center justify-center gap-3 py-5 px-4 rounded-2xl border-2 transition-all duration-300 h-auto bg-white shadow-md hover:shadow-lg data-[state=active]:border-transparent data-[state=active]:bg-gradient-to-br data-[state=active]:from-blue-500 data-[state=active]:to-cyan-500 data-[state=active]:shadow-xl data-[state=active]:shadow-blue-500/30 data-[state=inactive]:border-slate-200 data-[state=inactive]:hover:border-blue-300 overflow-hidden group"
           >
-            <div className="flex items-center gap-2">
-              <Building2 className="w-5 h-5" />
-              <span>Agences ETT</span>
+            {/* Shimmer effect pour état actif */}
+            <div className="absolute inset-0 opacity-0 group-data-[state=active]:opacity-100 pointer-events-none">
+              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-data-[state=active]:animate-[shimmer_2s_infinite]" />
             </div>
-            <div className="flex items-center gap-2 text-xs">
-              <Badge variant="outline" className="bg-blue-50 text-blue-700 border-blue-200">
+            
+            {/* Content */}
+            <div className="relative flex items-center gap-3 z-10">
+              <div className="w-10 h-10 rounded-xl flex items-center justify-center shadow-sm transition-all group-data-[state=active]:bg-white/20 group-data-[state=active]:backdrop-blur-sm group-data-[state=inactive]:bg-blue-100">
+                <Building2 className="w-5 h-5 transition-colors group-data-[state=active]:text-white group-data-[state=inactive]:text-blue-600" />
+              </div>
+              <span className="transition-colors group-data-[state=active]:text-white group-data-[state=inactive]:text-slate-900">
+                Agences ETT
+              </span>
+            </div>
+            <div className="relative flex flex-wrap items-center justify-center gap-2 text-xs z-10">
+              <Badge 
+                variant="outline" 
+                className="transition-all group-data-[state=active]:bg-white/20 group-data-[state=active]:text-white group-data-[state=active]:border-white/40 group-data-[state=inactive]:bg-blue-50 group-data-[state=inactive]:text-blue-700 group-data-[state=inactive]:border-blue-200"
+              >
                 {QUESTION_COUNT_BY_PROFILE.agency} questions
               </Badge>
-              <span className="text-slate-500">{ESTIMATED_TIME_BY_PROFILE.agency}</span>
+              <span className="transition-colors group-data-[state=active]:text-white/90 group-data-[state=inactive]:text-slate-500">
+                {ESTIMATED_TIME_BY_PROFILE.agency}
+              </span>
             </div>
           </TabsTrigger>
 
+          {/* Clients/Entreprises */}
           <TabsTrigger
             value="client"
-            className="flex flex-col items-center gap-2 py-3 data-[state=active]:bg-white data-[state=active]:shadow-md rounded-lg transition-all"
+            className="relative flex flex-col items-center justify-center gap-3 py-5 px-4 rounded-2xl border-2 transition-all duration-300 h-auto bg-white shadow-md hover:shadow-lg data-[state=active]:border-transparent data-[state=active]:bg-gradient-to-br data-[state=active]:from-violet-500 data-[state=active]:to-purple-500 data-[state=active]:shadow-xl data-[state=active]:shadow-violet-500/30 data-[state=inactive]:border-slate-200 data-[state=inactive]:hover:border-violet-300 overflow-hidden group"
           >
-            <div className="flex items-center gap-2">
-              <Briefcase className="w-5 h-5" />
-              <span>Clients/Entreprises</span>
+            {/* Shimmer effect pour état actif */}
+            <div className="absolute inset-0 opacity-0 group-data-[state=active]:opacity-100 pointer-events-none">
+              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-data-[state=active]:animate-[shimmer_2s_infinite]" />
             </div>
-            <div className="flex items-center gap-2 text-xs">
-              <Badge variant="outline" className="bg-violet-50 text-violet-700 border-violet-200">
+            
+            {/* Content */}
+            <div className="relative flex items-center gap-3 z-10">
+              <div className="w-10 h-10 rounded-xl flex items-center justify-center shadow-sm transition-all group-data-[state=active]:bg-white/20 group-data-[state=active]:backdrop-blur-sm group-data-[state=inactive]:bg-violet-100">
+                <Briefcase className="w-5 h-5 transition-colors group-data-[state=active]:text-white group-data-[state=inactive]:text-violet-600" />
+              </div>
+              <span className="transition-colors group-data-[state=active]:text-white group-data-[state=inactive]:text-slate-900">
+                Clients/Entreprises
+              </span>
+            </div>
+            <div className="relative flex flex-wrap items-center justify-center gap-2 text-xs z-10">
+              <Badge 
+                variant="outline" 
+                className="transition-all group-data-[state=active]:bg-white/20 group-data-[state=active]:text-white group-data-[state=active]:border-white/40 group-data-[state=inactive]:bg-violet-50 group-data-[state=inactive]:text-violet-700 group-data-[state=inactive]:border-violet-200"
+              >
                 {QUESTION_COUNT_BY_PROFILE.client} questions
               </Badge>
-              <span className="text-slate-500">{ESTIMATED_TIME_BY_PROFILE.client}</span>
+              <span className="transition-colors group-data-[state=active]:text-white/90 group-data-[state=inactive]:text-slate-500">
+                {ESTIMATED_TIME_BY_PROFILE.client}
+              </span>
             </div>
           </TabsTrigger>
 
+          {/* Intérimaires */}
           <TabsTrigger
             value="worker"
-            className="flex flex-col items-center gap-2 py-3 data-[state=active]:bg-white data-[state=active]:shadow-md rounded-lg transition-all"
+            className="relative flex flex-col items-center justify-center gap-3 py-5 px-4 rounded-2xl border-2 transition-all duration-300 h-auto bg-white shadow-md hover:shadow-lg data-[state=active]:border-transparent data-[state=active]:bg-gradient-to-br data-[state=active]:from-green-500 data-[state=active]:to-emerald-500 data-[state=active]:shadow-xl data-[state=active]:shadow-green-500/30 data-[state=inactive]:border-slate-200 data-[state=inactive]:hover:border-green-300 overflow-hidden group"
           >
-            <div className="flex items-center gap-2">
-              <HardHat className="w-5 h-5" />
-              <span>Intérimaires</span>
+            {/* Shimmer effect pour état actif */}
+            <div className="absolute inset-0 opacity-0 group-data-[state=active]:opacity-100 pointer-events-none">
+              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-data-[state=active]:animate-[shimmer_2s_infinite]" />
             </div>
-            <div className="flex items-center gap-2 text-xs">
-              <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200">
+            
+            {/* Content */}
+            <div className="relative flex items-center gap-3 z-10">
+              <div className="w-10 h-10 rounded-xl flex items-center justify-center shadow-sm transition-all group-data-[state=active]:bg-white/20 group-data-[state=active]:backdrop-blur-sm group-data-[state=inactive]:bg-green-100">
+                <HardHat className="w-5 h-5 transition-colors group-data-[state=active]:text-white group-data-[state=inactive]:text-green-600" />
+              </div>
+              <span className="transition-colors group-data-[state=active]:text-white group-data-[state=inactive]:text-slate-900">
+                Intérimaires
+              </span>
+            </div>
+            <div className="relative flex flex-wrap items-center justify-center gap-2 text-xs z-10">
+              <Badge 
+                variant="outline" 
+                className="transition-all group-data-[state=active]:bg-white/20 group-data-[state=active]:text-white group-data-[state=active]:border-white/40 group-data-[state=inactive]:bg-green-50 group-data-[state=inactive]:text-green-700 group-data-[state=inactive]:border-green-200"
+              >
                 {QUESTION_COUNT_BY_PROFILE.worker} questions
               </Badge>
-              <span className="text-slate-500">{ESTIMATED_TIME_BY_PROFILE.worker}</span>
+              <span className="transition-colors group-data-[state=active]:text-white/90 group-data-[state=inactive]:text-slate-500">
+                {ESTIMATED_TIME_BY_PROFILE.worker}
+              </span>
             </div>
           </TabsTrigger>
         </TabsList>
@@ -342,33 +394,33 @@ export function QuestionManagerV2() {
         {(['agency', 'client', 'worker'] as RespondentType[]).map(profile => (
           <TabsContent key={profile} value={profile} className="mt-6 space-y-6">
             {/* Summary Card */}
-            <Card className="bg-gradient-to-br from-slate-50 to-blue-50 border-slate-200">
+            <Card className="bg-gradient-to-br from-slate-50 to-blue-50 border-slate-200 shadow-lg hover:shadow-xl transition-shadow">
               <CardContent className="p-6">
                 <div className="grid sm:grid-cols-3 gap-4">
                   <div className="flex items-center gap-3">
-                    <div className="p-3 bg-blue-100 rounded-lg">
-                      <FileText className="w-6 h-6 text-blue-600" />
+                    <div className="p-3 bg-gradient-to-br from-blue-500 to-cyan-500 rounded-xl shadow-lg shadow-blue-500/30">
+                      <FileText className="w-6 h-6 text-white" />
                     </div>
                     <div>
-                      <div className="text-2xl text-slate-900">{profileQuestions.length}</div>
+                      <div className="text-slate-900">{profileQuestions.length}</div>
                       <div className="text-sm text-slate-600">Questions totales</div>
                     </div>
                   </div>
                   <div className="flex items-center gap-3">
-                    <div className="p-3 bg-green-100 rounded-lg">
-                      <CheckCircle2 className="w-6 h-6 text-green-600" />
+                    <div className="p-3 bg-gradient-to-br from-green-500 to-emerald-500 rounded-xl shadow-lg shadow-green-500/30">
+                      <CheckCircle2 className="w-6 h-6 text-white" />
                     </div>
                     <div>
-                      <div className="text-2xl text-slate-900">{profileQuestions.filter(q => q.required).length}</div>
+                      <div className="text-slate-900">{profileQuestions.filter(q => q.required).length}</div>
                       <div className="text-sm text-slate-600">Questions requises</div>
                     </div>
                   </div>
                   <div className="flex items-center gap-3">
-                    <div className="p-3 bg-violet-100 rounded-lg">
-                      <Eye className="w-6 h-6 text-violet-600" />
+                    <div className="p-3 bg-gradient-to-br from-violet-500 to-purple-500 rounded-xl shadow-lg shadow-violet-500/30">
+                      <Eye className="w-6 h-6 text-white" />
                     </div>
                     <div>
-                      <div className="text-2xl text-slate-900">{Object.keys(questionsBySection).length}</div>
+                      <div className="text-slate-900">{Object.keys(questionsBySection).length}</div>
                       <div className="text-sm text-slate-600">Sections</div>
                     </div>
                   </div>
@@ -383,7 +435,7 @@ export function QuestionManagerV2() {
                 <div key={sectionNum} className="space-y-3">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-3">
-                      <h3 className="text-slate-900 text-lg">{sectionNames[Number(sectionNum)]}</h3>
+                      <h3 className="text-slate-900">{sectionNames[Number(sectionNum)]}</h3>
                       <Badge variant="outline" className="bg-slate-100 text-slate-700">
                         {questions.length} question{questions.length > 1 ? 's' : ''}
                       </Badge>

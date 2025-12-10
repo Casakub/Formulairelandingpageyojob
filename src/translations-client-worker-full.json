@@ -1,0 +1,195 @@
+{
+  "CLIENT_WORKER_TRANSLATIONS": {
+    "en": {
+      "questions": {
+        "q2_annee_client": {
+          "label": "Year your company was founded",
+          "placeholder": "2010"
+        },
+        "q5_localisation": {
+          "label": "Country where your company is located",
+          "placeholder": "E.g.: France"
+        },
+        "q6_volume_client": {
+          "label": "How many temporary workers do you employ per year?",
+          "options": {
+            "0": "None currently",
+            "1-10": "1-10 people",
+            "11-50": "11-50 people",
+            "51-200": "51-200 people",
+            "200+": "200+ people"
+          }
+        },
+        "q8_nationalites": {
+          "label": "Nationalities of temporary workers you employ",
+          "placeholder": "E.g.: Polish, Romanian, Bulgarian..."
+        },
+        "q9_defi_client": {
+          "label": "Main challenge with European temporary work",
+          "options": {
+            "trouver": "Finding reliable agencies",
+            "conformite": "Legal compliance",
+            "qualite": "Quality of candidates",
+            "cout": "Costs too high",
+            "langues": "Communication / Languages",
+            "autre": "Other"
+          }
+        },
+        "q10_agences": {
+          "label": "How many temporary work agencies do you use?",
+          "options": {
+            "0": "None",
+            "1": "1 agency",
+            "2-3": "2-3 agencies",
+            "4-10": "4-10 agencies",
+            "10+": "More than 10"
+          }
+        },
+        "q12_budget_client": {
+          "label": "Annual budget dedicated to temporary work",
+          "options": {
+            "0-50k": "€0-50,000",
+            "50-200k": "€50,000-200,000",
+            "200-500k": "€200,000-500,000",
+            "500k+": "€500,000+",
+            "inconnu": "I don't know"
+          }
+        },
+        "q13_satisfaction": {
+          "label": "Satisfaction with your current agencies",
+          "options": {
+            "tres_satisfait": "Very satisfied",
+            "satisfait": "Satisfied",
+            "neutre": "Neutral",
+            "insatisfait": "Somewhat dissatisfied",
+            "tres_insatisfait": "Very dissatisfied"
+          }
+        },
+        "q14_risques_client": {
+          "label": "Which risks concern you most?",
+          "options": {
+            "conformite": "Legal non-compliance",
+            "qualite": "Insufficient quality",
+            "fiabilite": "Agency reliability",
+            "cout": "Unexpected costs",
+            "disponibilite": "Candidate availability",
+            "aucun": "No major risks"
+          }
+        },
+        "q15_besoins_client": {
+          "label": "What are your priority needs?",
+          "placeholder": "E.g.: Finding quickly, better quality, pricing..."
+        },
+        "q19_features_client": {
+          "label": "Most interesting features",
+          "options": {
+            "recherche": "Search reliable agencies",
+            "comparaison": "Price/quality comparison",
+            "avis": "Verified reviews",
+            "conformite": "Compliance guarantee",
+            "support": "Dedicated support",
+            "facturation": "Centralized billing",
+            "suivi": "Real-time tracking"
+          }
+        },
+        "q2_nationalite": {
+          "label": "Your nationality",
+          "placeholder": "E.g.: Polish, Romanian..."
+        },
+        "q3_experience": {
+          "label": "Years of temporary work experience",
+          "options": {
+            "<1": "Less than 1 year",
+            "1-3": "1-3 years",
+            "3-5": "3-5 years",
+            "5-10": "5-10 years",
+            "10+": "More than 10 years"
+          }
+        },
+        "q4_metiers": {
+          "label": "Jobs performed",
+          "description": "Select all your jobs"
+        },
+        "q5_pays_travail": {
+          "label": "Countries where you worked temporarily",
+          "placeholder": "E.g.: France, Germany, Belgium..."
+        },
+        "q6_frequence": {
+          "label": "How often do you work temporarily?",
+          "options": {
+            "permanent": "Regularly (all year)",
+            "saisonnier": "Seasonally (certain months)",
+            "occasionnel": "Occasionally (a few times)",
+            "jamais": "Never yet (looking)"
+          }
+        },
+        "q9_defi_worker": {
+          "label": "Main challenge in your assignments",
+          "options": {
+            "trouver": "Finding assignments",
+            "admin": "Administrative paperwork",
+            "logement": "Housing / Accommodation",
+            "langue": "Local language",
+            "paiement": "Payments / Salary",
+            "autre": "Other"
+          }
+        },
+        "q10_agences_worker": {
+          "label": "How many agencies do you work with?",
+          "options": {
+            "1": "Only 1 agency",
+            "2-3": "2-3 agencies",
+            "4-10": "4-10 agencies",
+            "10+": "More than 10"
+          }
+        },
+        "q12_salaire": {
+          "label": "Average monthly salary from your assignments",
+          "options": {
+            "<1500": "Less than €1,500",
+            "1500-2500": "€1,500-2,500",
+            "2500-3500": "€2,500-3,500",
+            "3500+": "€3,500+"
+          }
+        },
+        "q13_satisfaction_worker": {
+          "label": "Satisfaction with your current agencies",
+          "options": {
+            "tres_satisfait": "Very satisfied",
+            "satisfait": "Satisfied",
+            "neutre": "Neutral",
+            "insatisfait": "Somewhat dissatisfied",
+            "tres_insatisfait": "Very dissatisfied"
+          }
+        },
+        "q14_risques_worker": {
+          "label": "Which problems do you encounter most often?",
+          "options": {
+            "paiement": "Payment delays",
+            "conditions": "Poor conditions",
+            "contrat": "Contracts not honored",
+            "logement": "Inadequate housing",
+            "communication": "Communication problems",
+            "aucun": "No major problems"
+          }
+        },
+        "q15_ameliorations": {
+          "label": "What would you like to improve in your assignments?",
+          "placeholder": "E.g.: Salary, housing, support, stability..."
+        },
+        "q19_features_worker": {
+          "label": "Most interesting features",
+          "options": {
+            "recherche": "Search assignments",
+            "avis": "Reviews on agencies",
+            "logement": "Housing assistance",
+            "paiement": "Secure payment",
+            "support": "Support in my language",
+            "documents": "Administrative document help",
+            "formation": "Qualifying training"
+          }
+        }
+      }
+    }
+  }
+}

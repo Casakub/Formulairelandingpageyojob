@@ -19,7 +19,7 @@ import {
   ChevronRight
 } from 'lucide-react';
 import { Button } from './components/ui/button';
-import { TranslationProvider } from './context/TranslationContext';
+import { TranslationProvider } from './contexts/TranslationContext';
 import { UnifiedTranslationManager } from './components/dashboard/UnifiedTranslationManager';
 import { DashboardOverview } from './components/dashboard/DashboardOverview';
 import { DynamicResultsOverview } from './components/dashboard/DynamicResultsOverview';

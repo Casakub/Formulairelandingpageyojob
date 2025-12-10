@@ -29,7 +29,8 @@ import {
   TrendingDown,
   Zap,
   Briefcase,
-  HardHat
+  HardHat,
+  PieChart as PieChartIcon
 } from 'lucide-react';
 import { Button } from '../ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '../ui/card';
@@ -145,9 +146,14 @@ export function DynamicResultsOverview() {
     );
   }, [visibleQuestions]);
 
-  // Appliquer filtres + recherche
+  // Appliquer filtres + recherche + PROFIL
   const filteredResponses = useMemo(() => {
     let result = responses;
+
+    // ✅ NOUVEAU : Filtre par profil
+    if (selectedProfile !== 'all') {
+      result = result.filter(response => response.respondent_type === selectedProfile);
+    }
 
     // Filtres
     if (Object.keys(filters).length > 0) {
@@ -171,7 +177,7 @@ export function DynamicResultsOverview() {
     }
 
     return result;
-  }, [responses, filters, searchTerm]);
+  }, [responses, filters, searchTerm, selectedProfile]);
 
   // Calculer statistiques dynamiques
   const stats = useMemo(() => {

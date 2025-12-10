@@ -3,6 +3,7 @@ import { MissingTranslationsSeeder } from './MissingTranslationsSeeder';
 import { AutoTranslateAll } from './AutoTranslateAll';
 import { OneClickAutoSetup } from './OneClickAutoSetup';
 import { CompleteTranslationsSeeder } from './CompleteTranslationsSeeder';
+import { TranslateClientWorkerProfiles } from './TranslateClientWorkerProfiles';
 import { useQuestions } from '../../context/QuestionsContext';
 import { useTranslationContext } from '../../contexts/TranslationContext';
 import { EUROPEAN_LANGUAGES } from '../../lib/languages';
@@ -367,6 +368,14 @@ export function TranslationStatistics({ onBack, onSelectLanguage }: Props) {
         // Reload translations after seeding
         if (window.location.reload) {
           setTimeout(() => window.location.reload(), 1000);
+        }
+      }} />
+
+      {/* NEW: Translate Client & Worker Profiles Automatically */}
+      <TranslateClientWorkerProfiles onComplete={() => {
+        // Reload translations after completion
+        if (window.location.reload) {
+          setTimeout(() => window.location.reload(), 2000);
         }
       }} />
 

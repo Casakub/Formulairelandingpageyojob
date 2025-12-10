@@ -19,31 +19,30 @@ const app = new Hono();
 // Enable logger
 app.use('*', logger(console.log));
 
-// Middleware pour ajouter un timeout aux requêtes
+// Middleware pour capturer les "broken pipe" silencieusement
 app.use('*', async (c, next) => {
-  const timeoutSignal = AbortSignal.timeout(25000); // 25 secondes max
-  
   try {
     await next();
-  } catch (err) {
-    // Ignore les erreurs de broken pipe qui sont normales en dev
-    if (err.code === 'EPIPE' || err.message?.includes('broken pipe')) {
-      console.log('⚠️ Client disconnected (expected during hot reload)');
-      return new Response(null, { status: 499 });
+  } catch (err: any) {
+    // Les erreurs "broken pipe" sont normales pendant le développement (hot reload)
+    // et quand le client ferme la connexion avant la réponse
+    if (err?.code === 'EPIPE' || err?.message?.includes('broken pipe')) {
+      // Ne pas logger ces erreurs car elles sont attendues
+      return new Response(null, { status: 499 }); // Client Closed Request
     }
+    // Re-throw les autres erreurs pour qu'elles soient gérées par onError
     throw err;
   }
 });
 
-// Middleware global de gestion d'erreurs pour éviter les "broken pipe"
-app.onError((err, c) => {
+// Middleware global de gestion d'erreurs
+app.onError((err: any, c) => {
   // Les erreurs broken pipe sont normales pendant le hot reload
-  if (err.code === 'EPIPE' || err.message?.includes('broken pipe')) {
-    console.log('⚠️ Broken pipe (client disconnected) - This is normal during development hot reload');
+  if (err?.code === 'EPIPE' || err?.message?.includes('broken pipe')) {
     return new Response(null, { status: 499 }); // Client Closed Request
   }
   
-  // Log des vraies erreurs
+  // Log des vraies erreurs seulement
   console.error('🔴 Server error:', {
     message: err.message,
     name: err.name,

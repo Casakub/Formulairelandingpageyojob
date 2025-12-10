@@ -1,23 +1,15 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { 
-  Globe, 
-  FileText, 
-  Sparkles, 
-  Settings, 
-  CheckCircle, 
-  BarChart3,
-  Zap,
-  Languages,
-  Info
-} from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../ui/card';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '../ui/tabs';
-import { Button } from '../ui/button';
 import { Badge } from '../ui/badge';
-import { TranslationManager } from './TranslationManager';
-import { LandingContentManager } from './LandingContentManager';
+import { Button } from '../ui/button';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '../ui/tabs';
+import { Globe, Sparkles, FileText, Languages, Info, Settings, CheckCircle } from 'lucide-react';
 import { LandingContentManagerUnified } from './LandingContentManagerUnified';
+import { TranslateClientWorkerProfiles } from './TranslateClientWorkerProfiles';
+import { ImportClientWorkerTranslations } from './ImportClientWorkerTranslations';
+import { ValidateTranslations } from './ValidateTranslations';
+import { TranslationManager } from './TranslationManager';
 import { setTranslationProvider } from '../../services/aiTranslationService';
 import { TranslationProvider } from '../../contexts/TranslationContext';
 
@@ -248,6 +240,27 @@ export function UnifiedTranslationManager() {
                         </div>
                       </div>
                     </div>
+
+                    {/* 🚀 NEW: Traduction automatique CLIENT & WORKER */}
+                    <div className="mb-6">
+                      <TranslateClientWorkerProfiles onComplete={() => {
+                        // Reload translations after completion
+                        if (window.location.reload) {
+                          setTimeout(() => window.location.reload(), 2000);
+                        }
+                      }} />
+                    </div>
+
+                    {/* ✅ Valider les traductions CLIENT & WORKER */}
+                    <div className="mb-6">
+                      <ValidateTranslations />
+                    </div>
+
+                    {/* 📥 Importer les traductions CLIENT & WORKER */}
+                    <div className="mb-6">
+                      <ImportClientWorkerTranslations />
+                    </div>
+
                     <TranslationProvider>
                       <TranslationManager />
                     </TranslationProvider>

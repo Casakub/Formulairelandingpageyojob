@@ -27,6 +27,8 @@ import { saveResponsePublic } from './lib/supabase-public';
 import { extractCountry, getInterestLevel } from './utils/helpers';
 import type { RespondentType } from './types/survey';
 import './utils/diagnostic-supabase'; // Import diagnostic tool
+import { projectId, publicAnonKey } from './utils/supabase/info';
+import { addToProspects } from './lib/prospects';
 
 export interface FormData {
   // Section 1: Profil
@@ -237,6 +239,14 @@ export default function AppSurveyOriginal() {
         toast.success('Merci ! Votre réponse a été enregistrée.', {
           description: 'Vous recevrez une analyse par email si vous avez coché l\'option.'
         });
+        
+        // ✅ NOUVEAU: Ajouter automatiquement le contact dans l'onglet Prospects
+        try {
+          await addToProspects(formData, respondentType, country, sector, responseId);
+        } catch (prospectError) {
+          // Log l'erreur mais ne bloque pas le flow utilisateur
+          console.warn('⚠️ Impossible d\'ajouter aux prospects:', prospectError);
+        }
         
         setCurrentSection(7); // Show confirmation screen
         window.scrollTo({ top: 0, behavior: 'smooth' });

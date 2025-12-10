@@ -14,6 +14,10 @@ import { AutoUploadTranslations } from './AutoUploadTranslations';
 import { UploadHeroTranslations } from './UploadHeroTranslations';
 import { UploadProgressTranslations } from './UploadProgressTranslations';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select';
+import { ProfileDistributionChart } from './ProfileDistributionChart';
+import { ProfileSpecificMetrics } from './ProfileSpecificMetrics';
+import { ProfileInsights } from './ProfileInsights';
+import { ProfileComparison } from './ProfileComparison';
 
 export function DashboardOverview() {
   const [showLanguagePreview, setShowLanguagePreview] = useState(false);
@@ -401,6 +405,65 @@ export function DashboardOverview() {
 
       {/* Score Distribution - New Component */}
       <ScoreDistributionChart />
+
+      {/* ========== NOUVELLE SECTION : RÉPARTITION PAR PROFIL ========== */}
+      {selectedProfile === 'all' && responses.length > 0 && (
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.3 }}
+          className="mt-8"
+        >
+          <h2 className="text-slate-900 mb-6 flex items-center gap-2">
+            <Users className="w-6 h-6 text-violet-600" />
+            Analyse multi-profils
+          </h2>
+          
+          <div className="grid lg:grid-cols-3 gap-6 mb-8">
+            {/* Profile Distribution Chart */}
+            <ProfileDistributionChart responses={responses} />
+            
+            {/* Profile Comparison */}
+            <div className="lg:col-span-2">
+              <ProfileComparison responses={responses} />
+            </div>
+          </div>
+
+          {/* Profile Insights pour vue globale */}
+          <ProfileInsights responses={responses} profileType="all" />
+        </motion.div>
+      )}
+
+      {/* ========== NOUVELLE SECTION : MÉTRIQUES SPÉCIFIQUES AU PROFIL ========== */}
+      {selectedProfile !== 'all' && filteredResponses.length > 0 && (
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.3 }}
+          className="mt-8"
+        >
+          <h2 className="text-slate-900 mb-6 flex items-center gap-2">
+            {selectedProfile === 'agency' && <Building2 className="w-6 h-6 text-orange-600" />}
+            {selectedProfile === 'client' && <Briefcase className="w-6 h-6 text-blue-600" />}
+            {selectedProfile === 'worker' && <HardHat className="w-6 h-6 text-green-600" />}
+            Métriques spécifiques - {selectedProfile === 'agency' ? 'Agences ETT' : selectedProfile === 'client' ? 'Clients/Entreprises' : 'Intérimaires'}
+          </h2>
+          
+          {/* Métriques spécifiques selon le profil */}
+          <div className="mb-8">
+            <ProfileSpecificMetrics 
+              responses={filteredResponses} 
+              profileType={selectedProfile} 
+            />
+          </div>
+
+          {/* Insights spécifiques au profil */}
+          <ProfileInsights 
+            responses={filteredResponses} 
+            profileType={selectedProfile} 
+          />
+        </motion.div>
+      )}
 
       {/* Quick Stats */}
       <div className="mt-8 grid md:grid-cols-4 gap-6">
