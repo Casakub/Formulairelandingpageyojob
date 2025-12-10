@@ -13,6 +13,10 @@ export interface Question {
     dependsOn: string;
     showWhen: string;
   };
+  
+  // 🆕 MULTI-PROFILS SUPPORT (optionnel pour backward compatibility)
+  visibleFor?: ('agency' | 'client' | 'worker')[]; // Par défaut: ['agency']
+  category?: 'profile' | 'experience' | 'needs' | 'interest' | 'vision' | 'contact'; // Catégorie de la question
 }
 
 export const DEFAULT_QUESTIONS: Question[] = [

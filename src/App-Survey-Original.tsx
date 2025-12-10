@@ -395,7 +395,7 @@ function AppContent({
 
         {/* Step 0: Hero Section (only shown after profile selection) */}
         {respondentType && currentSection === 0 && (
-          <HeroSection key="hero" onStart={handleStartSurvey} />
+          <HeroSection key="hero" onStart={handleStartSurvey} respondentType={respondentType} />
         )}
 
         {currentSection === 7 && (
@@ -433,42 +433,48 @@ function AppContent({
                   <Section1Profile 
                     key="section1"
                     formData={formData} 
-                    updateFormData={updateFormData} 
+                    updateFormData={updateFormData}
+                    respondentType={respondentType!}
                   />
                 )}
                 {currentSection === 2 && (
                   <Section2Detachement 
                     key="section2"
                     formData={formData} 
-                    updateFormData={updateFormData} 
+                    updateFormData={updateFormData}
+                    respondentType={respondentType!}
                   />
                 )}
                 {currentSection === 3 && (
                   <Section3Besoins 
                     key="section3"
                     formData={formData} 
-                    updateFormData={updateFormData} 
+                    updateFormData={updateFormData}
+                    respondentType={respondentType!}
                   />
                 )}
                 {currentSection === 4 && (
                   <Section4Interet 
                     key="section4"
                     formData={formData} 
-                    updateFormData={updateFormData} 
+                    updateFormData={updateFormData}
+                    respondentType={respondentType!}
                   />
                 )}
                 {currentSection === 5 && (
                   <Section5Vision 
                     key="section5"
                     formData={formData} 
-                    updateFormData={updateFormData} 
+                    updateFormData={updateFormData}
+                    respondentType={respondentType!}
                   />
                 )}
                 {currentSection === 6 && (
                   <Section6Contact 
                     key="section6"
                     formData={formData} 
-                    updateFormData={updateFormData} 
+                    updateFormData={updateFormData}
+                    respondentType={respondentType!}
                   />
                 )}
               </AnimatePresence>

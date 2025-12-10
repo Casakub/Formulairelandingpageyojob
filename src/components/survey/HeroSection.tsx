@@ -3,12 +3,15 @@ import { ArrowRight, Globe, Users, Clock } from 'lucide-react';
 import { Button } from '../ui/button';
 import { Card, CardContent } from '../ui/card';
 import { useI18n } from '../../hooks/useI18n';
+import { QUESTION_COUNT_BY_PROFILE, ESTIMATED_TIME_BY_PROFILE } from '../../config/survey-questions';
+import type { RespondentType } from '../../types/survey';
 
 interface HeroSectionProps {
   onStart: () => void;
+  respondentType: RespondentType;
 }
 
-export function HeroSection({ onStart }: HeroSectionProps) {
+export function HeroSection({ onStart, respondentType }: HeroSectionProps) {
   const { t } = useI18n();
   
   // Fallbacks en français si les traductions ne sont pas encore chargées
@@ -16,6 +19,10 @@ export function HeroSection({ onStart }: HeroSectionProps) {
     const translated = t(key);
     return translated === key ? fallback : translated;
   };
+
+  // Stats dynamiques selon le profil
+  const questionCount = QUESTION_COUNT_BY_PROFILE[respondentType];
+  const estimatedTime = ESTIMATED_TIME_BY_PROFILE[respondentType];
   
   const stats = [
     { 
@@ -33,7 +40,7 @@ export function HeroSection({ onStart }: HeroSectionProps) {
     { 
       icon: Clock, 
       labelKey: 'hero.stat.duration',
-      fallback: '8-10 min pour répondre',
+      fallback: `${questionCount} questions • ${estimatedTime}`,
       color: 'from-green-400 to-emerald-500' 
     }
   ];
@@ -55,7 +62,7 @@ export function HeroSection({ onStart }: HeroSectionProps) {
         >
           <div className="inline-flex items-center px-6 py-3 rounded-full bg-white/10 backdrop-blur-sm border border-white/20 shadow-lg">
             <span className="mr-2 text-2xl">📊</span>
-            <span className="text-white">{getText('hero.badge', 'Étude de marché européenne')}</span>
+            <span className="text-white">{getText('hero.badge', 'Étude de marché européen')}</span>
           </div>
         </motion.div>
 

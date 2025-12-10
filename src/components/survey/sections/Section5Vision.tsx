@@ -1,16 +1,18 @@
 import { motion } from 'motion/react';
-import { Sparkles } from 'lucide-react';
+import { Lightbulb } from 'lucide-react';
 import { SectionHeader } from '../SectionHeader';
-import { FormData } from '../../../App';
-import { DynamicQuestionRenderer } from '../DynamicQuestionRenderer';
+import { FormData } from '../../../App-Survey-Original';
+import { MultiProfileQuestionRenderer } from '../MultiProfileQuestionRenderer';
 import { useI18n } from '../../../hooks/useI18n';
+import type { RespondentType } from '../../../types/survey';
 
 interface Section5VisionProps {
   formData: FormData;
   updateFormData: (updates: Partial<FormData>) => void;
+  respondentType: RespondentType;
 }
 
-export function Section5Vision({ formData, updateFormData }: Section5VisionProps) {
+export function Section5Vision({ formData, updateFormData, respondentType }: Section5VisionProps) {
   const { t } = useI18n();
 
   return (
@@ -21,14 +23,15 @@ export function Section5Vision({ formData, updateFormData }: Section5VisionProps
       transition={{ duration: 0.3 }}
     >
       <SectionHeader
-        icon={Sparkles}
-        title={t('nav.section5', 'Vision du futur')}
+        icon={Lightbulb}
+        title={t('nav.section5', 'Vision Future')}
         description={t('section5.description', '2 questions • 1 min')}
-        gradient="from-purple-500 to-pink-500"
+        gradient="from-pink-500 to-rose-500"
       />
 
-      <DynamicQuestionRenderer
+      <MultiProfileQuestionRenderer
         sectionNumber={5}
+        respondentType={respondentType}
         formData={formData}
         updateFormData={updateFormData}
       />

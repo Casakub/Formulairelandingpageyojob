@@ -1458,6 +1458,10 @@
     width: 180px;
   }
 
+  .w-\[200px\] {
+    width: 200px;
+  }
+
   .w-\[280px\] {
     width: 280px;
   }
@@ -6354,18 +6358,6 @@
   }
 
   @media (hover: hover) {
-    .hover\:border-violet-400\/30:hover {
-      border-color: color-mix(in srgb, oklch(.702 .183 293.541) 30%, transparent);
-    }
-
-    @supports (color: color-mix(in lab, red, red)) {
-      .hover\:border-violet-400\/30:hover {
-        border-color: color-mix(in oklab, var(--color-violet-400) 30%, transparent);
-      }
-    }
-  }
-
-  @media (hover: hover) {
     .hover\:border-white\/20:hover {
       border-color: #fff3;
     }
@@ -7273,10 +7265,6 @@
     box-shadow: var(--tw-inset-shadow), var(--tw-inset-ring-shadow), var(--tw-ring-offset-shadow), var(--tw-ring-shadow), var(--tw-shadow);
   }
 
-  .focus\:ring-cyan-400:focus {
-    --tw-ring-color: var(--color-cyan-400);
-  }
-
   .focus\:ring-cyan-400\/20:focus {
     --tw-ring-color: color-mix(in srgb, oklch(.789 .154 211.53) 20%, transparent);
   }
@@ -7311,10 +7299,6 @@
     }
   }
 
-  .focus\:ring-violet-400:focus {
-    --tw-ring-color: var(--color-violet-400);
-  }
-
   .focus\:ring-violet-500:focus {
     --tw-ring-color: var(--color-violet-500);
   }
@@ -7327,11 +7311,6 @@
     .focus\:ring-violet-500\/20:focus {
       --tw-ring-color: color-mix(in oklab, var(--color-violet-500) 20%, transparent);
     }
-  }
-
-  .focus\:ring-offset-0:focus {
-    --tw-ring-offset-width: 0px;
-    --tw-ring-offset-shadow: var(--tw-ring-inset, ) 0 0 0 var(--tw-ring-offset-width) var(--tw-ring-offset-color);
   }
 
   .focus\:outline-none:focus {
@@ -7676,8 +7655,16 @@
     translate: var(--tw-translate-x) var(--tw-translate-y);
   }
 
+  .data-\[state\=checked\]\:border-cyan-500[data-state="checked"] {
+    border-color: var(--color-cyan-500);
+  }
+
   .data-\[state\=checked\]\:border-primary[data-state="checked"] {
     border-color: var(--primary);
+  }
+
+  .data-\[state\=checked\]\:bg-cyan-500[data-state="checked"] {
+    background-color: var(--color-cyan-500);
   }
 
   .data-\[state\=checked\]\:bg-primary[data-state="checked"] {

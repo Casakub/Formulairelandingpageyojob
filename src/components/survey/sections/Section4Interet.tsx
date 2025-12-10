@@ -1,16 +1,18 @@
 import { motion } from 'motion/react';
 import { Star } from 'lucide-react';
 import { SectionHeader } from '../SectionHeader';
-import { FormData } from '../../../App';
-import { DynamicQuestionRenderer } from '../DynamicQuestionRenderer';
+import { FormData } from '../../../App-Survey-Original';
+import { MultiProfileQuestionRenderer } from '../MultiProfileQuestionRenderer';
 import { useI18n } from '../../../hooks/useI18n';
+import type { RespondentType } from '../../../types/survey';
 
 interface Section4InteretProps {
   formData: FormData;
   updateFormData: (updates: Partial<FormData>) => void;
+  respondentType: RespondentType;
 }
 
-export function Section4Interet({ formData, updateFormData }: Section4InteretProps) {
+export function Section4Interet({ formData, updateFormData, respondentType }: Section4InteretProps) {
   const { t } = useI18n();
 
   return (
@@ -22,13 +24,14 @@ export function Section4Interet({ formData, updateFormData }: Section4InteretPro
     >
       <SectionHeader
         icon={Star}
-        title={t('nav.section4', 'Votre intérêt pour YoJob')}
+        title={t('nav.section4', 'Intérêt pour YoJob')}
         description={t('section4.description', '6 questions • 3 min')}
         gradient="from-yellow-500 to-orange-500"
       />
 
-      <DynamicQuestionRenderer
+      <MultiProfileQuestionRenderer
         sectionNumber={4}
+        respondentType={respondentType}
         formData={formData}
         updateFormData={updateFormData}
       />

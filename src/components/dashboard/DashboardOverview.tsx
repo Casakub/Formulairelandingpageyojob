@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'motion/react';
-import { Users, TrendingUp, Star, CheckCircle, Calendar, Globe, Target, Award, Languages, Eye, Rocket, Database, Activity, Clock, MapPin, Building2, Zap, RefreshCw } from 'lucide-react';
+import { Users, TrendingUp, Star, CheckCircle, Calendar, Globe, Target, Award, Languages, Eye, Rocket, Database, Activity, Clock, MapPin, Building2, Zap, RefreshCw, Briefcase, HardHat } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '../ui/card';
 import { ScoreDistributionChart } from './ScoreDistributionChart';
 import { Button } from '../ui/button';
@@ -13,11 +13,13 @@ import { toast } from 'sonner@2.0.3';
 import { AutoUploadTranslations } from './AutoUploadTranslations';
 import { UploadHeroTranslations } from './UploadHeroTranslations';
 import { UploadProgressTranslations } from './UploadProgressTranslations';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select';
 
 export function DashboardOverview() {
   const [showLanguagePreview, setShowLanguagePreview] = useState(false);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
+  const [selectedProfile, setSelectedProfile] = useState<'all' | 'agency' | 'client' | 'worker'>('all');
   
   const [responses, setResponses] = useState<MarketResearchResponse[]>([]);
   const [integrationStats, setIntegrationStats] = useState<any>(null);
@@ -71,7 +73,11 @@ export function DashboardOverview() {
   }
 
   // Calculs des statistiques en temps réel
-  const totalResponses = responses.length;
+  const filteredResponses = selectedProfile === 'all' 
+    ? responses 
+    : responses.filter(r => (r as any).respondent_type === selectedProfile);
+  
+  const totalResponses = filteredResponses.length;
   const totalTarget = 27000;
   const progressPercentage = Math.round((totalResponses / totalTarget) * 100 * 10) / 10;
 
@@ -81,8 +87,8 @@ export function DashboardOverview() {
     const filledFields = Object.values(response).filter(val => val !== null && val !== '' && val !== undefined).length;
     return (filledFields / totalFields) * 100;
   };
-  const averageCompletion = responses.length > 0
-    ? Math.round(responses.reduce((sum, r) => sum + calculateCompletionRate(r), 0) / responses.length)
+  const averageCompletion = filteredResponses.length > 0
+    ? Math.round(filteredResponses.reduce((sum, r) => sum + calculateCompletionRate(r), 0) / filteredResponses.length)
     : 0;
 
   // Calculer le score moyen (basé sur interest_level)
@@ -95,27 +101,27 @@ export function DashboardOverview() {
     };
     return scoreMap[interestLevel || ''] || 5;
   };
-  const averageScore = responses.length > 0
-    ? (responses.reduce((sum, r) => sum + calculateScore(r.interest_level), 0) / responses.length).toFixed(1)
+  const averageScore = filteredResponses.length > 0
+    ? (filteredResponses.reduce((sum, r) => sum + calculateScore(r.interest_level), 0) / filteredResponses.length).toFixed(1)
     : '0.0';
 
   // Compter les "Prêts pour MVP" (Très intéressé + Intéressé)
-  const readyForMVP = responses.filter(r => 
+  const readyForMVP = filteredResponses.filter(r => 
     r.interest_level === 'Très intéressé' || r.interest_level === 'Intéressé'
   ).length;
-  const readyPercentage = responses.length > 0
-    ? Math.round((readyForMVP / responses.length) * 100)
+  const readyPercentage = filteredResponses.length > 0
+    ? Math.round((readyForMVP / filteredResponses.length) * 100)
     : 0;
 
   // Réponses aujourd'hui
   const today = new Date().toISOString().split('T')[0];
-  const responsesToday = responses.filter(r => 
+  const responsesToday = filteredResponses.filter(r => 
     r.created_at?.startsWith(today)
   ).length;
 
   // Dernière réponse
-  const lastResponse = responses.length > 0 
-    ? responses.sort((a, b) => new Date(b.created_at || 0).getTime() - new Date(a.created_at || 0).getTime())[0]
+  const lastResponse = filteredResponses.length > 0 
+    ? filteredResponses.sort((a, b) => new Date(b.created_at || 0).getTime() - new Date(a.created_at || 0).getTime())[0]
     : null;
   
   const getTimeAgo = (date: string | null) => {
@@ -135,7 +141,7 @@ export function DashboardOverview() {
 
   // Top pays
   const countryCount: Record<string, number> = {};
-  responses.forEach(r => {
+  filteredResponses.forEach(r => {
     const country = r.country || 'Non spécifié';
     countryCount[country] = (countryCount[country] || 0) + 1;
   });
@@ -150,7 +156,7 @@ export function DashboardOverview() {
 
   // Top secteurs
   const sectorCount: Record<string, number> = {};
-  responses.forEach(r => {
+  filteredResponses.forEach(r => {
     const sector = r.sector || 'Non spécifié';
     sectorCount[sector] = (sectorCount[sector] || 0) + 1;
   });
@@ -223,16 +229,64 @@ export function DashboardOverview() {
             Dernière mise à jour: {lastResponse ? getTimeAgo(lastResponse.created_at) : 'Aucune donnée'}
           </p>
         </div>
-        <Button
-          onClick={handleRefresh}
-          disabled={refreshing}
-          variant="outline"
-          className="flex items-center gap-2"
-        >
-          <RefreshCw className={`w-4 h-4 ${refreshing ? 'animate-spin' : ''}`} />
-          Actualiser
-        </Button>
+        <div className="flex items-center gap-3">
+          <Select value={selectedProfile} onValueChange={(value: any) => setSelectedProfile(value)}>
+            <SelectTrigger className="w-[200px] border-slate-300">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">
+                <div className="flex items-center gap-2">
+                  <Globe className="w-4 h-4" />
+                  Tous les profils
+                </div>
+              </SelectItem>
+              <SelectItem value="agency">
+                <div className="flex items-center gap-2">
+                  <Building2 className="w-4 h-4" />
+                  Agences ETT
+                </div>
+              </SelectItem>
+              <SelectItem value="client">
+                <div className="flex items-center gap-2">
+                  <Briefcase className="w-4 h-4" />
+                  Clients/Entreprises
+                </div>
+              </SelectItem>
+              <SelectItem value="worker">
+                <div className="flex items-center gap-2">
+                  <HardHat className="w-4 h-4" />
+                  Intérimaires
+                </div>
+              </SelectItem>
+            </SelectContent>
+          </Select>
+          <Button
+            onClick={handleRefresh}
+            disabled={refreshing}
+            variant="outline"
+            className="flex items-center gap-2"
+          >
+            <RefreshCw className={`w-4 h-4 ${refreshing ? 'animate-spin' : ''}`} />
+            Actualiser
+          </Button>
+        </div>
       </div>
+
+      {/* Profile Badge Indicator */}
+      {selectedProfile !== 'all' && (
+        <motion.div
+          initial={{ opacity: 0, y: -10 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="mb-6"
+        >
+          <Badge className="bg-gradient-to-r from-blue-500 to-cyan-500 text-white px-4 py-2 text-sm">
+            <span>
+              Filtré sur: {selectedProfile === 'agency' ? '🏢 Agences ETT' : selectedProfile === 'client' ? '💼 Clients' : '👷 Intérimaires'}
+            </span>
+          </Badge>
+        </motion.div>
+      )}
 
       {/* Stats Grid */}
       <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">

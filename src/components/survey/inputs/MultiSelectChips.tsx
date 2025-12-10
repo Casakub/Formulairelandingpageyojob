@@ -14,12 +14,15 @@ interface MultiSelectChipsProps {
 }
 
 export function MultiSelectChips({ options, selected, onChange, maxSelections }: MultiSelectChipsProps) {
+  // Ensure selected is always an array
+  const selectedArray = Array.isArray(selected) ? selected : [];
+  
   const handleToggle = (value: string) => {
-    if (selected.includes(value)) {
-      onChange(selected.filter(v => v !== value));
+    if (selectedArray.includes(value)) {
+      onChange(selectedArray.filter(v => v !== value));
     } else {
-      if (!maxSelections || selected.length < maxSelections) {
-        onChange([...selected, value]);
+      if (!maxSelections || selectedArray.length < maxSelections) {
+        onChange([...selectedArray, value]);
       }
     }
   };
@@ -27,8 +30,8 @@ export function MultiSelectChips({ options, selected, onChange, maxSelections }:
   return (
     <div className="flex flex-wrap gap-2">
       {options.map((option, index) => {
-        const isSelected = selected.includes(option.value);
-        const isDisabled = !isSelected && maxSelections && selected.length >= maxSelections;
+        const isSelected = selectedArray.includes(option.value);
+        const isDisabled = !isSelected && maxSelections && selectedArray.length >= maxSelections;
 
         return (
           <motion.button
