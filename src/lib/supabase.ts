@@ -67,6 +67,7 @@ export interface MarketResearchResponse {
   id?: string;
   created_at?: string;
   response_id: string;
+  respondent_type?: string; // ✅ 'agency' | 'client' | 'worker'
   
   // Section 1: Profil
   q1_nom: string;

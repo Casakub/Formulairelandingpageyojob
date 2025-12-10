@@ -301,6 +301,16 @@ const defaultFRContent: LandingPageContent = {
           label: 'Entreprise',
           placeholder: 'Nom de votre entreprise',
         },
+        contactType: {
+          label: 'Vous êtes',
+          placeholder: 'Sélectionnez votre profil',
+          options: {
+            client: 'Client / Entreprise',
+            agency: 'Agence de travail temporaire',
+            interim: 'Intérimaire',
+            other: 'Autre',
+          },
+        },
         needType: {
           label: 'Type de besoin',
           placeholder: 'Sélectionnez votre besoin',
@@ -388,6 +398,15 @@ export function useLandingContent() {
           // Sauvegarder immédiatement
           localStorage.setItem(STORAGE_KEY, JSON.stringify(parsed));
           console.log('✅ Migration ctaForm terminée et sauvegardée');
+        }
+        
+        // 🔄 MIGRATION : Ajout du champ contactType dans ctaForm.form.fields
+        if (parsed.fr?.ctaForm?.form?.fields && !parsed.fr.ctaForm.form.fields.contactType) {
+          console.log('🔄 Migration détectée : Champ contactType manquant, ajout en cours...');
+          parsed.fr.ctaForm.form.fields.contactType = defaultFRContent.ctaForm.form.fields.contactType;
+          // Sauvegarder immédiatement
+          localStorage.setItem(STORAGE_KEY, JSON.stringify(parsed));
+          console.log('✅ Migration contactType terminée et sauvegardée');
         }
         
         return parsed;

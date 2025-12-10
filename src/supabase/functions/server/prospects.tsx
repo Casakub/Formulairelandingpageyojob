@@ -35,6 +35,7 @@ app.post("/submit", async (c) => {
       source, // 'landing_contact', 'landing_waitlist', 'manual', 'import'
       
       // Données optionnelles
+      type, // Type de contact depuis le formulaire: 'client', 'agency', 'interim', 'other'
       name,
       phone,
       company,
@@ -54,19 +55,19 @@ app.post("/submit", async (c) => {
 
     const supabase = getSupabaseClient();
     
-    // Déterminer le type en fonction de la source
-    let type = 'contact';
-    if (source === 'landing_waitlist') {
-      type = 'waitlist';
-    } else if (source?.includes('agency')) {
-      type = 'agency';
-    } else if (source?.includes('interim')) {
-      type = 'interim';
+    // Déterminer le type en fonction du formulaire ou de la source
+    let prospectType = type || 'contact'; // Utiliser le type du formulaire en priorité
+    if (!type && source === 'landing_waitlist') {
+      prospectType = 'waitlist';
+    } else if (!type && source?.includes('agency')) {
+      prospectType = 'agency';
+    } else if (!type && source?.includes('interim')) {
+      prospectType = 'interim';
     }
 
     const prospectData = {
       email,
-      type,
+      type: prospectType,
       source: source || 'manual',
       status: 'new',
       name,
@@ -268,6 +269,55 @@ app.get("/:id", async (c) => {
     });
   } catch (error: any) {
     console.error("Error in GET /:id:", error);
+    return c.json({ error: error.message }, 500);
+  }
+});
+
+/**
+ * GET /details/:id
+ * Obtenir les détails COMPLETS d'un prospect (incluant les données de l'enquête)
+ */
+app.get("/details/:id", async (c) => {
+  try {
+    const id = c.req.param("id");
+    const supabase = getSupabaseClient();
+
+    // Récupérer le prospect
+    const { data: prospect, error: prospectError } = await supabase
+      .from("prospects")
+      .select("*")
+      .eq("id", id)
+      .single();
+
+    if (prospectError) {
+      console.error("Error fetching prospect:", prospectError);
+      return c.json({ error: prospectError.message }, 500);
+    }
+
+    if (!prospect) {
+      return c.json({ error: "Prospect not found" }, 404);
+    }
+
+    // Si le prospect vient d'une enquête (source = survey_*), récupérer les données complètes
+    let surveyData = null;
+    if (prospect.source?.startsWith('survey_') && prospect.email) {
+      const { data: response } = await supabase
+        .from("market_research_responses")
+        .select("*")
+        .eq("email", prospect.email)
+        .order("created_at", { ascending: false })
+        .limit(1)
+        .single();
+
+      surveyData = response;
+    }
+
+    return c.json({
+      success: true,
+      prospect: surveyData || prospect,
+    });
+  } catch (error: any) {
+    console.error("Error in GET /details/:id:", error);
     return c.json({ error: error.message }, 500);
   }
 });

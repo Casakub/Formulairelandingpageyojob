@@ -16,14 +16,16 @@ import { HeroSection } from './components/survey/HeroSection';
 import { ConfirmationScreen } from './components/survey/ConfirmationScreen';
 import { ProgressBar } from './components/survey/ProgressBar';
 import { SectionNavigator } from './components/survey/SectionNavigator';
+import { RespondentSelector } from './components/survey/RespondentSelector';
 import { Section1Profile } from './components/survey/sections/Section1Profile';
 import { Section2Detachement } from './components/survey/sections/Section2Detachement';
 import { Section3Besoins } from './components/survey/sections/Section3Besoins';
 import { Section4Interet } from './components/survey/sections/Section4Interet';
 import { Section5Vision } from './components/survey/sections/Section5Vision';
 import { Section6Contact } from './components/survey/sections/Section6Contact';
-import { saveResponsePublic } from './services/responseService';
+import { saveResponsePublic } from './lib/supabase-public';
 import { extractCountry, getInterestLevel } from './utils/helpers';
+import type { RespondentType } from './types/survey';
 import './utils/diagnostic-supabase'; // Import diagnostic tool
 
 export interface FormData {
@@ -82,6 +84,7 @@ const SECTIONS = [
 export default function AppSurveyOriginal() {
   const [viewMode, setViewMode] = useState<'survey' | 'dashboard' | 'login'>('survey'); // Toggle between survey, dashboard and login
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [respondentType, setRespondentType] = useState<RespondentType | null>(null); // Step -1: Profile selection
   const [currentSection, setCurrentSection] = useState(0); // 0 = Hero, 1-6 = Sections, 7 = Confirmation
   const [formData, setFormData] = useState<FormData>({
     q1_nom: '',
@@ -182,7 +185,7 @@ export default function AppSurveyOriginal() {
     }
   };
 
-  const handleSubmit = async (t: (key: string, fallback: string) => string) => {
+  const handleSubmit = async () => {
     setIsSubmitting(true);
     
     try {
@@ -201,9 +204,10 @@ export default function AppSurveyOriginal() {
       const userAgent = navigator.userAgent;
       const referrer = document.referrer || 'Direct';
       
-      // Prepare data for Supabase
+      // Prepare data for Supabase WITH respondent_type
       const responseData = {
         response_id: responseId,
+        respondent_type: respondentType || 'agency', // ✅ Include respondent type
         ...formData,
         country,
         sector,
@@ -215,13 +219,15 @@ export default function AppSurveyOriginal() {
         referrer
       };
       
+      console.log('📤 Envoi de la réponse avec type:', respondentType);
+      
       // Save to Supabase using PUBLIC client (no session possible)
       const result = await saveResponsePublic(responseData);
       
       if (result.success) {
         console.log('✅ Réponse sauvegardée avec succès:', responseId);
-        toast.success(t('confirmation.toast.title', 'Merci ! Votre réponse a été enregistrée.'), {
-          description: t('confirmation.toast.description', 'Vous recevrez une analyse par email si vous avez coché l\'option.')
+        toast.success('Merci ! Votre réponse a été enregistrée.', {
+          description: 'Vous recevrez une analyse par email si vous avez coché l\'option.'
         });
         
         setCurrentSection(7); // Show confirmation screen
@@ -294,6 +300,8 @@ export default function AppSurveyOriginal() {
             progress={progress}
             formData={formData}
             completedSections={completedSections}
+            respondentType={respondentType}
+            setRespondentType={setRespondentType}
             setViewMode={setViewMode}
             handleStartSurvey={handleStartSurvey}
             setCurrentSection={setCurrentSection}
@@ -314,6 +322,8 @@ interface AppContentProps {
   progress: number;
   formData: FormData;
   completedSections: number[];
+  respondentType: RespondentType | null;
+  setRespondentType: (type: RespondentType) => void;
   setViewMode: (mode: 'survey' | 'dashboard') => void;
   handleStartSurvey: () => void;
   setCurrentSection: (section: number | ((prev: number) => number)) => void;
@@ -329,6 +339,8 @@ function AppContent({
   progress,
   formData,
   completedSections,
+  respondentType,
+  setRespondentType,
   setViewMode,
   handleStartSurvey,
   setCurrentSection,
@@ -370,7 +382,19 @@ function AppContent({
 
       {/* Main Content */}
       <AnimatePresence mode="wait">
-        {currentSection === 0 && (
+        {/* Step -1: Respondent Type Selection */}
+        {!respondentType && currentSection === 0 && (
+          <RespondentSelector
+            key="respondent-selector"
+            onSelect={(type) => {
+              setRespondentType(type);
+              console.log('✅ Type de répondant sélectionné:', type);
+            }}
+          />
+        )}
+
+        {/* Step 0: Hero Section (only shown after profile selection) */}
+        {respondentType && currentSection === 0 && (
           <HeroSection key="hero" onStart={handleStartSurvey} />
         )}
 
@@ -472,7 +496,7 @@ function AppContent({
                   </Button>
                 ) : (
                   <Button
-                    onClick={() => handleSubmit(t)}
+                    onClick={() => handleSubmit()}
                     disabled={isSubmitting || !formData.email}
                     className="flex-1 h-12 bg-gradient-to-r from-cyan-500 to-violet-500 hover:from-cyan-400 hover:to-violet-400 text-white rounded-xl shadow-lg shadow-cyan-500/30 relative overflow-hidden disabled:opacity-50 disabled:cursor-not-allowed"
                   >

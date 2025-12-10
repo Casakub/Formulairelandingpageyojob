@@ -86,13 +86,38 @@ export function useLandingTranslations(
       const data = await response.json();
 
       if (data.success && data.translations) {
-        setTranslations(data.translations);
-        setAvailableLanguages(Object.keys(data.translations));
+        // 🔄 MIGRATION : Ajouter le champ contactType si absent
+        const migratedTranslations = { ...data.translations };
+        let hasMigrations = false;
+        
+        Object.keys(migratedTranslations).forEach(lang => {
+          const translation = migratedTranslations[lang];
+          if (translation?.ctaForm?.form?.fields && !translation.ctaForm.form.fields.contactType) {
+            // Définir les traductions par défaut pour contactType
+            const defaultContactType = {
+              label: lang === 'fr' ? 'Vous êtes' : 'You are',
+              placeholder: lang === 'fr' ? 'Sélectionnez votre profil' : 'Select your profile',
+              options: {
+                client: lang === 'fr' ? 'Client / Entreprise' : 'Client / Company',
+                agency: lang === 'fr' ? 'Agence de travail temporaire' : 'Temporary work agency',
+                interim: lang === 'fr' ? 'Intérimaire' : 'Temporary worker',
+                other: lang === 'fr' ? 'Autre' : 'Other',
+              },
+            };
+            
+            migratedTranslations[lang].ctaForm.form.fields.contactType = defaultContactType;
+            hasMigrations = true;
+            console.log(`🔄 Migration: Added contactType field for ${lang}`);
+          }
+        });
+        
+        setTranslations(migratedTranslations);
+        setAvailableLanguages(Object.keys(migratedTranslations));
         
         // Sauvegarder en cache localStorage pour accès offline
         if (fallbackToLocalStorage) {
           try {
-            localStorage.setItem('yojob_landing_translations_cache', JSON.stringify(data.translations));
+            localStorage.setItem('yojob_landing_translations_cache', JSON.stringify(migratedTranslations));
           } catch (e) {
             console.warn('Failed to cache translations in localStorage:', e);
           }
@@ -117,6 +142,26 @@ export function useLandingTranslations(
           const cached = localStorage.getItem('yojob_landing_translations_cache');
           if (cached) {
             const cachedTranslations = JSON.parse(cached);
+            
+            // 🔄 MIGRATION : Ajouter contactType aussi dans le cache
+            Object.keys(cachedTranslations).forEach(lang => {
+              const translation = cachedTranslations[lang];
+              if (translation?.ctaForm?.form?.fields && !translation.ctaForm.form.fields.contactType) {
+                const defaultContactType = {
+                  label: lang === 'fr' ? 'Vous êtes' : 'You are',
+                  placeholder: lang === 'fr' ? 'Sélectionnez votre profil' : 'Select your profile',
+                  options: {
+                    client: lang === 'fr' ? 'Client / Entreprise' : 'Client / Company',
+                    agency: lang === 'fr' ? 'Agence de travail temporaire' : 'Temporary work agency',
+                    interim: lang === 'fr' ? 'Intérimaire' : 'Temporary worker',
+                    other: lang === 'fr' ? 'Autre' : 'Other',
+                  },
+                };
+                cachedTranslations[lang].ctaForm.form.fields.contactType = defaultContactType;
+                console.log(`🔄 Cache Migration: Added contactType field for ${lang}`);
+              }
+            });
+            
             setTranslations(cachedTranslations);
             setAvailableLanguages(Object.keys(cachedTranslations));
             console.log('✅ Loaded translations from localStorage cache');
@@ -127,6 +172,26 @@ export function useLandingTranslations(
             const oldContent = localStorage.getItem('yojob_landing_content');
             if (oldContent) {
               const oldTranslations = JSON.parse(oldContent);
+              
+              // 🔄 MIGRATION : Ajouter contactType aussi dans l'ancien système
+              Object.keys(oldTranslations).forEach(lang => {
+                const translation = oldTranslations[lang];
+                if (translation?.ctaForm?.form?.fields && !translation.ctaForm.form.fields.contactType) {
+                  const defaultContactType = {
+                    label: lang === 'fr' ? 'Vous êtes' : 'You are',
+                    placeholder: lang === 'fr' ? 'Sélectionnez votre profil' : 'Select your profile',
+                    options: {
+                      client: lang === 'fr' ? 'Client / Entreprise' : 'Client / Company',
+                      agency: lang === 'fr' ? 'Agence de travail temporaire' : 'Temporary work agency',
+                      interim: lang === 'fr' ? 'Intérimaire' : 'Temporary worker',
+                      other: lang === 'fr' ? 'Autre' : 'Other',
+                    },
+                  };
+                  oldTranslations[lang].ctaForm.form.fields.contactType = defaultContactType;
+                  console.log(`🔄 Old System Migration: Added contactType field for ${lang}`);
+                }
+              });
+              
               setTranslations(oldTranslations);
               setAvailableLanguages(Object.keys(oldTranslations));
               console.log('✅ Loaded translations from OLD localStorage system (yojob_landing_content)');

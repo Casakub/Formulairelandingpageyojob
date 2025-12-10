@@ -1,5 +1,6 @@
 import { Hono } from "npm:hono";
 import { createClient } from "npm:@supabase/supabase-js@2.39.3";
+import { contactTypeTranslations } from "./contact-type-translations.tsx";
 
 const app = new Hono();
 
@@ -457,6 +458,93 @@ Return the complete translated JSON in ${targetLangName}. Respond with ONLY the 
 
   } catch (error: any) {
     console.error("Error in POST /translate:", error);
+    return c.json({ error: error.message }, 500);
+  }
+});
+
+/**
+ * POST /migrate-contacttype
+ * Migrer le champ contactType dans toutes les traductions existantes
+ */
+app.post("/migrate-contacttype", async (c) => {
+  try {
+    const supabase = getSupabaseClient();
+    const results = [];
+    const errors = [];
+
+    console.log('🔄 Starting contactType migration...');
+
+    // Récupérer toutes les traductions existantes
+    const { data: translations, error: fetchError } = await supabase
+      .from("landing_translations")
+      .select("*");
+
+    if (fetchError) {
+      console.error("Error fetching translations:", fetchError);
+      return c.json({ error: fetchError.message }, 500);
+    }
+
+    // Pour chaque traduction, ajouter le champ contactType
+    for (const translation of translations || []) {
+      try {
+        const lang = translation.language_code;
+        const content = translation.content;
+
+        // Vérifier si contactType existe déjà
+        if (content?.ctaForm?.form?.fields?.contactType) {
+          console.log(`✓ ${lang}: contactType already exists, skipping`);
+          results.push({ lang, action: 'skipped', reason: 'already_exists' });
+          continue;
+        }
+
+        // Vérifier si ctaForm existe
+        if (!content?.ctaForm?.form?.fields) {
+          console.log(`⚠ ${lang}: ctaForm.form.fields not found, skipping`);
+          results.push({ lang, action: 'skipped', reason: 'no_ctaform' });
+          continue;
+        }
+
+        // Ajouter le champ contactType depuis les traductions pré-définies
+        const contactTypeData = contactTypeTranslations[lang];
+        
+        if (!contactTypeData) {
+          console.log(`⚠ ${lang}: No contactType translation found, using French as fallback`);
+          content.ctaForm.form.fields.contactType = contactTypeTranslations.fr;
+          results.push({ lang, action: 'updated', fallback: true });
+        } else {
+          content.ctaForm.form.fields.contactType = contactTypeData;
+          results.push({ lang, action: 'updated', fallback: false });
+        }
+
+        // Sauvegarder la mise à jour
+        const { error: updateError } = await supabase
+          .from("landing_translations")
+          .update({
+            content,
+            updated_at: new Date().toISOString(),
+          })
+          .eq("language_code", lang);
+
+        if (updateError) throw updateError;
+        console.log(`✅ ${lang}: contactType added successfully`);
+
+      } catch (error: any) {
+        console.error(`Error migrating ${translation.language_code}:`, error);
+        errors.push({ lang: translation.language_code, error: error.message });
+      }
+    }
+
+    return c.json({
+      success: errors.length === 0,
+      message: `Migration completed: ${results.length} processed, ${errors.length} errors`,
+      results,
+      errors,
+      total_processed: results.length,
+      total_errors: errors.length,
+    });
+
+  } catch (error: any) {
+    console.error("Error in POST /migrate-contacttype:", error);
     return c.json({ error: error.message }, 500);
   }
 });

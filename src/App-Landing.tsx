@@ -136,6 +136,7 @@ export default function AppLanding() {
     email: '',
     phone: '',
     company: '',
+    contactType: '',
     needType: '',
     message: '',
   });
@@ -287,6 +288,7 @@ export default function AppLanding() {
             email: formData.email,
             phone: formData.phone,
             company: formData.company,
+            type: formData.contactType,
             needType: formData.needType,
             message: formData.message,
             source: 'landing_contact',
@@ -310,6 +312,7 @@ export default function AppLanding() {
           email: '',
           phone: '',
           company: '',
+          contactType: '',
           needType: '',
           message: '',
         });
@@ -1606,6 +1609,27 @@ export default function AppLanding() {
                       />
                     </div>
                   </div>
+
+                  {content.ctaForm?.form?.fields?.contactType && (
+                    <div className="space-y-1.5 lg:space-y-2">
+                      <Label htmlFor="contactType" className="text-gray-700 font-medium">{content.ctaForm.form.fields.contactType.label} *</Label>
+                      <Select
+                        value={formData.contactType}
+                        onValueChange={(value) => setFormData({ ...formData, contactType: value })}
+                        required
+                      >
+                        <SelectTrigger id="contactType" className="border-gray-300 focus:border-violet-500 focus:ring-violet-500 rounded-xl">
+                          <SelectValue placeholder={content.ctaForm.form.fields.contactType.placeholder} />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="client">{content.ctaForm.form.fields.contactType.options.client}</SelectItem>
+                          <SelectItem value="agency">{content.ctaForm.form.fields.contactType.options.agency}</SelectItem>
+                          <SelectItem value="interim">{content.ctaForm.form.fields.contactType.options.interim}</SelectItem>
+                          <SelectItem value="other">{content.ctaForm.form.fields.contactType.options.other}</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  )}
 
                   <div className="space-y-1.5 lg:space-y-2">
                     <Label htmlFor="needType" className="text-gray-700 font-medium">{content.ctaForm.form.fields.needType.label} *</Label>

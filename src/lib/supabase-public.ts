@@ -84,6 +84,35 @@ export async function saveResponsePublic(data: MarketResearchResponse) {
     console.log('✅ Réponse sauvegardée avec succès !');
     console.log('   → ID:', response?.id);
 
+    // 🔗 SYNCHRONISATION VERS LE CRM PROSPECTS
+    try {
+      console.log('🔗 Synchronisation vers CRM Prospects...');
+
+      const syncResponse = await fetch(
+        `${supabaseUrl}/functions/v1/make-server-10092a63/survey/sync-to-prospect`,
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${publicAnonKey}`
+          },
+          body: JSON.stringify(response)
+        }
+      );
+
+      if (syncResponse.ok) {
+        const syncResult = await syncResponse.json();
+        console.log('✅ Synchronisation CRM réussie:', syncResult);
+        console.log(`   → Prospect ${syncResult.isNew ? 'créé' : 'mis à jour'}: ${syncResult.prospectId}`);
+        console.log(`   → Score qualification: ${syncResult.qualificationScore}/100`);
+      } else {
+        console.warn('⚠️ Erreur synchronisation CRM (non bloquant)');
+      }
+    } catch (syncError) {
+      // Les erreurs de sync ne doivent pas bloquer la soumission du formulaire
+      console.warn('⚠️ CRM sync non déclenchée (non bloquant):', syncError);
+    }
+
     // 🔗 DÉCLENCHER LES INTÉGRATIONS (Google Sheets, n8n, Notion, etc.)
     try {
       console.log('🔗 Déclenchement des intégrations...');

@@ -1,0 +1,955 @@
+/**
+ * 🎯 SYSTÈME DE QUESTIONS ÉTENDU MULTI-PROFILS
+ * 
+ * Questions conditionnelles pour 3 types de répondants :
+ * - Agences ETT (26 questions : 10 communes + 16 spécifiques)
+ * - Clients (18 questions : 10 communes + 8 spécifiques)
+ * - Intérimaires (18 questions : 10 communes + 8 spécifiques)
+ */
+
+import type { SurveyQuestion, RespondentType } from '../types/survey';
+
+/**
+ * Configuration complète des questions avec visibilité conditionnelle
+ */
+export const EXTENDED_QUESTIONS: SurveyQuestion[] = [
+  
+  // =============================================================================
+  // SECTION 1 : PROFIL (Questions communes à tous)
+  // =============================================================================
+  
+  {
+    id: 'q_common_1',
+    section: 1,
+    order: 1,
+    code: 'q_common_1_pays',
+    type: 'text',
+    label: 'Dans quel pays êtes-vous basé(e) ?',
+    labelKey: 'question.common.1.label',
+    placeholder: 'Ex: France',
+    placeholderKey: 'question.common.1.placeholder',
+    required: true,
+    visible: true,
+    visibleFor: ['agency', 'client', 'worker'],
+    category: 'common',
+  },
+  
+  {
+    id: 'q_common_2',
+    section: 1,
+    order: 2,
+    code: 'q_common_2_secteurs',
+    type: 'multi-select',
+    label: 'Principaux secteurs d\'activité',
+    labelKey: 'question.common.2.label',
+    required: true,
+    visible: true,
+    visibleFor: ['agency', 'client', 'worker'],
+    category: 'common',
+    options: [
+      { value: 'btp', label: 'BTP / Construction', labelKey: 'question.common.2.option.btp', icon: '🏗️' },
+      { value: 'industrie', label: 'Industrie manufacturière', labelKey: 'question.common.2.option.industrie', icon: '⚙️' },
+      { value: 'logistique', label: 'Logistique / Transport', labelKey: 'question.common.2.option.logistique', icon: '🚚' },
+      { value: 'hotellerie', label: 'Hôtellerie / Restauration', labelKey: 'question.common.2.option.hotellerie', icon: '🍽️' },
+      { value: 'sante', label: 'Santé / Médical', labelKey: 'question.common.2.option.sante', icon: '⚕️' },
+      { value: 'agriculture', label: 'Agriculture', labelKey: 'question.common.2.option.agriculture', icon: '🌾' },
+      { value: 'services', label: 'Services aux entreprises', labelKey: 'question.common.2.option.services', icon: '💼' },
+      { value: 'autre', label: 'Autre', labelKey: 'question.common.2.option.autre', icon: '📌' },
+    ],
+  },
+  
+  {
+    id: 'q_common_3',
+    section: 1,
+    order: 3,
+    code: 'q_common_3_taille',
+    type: 'radio',
+    label: 'Taille de votre organisation',
+    labelKey: 'question.common.3.label',
+    required: true,
+    visible: true,
+    visibleFor: ['agency', 'client', 'worker'],
+    category: 'common',
+    options: [
+      { value: '1-5', label: '1-5 personnes', labelKey: 'question.common.3.option.1-5', icon: '👤' },
+      { value: '6-50', label: '6-50 personnes', labelKey: 'question.common.3.option.6-50', icon: '👥' },
+      { value: '51-250', label: '51-250 personnes', labelKey: 'question.common.3.option.51-250', icon: '🏢' },
+      { value: '250+', label: '250+ personnes', labelKey: 'question.common.3.option.250+', icon: '🏛️' },
+    ],
+  },
+  
+  // =============================================================================
+  // SECTION 2 : ACTIVITÉ (Questions communes adaptées)
+  // =============================================================================
+  
+  {
+    id: 'q_common_4',
+    section: 2,
+    order: 1,
+    code: 'q_common_4_volume',
+    type: 'radio',
+    label: 'Volume annuel de recrutements/détachements',
+    labelKey: 'question.common.4.label',
+    required: true,
+    visible: true,
+    visibleFor: ['agency', 'client', 'worker'],
+    category: 'common',
+    options: [
+      { value: '0-10', label: '0-10', labelKey: 'question.common.4.option.0-10', icon: '📊' },
+      { value: '11-50', label: '11-50', labelKey: 'question.common.4.option.11-50', icon: '📈' },
+      { value: '51-200', label: '51-200', labelKey: 'question.common.4.option.51-200', icon: '🚀' },
+      { value: '200+', label: '200+', labelKey: 'question.common.4.option.200+', icon: '🏆' },
+    ],
+  },
+  
+  {
+    id: 'q_common_5',
+    section: 2,
+    order: 2,
+    code: 'q_common_5_defis',
+    type: 'radio',
+    label: 'Quel est votre principal défi ?',
+    labelKey: 'question.common.5.label',
+    required: true,
+    visible: true,
+    visibleFor: ['agency', 'client', 'worker'],
+    category: 'common',
+    options: [
+      { value: 'conformite', label: 'Conformité juridique', labelKey: 'question.common.5.option.conformite', icon: '⚖️' },
+      { value: 'recrutement', label: 'Difficulté à recruter', labelKey: 'question.common.5.option.recrutement', icon: '🎯' },
+      { value: 'couts', label: 'Maîtrise des coûts', labelKey: 'question.common.5.option.couts', icon: '💰' },
+      { value: 'qualite', label: 'Qualité des profils', labelKey: 'question.common.5.option.qualite', icon: '⭐' },
+      { value: 'delais', label: 'Délais de placement', labelKey: 'question.common.5.option.delais', icon: '⏱️' },
+      { value: 'autre', label: 'Autre', labelKey: 'question.common.5.option.autre', icon: '📝' },
+    ],
+  },
+  
+  {
+    id: 'q_common_5_autre',
+    section: 2,
+    order: 3,
+    code: 'q_common_5_autre',
+    type: 'text',
+    label: 'Précisez votre défi',
+    labelKey: 'question.common.5.autre.label',
+    placeholder: 'Décrivez brièvement...',
+    placeholderKey: 'question.common.5.autre.placeholder',
+    required: false,
+    visible: true,
+    visibleFor: ['agency', 'client', 'worker'],
+    category: 'common',
+    conditional: {
+      dependsOn: 'q_common_5_defis',
+      showWhen: 'autre',
+    },
+  },
+  
+  {
+    id: 'q_common_6',
+    section: 2,
+    order: 4,
+    code: 'q_common_6_outils',
+    type: 'radio',
+    label: 'Quels outils/logiciels utilisez-vous ?',
+    labelKey: 'question.common.6.label',
+    required: true,
+    visible: true,
+    visibleFor: ['agency', 'client', 'worker'],
+    category: 'common',
+    options: [
+      { value: 'excel', label: 'Excel / Tableurs', labelKey: 'question.common.6.option.excel', icon: '📊' },
+      { value: 'erp', label: 'ERP spécialisé', labelKey: 'question.common.6.option.erp', icon: '💻' },
+      { value: 'saas', label: 'Solution SaaS', labelKey: 'question.common.6.option.saas', icon: '☁️' },
+      { value: 'interne', label: 'Développement interne', labelKey: 'question.common.6.option.interne', icon: '🔧' },
+      { value: 'aucun', label: 'Aucun / Papier', labelKey: 'question.common.6.option.aucun', icon: '📄' },
+      { value: 'autre', label: 'Autre', labelKey: 'question.common.6.option.autre', icon: '📝' },
+    ],
+  },
+  
+  {
+    id: 'q_common_6_autre',
+    section: 2,
+    order: 5,
+    code: 'q_common_6_autre',
+    type: 'text',
+    label: 'Précisez l\'outil',
+    labelKey: 'question.common.6.autre.label',
+    placeholder: 'Nom de l\'outil...',
+    placeholderKey: 'question.common.6.autre.placeholder',
+    required: false,
+    visible: true,
+    visibleFor: ['agency', 'client', 'worker'],
+    category: 'common',
+    conditional: {
+      dependsOn: 'q_common_6_outils',
+      showWhen: 'autre',
+    },
+  },
+  
+  // =============================================================================
+  // SECTION 3 : BESOINS & BUDGET (Questions communes)
+  // =============================================================================
+  
+  {
+    id: 'q_common_7',
+    section: 3,
+    order: 1,
+    code: 'q_common_7_budget',
+    type: 'radio',
+    label: 'Budget mensuel pour outils RH/recrutement',
+    labelKey: 'question.common.7.label',
+    required: true,
+    visible: true,
+    visibleFor: ['agency', 'client', 'worker'],
+    category: 'common',
+    options: [
+      { value: '0-100', label: '0-100€', labelKey: 'question.common.7.option.0-100', icon: '💵' },
+      { value: '100-500', label: '100-500€', labelKey: 'question.common.7.option.100-500', icon: '💶' },
+      { value: '500-2000', label: '500-2000€', labelKey: 'question.common.7.option.500-2000', icon: '💷' },
+      { value: '2000+', label: '2000€+', labelKey: 'question.common.7.option.2000+', icon: '💸' },
+    ],
+  },
+  
+  // =============================================================================
+  // SECTION 4 : INTÉRÊT YOJOB (Questions communes)
+  // =============================================================================
+  
+  {
+    id: 'q_common_8',
+    section: 4,
+    order: 1,
+    code: 'q_common_8_score',
+    type: 'score',
+    label: 'Intérêt pour une solution européenne de recrutement/détachement',
+    labelKey: 'question.common.8.label',
+    required: true,
+    visible: true,
+    visibleFor: ['agency', 'client', 'worker'],
+    category: 'common',
+  },
+  
+  {
+    id: 'q_common_9',
+    section: 4,
+    order: 2,
+    code: 'q_common_9_features',
+    type: 'multi-select',
+    label: 'Fonctionnalités prioritaires',
+    labelKey: 'question.common.9.label',
+    required: true,
+    visible: true,
+    visibleFor: ['agency', 'client', 'worker'],
+    category: 'common',
+    options: [
+      { value: 'conformite', label: 'Vérification conformité automatique', labelKey: 'question.common.9.option.conformite', icon: '✅' },
+      { value: 'documents', label: 'Génération documents (A1, contrats)', labelKey: 'question.common.9.option.documents', icon: '📄' },
+      { value: 'matching', label: 'Matching candidats/entreprises', labelKey: 'question.common.9.option.matching', icon: '🎯' },
+      { value: 'suivi', label: 'Suivi temps réel des missions', labelKey: 'question.common.9.option.suivi', icon: '📊' },
+      { value: 'paiement', label: 'Gestion paiements internationaux', labelKey: 'question.common.9.option.paiement', icon: '💳' },
+      { value: 'reseau', label: 'Réseau d\'agences européennes', labelKey: 'question.common.9.option.reseau', icon: '🌍' },
+    ],
+  },
+  
+  // =============================================================================
+  // SECTION 6 : CONTACT (Questions communes)
+  // =============================================================================
+  
+  {
+    id: 'q_common_10',
+    section: 6,
+    order: 1,
+    code: 'q_common_10_email',
+    type: 'email',
+    label: 'Email professionnel',
+    labelKey: 'question.common.10.label',
+    placeholder: 'votre.email@entreprise.com',
+    placeholderKey: 'question.common.10.placeholder',
+    required: true,
+    visible: true,
+    visibleFor: ['agency', 'client', 'worker'],
+    category: 'common',
+  },
+  
+  // =============================================================================
+  // QUESTIONS SPÉCIFIQUES AGENCES ETT
+  // =============================================================================
+  
+  {
+    id: 'q_agency_1',
+    section: 1,
+    order: 10,
+    code: 'q_agency_1_nom',
+    type: 'text',
+    label: 'Nom de l\'agence',
+    labelKey: 'question.agency.1.label',
+    placeholder: 'Ex: CEA Personalmanagement',
+    placeholderKey: 'question.agency.1.placeholder',
+    required: true,
+    visible: true,
+    visibleFor: ['agency'],
+    category: 'agency',
+  },
+  
+  {
+    id: 'q_agency_2',
+    section: 1,
+    order: 11,
+    code: 'q_agency_2_annee',
+    type: 'number',
+    label: 'Année de création de l\'agence',
+    labelKey: 'question.agency.2.label',
+    placeholder: 'Ex: 2010',
+    placeholderKey: 'question.agency.2.placeholder',
+    required: true,
+    visible: true,
+    visibleFor: ['agency'],
+    category: 'agency',
+  },
+  
+  {
+    id: 'q_agency_3',
+    section: 2,
+    order: 10,
+    code: 'q_agency_3_origine',
+    type: 'text',
+    label: 'Pays d\'origine de vos travailleurs détachés',
+    labelKey: 'question.agency.3.label',
+    placeholder: 'Ex: Pologne, Roumanie',
+    placeholderKey: 'question.agency.3.placeholder',
+    required: true,
+    visible: true,
+    visibleFor: ['agency'],
+    category: 'agency',
+  },
+  
+  {
+    id: 'q_agency_4',
+    section: 2,
+    order: 11,
+    code: 'q_agency_4_destinations',
+    type: 'textarea',
+    label: 'Pays de destination de vos détachements',
+    labelKey: 'question.agency.4.label',
+    placeholder: 'Listez les pays principaux...',
+    placeholderKey: 'question.agency.4.placeholder',
+    required: true,
+    visible: true,
+    visibleFor: ['agency'],
+    category: 'agency',
+  },
+  
+  {
+    id: 'q_agency_5',
+    section: 2,
+    order: 12,
+    code: 'q_agency_5_gestion',
+    type: 'radio',
+    label: 'Comment gérez-vous la conformité juridique ?',
+    labelKey: 'question.agency.5.label',
+    required: true,
+    visible: true,
+    visibleFor: ['agency'],
+    category: 'agency',
+    options: [
+      { value: 'interne', label: 'Équipe juridique interne', labelKey: 'question.agency.5.option.interne', icon: '👨‍💼' },
+      { value: 'externe', label: 'Cabinet externe', labelKey: 'question.agency.5.option.externe', icon: '🏛️' },
+      { value: 'mixte', label: 'Mixte (interne + externe)', labelKey: 'question.agency.5.option.mixte', icon: '🤝' },
+      { value: 'basique', label: 'Gestion basique / manuelle', labelKey: 'question.agency.5.option.basique', icon: '📝' },
+    ],
+  },
+  
+  {
+    id: 'q_agency_6',
+    section: 2,
+    order: 13,
+    code: 'q_agency_6_incidents',
+    type: 'radio',
+    label: 'Avez-vous rencontré des incidents juridiques/administratifs ?',
+    labelKey: 'question.agency.6.label',
+    required: true,
+    visible: true,
+    visibleFor: ['agency'],
+    category: 'agency',
+    options: [
+      { value: 'jamais', label: 'Jamais', labelKey: 'question.agency.6.option.jamais', icon: '✅' },
+      { value: 'rarement', label: 'Rarement (1-2 fois)', labelKey: 'question.agency.6.option.rarement', icon: '😌' },
+      { value: 'parfois', label: 'Parfois (3-5 fois)', labelKey: 'question.agency.6.option.parfois', icon: '😐' },
+      { value: 'souvent', label: 'Souvent (6+ fois)', labelKey: 'question.agency.6.option.souvent', icon: '⚠️' },
+    ],
+  },
+  
+  {
+    id: 'q_agency_7',
+    section: 3,
+    order: 10,
+    code: 'q_agency_7_budget_outils',
+    type: 'radio',
+    label: 'Budget annuel pour outils/logiciels de gestion',
+    labelKey: 'question.agency.7.label',
+    required: true,
+    visible: true,
+    visibleFor: ['agency'],
+    category: 'agency',
+    options: [
+      { value: '0-1000', label: '0-1 000€', labelKey: 'question.agency.7.option.0-1000', icon: '💵' },
+      { value: '1000-5000', label: '1 000-5 000€', labelKey: 'question.agency.7.option.1000-5000', icon: '💶' },
+      { value: '5000-20000', label: '5 000-20 000€', labelKey: 'question.agency.7.option.5000-20000', icon: '💷' },
+      { value: '20000+', label: '20 000€+', labelKey: 'question.agency.7.option.20000+', icon: '💸' },
+    ],
+  },
+  
+  {
+    id: 'q_agency_8',
+    section: 3,
+    order: 11,
+    code: 'q_agency_8_manque_gagner',
+    type: 'radio',
+    label: 'Manque à gagner annuel dû à la complexité administrative',
+    labelKey: 'question.agency.8.label',
+    required: true,
+    visible: true,
+    visibleFor: ['agency'],
+    category: 'agency',
+    options: [
+      { value: '0-10k', label: '0-10 000€', labelKey: 'question.agency.8.option.0-10k', icon: '💵' },
+      { value: '10k-50k', label: '10 000-50 000€', labelKey: 'question.agency.8.option.10k-50k', icon: '💶' },
+      { value: '50k-200k', label: '50 000-200 000€', labelKey: 'question.agency.8.option.50k-200k', icon: '💷' },
+      { value: '200k+', label: '200 000€+', labelKey: 'question.agency.8.option.200k+', icon: '💸' },
+    ],
+  },
+  
+  {
+    id: 'q_agency_9',
+    section: 3,
+    order: 12,
+    code: 'q_agency_9_risques',
+    type: 'radio',
+    label: 'Évaluation des risques juridiques/financiers',
+    labelKey: 'question.agency.9.label',
+    required: true,
+    visible: true,
+    visibleFor: ['agency'],
+    category: 'agency',
+    options: [
+      { value: 'faible', label: 'Faible', labelKey: 'question.agency.9.option.faible', icon: '🟢' },
+      { value: 'moyen', label: 'Moyen', labelKey: 'question.agency.9.option.moyen', icon: '🟡' },
+      { value: 'eleve', label: 'Élevé', labelKey: 'question.agency.9.option.eleve', icon: '🟠' },
+      { value: 'tres_eleve', label: 'Très élevé', labelKey: 'question.agency.9.option.tres_eleve', icon: '🔴' },
+    ],
+  },
+  
+  {
+    id: 'q_agency_10',
+    section: 3,
+    order: 13,
+    code: 'q_agency_10_probleme',
+    type: 'textarea',
+    label: 'Quel est votre problème le plus urgent à résoudre ?',
+    labelKey: 'question.agency.10.label',
+    placeholder: 'Décrivez votre défi principal...',
+    placeholderKey: 'question.agency.10.placeholder',
+    required: true,
+    visible: true,
+    visibleFor: ['agency'],
+    category: 'agency',
+  },
+  
+  {
+    id: 'q_agency_11',
+    section: 3,
+    order: 14,
+    code: 'q_agency_11_migration',
+    type: 'radio',
+    label: 'Seriez-vous prêt à migrer vers un nouveau logiciel ?',
+    labelKey: 'question.agency.11.label',
+    required: true,
+    visible: true,
+    visibleFor: ['agency'],
+    category: 'agency',
+    options: [
+      { value: 'oui_rapidement', label: 'Oui, rapidement', labelKey: 'question.agency.11.option.oui_rapidement', icon: '🚀' },
+      { value: 'oui_6_mois', label: 'Oui, dans 6 mois', labelKey: 'question.agency.11.option.oui_6_mois', icon: '📅' },
+      { value: 'peut_etre', label: 'Peut-être, à évaluer', labelKey: 'question.agency.11.option.peut_etre', icon: '🤔' },
+      { value: 'non', label: 'Non, satisfait actuellement', labelKey: 'question.agency.11.option.non', icon: '❌' },
+    ],
+  },
+  
+  {
+    id: 'q_agency_12',
+    section: 4,
+    order: 10,
+    code: 'q_agency_12_mvp',
+    type: 'textarea',
+    label: 'Quelle fonctionnalité serait critique pour vous (MVP) ?',
+    labelKey: 'question.agency.12.label',
+    placeholder: 'La fonctionnalité indispensable...',
+    placeholderKey: 'question.agency.12.placeholder',
+    required: true,
+    visible: true,
+    visibleFor: ['agency'],
+    category: 'agency',
+  },
+  
+  {
+    id: 'q_agency_13',
+    section: 4,
+    order: 11,
+    code: 'q_agency_13_role',
+    type: 'radio',
+    label: 'Quel est votre rôle dans la décision d\'achat ?',
+    labelKey: 'question.agency.13.label',
+    required: true,
+    visible: true,
+    visibleFor: ['agency'],
+    category: 'agency',
+    options: [
+      { value: 'decideur', label: 'Décideur final', labelKey: 'question.agency.13.option.decideur', icon: '👑' },
+      { value: 'influenceur', label: 'Influenceur / Recommandation', labelKey: 'question.agency.13.option.influenceur', icon: '💡' },
+      { value: 'utilisateur', label: 'Utilisateur final', labelKey: 'question.agency.13.option.utilisateur', icon: '👤' },
+      { value: 'autre', label: 'Autre', labelKey: 'question.agency.13.option.autre', icon: '📌' },
+    ],
+  },
+  
+  {
+    id: 'q_agency_14',
+    section: 5,
+    order: 10,
+    code: 'q_agency_14_evolution',
+    type: 'textarea',
+    label: 'Comment voyez-vous l\'évolution du marché européen du détachement ?',
+    labelKey: 'question.agency.14.label',
+    placeholder: 'Votre vision pour les 2-3 prochaines années...',
+    placeholderKey: 'question.agency.14.placeholder',
+    required: true,
+    visible: true,
+    visibleFor: ['agency'],
+    category: 'agency',
+  },
+  
+  {
+    id: 'q_agency_15',
+    section: 5,
+    order: 11,
+    code: 'q_agency_15_besoins',
+    type: 'textarea',
+    label: 'Quels seraient vos besoins futurs (nouveaux services) ?',
+    labelKey: 'question.agency.15.label',
+    placeholder: 'Services que vous aimeriez voir...',
+    placeholderKey: 'question.agency.15.placeholder',
+    required: false,
+    visible: true,
+    visibleFor: ['agency'],
+    category: 'agency',
+  },
+  
+  {
+    id: 'q_agency_16',
+    section: 5,
+    order: 12,
+    code: 'q_agency_16_partenariats',
+    type: 'textarea',
+    label: 'Avez-vous des partenariats avec d\'autres agences européennes ?',
+    labelKey: 'question.agency.16.label',
+    placeholder: 'Décrivez vos partenariats existants...',
+    placeholderKey: 'question.agency.16.placeholder',
+    required: false,
+    visible: true,
+    visibleFor: ['agency'],
+    category: 'agency',
+  },
+  
+  // =============================================================================
+  // QUESTIONS SPÉCIFIQUES CLIENTS
+  // =============================================================================
+  
+  {
+    id: 'q_client_1',
+    section: 1,
+    order: 10,
+    code: 'q_client_1_nom',
+    type: 'text',
+    label: 'Nom de votre entreprise',
+    labelKey: 'question.client.1.label',
+    placeholder: 'Ex: Acme Industries',
+    placeholderKey: 'question.client.1.placeholder',
+    required: true,
+    visible: true,
+    visibleFor: ['client'],
+    category: 'client',
+  },
+  
+  {
+    id: 'q_client_2',
+    section: 2,
+    order: 10,
+    code: 'q_client_2_volume_embauches',
+    type: 'radio',
+    label: 'Volume annuel d\'embauches (CDI + CDD + intérim)',
+    labelKey: 'question.client.2.label',
+    required: true,
+    visible: true,
+    visibleFor: ['client'],
+    category: 'client',
+    options: [
+      { value: '0-20', label: '0-20', labelKey: 'question.client.2.option.0-20', icon: '📊' },
+      { value: '21-100', label: '21-100', labelKey: 'question.client.2.option.21-100', icon: '📈' },
+      { value: '101-500', label: '101-500', labelKey: 'question.client.2.option.101-500', icon: '🚀' },
+      { value: '500+', label: '500+', labelKey: 'question.client.2.option.500+', icon: '🏆' },
+    ],
+  },
+  
+  {
+    id: 'q_client_3',
+    section: 2,
+    order: 11,
+    code: 'q_client_3_process',
+    type: 'radio',
+    label: 'Comment recrutez-vous actuellement vos intérimaires ?',
+    labelKey: 'question.client.3.label',
+    required: true,
+    visible: true,
+    visibleFor: ['client'],
+    category: 'client',
+    options: [
+      { value: 'agence_locale', label: 'Agence locale unique', labelKey: 'question.client.3.option.agence_locale', icon: '🏢' },
+      { value: 'multi_agences', label: 'Plusieurs agences', labelKey: 'question.client.3.option.multi_agences', icon: '🏛️' },
+      { value: 'plateforme', label: 'Plateforme en ligne', labelKey: 'question.client.3.option.plateforme', icon: '💻' },
+      { value: 'interne', label: 'Vivier interne', labelKey: 'question.client.3.option.interne', icon: '👥' },
+      { value: 'mixte', label: 'Mixte', labelKey: 'question.client.3.option.mixte', icon: '🤝' },
+    ],
+  },
+  
+  {
+    id: 'q_client_4',
+    section: 2,
+    order: 12,
+    code: 'q_client_4_delai',
+    type: 'radio',
+    label: 'Délai moyen pour pourvoir un poste en intérim',
+    labelKey: 'question.client.4.label',
+    required: true,
+    visible: true,
+    visibleFor: ['client'],
+    category: 'client',
+    options: [
+      { value: '0-2j', label: '0-2 jours', labelKey: 'question.client.4.option.0-2j', icon: '⚡' },
+      { value: '3-7j', label: '3-7 jours', labelKey: 'question.client.4.option.3-7j', icon: '📅' },
+      { value: '1-2sem', label: '1-2 semaines', labelKey: 'question.client.4.option.1-2sem', icon: '⏳' },
+      { value: '2sem+', label: '2+ semaines', labelKey: 'question.client.4.option.2sem+', icon: '⏰' },
+    ],
+  },
+  
+  {
+    id: 'q_client_5',
+    section: 3,
+    order: 10,
+    code: 'q_client_5_budget_annuel',
+    type: 'radio',
+    label: 'Budget annuel consacré au recrutement',
+    labelKey: 'question.client.5.label',
+    required: true,
+    visible: true,
+    visibleFor: ['client'],
+    category: 'client',
+    options: [
+      { value: '0-50k', label: '0-50 000€', labelKey: 'question.client.5.option.0-50k', icon: '💵' },
+      { value: '50k-200k', label: '50 000-200 000€', labelKey: 'question.client.5.option.50k-200k', icon: '💶' },
+      { value: '200k-1M', label: '200 000-1M€', labelKey: 'question.client.5.option.200k-1M', icon: '💷' },
+      { value: '1M+', label: '1M€+', labelKey: 'question.client.5.option.1M+', icon: '💸' },
+    ],
+  },
+  
+  {
+    id: 'q_client_6',
+    section: 3,
+    order: 11,
+    code: 'q_client_6_difficulte',
+    type: 'score',
+    label: 'Difficulté à recruter les profils souhaités (1=facile, 10=très difficile)',
+    labelKey: 'question.client.6.label',
+    required: true,
+    visible: true,
+    visibleFor: ['client'],
+    category: 'client',
+  },
+  
+  {
+    id: 'q_client_7',
+    section: 4,
+    order: 10,
+    code: 'q_client_7_experience_detachement',
+    type: 'radio',
+    label: 'Avez-vous déjà eu recours au détachement de travailleurs européens ?',
+    labelKey: 'question.client.7.label',
+    required: true,
+    visible: true,
+    visibleFor: ['client'],
+    category: 'client',
+    options: [
+      { value: 'oui_regulier', label: 'Oui, régulièrement', labelKey: 'question.client.7.option.oui_regulier', icon: '✅' },
+      { value: 'oui_ponctuel', label: 'Oui, ponctuellement', labelKey: 'question.client.7.option.oui_ponctuel', icon: '🔄' },
+      { value: 'test', label: 'En phase de test', labelKey: 'question.client.7.option.test', icon: '🧪' },
+      { value: 'non_interesse', label: 'Non, mais intéressé', labelKey: 'question.client.7.option.non_interesse', icon: '👀' },
+      { value: 'non', label: 'Non, pas intéressé', labelKey: 'question.client.7.option.non', icon: '❌' },
+    ],
+  },
+  
+  {
+    id: 'q_client_8',
+    section: 4,
+    order: 11,
+    code: 'q_client_8_freins',
+    type: 'multi-select',
+    label: 'Quels sont vos principaux freins au recrutement européen ?',
+    labelKey: 'question.client.8.label',
+    required: true,
+    visible: true,
+    visibleFor: ['client'],
+    category: 'client',
+    options: [
+      { value: 'langue', label: 'Barrière de la langue', labelKey: 'question.client.8.option.langue', icon: '🗣️' },
+      { value: 'juridique', label: 'Complexité juridique', labelKey: 'question.client.8.option.juridique', icon: '⚖️' },
+      { value: 'cout', label: 'Coûts élevés', labelKey: 'question.client.8.option.cout', icon: '💰' },
+      { value: 'fiabilite', label: 'Fiabilité des prestataires', labelKey: 'question.client.8.option.fiabilite', icon: '🤝' },
+      { value: 'qualite', label: 'Qualité des profils', labelKey: 'question.client.8.option.qualite', icon: '⭐' },
+      { value: 'delai', label: 'Délais trop longs', labelKey: 'question.client.8.option.delai', icon: '⏱️' },
+      { value: 'aucun', label: 'Aucun frein particulier', labelKey: 'question.client.8.option.aucun', icon: '✅' },
+    ],
+  },
+  
+  // =============================================================================
+  // QUESTIONS SPÉCIFIQUES INTÉRIMAIRES
+  // =============================================================================
+  
+  {
+    id: 'q_worker_1',
+    section: 1,
+    order: 10,
+    code: 'q_worker_1_nom',
+    type: 'text',
+    label: 'Prénom et Nom',
+    labelKey: 'question.worker.1.label',
+    placeholder: 'Ex: Jean Dupont',
+    placeholderKey: 'question.worker.1.placeholder',
+    required: true,
+    visible: true,
+    visibleFor: ['worker'],
+    category: 'worker',
+  },
+  
+  {
+    id: 'q_worker_2',
+    section: 2,
+    order: 10,
+    code: 'q_worker_2_experience',
+    type: 'radio',
+    label: 'Années d\'expérience en travail intérimaire',
+    labelKey: 'question.worker.2.label',
+    required: true,
+    visible: true,
+    visibleFor: ['worker'],
+    category: 'worker',
+    options: [
+      { value: '0-1', label: 'Moins d\'1 an', labelKey: 'question.worker.2.option.0-1', icon: '🌱' },
+      { value: '1-3', label: '1-3 ans', labelKey: 'question.worker.2.option.1-3', icon: '🌿' },
+      { value: '3-10', label: '3-10 ans', labelKey: 'question.worker.2.option.3-10', icon: '🌳' },
+      { value: '10+', label: '10+ ans', labelKey: 'question.worker.2.option.10+', icon: '🌲' },
+    ],
+  },
+  
+  {
+    id: 'q_worker_3',
+    section: 2,
+    order: 11,
+    code: 'q_worker_3_metiers',
+    type: 'multi-select',
+    label: 'Métiers exercés en intérim',
+    labelKey: 'question.worker.3.label',
+    required: true,
+    visible: true,
+    visibleFor: ['worker'],
+    category: 'worker',
+    options: [
+      { value: 'btp', label: 'BTP / Construction', labelKey: 'question.worker.3.option.btp', icon: '🏗️' },
+      { value: 'industrie', label: 'Industrie / Production', labelKey: 'question.worker.3.option.industrie', icon: '⚙️' },
+      { value: 'logistique', label: 'Logistique / Manutention', labelKey: 'question.worker.3.option.logistique', icon: '🚚' },
+      { value: 'hotellerie', label: 'Hôtellerie / Restauration', labelKey: 'question.worker.3.option.hotellerie', icon: '🍽️' },
+      { value: 'sante', label: 'Santé / Aide à la personne', labelKey: 'question.worker.3.option.sante', icon: '⚕️' },
+      { value: 'agriculture', label: 'Agriculture', labelKey: 'question.worker.3.option.agriculture', icon: '🌾' },
+      { value: 'tertiaire', label: 'Tertiaire / Bureau', labelKey: 'question.worker.3.option.tertiaire', icon: '💼' },
+      { value: 'autre', label: 'Autre', labelKey: 'question.worker.3.option.autre', icon: '📌' },
+    ],
+  },
+  
+  {
+    id: 'q_worker_4',
+    section: 2,
+    order: 12,
+    code: 'q_worker_4_pays_travailles',
+    type: 'multi-select',
+    label: 'Dans quels pays avez-vous travaillé ?',
+    labelKey: 'question.worker.4.label',
+    required: true,
+    visible: true,
+    visibleFor: ['worker'],
+    category: 'worker',
+    options: [
+      { value: 'FR', label: 'France', labelKey: 'question.worker.4.option.FR', icon: '🇫🇷' },
+      { value: 'DE', label: 'Allemagne', labelKey: 'question.worker.4.option.DE', icon: '🇩🇪' },
+      { value: 'ES', label: 'Espagne', labelKey: 'question.worker.4.option.ES', icon: '🇪🇸' },
+      { value: 'IT', label: 'Italie', labelKey: 'question.worker.4.option.IT', icon: '🇮🇹' },
+      { value: 'PL', label: 'Pologne', labelKey: 'question.worker.4.option.PL', icon: '🇵🇱' },
+      { value: 'PT', label: 'Portugal', labelKey: 'question.worker.4.option.PT', icon: '🇵🇹' },
+      { value: 'BE', label: 'Belgique', labelKey: 'question.worker.4.option.BE', icon: '🇧🇪' },
+      { value: 'NL', label: 'Pays-Bas', labelKey: 'question.worker.4.option.NL', icon: '🇳🇱' },
+      { value: 'autre', label: 'Autre pays européen', labelKey: 'question.worker.4.option.autre', icon: '🇪🇺' },
+    ],
+  },
+  
+  {
+    id: 'q_worker_5',
+    section: 3,
+    order: 10,
+    code: 'q_worker_5_satisfaction',
+    type: 'score',
+    label: 'Satisfaction générale de vos missions en intérim (1=très insatisfait, 10=très satisfait)',
+    labelKey: 'question.worker.5.label',
+    required: true,
+    visible: true,
+    visibleFor: ['worker'],
+    category: 'worker',
+  },
+  
+  {
+    id: 'q_worker_6',
+    section: 3,
+    order: 11,
+    code: 'q_worker_6_problemes',
+    type: 'multi-select',
+    label: 'Quels problèmes avez-vous rencontrés en intérim ?',
+    labelKey: 'question.worker.6.label',
+    required: true,
+    visible: true,
+    visibleFor: ['worker'],
+    category: 'worker',
+    options: [
+      { value: 'paiement', label: 'Retards de paiement', labelKey: 'question.worker.6.option.paiement', icon: '💰' },
+      { value: 'conditions', label: 'Mauvaises conditions de travail', labelKey: 'question.worker.6.option.conditions', icon: '⚠️' },
+      { value: 'logement', label: 'Problèmes de logement', labelKey: 'question.worker.6.option.logement', icon: '🏠' },
+      { value: 'langue', label: 'Barrière de la langue', labelKey: 'question.worker.6.option.langue', icon: '🗣️' },
+      { value: 'administratif', label: 'Complexité administrative', labelKey: 'question.worker.6.option.administratif', icon: '📄' },
+      { value: 'securite', label: 'Problèmes de sécurité', labelKey: 'question.worker.6.option.securite', icon: '🛡️' },
+      { value: 'aucun', label: 'Aucun problème particulier', labelKey: 'question.worker.6.option.aucun', icon: '✅' },
+    ],
+  },
+  
+  {
+    id: 'q_worker_7',
+    section: 4,
+    order: 10,
+    code: 'q_worker_7_attentes',
+    type: 'textarea',
+    label: 'Qu\'attendez-vous d\'une plateforme européenne de mise en relation ?',
+    labelKey: 'question.worker.7.label',
+    placeholder: 'Décrivez vos attentes principales...',
+    placeholderKey: 'question.worker.7.placeholder',
+    required: true,
+    visible: true,
+    visibleFor: ['worker'],
+    category: 'worker',
+  },
+  
+  {
+    id: 'q_worker_8',
+    section: 4,
+    order: 11,
+    code: 'q_worker_8_mobilite',
+    type: 'radio',
+    label: 'Êtes-vous disponible pour des missions dans d\'autres pays européens ?',
+    labelKey: 'question.worker.8.label',
+    required: true,
+    visible: true,
+    visibleFor: ['worker'],
+    category: 'worker',
+    options: [
+      { value: 'oui_immediatement', label: 'Oui, immédiatement', labelKey: 'question.worker.8.option.oui_immediatement', icon: '✈️' },
+      { value: 'oui_preparation', label: 'Oui, avec préparation (1-3 mois)', labelKey: 'question.worker.8.option.oui_preparation', icon: '📅' },
+      { value: 'selon_pays', label: 'Selon le pays/projet', labelKey: 'question.worker.8.option.selon_pays', icon: '🌍' },
+      { value: 'non', label: 'Non, uniquement local', labelKey: 'question.worker.8.option.non', icon: '🏠' },
+    ],
+  },
+];
+
+/**
+ * Fonction utilitaire pour obtenir les questions filtrées par type de répondant
+ */
+export function getQuestionsForRespondent(respondentType: RespondentType): SurveyQuestion[] {
+  return EXTENDED_QUESTIONS.filter(q => q.visibleFor.includes(respondentType));
+}
+
+/**
+ * Fonction utilitaire pour obtenir le nombre de questions par type
+ */
+export function getQuestionCountByType(respondentType: RespondentType): number {
+  return getQuestionsForRespondent(respondentType).length;
+}
+
+/**
+ * Sections étendues avec visibilité conditionnelle
+ */
+export const EXTENDED_SECTIONS = [
+  { 
+    id: 1, 
+    labelKey: 'section.1.title', 
+    labelFallback: 'Profil', 
+    icon: '👤', 
+    questions: 4, 
+    time: '2 min',
+    visibleFor: ['agency', 'client', 'worker'] as RespondentType[],
+  },
+  { 
+    id: 2, 
+    labelKey: 'section.2.title', 
+    labelFallback: 'Activité', 
+    icon: '🌍', 
+    questions: 7, 
+    time: '3 min',
+    visibleFor: ['agency', 'client', 'worker'] as RespondentType[],
+  },
+  { 
+    id: 3, 
+    labelKey: 'section.3.title', 
+    labelFallback: 'Besoins', 
+    icon: '💼', 
+    questions: 6, 
+    time: '2 min',
+    visibleFor: ['agency', 'client', 'worker'] as RespondentType[],
+  },
+  { 
+    id: 4, 
+    labelKey: 'section.4.title', 
+    labelFallback: 'Intérêt YoJob', 
+    icon: '⭐', 
+    questions: 6, 
+    time: '3 min',
+    visibleFor: ['agency', 'client', 'worker'] as RespondentType[],
+  },
+  { 
+    id: 5, 
+    labelKey: 'section.5.title', 
+    labelFallback: 'Vision Future', 
+    icon: '🔮', 
+    questions: 2, 
+    time: '1 min',
+    visibleFor: ['agency'] as RespondentType[], // Uniquement pour agences
+  },
+  { 
+    id: 6, 
+    labelKey: 'section.6.title', 
+    labelFallback: 'Contact', 
+    icon: '📧', 
+    questions: 1, 
+    time: '1 min',
+    visibleFor: ['agency', 'client', 'worker'] as RespondentType[],
+  },
+];

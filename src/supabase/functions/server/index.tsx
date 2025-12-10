@@ -12,6 +12,7 @@ import { seedCompleteTranslations } from "./seed-complete-translations.tsx";
 import { uploadAvatar, deleteAvatar, refreshSignedUrl } from "./storage.tsx";
 import landingRoutes from "./landing.tsx";
 import prospectsRoutes from "./prospects.tsx";
+import { syncSurveyToProspect, batchSyncSurveysToProspects } from "./survey-to-prospect.tsx";
 
 const app = new Hono();
 
@@ -128,5 +129,36 @@ app.post("/make-server-10092a63/storage/refresh-url", refreshSignedUrl);
 
 // Prospects endpoints
 app.route("/make-server-10092a63/prospects", prospectsRoutes);
+
+// Survey to Prospect sync endpoints
+app.post("/make-server-10092a63/survey/sync-to-prospect", async (c) => {
+  try {
+    const surveyResponse = await c.req.json();
+    
+    if (!surveyResponse || !surveyResponse.response_id) {
+      return c.json({ error: 'Missing survey response data' }, 400);
+    }
+    
+    const result = await syncSurveyToProspect(surveyResponse);
+    
+    return c.json(result);
+  } catch (error: any) {
+    console.error('Error syncing survey to prospect:', error);
+    return c.json({ error: error.message }, 500);
+  }
+});
+
+app.post("/make-server-10092a63/survey/batch-sync", async (c) => {
+  try {
+    const { limit } = await c.req.json().catch(() => ({}));
+    
+    const result = await batchSyncSurveysToProspects(limit || 100);
+    
+    return c.json(result);
+  } catch (error: any) {
+    console.error('Error in batch sync:', error);
+    return c.json({ error: error.message }, 500);
+  }
+});
 
 Deno.serve(app.fetch);

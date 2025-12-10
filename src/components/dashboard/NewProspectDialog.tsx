@@ -65,6 +65,16 @@ export function NewProspectDialog({ open, onClose, onSuccess }: NewProspectDialo
     sector: '',
     needType: '',
     message: '',
+    customFields: {
+      companyId: '',
+      website: '',
+      companySize: '',
+      foundedYear: '',
+      agencySpecialties: '',
+      operatingCountries: '',
+      annualRecruitmentVolume: '',
+      hrBudget: '',
+    },
   });
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -87,6 +97,7 @@ export function NewProspectDialog({ open, onClose, onSuccess }: NewProspectDialo
               created_by: 'Admin',
               created_from: 'dashboard',
               manual_entry: true,
+              ...formData.customFields,
             },
           }),
         }
@@ -106,6 +117,16 @@ export function NewProspectDialog({ open, onClose, onSuccess }: NewProspectDialo
           sector: '',
           needType: '',
           message: '',
+          customFields: {
+            companyId: '',
+            website: '',
+            companySize: '',
+            foundedYear: '',
+            agencySpecialties: '',
+            operatingCountries: '',
+            annualRecruitmentVolume: '',
+            hrBudget: '',
+          },
         });
         onSuccess();
         onClose();
@@ -252,6 +273,199 @@ export function NewProspectDialog({ open, onClose, onSuccess }: NewProspectDialo
                     />
                   </div>
                 </div>
+
+                {/* Champs spécifiques pour Agences et Clients */}
+                {(formData.type === 'agency' || formData.type === 'client') && (
+                  <>
+                    {/* Numéro d'identification et Site web */}
+                    <div className="grid md:grid-cols-2 gap-4">
+                      <div>
+                        <Label htmlFor="companyId" className="text-slate-700">
+                          Numéro d&apos;identification {formData.type === 'agency' ? '(SIRET, VAT)' : '(SIRET)'}
+                        </Label>
+                        <Input
+                          id="companyId"
+                          value={formData.customFields?.companyId || ''}
+                          onChange={(e) =>
+                            setFormData({
+                              ...formData,
+                              customFields: { ...formData.customFields, companyId: e.target.value },
+                            })
+                          }
+                          placeholder={formData.type === 'agency' ? 'FR123456789 ou VAT123' : '12345678901234'}
+                          className="mt-1.5"
+                        />
+                      </div>
+
+                      <div>
+                        <Label htmlFor="website" className="text-slate-700">
+                          Site web
+                        </Label>
+                        <Input
+                          id="website"
+                          type="url"
+                          value={formData.customFields?.website || ''}
+                          onChange={(e) =>
+                            setFormData({
+                              ...formData,
+                              customFields: { ...formData.customFields, website: e.target.value },
+                            })
+                          }
+                          placeholder="https://www.entreprise.com"
+                          className="mt-1.5"
+                        />
+                      </div>
+                    </div>
+
+                    {/* Taille et Année de création */}
+                    <div className="grid md:grid-cols-2 gap-4">
+                      <div>
+                        <Label htmlFor="companySize" className="text-slate-700">
+                          Nombre d&apos;employés
+                        </Label>
+                        <Select
+                          value={formData.customFields?.companySize || ''}
+                          onValueChange={(value) =>
+                            setFormData({
+                              ...formData,
+                              customFields: { ...formData.customFields, companySize: value },
+                            })
+                          }
+                        >
+                          <SelectTrigger className="mt-1.5">
+                            <SelectValue placeholder="Sélectionner la taille" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="1-9">1-9 employés</SelectItem>
+                            <SelectItem value="10-49">10-49 employés</SelectItem>
+                            <SelectItem value="50-249">50-249 employés</SelectItem>
+                            <SelectItem value="250-999">250-999 employés</SelectItem>
+                            <SelectItem value="1000+">1000+ employés</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+
+                      <div>
+                        <Label htmlFor="foundedYear" className="text-slate-700">
+                          Année de création
+                        </Label>
+                        <Input
+                          id="foundedYear"
+                          type="number"
+                          min="1900"
+                          max={new Date().getFullYear()}
+                          value={formData.customFields?.foundedYear || ''}
+                          onChange={(e) =>
+                            setFormData({
+                              ...formData,
+                              customFields: { ...formData.customFields, foundedYear: e.target.value },
+                            })
+                          }
+                          placeholder="2010"
+                          className="mt-1.5"
+                        />
+                      </div>
+                    </div>
+                  </>
+                )}
+
+                {/* Champs spécifiques AGENCES uniquement */}
+                {formData.type === 'agency' && (
+                  <>
+                    <div>
+                      <Label htmlFor="agencySpecialties" className="text-slate-700">
+                        Spécialités de recrutement
+                      </Label>
+                      <Input
+                        id="agencySpecialties"
+                        value={formData.customFields?.agencySpecialties || ''}
+                        onChange={(e) =>
+                          setFormData({
+                            ...formData,
+                            customFields: { ...formData.customFields, agencySpecialties: e.target.value },
+                          })
+                        }
+                        placeholder="Ex: BTP, Industrie, Logistique"
+                        className="mt-1.5"
+                      />
+                    </div>
+
+                    <div>
+                      <Label htmlFor="operatingCountries" className="text-slate-700">
+                        Pays d&apos;opération
+                      </Label>
+                      <Input
+                        id="operatingCountries"
+                        value={formData.customFields?.operatingCountries || ''}
+                        onChange={(e) =>
+                          setFormData({
+                            ...formData,
+                            customFields: { ...formData.customFields, operatingCountries: e.target.value },
+                          })
+                        }
+                        placeholder="Ex: France, Pologne, Roumanie"
+                        className="mt-1.5"
+                      />
+                    </div>
+                  </>
+                )}
+
+                {/* Champs spécifiques CLIENTS uniquement */}
+                {formData.type === 'client' && (
+                  <div className="grid md:grid-cols-2 gap-4">
+                    <div>
+                      <Label htmlFor="annualRecruitmentVolume" className="text-slate-700">
+                        Volume de recrutement annuel
+                      </Label>
+                      <Select
+                        value={formData.customFields?.annualRecruitmentVolume || ''}
+                        onValueChange={(value) =>
+                          setFormData({
+                            ...formData,
+                            customFields: { ...formData.customFields, annualRecruitmentVolume: value },
+                          })
+                        }
+                      >
+                        <SelectTrigger className="mt-1.5">
+                          <SelectValue placeholder="Sélectionner le volume" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="1-10">1-10 recrutements/an</SelectItem>
+                          <SelectItem value="11-50">11-50 recrutements/an</SelectItem>
+                          <SelectItem value="51-100">51-100 recrutements/an</SelectItem>
+                          <SelectItem value="101-500">101-500 recrutements/an</SelectItem>
+                          <SelectItem value="500+">500+ recrutements/an</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+
+                    <div>
+                      <Label htmlFor="hrBudget" className="text-slate-700">
+                        Budget annuel RH
+                      </Label>
+                      <Select
+                        value={formData.customFields?.hrBudget || ''}
+                        onValueChange={(value) =>
+                          setFormData({
+                            ...formData,
+                            customFields: { ...formData.customFields, hrBudget: value },
+                          })
+                        }
+                      >
+                        <SelectTrigger className="mt-1.5">
+                          <SelectValue placeholder="Sélectionner le budget" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="<50k">&lt; 50k€</SelectItem>
+                          <SelectItem value="50k-100k">50k€ - 100k€</SelectItem>
+                          <SelectItem value="100k-250k">100k€ - 250k€</SelectItem>
+                          <SelectItem value="250k-500k">250k€ - 500k€</SelectItem>
+                          <SelectItem value="500k+">500k€+</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  </div>
+                )}
 
                 {/* Localisation et secteur */}
                 <div className="grid md:grid-cols-2 gap-4">
