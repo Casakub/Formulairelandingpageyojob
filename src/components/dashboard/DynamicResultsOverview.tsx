@@ -27,7 +27,9 @@ import {
   Phone,
   ArrowRight,
   TrendingDown,
-  Zap
+  Zap,
+  Briefcase,
+  HardHat
 } from 'lucide-react';
 import { Button } from '../ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '../ui/card';
@@ -98,6 +100,7 @@ export function DynamicResultsOverview() {
   const [filters, setFilters] = useState<Record<string, string>>({});
   const [searchTerm, setSearchTerm] = useState('');
   const [expandedCards, setExpandedCards] = useState<Set<string>>(new Set());
+  const [selectedProfile, setSelectedProfile] = useState<string>('all'); // Nouveau filtre profil
 
   // Charger les réponses
   useEffect(() => {

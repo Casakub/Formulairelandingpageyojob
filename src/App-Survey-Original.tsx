@@ -67,6 +67,10 @@ export interface FormData {
   q25_besoins: string;
   
   // Section 6: Contact
+  q26_phone: string;
+  q27_firstname: string;
+  q28_lastname: string;
+  q29_siret: string;
   email: string;
   autorise_contact: boolean;
   souhaite_rapport: boolean;
@@ -114,6 +118,10 @@ export default function AppSurveyOriginal() {
     q23_role: '',
     q24_evolution: '',
     q25_besoins: '',
+    q26_phone: '',
+    q27_firstname: '',
+    q28_lastname: '',
+    q29_siret: '',
     email: '',
     autorise_contact: false,
     souhaite_rapport: false

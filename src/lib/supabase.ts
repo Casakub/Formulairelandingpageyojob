@@ -107,6 +107,10 @@ export interface MarketResearchResponse {
   q25_besoins: string;
   
   // Section 6: Contact
+  q26_phone: string;
+  q27_firstname: string;
+  q28_lastname: string;
+  q29_siret: string;
   email: string;
   autorise_contact: boolean;
   souhaite_rapport: boolean;

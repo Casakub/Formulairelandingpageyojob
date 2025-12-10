@@ -27,6 +27,8 @@ export function Section6Contact({ formData, updateFormData, respondentType }: Se
         title={t('nav.section6', 'Contact')}
         description={t('section6.description', '1 question • 1 min')}
         gradient="from-green-500 to-emerald-500"
+        respondentType={respondentType}
+        sectionNumber={6}
       />
 
       <MultiProfileQuestionRenderer

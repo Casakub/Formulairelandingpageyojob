@@ -1,30 +1,29 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import {
-  LayoutDashboard,
-  BarChart3,
-  FileEdit,
-  Languages,
-  Download,
-  Plug,
-  FileType,
-  Globe,
-  Settings,
+import { 
+  LayoutDashboard, 
+  BarChart3, 
+  FileEdit, 
+  Languages, 
+  Download, 
+  Plug, 
+  FileType, 
+  Settings, 
+  Users,
   User,
   LogOut,
-  ArrowLeft,
   Menu,
   X,
+  ArrowLeft,
   ChevronLeft,
-  ChevronRight,
-  Users,
+  ChevronRight
 } from 'lucide-react';
 import { Button } from './components/ui/button';
-import { TranslationProvider } from './contexts/TranslationContext';
+import { TranslationProvider } from './context/TranslationContext';
 import { UnifiedTranslationManager } from './components/dashboard/UnifiedTranslationManager';
 import { DashboardOverview } from './components/dashboard/DashboardOverview';
 import { DynamicResultsOverview } from './components/dashboard/DynamicResultsOverview';
-import { QuestionManager } from './components/dashboard/QuestionManager';
+import { QuestionManagerV2 } from './components/dashboard/QuestionManagerV2';
 import { ExportImportManager } from './components/dashboard/ExportImportManager';
 import { IntegrationManager } from './components/dashboard/IntegrationManager';
 import { ContentCMS } from './components/dashboard/ContentCMS';
@@ -311,7 +310,7 @@ export default function DashboardApp({ onBackToSurvey }: DashboardAppProps = {})
               <DynamicResultsOverview key="results" />
             )}
             {activeTab === 'questions' && (
-              <QuestionManager key="questions" />
+              <QuestionManagerV2 key="questions" />
             )}
             {activeTab === 'translations' && (
               <TranslationProvider>

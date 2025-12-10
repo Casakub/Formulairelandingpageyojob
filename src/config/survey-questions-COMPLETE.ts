@@ -1063,11 +1063,77 @@ export const SURVEY_QUESTIONS: QuestionConfig[] = [
   // SECTION 6 : CONTACT
   // ========================================
 
-  // Q26 : Email professionnel (ALL)
+  // Q26 : Téléphone professionnel (AGENCY & CLIENT)
+  {
+    id: 'q26_phone',
+    section: 6,
+    order: 1,
+    category: 'contact',
+    visibleFor: ['agency', 'client'],
+    type: 'text',
+    required: true,
+    fieldName: 'q26_phone',
+    labelKey: 'questions.q26_phone.label',
+    labelFallback: 'Téléphone professionnel',
+    placeholderKey: 'questions.q26_phone.placeholder',
+    placeholderFallback: '+33 6 12 34 56 78',
+  },
+
+  // Q27 : Prénom (ALL)
+  {
+    id: 'q27_firstname',
+    section: 6,
+    order: 2,
+    category: 'contact',
+    visibleFor: ['agency', 'client', 'worker'],
+    type: 'text',
+    required: true,
+    fieldName: 'q27_firstname',
+    labelKey: 'questions.q27_firstname.label',
+    labelFallback: 'Prénom',
+    placeholderKey: 'questions.q27_firstname.placeholder',
+    placeholderFallback: 'Votre prénom',
+  },
+
+  // Q28 : Nom (ALL)
+  {
+    id: 'q28_lastname',
+    section: 6,
+    order: 3,
+    category: 'contact',
+    visibleFor: ['agency', 'client', 'worker'],
+    type: 'text',
+    required: true,
+    fieldName: 'q28_lastname',
+    labelKey: 'questions.q28_lastname.label',
+    labelFallback: 'Nom',
+    placeholderKey: 'questions.q28_lastname.placeholder',
+    placeholderFallback: 'Votre nom',
+  },
+
+  // Q29 : SIRET/SIREN (AGENCY & CLIENT - optionnel)
+  {
+    id: 'q29_siret',
+    section: 6,
+    order: 4,
+    category: 'contact',
+    visibleFor: ['agency', 'client'],
+    type: 'text',
+    required: false,
+    fieldName: 'q29_siret',
+    labelKey: 'questions.q29_siret.label',
+    labelFallback: 'SIRET ou SIREN (optionnel)',
+    placeholderKey: 'questions.q29_siret.placeholder',
+    placeholderFallback: '123 456 789 00012',
+    descriptionKey: 'questions.q29_siret.description',
+    descriptionFallback: 'Pour enrichissement via Pappers/Société.com',
+  },
+
+  // Q30 : Email professionnel (ALL)
   {
     id: 'email',
     section: 6,
-    order: 1,
+    order: 5,
     category: 'contact',
     visibleFor: ['agency', 'client', 'worker'],
     type: 'email',
@@ -1079,11 +1145,11 @@ export const SURVEY_QUESTIONS: QuestionConfig[] = [
     placeholderFallback: 'votre.email@exemple.com',
   },
 
-  // Q27 : Autorisation contact (ALL)
+  // Q31 : Autorisation contact (ALL)
   {
     id: 'autorise_contact',
     section: 6,
-    order: 2,
+    order: 6,
     category: 'contact',
     visibleFor: ['agency', 'client', 'worker'],
     type: 'checkbox',
@@ -1093,11 +1159,11 @@ export const SURVEY_QUESTIONS: QuestionConfig[] = [
     labelFallback: 'J\'accepte d\'être recontacté',
   },
 
-  // Q28 : Rapport d'étude (ALL)
+  // Q32 : Rapport d'étude (ALL)
   {
     id: 'souhaite_rapport',
     section: 6,
-    order: 3,
+    order: 7,
     category: 'contact',
     visibleFor: ['agency', 'client', 'worker'],
     type: 'checkbox',
@@ -1112,18 +1178,18 @@ export const SURVEY_QUESTIONS: QuestionConfig[] = [
  * 🔢 COMPTEUR DE QUESTIONS PAR PROFIL
  */
 export const QUESTION_COUNT_BY_PROFILE: Record<RespondentType, number> = {
-  agency: 26,
-  client: 18,
-  worker: 15,
+  agency: 30,  // 26 questions de base + 4 nouveaux champs contact
+  client: 22,  // 18 questions de base + 4 nouveaux champs contact
+  worker: 17,  // 15 questions de base + 2 nouveaux champs contact (prénom, nom)
 };
 
 /**
  * ⏱️ TEMPS ESTIMÉ PAR PROFIL (en minutes)
  */
 export const ESTIMATED_TIME_BY_PROFILE: Record<RespondentType, string> = {
-  agency: '8-10 min',
-  client: '6-7 min',
-  worker: '5-6 min',
+  agency: '9-11 min',  // Augmenté avec nouveaux champs
+  client: '7-8 min',   // Augmenté avec nouveaux champs
+  worker: '5-6 min',   // Légèrement augmenté
 };
 
 /**

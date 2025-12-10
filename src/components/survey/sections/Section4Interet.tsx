@@ -27,6 +27,9 @@ export function Section4Interet({ formData, updateFormData, respondentType }: Se
         title={t('nav.section4', 'Intérêt pour YoJob')}
         description={t('section4.description', '6 questions • 3 min')}
         gradient="from-yellow-500 to-orange-500"
+        respondentType={respondentType}
+        sectionNumber={4}
+        isPremium
       />
 
       <MultiProfileQuestionRenderer

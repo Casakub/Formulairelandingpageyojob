@@ -27,6 +27,8 @@ export function Section5Vision({ formData, updateFormData, respondentType }: Sec
         title={t('nav.section5', 'Vision Future')}
         description={t('section5.description', '2 questions • 1 min')}
         gradient="from-pink-500 to-rose-500"
+        respondentType={respondentType}
+        sectionNumber={5}
       />
 
       <MultiProfileQuestionRenderer

@@ -15,7 +15,10 @@ import {
   Zap,
   RefreshCw,
   Database,
-  Info
+  Info,
+  Briefcase,
+  HardHat,
+  Globe
 } from 'lucide-react';
 import { Button } from '../ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '../ui/card';
@@ -179,6 +182,7 @@ const mockResponses: DisplayResponse[] = [
 export function ResultsOverview() {
   const [selectedCountry, setSelectedCountry] = useState<string>('all');
   const [selectedSector, setSelectedSector] = useState<string>('all');
+  const [selectedProfile, setSelectedProfile] = useState<'all' | 'agency' | 'client' | 'worker'>('all');
   const [showExportModal, setShowExportModal] = useState(false);
   const [showAIPanel, setShowAIPanel] = useState(false);
   const [responses, setResponses] = useState<DisplayResponse[]>([]);
@@ -323,7 +327,7 @@ export function ResultsOverview() {
           <p className="text-slate-600">
             {useMockData 
               ? 'Affichage des données de démonstration' 
-              : 'Vue d\'ensemble de l\'étude de marché européenne'
+              : 'Vue d\'ensemble de l\'étude de marché européen'
             }
           </p>
         </div>

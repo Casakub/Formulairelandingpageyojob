@@ -35,6 +35,8 @@ export function Section2Detachement({ formData, updateFormData, respondentType }
         title={t('nav.section2', title)}
         description={t('section2.description', '7 questions • 3 min')}
         gradient="from-cyan-500 to-blue-500"
+        respondentType={respondentType}
+        sectionNumber={2}
       />
 
       <MultiProfileQuestionRenderer
