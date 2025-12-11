@@ -138,6 +138,8 @@ function generateFrenchBundle(): TranslationBundle {
     },
     
     progress: {
+      section: 'Section',
+      question: 'Question',
       section_completed: 'Section complétée',
       questions_remaining: '{count} questions restantes',
       time_remaining: 'Environ {time} restant',

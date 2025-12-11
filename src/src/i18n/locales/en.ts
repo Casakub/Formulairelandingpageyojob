@@ -191,6 +191,8 @@ export const en: TranslationBundle = {
   
   // Progress
   progress: {
+    section: 'Section',
+    question: 'Question',
     section_completed: 'Section completed',
     questions_remaining: '{count} questions remaining',
     time_remaining: 'About {time} remaining',
@@ -905,7 +907,7 @@ export const en: TranslationBundle = {
     
     // Q30 : Email
     email: {
-      label: 'Your email (optional)',
+      label: 'Your email',
       placeholder: 'your.email@example.com',
     },
     

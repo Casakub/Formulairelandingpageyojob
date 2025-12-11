@@ -22,6 +22,7 @@ import type {
 // Import statique des locales
 import { fr } from './locales/fr.generated';
 import { en } from './locales/en';
+import { de } from './locales/de';
 
 /**
  * Toutes les traductions chargées
@@ -29,6 +30,7 @@ import { en } from './locales/en';
 const TRANSLATIONS: Partial<TranslationsByLanguage> = {
   fr,
   en,
+  de,
   // Les autres langues seront ajoutées progressivement
 };
 
