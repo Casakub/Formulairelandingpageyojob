@@ -1,9 +1,8 @@
-import { LanguageProgressIndicator } from './LanguageProgressIndicator';
-import { MissingTranslationsSeeder } from './MissingTranslationsSeeder';
-import { AutoTranslateAll } from './AutoTranslateAll';
-import { OneClickAutoSetup } from './OneClickAutoSetup';
 import { CompleteTranslationsSeeder } from './CompleteTranslationsSeeder';
 import { TranslateClientWorkerProfiles } from './TranslateClientWorkerProfiles';
+import { SeedAllFormsButton } from './SeedAllFormsButton';
+import { SeedFromSurveyConfig } from './SeedFromSurveyConfig';
+import { SeedWithProfilesButton } from './SeedWithProfilesButton';
 import { useQuestions } from '../../context/QuestionsContext';
 import { useTranslationContext } from '../../contexts/TranslationContext';
 import { EUROPEAN_LANGUAGES } from '../../lib/languages';
@@ -371,6 +370,9 @@ export function TranslationStatistics({ onBack, onSelectLanguage }: Props) {
         }
       }} />
 
+      {/* NEW: Seed All Forms Translations (FR/EN/DE) */}
+      <SeedAllFormsButton />
+
       {/* NEW: Translate Client & Worker Profiles Automatically */}
       <TranslateClientWorkerProfiles onComplete={() => {
         // Reload translations after completion
@@ -378,6 +380,12 @@ export function TranslationStatistics({ onBack, onSelectLanguage }: Props) {
           setTimeout(() => window.location.reload(), 2000);
         }
       }} />
+
+      {/* NEW: Seed From Survey Config */}
+      <SeedFromSurveyConfig />
+
+      {/* NEW: Seed With Profiles */}
+      <SeedWithProfilesButton />
 
       {/* Recommendations */}
       <Card className="border-2 border-orange-200 bg-orange-50">

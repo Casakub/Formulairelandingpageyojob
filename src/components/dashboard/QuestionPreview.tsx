@@ -1,12 +1,13 @@
 import { motion } from 'motion/react';
-import { Question } from '../../config/questions';
+import { Card, CardContent, CardHeader, CardTitle } from '../ui/card';
+import { Label } from '../ui/label';
 import { Input } from '../ui/input';
 import { Textarea } from '../ui/textarea';
-import { Label } from '../ui/label';
-import { RadioCard } from '../survey/inputs/RadioCard';
+import { RadioGroup, RadioGroupItem } from '../ui/radio-group';
 import { MultiSelectChips } from '../survey/inputs/MultiSelectChips';
 import { ScoreSelector } from '../survey/inputs/ScoreSelector';
-import { useI18n } from '../../hooks/useI18n';
+import { useI18n } from '../../src/i18n';
+import type { Question } from '../../context/QuestionsContext';
 import { 
   Building2, 
   Calendar, 

@@ -1,8 +1,8 @@
 import { motion } from 'motion/react';
-import { useI18n } from '../../hooks/useI18n';
+import { Loader2 } from 'lucide-react';
+import { useI18n } from '../../src/i18n';
 import { useAvailableLanguages, getCompletionColor } from '../../hooks/useAvailableLanguages';
 import { Badge } from '../ui/badge';
-import { Loader2 } from 'lucide-react';
 
 interface QuickLanguageSwitchProps {
   variant?: 'compact' | 'full';

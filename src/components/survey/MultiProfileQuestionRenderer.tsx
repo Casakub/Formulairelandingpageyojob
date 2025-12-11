@@ -6,32 +6,47 @@
  */
 
 import { motion } from 'motion/react';
+import { Label } from '../ui/label';
 import { Input } from '../ui/input';
 import { Textarea } from '../ui/textarea';
-import { Label } from '../ui/label';
-import { RadioCard } from './inputs/RadioCard';
+import { RadioGroup, RadioGroupItem } from '../ui/radio-group';
+import { 
+  Building2, 
+  Factory, 
+  Tractor, 
+  UtensilsCrossed, 
+  Heart, 
+  Laptop, 
+  Globe, 
+  MapPin, 
+  Mail, 
+  Phone, 
+  User, 
+  Briefcase, 
+  Hash,
+  TrendingUp,
+  Settings,
+  FileText,
+  DollarSign,
+  Calendar,
+  Users,
+  UserCheck
+} from 'lucide-react';
+import { 
+  Select, 
+  SelectContent, 
+  SelectItem, 
+  SelectTrigger, 
+  SelectValue 
+} from '../ui/select';
+import { Card, CardContent } from '../ui/card';
 import { MultiSelectChips } from './inputs/MultiSelectChips';
 import { ScoreSelector } from './inputs/ScoreSelector';
 import { Checkbox } from '../ui/checkbox';
-import { useI18n } from '../../hooks/useI18n';
+import { useI18n } from '../../src/i18n';
 import { useQuestionVisibility } from '../../hooks/useQuestionVisibility';
 import type { RespondentType } from '../../types/survey';
 import type { FormData } from '../../App-Survey-Original';
-import { 
-  Building2, 
-  Calendar, 
-  Users, 
-  Globe, 
-  FileText,
-  Mail,
-  Briefcase,
-  UserCheck,
-  MapPin,
-  TrendingUp,
-  DollarSign,
-  Settings,
-  Heart
-} from 'lucide-react';
 
 interface MultiProfileQuestionRendererProps {
   sectionNumber: number;
@@ -43,8 +58,8 @@ interface MultiProfileQuestionRendererProps {
 // Map des icônes par fieldName pour visuel amélioré
 const FIELD_ICONS: Record<string, any> = {
   q1_nom: Building2,
-  q2_annee: Calendar,
-  q3_taille: Users,
+  q2_annee: Factory,
+  q3_taille: Tractor,
   q4_secteurs: Briefcase,
   q5_pays: Globe,
   q6_volume: TrendingUp,
@@ -98,7 +113,7 @@ export function MultiProfileQuestionRenderer({
     const Icon = getIcon(question.fieldName);
     const baseDelay = index * 0.1;
 
-    // Labels i18n avec fallback
+    // 🌍 Labels i18n avec fallback
     const label = t(question.labelKey, question.labelFallback);
     const placeholder = question.placeholderKey 
       ? t(question.placeholderKey, question.placeholderFallback || '')
@@ -106,6 +121,18 @@ export function MultiProfileQuestionRenderer({
     const description = question.descriptionKey
       ? t(question.descriptionKey, question.descriptionFallback || '')
       : question.descriptionFallback || '';
+
+    // 🐛 Debug: Log des options pour vérifier qu'elles sont bien chargées
+    if (question.options && question.options.length > 0 && (question.type === 'radio' || question.type === 'multi-select')) {
+      console.log(`[MultiProfileQuestionRenderer] Question ${question.id} has ${question.options.length} options:`, 
+        question.options.map((opt: any) => ({
+          value: opt.value,
+          labelKey: opt.labelKey,
+          labelFallback: opt.labelFallback,
+          translated: t(opt.labelKey, opt.labelFallback)
+        }))
+      );
+    }
 
     switch (question.type) {
       case 'text':
@@ -204,19 +231,24 @@ export function MultiProfileQuestionRenderer({
             {description && (
               <p className="text-cyan-200 text-sm mb-4">{description}</p>
             )}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <RadioGroup
+              value={value as string}
+              onValueChange={onChange}
+              className="grid grid-cols-1 sm:grid-cols-2 gap-3"
+            >
               {question.options?.map((option: any) => (
-                <RadioCard
+                <div
                   key={option.value}
-                  name={question.id}
-                  value={option.value}
-                  label={t(option.labelKey, option.labelFallback)}
-                  icon={option.icon}
-                  checked={value === option.value}
-                  onChange={() => onChange(option.value)}
-                />
+                  className="flex items-center gap-3 px-4 py-3 bg-white/5 border border-white/10 rounded-xl hover:border-cyan-400/50 transition-colors"
+                >
+                  <RadioGroupItem value={option.value} id={`${question.id}-${option.value}`} />
+                  <Label htmlFor={`${question.id}-${option.value}`} className="text-white cursor-pointer select-none flex-1 flex items-center gap-3">
+                    <Icon className="w-5 h-5 text-cyan-400" />
+                    {t(option.labelKey, option.labelFallback)}
+                  </Label>
+                </div>
               ))}
-            </div>
+            </RadioGroup>
           </motion.div>
         );
 

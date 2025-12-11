@@ -18,7 +18,7 @@ import { toast } from 'sonner@2.0.3';
 import { Button } from '../ui/button';
 import { Card, CardContent } from '../ui/card';
 import { Badge } from '../ui/badge';
-import { Question } from '../../config/questions';
+import { Question } from '../../config/survey-questions-COMPLETE';
 
 interface AIAnalysisPanelProps {
   responses: any[];

@@ -39,7 +39,7 @@ import {
   SelectValue,
 } from '../ui/select';
 import { useQuestions } from '../../context/QuestionsContext';
-import { Question } from '../../config/questions';
+import { Question } from '../../config/survey-questions-COMPLETE';
 import { QuestionStats } from './QuestionStats';
 import { SortableQuestion } from './SortableQuestion';
 import { AdvancedSearch } from './AdvancedSearch';

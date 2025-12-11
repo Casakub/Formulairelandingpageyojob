@@ -1,8 +1,7 @@
-import { useState, useEffect } from 'react';
-import { Search, X, Filter, Eye, EyeOff, AlertCircle } from 'lucide-react';
+import { Search, X, Filter } from 'lucide-react';
 import { Input } from '../ui/input';
 import { Button } from '../ui/button';
-import { Question } from '../../config/questions';
+import { Question } from '../../config/survey-questions-COMPLETE';
 import {
   Select,
   SelectContent,

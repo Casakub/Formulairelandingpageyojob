@@ -7,7 +7,7 @@
  * - WORKER : 15 questions (5-6 min) - Intérimaires/Travailleurs
  * 
  * Version: 2.0.0
- * Date: 10 Décembre 2024
+ * Date: 10 Décembre 2025
  */
 
 import type { RespondentType } from '../types/survey';
@@ -1176,20 +1176,26 @@ export const SURVEY_QUESTIONS: QuestionConfig[] = [
 
 /**
  * 🔢 COMPTEUR DE QUESTIONS PAR PROFIL
+ *
+ * Calcul dynamique basé sur `visibleFor` dans SURVEY_QUESTIONS.
+ * Les placeholders et options ne sont pas comptés comme des questions distinctes.
  */
 export const QUESTION_COUNT_BY_PROFILE: Record<RespondentType, number> = {
-  agency: 30,  // 26 questions de base + 4 nouveaux champs contact
-  client: 22,  // 18 questions de base + 4 nouveaux champs contact
-  worker: 17,  // 15 questions de base + 2 nouveaux champs contact (prénom, nom)
+  agency: getTotalQuestions('agency'), // ≈ 34 questions
+  client: getTotalQuestions('client'), // ≈ 29 questions
+  worker: getTotalQuestions('worker'), // ≈ 24 questions
 };
 
 /**
  * ⏱️ TEMPS ESTIMÉ PAR PROFIL (en minutes)
+ *
+ * Estimation indicative en conditions réelles (lecture + réflexion),
+ * cohérente avec le volume de questions par profil.
  */
 export const ESTIMATED_TIME_BY_PROFILE: Record<RespondentType, string> = {
-  agency: '9-11 min',  // Augmenté avec nouveaux champs
-  client: '7-8 min',   // Augmenté avec nouveaux champs
-  worker: '5-6 min',   // Légèrement augmenté
+  agency: '9-11 min',
+  client: '7-9 min',
+  worker: '6-8 min',
 };
 
 /**
@@ -1221,3 +1227,60 @@ export function getTotalQuestions(profile: RespondentType): number {
 export function getRequiredQuestions(profile: RespondentType): QuestionConfig[] {
   return getQuestionsByProfile(profile).filter(q => q.required);
 }
+
+/**
+ * 🔄 COMPATIBILITÉ AVEC L'ANCIEN SYSTÈME
+ * Interface et exports pour le code legacy
+ */
+
+export interface Question {
+  id: string;
+  section: number;
+  order: number;
+  code: string;
+  type: 'text' | 'textarea' | 'radio' | 'multi-select' | 'number' | 'email' | 'score';
+  label: string;
+  placeholder?: string;
+  required: boolean;
+  options?: Array<{ value: string; label: string; icon?: string }>;
+  visible: boolean;
+  conditional?: {
+    dependsOn: string;
+    showWhen: string;
+  };
+  
+  // Support multi-profils (optionnel pour backward compatibility)
+  visibleFor?: ('agency' | 'client' | 'worker')[];
+  category?: 'profile' | 'experience' | 'needs' | 'interest' | 'vision' | 'contact';
+}
+
+/**
+ * Convertit QuestionConfig vers Question (format legacy)
+ */
+function convertToLegacyQuestion(config: QuestionConfig): Question {
+  return {
+    id: config.id,
+    section: config.section,
+    order: config.order,
+    code: config.fieldName,
+    type: config.type as any,
+    label: config.labelFallback,
+    placeholder: config.placeholderFallback,
+    required: config.required,
+    options: config.options?.map(opt => ({
+      value: opt.value,
+      label: opt.labelFallback,
+      icon: opt.icon,
+    })),
+    visible: true,
+    conditional: config.conditional,
+    visibleFor: config.visibleFor,
+    category: config.category,
+  };
+}
+
+/**
+ * Export DEFAULT_QUESTIONS pour compatibilité
+ * Contient toutes les questions (3 profils) au format legacy
+ */
+export const DEFAULT_QUESTIONS: Question[] = SURVEY_QUESTIONS.map(convertToLegacyQuestion);

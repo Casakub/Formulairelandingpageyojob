@@ -1,14 +1,15 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { ArrowLeft, LayoutDashboard, Globe, Check, Loader2 } from 'lucide-react';
+import { Building2, LayoutDashboard, Globe, Check, Loader2, ArrowLeft } from 'lucide-react';
 import { Button } from '../ui/button';
+import { Badge } from '../ui/badge';
 import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
 } from '../ui/tooltip';
-import { useI18n } from '../../hooks/useI18n';
+import { useI18n } from '../../src/i18n';
 import { useAvailableLanguages, getCompletionColor } from '../../hooks/useAvailableLanguages';
 
 interface HeaderProps {
@@ -20,7 +21,7 @@ interface HeaderProps {
 export function Header({ currentSection, progress, onDashboardClick }: HeaderProps) {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isLangMenuOpen, setIsLangMenuOpen] = useState(false);
-  const { currentLang, setCurrentLang, t } = useI18n();
+  const { currentLang, setLanguage, t } = useI18n();
   const { availableLanguages, loading: languagesLoading } = useAvailableLanguages();
 
   useEffect(() => {
@@ -146,7 +147,7 @@ export function Header({ currentSection, progress, onDashboardClick }: HeaderPro
                                 <motion.button
                                   key={lang.code}
                                   onClick={() => {
-                                    setCurrentLang(lang.code);
+                                    setLanguage(lang.code);
                                     setIsLangMenuOpen(false);
                                   }}
                                   whileHover={{ x: 4 }}

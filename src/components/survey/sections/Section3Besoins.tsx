@@ -1,9 +1,9 @@
 import { motion } from 'motion/react';
-import { Briefcase, DollarSign, AlertCircle } from 'lucide-react';
+import { Target } from 'lucide-react';
 import { SectionHeader } from '../SectionHeader';
 import { FormData } from '../../../App-Survey-Original';
 import { MultiProfileQuestionRenderer } from '../MultiProfileQuestionRenderer';
-import { useI18n } from '../../../hooks/useI18n';
+import { useI18n } from '../../../src/i18n';
 import type { RespondentType } from '../../../types/survey';
 
 interface Section3BesoinsProps {
@@ -31,7 +31,7 @@ export function Section3Besoins({ formData, updateFormData, respondentType }: Se
       transition={{ duration: 0.3 }}
     >
       <SectionHeader
-        icon={Briefcase}
+        icon={Target}
         title={t('nav.section3', title)}
         description={t('section3.description', '6 questions • 2 min')}
         gradient="from-violet-500 to-purple-500"

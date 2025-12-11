@@ -1,22 +1,18 @@
 import { motion } from 'motion/react';
-import { useQuestions } from '../../context/QuestionsContext';
-import { Question } from '../../config/questions';
+import { Label } from '../ui/label';
 import { Input } from '../ui/input';
 import { Textarea } from '../ui/textarea';
-import { Label } from '../ui/label';
-import { RadioCard } from './inputs/RadioCard';
+import { RadioGroup, RadioGroupItem } from '../ui/radio-group';
+import { Building2, Factory, Tractor, UtensilsCrossed, Heart, Laptop, FileText, Mail } from 'lucide-react';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select';
+import { Card, CardContent } from '../ui/card';
 import { MultiSelectChips } from './inputs/MultiSelectChips';
 import { ScoreSelector } from './inputs/ScoreSelector';
-import { useI18n } from '../../hooks/useI18n';
-import { 
-  Building2, 
-  Calendar, 
-  Users, 
-  Globe, 
-  FileText,
-  AlertCircle,
-  Mail
-} from 'lucide-react';
+import { useI18n } from '../../src/i18n';
+import { useQuestions } from '../../context/QuestionsContext';
+import type { Question } from '../../context/QuestionsContext';
+
+const Icon1 = Building2;
 
 interface DynamicQuestionRendererProps {
   sectionNumber: number;
@@ -26,12 +22,12 @@ interface DynamicQuestionRendererProps {
 
 // Map question codes to icons for visual enhancement
 const QUESTION_ICONS: Record<string, any> = {
-  q1_nom: Building2,
-  q2_annee: Calendar,
-  q3_taille: Users,
-  q5_pays: Globe,
-  q7_origine: Globe,
-  q8_destinations: Globe,
+  q1_nom: Icon1,
+  q2_annee: Factory,
+  q3_taille: Tractor,
+  q5_pays: UtensilsCrossed,
+  q7_origine: Heart,
+  q8_destinations: Laptop,
   email: Mail
 };
 

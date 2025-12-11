@@ -3,16 +3,28 @@ import { cors } from "npm:hono/cors";
 import { logger } from "npm:hono/logger";
 import * as kv from "./kv_store.tsx";
 import { analyzeWithClaude } from "./ai-analysis.tsx";
-import { getApiKeyStatus, saveApiKey, deleteApiKey, testApiKey } from "./settings.tsx";
+import { getApiKeyStatus, saveApiKey, deleteApiKey, testApiKey, getOverridesDebug, deleteAllOverrides } from "./settings.tsx";
 import i18nRoutes from "./i18n.tsx";
+// Alternative KV store pour i18n (fallback si problème de cache)
+// import i18nRoutes from "./i18n-kv.tsx";
 import { triggerAllIntegrations, testIntegration } from "./integrations.ts";
 import historyRoutes from "./history-routes.ts";
 import { seedMissingTranslations } from "./seed-translations.tsx";
 import { seedCompleteTranslations } from "./seed-complete-translations.tsx";
+import { seedAllFormsTranslations } from "./seed-all-forms-translations.tsx";
+import { seedFromSurveyConfig } from "./seed-from-survey-config.tsx";
 import { uploadAvatar, deleteAvatar, refreshSignedUrl } from "./storage.tsx";
 import landingRoutes from "./landing.tsx";
 import prospectsRoutes from "./prospects.tsx";
 import { syncSurveyToProspect, batchSyncSurveysToProspects } from "./survey-to-prospect.tsx";
+import questionsRoutes from "./questions.tsx";
+import migrateTranslationsRoutes from "./migrate-translations.tsx";
+import smartSeedRoutes from "./seed-smart-translations.tsx";
+import surveyResponsesRoutes from "./survey-responses.tsx";
+import pushTranslationsRoutes from "./push-translations.tsx";
+import { seedWithProfiles } from "./seed-with-profiles.tsx";
+import { seedFromConfig } from "./seed-from-config.tsx";
+import { seedClientWorkerTranslations } from "./seed-client-worker-translations.tsx";
 
 const app = new Hono();
 
@@ -82,6 +94,8 @@ app.get("/make-server-10092a63/settings/anthropic-key", getApiKeyStatus);
 app.post("/make-server-10092a63/settings/anthropic-key", saveApiKey);
 app.delete("/make-server-10092a63/settings/anthropic-key", deleteApiKey);
 app.post("/make-server-10092a63/settings/test-anthropic", testApiKey);
+app.get("/make-server-10092a63/settings/overrides-debug", getOverridesDebug);
+app.delete("/make-server-10092a63/settings/delete-all-overrides", deleteAllOverrides);
 
 // i18n endpoints
 app.route("/make-server-10092a63/i18n", i18nRoutes);
@@ -97,6 +111,12 @@ app.post("/make-server-10092a63/seed-missing-translations", seedMissingTranslati
 
 // Seed complete translations endpoint
 app.post("/make-server-10092a63/seed-complete-translations", seedCompleteTranslations);
+
+// Seed all forms translations endpoint
+app.post("/make-server-10092a63/seed-all-forms-translations", seedAllFormsTranslations);
+
+// Seed from survey config endpoint
+app.post("/make-server-10092a63/seed-from-survey-config", seedFromSurveyConfig);
 
 // Import auth routes
 import authRoutes from "./auth.tsx";
@@ -180,5 +200,29 @@ app.post("/make-server-10092a63/survey/batch-sync", async (c) => {
     return c.json({ error: error.message }, 500);
   }
 });
+
+// Questions endpoints
+app.route("/make-server-10092a63/questions", questionsRoutes);
+
+// Migrate translations endpoints
+app.route("/make-server-10092a63/migrate-translations", migrateTranslationsRoutes);
+
+// Smart seed translations endpoints (nouvelle génération IA)
+app.route("/make-server-10092a63/seed", smartSeedRoutes);
+
+// Survey responses endpoints
+app.route("/make-server-10092a63/survey-responses", surveyResponsesRoutes);
+
+// Push translations endpoints
+app.route("/make-server-10092a63/push-translations", pushTranslationsRoutes);
+
+// Seed with profiles endpoint
+app.post("/make-server-10092a63/seed-with-profiles", seedWithProfiles);
+
+// Seed from config endpoint
+app.post("/make-server-10092a63/seed-from-config", seedFromConfig);
+
+// Seed client-worker translations endpoint
+app.post("/make-server-10092a63/seed-client-worker-translations", seedClientWorkerTranslations);
 
 Deno.serve(app.fetch);

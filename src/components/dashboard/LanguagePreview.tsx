@@ -1,12 +1,12 @@
-import { useState } from 'react';
 import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'motion/react';
-import { Eye, X, Globe, ChevronRight } from 'lucide-react';
-import { Card, CardContent, CardHeader, CardTitle } from '../ui/card';
+import { useState } from 'react';
+import { Globe, Check, Loader2, AlertTriangle, ChevronRight, X } from 'lucide-react';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '../ui/card';
 import { Button } from '../ui/button';
 import { Badge } from '../ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select';
-import { useI18n } from '../../hooks/useI18n';
+import { useI18n } from '../../src/i18n';
 import { useAvailableLanguages } from '../../hooks/useAvailableLanguages';
 import { Separator } from '../ui/separator';
 
@@ -59,7 +59,7 @@ export function LanguagePreview({ onClose }: LanguagePreviewProps) {
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-blue-500 to-cyan-500 flex items-center justify-center">
-                  <Eye className="w-5 h-5 text-white" />
+                  <Check className="w-5 h-5 text-white" />
                 </div>
                 <div>
                   <CardTitle className="text-slate-900">Prévisualisation multilingue</CardTitle>

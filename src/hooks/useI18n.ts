@@ -227,7 +227,61 @@ export function I18nProvider({ children, initialLang }: I18nProviderProps) {
 
   // Translate UI text by key
   const t = (key: string, fallback?: string): string => {
-    return translations.ui[key] || fallback || key;
+    // D'abord chercher dans UI
+    if (translations.ui[key]) {
+      return translations.ui[key];
+    }
+    
+    // Si c'est une clé de question (questions.XXX)
+    if (key.startsWith('questions.')) {
+      const parts = key.split('.');
+      const isProfileSpecific = ['agency', 'client', 'worker'].includes(parts[1]);
+      
+      // CAS 1 : Format AVEC profil (questions.agency.q1_nom.label)
+      if (isProfileSpecific && parts.length >= 4) {
+        const questionId = parts[2];
+        const field = parts[3]; // 'label', 'placeholder', 'description', 'options'
+        
+        const question = translations.questions[questionId];
+        if (question) {
+          if (field === 'label') return question.label || fallback || key;
+          if (field === 'placeholder') return question.placeholder || fallback || '';
+          if (field === 'description') return (question as any).description || fallback || '';
+          
+          // Gérer les options : questions.agency.q3_taille.options.1-9
+          if (field === 'options' && parts.length >= 5) {
+            const optionValue = parts[4]; // "1-9", "btp", etc.
+            if (question.options && typeof question.options === 'object') {
+              return (question.options as any)[optionValue] || fallback || key;
+            }
+          }
+        }
+      }
+      
+      // CAS 2 : Format SANS profil (questions.q1_nom.label)
+      // Fallback pour compatibilité avec les clés de survey-questions-COMPLETE.ts
+      if (!isProfileSpecific && parts.length >= 3) {
+        const questionId = parts[1]; // q1_nom, q6_volume_client, etc.
+        const field = parts[2]; // 'label', 'placeholder', 'description', 'options'
+        
+        const question = translations.questions[questionId];
+        if (question) {
+          if (field === 'label') return question.label || fallback || key;
+          if (field === 'placeholder') return question.placeholder || fallback || '';
+          if (field === 'description') return (question as any).description || fallback || '';
+          
+          // Gérer les options : questions.q3_taille.options.1-9
+          if (field === 'options' && parts.length >= 4) {
+            const optionValue = parts[3]; // "1-9", "btp", etc.
+            if (question.options && typeof question.options === 'object') {
+              return (question.options as any)[optionValue] || fallback || key;
+            }
+          }
+        }
+      }
+    }
+    
+    return fallback || key;
   };
 
   // Translate question by ID - returns translated label

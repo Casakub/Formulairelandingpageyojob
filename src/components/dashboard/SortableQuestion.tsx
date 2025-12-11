@@ -1,10 +1,7 @@
 import { useSortable } from '@dnd-kit/sortable';
-import { CSS } from '@dnd-kit/utilities';
-import { motion } from 'motion/react';
-import { GripVertical, Eye, EyeOff, Copy, Edit, Trash2 } from 'lucide-react';
 import { Card, CardContent } from '../ui/card';
 import { Button } from '../ui/button';
-import { Question } from '../../config/questions';
+import { Question } from '../../config/survey-questions-COMPLETE';
 
 interface SortableQuestionProps {
   question: Question;

@@ -1,5 +1,6 @@
 import { Context } from 'npm:hono';
 import * as kv from './kv_store.tsx';
+import { createClient } from "npm:@supabase/supabase-js";
 
 /**
  * 🌍 SEED CLIENT & WORKER TRANSLATIONS
@@ -237,10 +238,19 @@ const CLIENT_WORKER_TRANSLATIONS = [
 
 /**
  * Endpoint POST /seed-client-worker-translations
- * Importe toutes les traductions CLIENT & WORKER dans Supabase KV
+ * Importe toutes les traductions CLIENT & WORKER dans Supabase translations table
  */
 export async function seedClientWorkerTranslations(c: Context) {
   try {
+    const supabaseUrl = Deno.env.get("SUPABASE_URL");
+    const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
+
+    if (!supabaseUrl || !supabaseServiceKey) {
+      throw new Error("Missing Supabase credentials");
+    }
+
+    const supabase = createClient(supabaseUrl, supabaseServiceKey);
+    
     let imported = 0;
     let skipped = 0;
     let errors: string[] = [];
@@ -248,37 +258,46 @@ export async function seedClientWorkerTranslations(c: Context) {
     console.log(`🚀 Starting CLIENT & WORKER translations import...`);
     console.log(`📊 ${CLIENT_WORKER_TRANSLATIONS.length} translation entries to process`);
 
+    // Préparer tous les inserts en batch
+    const translationsToInsert = [];
+
     for (const entry of CLIENT_WORKER_TRANSLATIONS) {
-      try {
-        const { textId, category, translations } = entry;
+      const { textId, category, translations } = entry;
 
-        // Import chaque langue
-        for (const [lang, data] of Object.entries(translations)) {
-          const key = `translation:${lang}:${textId}`;
-          
-          await kv.set(key, {
-            textId,
-            lang,
-            text: data.text,
-            status: data.status,
-            category,
-            profile: textId.includes('_client') ? 'client' : textId.includes('_worker') ? 'worker' : 'both',
-            updatedAt: new Date().toISOString()
-          });
-
-          imported++;
-        }
-      } catch (error) {
-        errors.push(`${entry.textId}: ${error.message}`);
-        skipped++;
+      // Pour chaque langue dans cette entrée
+      for (const [lang, data] of Object.entries(translations)) {
+        translationsToInsert.push({
+          key: textId,
+          language: lang,
+          value: data.text,
+          context: category,
+          section: textId.includes('_client') ? 'client' : textId.includes('_worker') ? 'worker' : 'both'
+        });
       }
     }
 
-    console.log(`✅ Import completed: ${imported} translations imported, ${skipped} skipped`);
+    console.log(`📦 Prepared ${translationsToInsert.length} translations for batch insert`);
+
+    // Insert en batch dans la table Supabase
+    const { data, error } = await supabase
+      .from('translations_10092a63')
+      .upsert(translationsToInsert, {
+        onConflict: 'key,language',
+        ignoreDuplicates: false
+      });
+
+    if (error) {
+      console.error('❌ Supabase insert error:', error);
+      throw new Error(`Failed to insert translations: ${error.message}`);
+    }
+
+    imported = translationsToInsert.length;
+
+    console.log(`✅ Import completed: ${imported} translations imported successfully`);
 
     return c.json({
       success: true,
-      message: 'CLIENT & WORKER translations seeded successfully',
+      message: 'CLIENT & WORKER translations seeded successfully in Supabase',
       stats: {
         imported,
         skipped,
@@ -287,7 +306,7 @@ export async function seedClientWorkerTranslations(c: Context) {
       }
     });
 
-  } catch (error) {
+  } catch (error: any) {
     console.error('❌ Error seeding CLIENT & WORKER translations:', error);
     return c.json({
       success: false,

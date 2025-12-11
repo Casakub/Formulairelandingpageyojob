@@ -3,7 +3,7 @@ import { Star } from 'lucide-react';
 import { SectionHeader } from '../SectionHeader';
 import { FormData } from '../../../App-Survey-Original';
 import { MultiProfileQuestionRenderer } from '../MultiProfileQuestionRenderer';
-import { useI18n } from '../../../hooks/useI18n';
+import { useI18n } from '../../../src/i18n';
 import type { RespondentType } from '../../../types/survey';
 
 interface Section4InteretProps {

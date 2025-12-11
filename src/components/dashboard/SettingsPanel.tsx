@@ -17,6 +17,10 @@ import {
   Target,
   Users,
   TrendingUp,
+  Bug,
+  Trash2,
+  Database,
+  Download,
 } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../ui/card';
 import { Input } from '../ui/input';
@@ -32,6 +36,9 @@ export function SettingsPanel() {
   const [isLoading, setIsLoading] = useState(false);
   const [isTesting, setIsTesting] = useState(false);
   const [isConfigured, setIsConfigured] = useState(false);
+  const [overridesDebug, setOverridesDebug] = useState<any>(null);
+  const [isLoadingOverrides, setIsLoadingOverrides] = useState(false);
+  const [isImportingTranslations, setIsImportingTranslations] = useState(false);
 
   useEffect(() => {
     loadApiKey();
@@ -190,6 +197,110 @@ export function SettingsPanel() {
     }
   };
 
+  const loadOverrides = async () => {
+    setIsLoadingOverrides(true);
+    try {
+      const { projectId, publicAnonKey } = await import('../../utils/supabase/info');
+      
+      const response = await fetch(
+        `https://${projectId}.supabase.co/functions/v1/make-server-10092a63/settings/overrides-debug`,
+        {
+          method: 'GET',
+          headers: {
+            'Authorization': `Bearer ${publicAnonKey}`
+          }
+        }
+      );
+
+      if (response.ok) {
+        const result = await response.json();
+        setOverridesDebug(result);
+        console.log('🐛 [SettingsPanel] Overrides debug:', result);
+      }
+    } catch (error) {
+      console.error('Error loading overrides:', error);
+      toast.error('Erreur lors du chargement des overrides');
+    } finally {
+      setIsLoadingOverrides(false);
+    }
+  };
+
+  const deleteOverrides = async () => {
+    if (!confirm('⚠️ ATTENTION : Cette action va supprimer TOUS les overrides en base de données.\n\nCela ne touchera PAS les traductions, mais réinitialisera toutes les modifications de questions faites via le dashboard.\n\nÊtes-vous sûr de vouloir continuer ?')) {
+      return;
+    }
+
+    setIsLoadingOverrides(true);
+    try {
+      const { projectId, publicAnonKey } = await import('../../utils/supabase/info');
+      
+      const response = await fetch(
+        `https://${projectId}.supabase.co/functions/v1/make-server-10092a63/settings/delete-all-overrides`,
+        {
+          method: 'DELETE',
+          headers: {
+            'Authorization': `Bearer ${publicAnonKey}`
+          }
+        }
+      );
+
+      if (response.ok) {
+        setOverridesDebug(null);
+        toast.success('✅ Tous les overrides ont été supprimés !', {
+          description: 'Rechargez la page pour voir les changements.'
+        });
+      } else {
+        throw new Error('Failed to delete overrides');
+      }
+    } catch (error) {
+      console.error('Error deleting overrides:', error);
+      toast.error('Erreur lors de la suppression');
+    } finally {
+      setIsLoadingOverrides(false);
+    }
+  };
+
+  const importClientWorkerTranslations = async () => {
+    if (!confirm('📦 IMPORT DES TRADUCTIONS CLIENT & WORKER\n\nCette action va importer toutes les traductions françaises et internationales pour les profils Client et Worker (Section 2 - Détachement).\n\nCela inclut :\n- q5_localisation (Pays entreprise)\n- q6_volume_client (Volume intérimaires)\n- q8_nationalites (Nationalités)\n- Et toutes les autres questions client/worker\n\nContinuer ?')) {
+      return;
+    }
+
+    setIsImportingTranslations(true);
+    try {
+      const { projectId, publicAnonKey } = await import('../../utils/supabase/info');
+      
+      const response = await fetch(
+        `https://${projectId}.supabase.co/functions/v1/make-server-10092a63/seed-client-worker-translations`,
+        {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${publicAnonKey}`,
+            'Content-Type': 'application/json'
+          }
+        }
+      );
+
+      if (response.ok) {
+        const result = await response.json();
+        toast.success('✅ Traductions importées avec succès !', {
+          description: `${result.stats?.imported || 0} traductions ajoutées en base de données`,
+          duration: 6000
+        });
+        console.log('📦 Import result:', result);
+      } else {
+        const error = await response.json();
+        throw new Error(error.error || 'Import failed');
+      }
+    } catch (error) {
+      console.error('Error importing translations:', error);
+      toast.error('❌ Erreur lors de l\'import des traductions', {
+        description: error instanceof Error ? error.message : 'Erreur inconnue'
+      });
+    } finally {
+      setIsImportingTranslations(false);
+    }
+  };
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -234,8 +345,8 @@ export function SettingsPanel() {
             <Sparkles className="w-7 h-7 text-white" />
           </motion.div>
           <div>
-            <h2 className="text-slate-900">Configuration IA</h2>
-            <p className="text-slate-600">Analyse automatique avec Claude 3.5 Sonnet</p>
+            <h2 className="text-slate-900">Configuration & Debug</h2>
+            <p className="text-slate-600">Analyse IA & Diagnostic système</p>
           </div>
         </div>
         
@@ -271,6 +382,202 @@ export function SettingsPanel() {
             transition={{ delay: 0.01 }}
           >
             <QuickDiagnostic />
+          </motion.div>
+
+          {/* 🐛 DEBUG OVERRIDES */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.05 }}
+            whileHover={{ y: -4 }}
+          >
+            <Card className="bg-white border-orange-200 shadow-lg hover:shadow-xl hover:border-orange-300 transition-all duration-300">
+              <CardHeader className="border-b border-orange-100 pb-4">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-orange-500 to-red-500 flex items-center justify-center">
+                      <Bug className="w-5 h-5 text-white" />
+                    </div>
+                    <div>
+                      <CardTitle className="text-slate-900">Debug Overrides</CardTitle>
+                      <CardDescription>Diagnostiquer les problèmes de traduction</CardDescription>
+                    </div>
+                  </div>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={loadOverrides}
+                    disabled={isLoadingOverrides}
+                    className="border-orange-500/30 hover:bg-orange-500/10 text-orange-600"
+                  >
+                    {isLoadingOverrides ? (
+                      <>
+                        <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                        Chargement...
+                      </>
+                    ) : (
+                      'Analyser'
+                    )}
+                  </Button>
+                </div>
+              </CardHeader>
+              <CardContent className="pt-6">
+                {!overridesDebug ? (
+                  <div className="text-center py-8">
+                    <Bug className="w-12 h-12 text-orange-400 mx-auto mb-3" />
+                    <p className="text-slate-600 mb-4">
+                      Cliquez sur "Analyser" pour vérifier les overrides en base de données
+                    </p>
+                  </div>
+                ) : (
+                  <div className="space-y-4">
+                    {/* Résumé */}
+                    <div className="grid grid-cols-2 gap-4">
+                      <div className="p-4 rounded-xl bg-blue-50 border border-blue-200">
+                        <p className="text-sm text-slate-600 mb-1">Total overrides</p>
+                        <p className="text-2xl text-blue-700">{overridesDebug.count || 0}</p>
+                      </div>
+                      <div className="p-4 rounded-xl bg-red-50 border border-red-200">
+                        <p className="text-sm text-slate-600 mb-1">Labels anglais</p>
+                        <p className="text-2xl text-red-700">{overridesDebug.problematicCount || 0}</p>
+                      </div>
+                    </div>
+
+                    {/* Liste des overrides problématiques */}
+                    {overridesDebug.problematicCount > 0 && (
+                      <div className="max-h-64 overflow-y-auto border border-red-200 rounded-xl p-4 bg-red-50/50">
+                        <p className="text-sm text-slate-700 mb-3">
+                          <strong>Overrides avec labels anglais :</strong>
+                        </p>
+                        <div className="space-y-2">
+                          {overridesDebug.problematicOverrides.map((item: any, idx: number) => (
+                            <div key={idx} className="p-3 bg-white rounded-lg border border-red-200 text-xs">
+                              <code className="text-red-700 font-mono">{item.id}</code>
+                              {item.label && (
+                                <div className="mt-1 text-slate-600">
+                                  <span className="font-semibold">Label:</span> {item.label}
+                                </div>
+                              )}
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Actions */}
+                    <div className="flex gap-3">
+                      <Button
+                        variant="destructive"
+                        onClick={deleteOverrides}
+                        disabled={isLoadingOverrides || overridesDebug.count === 0}
+                        className="flex-1"
+                      >
+                        <Trash2 className="w-4 h-4 mr-2" />
+                        Supprimer tous les overrides
+                      </Button>
+                    </div>
+
+                    <div className="text-xs text-slate-500 p-3 bg-blue-50 rounded-lg border border-blue-200">
+                      <strong>💡 Note:</strong> La suppression des overrides ne touchera PAS les traductions. Elle réinitialisera seulement les modifications de structure faites via le dashboard Questions.
+                    </div>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          </motion.div>
+
+          {/* 📦 IMPORT TRADUCTIONS CLIENT & WORKER */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.07 }}
+            whileHover={{ y: -4 }}
+          >
+            <Card className="bg-white border-cyan-200 shadow-lg hover:shadow-xl hover:border-cyan-300 transition-all duration-300">
+              <CardHeader className="border-b border-cyan-100 pb-4">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-cyan-500 to-blue-500 flex items-center justify-center">
+                    <Database className="w-5 h-5 text-white" />
+                  </div>
+                  <div>
+                    <CardTitle className="text-slate-900">Maintenance Traductions</CardTitle>
+                    <CardDescription>Importer les traductions Client & Worker</CardDescription>
+                  </div>
+                </div>
+              </CardHeader>
+              <CardContent className="pt-6">
+                <div className="space-y-4">
+                  <div className="p-4 rounded-xl bg-cyan-50 border border-cyan-200">
+                    <div className="flex items-start gap-3 mb-3">
+                      <Info className="w-5 h-5 text-cyan-600 flex-shrink-0 mt-0.5" />
+                      <div>
+                        <p className="text-sm text-slate-900 mb-1">
+                          <strong>Traductions manquantes détectées</strong>
+                        </p>
+                        <p className="text-xs text-slate-600">
+                          Les questions Client et Worker de la Section 2 (Détachement) nécessitent des traductions françaises pour s'afficher correctement.
+                        </p>
+                      </div>
+                    </div>
+                    
+                    <div className="space-y-2 text-xs text-slate-700">
+                      <p className="flex items-center gap-2">
+                        <CheckCircle2 className="w-3 h-3 text-cyan-600" />
+                        q5_localisation (Pays entreprise)
+                      </p>
+                      <p className="flex items-center gap-2">
+                        <CheckCircle2 className="w-3 h-3 text-cyan-600" />
+                        q6_volume_client (Volume intérimaires)
+                      </p>
+                      <p className="flex items-center gap-2">
+                        <CheckCircle2 className="w-3 h-3 text-cyan-600" />
+                        q8_nationalites (Nationalités)
+                      </p>
+                      <p className="flex items-center gap-2">
+                        <CheckCircle2 className="w-3 h-3 text-cyan-600" />
+                        + toutes les autres questions client/worker
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="p-4 rounded-xl bg-gradient-to-r from-blue-50 to-violet-50 border border-blue-200">
+                    <div className="flex items-center gap-2 mb-2">
+                      <Download className="w-4 h-4 text-blue-600" />
+                      <span className="text-sm text-blue-900">Ce qui sera importé</span>
+                    </div>
+                    <div className="space-y-1 text-xs text-slate-700">
+                      <p>• Traductions FR + 22 langues européennes</p>
+                      <p>• Questions Client (18 items)</p>
+                      <p>• Questions Worker (15 items)</p>
+                      <p>• Options de réponses incluses</p>
+                    </div>
+                  </div>
+
+                  <Button
+                    onClick={importClientWorkerTranslations}
+                    disabled={isImportingTranslations}
+                    className="w-full bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-600 hover:to-blue-600 text-white shadow-lg shadow-cyan-500/30"
+                    size="lg"
+                  >
+                    {isImportingTranslations ? (
+                      <>
+                        <Loader2 className="w-5 h-5 mr-2 animate-spin" />
+                        Import en cours...
+                      </>
+                    ) : (
+                      <>
+                        <Download className="w-5 h-5 mr-2" />
+                        Importer les traductions
+                      </>
+                    )}
+                  </Button>
+
+                  <div className="text-xs text-slate-500 p-3 bg-green-50 rounded-lg border border-green-200">
+                    <strong>✅ Sécurisé:</strong> L'import utilise "upsert" - les traductions existantes seront mises à jour, pas de duplication.
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
           </motion.div>
 
           {/* Card principale - Configuration */}

@@ -20,7 +20,9 @@ import {
   Eye,
   EyeOff,
   FileText,
-  CheckCircle2
+  CheckCircle2,
+  RefreshCw,
+  AlertCircle
 } from 'lucide-react';
 import { Button } from '../ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '../ui/card';
@@ -38,6 +40,11 @@ import type { RespondentType } from '../../types/survey';
 import { QuestionEditModal } from './QuestionEditModal';
 import { QuestionDeleteModal } from './QuestionDeleteModal';
 import { toast } from 'sonner';
+import { useQuestions } from '../../hooks/useQuestions';
+import { MigrateTranslationsButton } from './MigrateTranslationsButton';
+import { SeedWithProfilesButton } from './SeedWithProfilesButton';
+import { SeedFromConfigButton } from './SeedFromConfigButton';
+import { ClearOverridesButton } from './ClearOverridesButton';
 
 interface QuestionCardProps {
   question: QuestionConfig;
@@ -171,6 +178,17 @@ export function QuestionManagerV2() {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   
+  // Utiliser le hook useQuestions pour charger les questions avec overrides
+  const { 
+    questions: allQuestions, 
+    isLoading, 
+    error,
+    refreshQuestions,
+    saveQuestion,
+    createQuestion,
+    deleteQuestion,
+  } = useQuestions();
+  
   // Track hidden questions (persisted in localStorage)
   const [hiddenQuestions, setHiddenQuestions] = useState<Set<string>>(() => {
     if (typeof window !== 'undefined') {
@@ -180,10 +198,10 @@ export function QuestionManagerV2() {
     return new Set();
   });
 
-  // Get questions for selected profile
+  // Get questions for selected profile (filtrer depuis allQuestions)
   const profileQuestions = useMemo(() => {
-    return getQuestionsByProfile(selectedProfile);
-  }, [selectedProfile]);
+    return allQuestions.filter(q => q.visibleFor.includes(selectedProfile));
+  }, [allQuestions, selectedProfile]);
 
   // Group questions by section
   const questionsBySection = useMemo(() => {
@@ -243,23 +261,37 @@ export function QuestionManagerV2() {
     console.log('Add question for profile:', selectedProfile);
   };
 
-  const handleSaveQuestion = (updatedQuestion: QuestionConfig) => {
-    // TODO: Implement save to Supabase
-    // For now, just show success message
-    console.log('Saving question:', updatedQuestion);
-    toast.success(`Question "${updatedQuestion.labelFallback}" mise à jour avec succès`);
-    setEditingQuestion(null);
-    setIsEditModalOpen(false);
+  const handleSaveQuestion = async (updatedQuestion: QuestionConfig) => {
+    console.log('🔵 [QuestionManagerV2] handleSaveQuestion called', {
+      questionId: updatedQuestion.id,
+      labelFallback: updatedQuestion.labelFallback,
+      required: updatedQuestion.required,
+      type: updatedQuestion.type,
+      visibleFor: updatedQuestion.visibleFor,
+    });
+
+    try {
+      await saveQuestion(updatedQuestion.id, updatedQuestion);
+      console.log('✅ [QuestionManagerV2] Question saved successfully');
+      toast.success(`✅ Question "${updatedQuestion.labelFallback}" mise à jour avec succès`);
+      setEditingQuestion(null);
+      setIsEditModalOpen(false);
+    } catch (error: any) {
+      console.error('❌ [QuestionManagerV2] Error saving question:', error);
+      toast.error(`❌ Erreur: ${error.message}`);
+    }
   };
 
-  const handleConfirmDelete = (questionId: string) => {
-    // TODO: Implement delete from Supabase
-    // For now, just show success message
-    console.log('Deleting question:', questionId);
-    toast.success('Question supprimée avec succès');
-    setDeletingQuestion(null);
-    setEditingQuestion(null);
-    setIsDeleteModalOpen(false);
+  const handleConfirmDelete = async (questionId: string) => {
+    try {
+      await deleteQuestion(questionId);
+      toast.success('✅ Question supprimée avec succès');
+      setDeletingQuestion(null);
+      setEditingQuestion(null);
+      setIsDeleteModalOpen(false);
+    } catch (error: any) {
+      toast.error(`❌ Erreur: ${error.message}`);
+    }
   };
 
   return (
@@ -275,19 +307,43 @@ export function QuestionManagerV2() {
                 {hiddenQuestions.size} masquée{hiddenQuestions.size > 1 ? 's' : ''}
               </Badge>
             )}
+            {isLoading && (
+              <Badge variant="outline" className="bg-blue-50 text-blue-700 border-blue-300">
+                <RefreshCw className="w-3 h-3 mr-1 animate-spin" />
+                Chargement...
+              </Badge>
+            )}
+            {error && (
+              <Badge variant="outline" className="bg-red-50 text-red-700 border-red-300">
+                <AlertCircle className="w-3 h-3 mr-1" />
+                Erreur de chargement
+              </Badge>
+            )}
           </div>
         </div>
-        <Button
-          onClick={handleAddQuestion}
-          className="relative overflow-hidden group bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-600 hover:to-blue-600 text-white shadow-lg hover:shadow-xl transition-all rounded-xl px-6 py-2.5"
-        >
-          <span className="relative z-10 flex items-center gap-2">
-            <Plus className="w-4 h-4" />
-            <span>Ajouter une question</span>
-          </span>
-          {/* Shimmer effect on hover */}
-          <div className="absolute inset-0 -translate-x-full group-hover:translate-x-full transition-transform duration-700 bg-gradient-to-r from-transparent via-white/30 to-transparent" />
-        </Button>
+        <div className="flex items-center gap-2">
+          <Button
+            onClick={refreshQuestions}
+            variant="outline"
+            size="sm"
+            disabled={isLoading}
+            className="hover:bg-slate-100"
+          >
+            <RefreshCw className={`w-4 h-4 mr-2 ${isLoading ? 'animate-spin' : ''}`} />
+            Actualiser
+          </Button>
+          <Button
+            onClick={handleAddQuestion}
+            className="relative overflow-hidden group bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-600 hover:to-blue-600 text-white shadow-lg hover:shadow-xl transition-all rounded-xl px-6 py-2.5"
+          >
+            <span className="relative z-10 flex items-center gap-2">
+              <Plus className="w-4 h-4" />
+              <span>Ajouter une question</span>
+            </span>
+            {/* Shimmer effect on hover */}
+            <div className="absolute inset-0 -translate-x-full group-hover:translate-x-full transition-transform duration-700 bg-gradient-to-r from-transparent via-white/30 to-transparent" />
+          </Button>
+        </div>
       </div>
 
       {/* Profile Tabs */}
@@ -523,6 +579,15 @@ export function QuestionManagerV2() {
           onConfirm={handleConfirmDelete}
         />
       )}
+
+      {/* Migrate Translations Button */}
+      <MigrateTranslationsButton />
+      {/* Seed With Profiles Button */}
+      <SeedWithProfilesButton />
+      {/* Seed From Config Button */}
+      <SeedFromConfigButton />
+      {/* Clear Overrides Button */}
+      <ClearOverridesButton />
     </div>
   );
 }

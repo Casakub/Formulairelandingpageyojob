@@ -1,5 +1,5 @@
 import { motion } from 'motion/react';
-import { useI18n } from '../../hooks/useI18n';
+import { useI18n } from '../../src/i18n';
 
 interface ProgressBarProps {
   currentSection: number;

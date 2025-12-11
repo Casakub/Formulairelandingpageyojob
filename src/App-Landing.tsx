@@ -1843,6 +1843,13 @@ export default function AppLanding() {
                 <span className="w-2 h-2 bg-green-400 rounded-full animate-pulse" />
                 Traductions Live • {availableLanguages.length} langues
               </Badge>
+              {/* Lien Admin */}
+              <a 
+                href="/push-translations" 
+                className="text-xs text-white/40 hover:text-cyan-400 transition-colors underline"
+              >
+                Admin
+              </a>
             </div>
           </motion.div>
         </div>

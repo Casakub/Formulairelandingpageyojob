@@ -1,8 +1,8 @@
 import { motion } from 'motion/react';
-import { CheckCircle, FileText, Gift } from 'lucide-react';
+import { CheckCircle, Home, FileText, ArrowLeft, Gift } from 'lucide-react';
 import { Button } from '../ui/button';
 import { Card, CardContent } from '../ui/card';
-import { useI18n } from '../../hooks/useI18n';
+import { useI18n } from '../../src/i18n';
 
 export function ConfirmationScreen() {
   const { t } = useI18n();

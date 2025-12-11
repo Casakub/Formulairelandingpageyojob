@@ -1,9 +1,10 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { AlertCircle, X, Languages } from 'lucide-react';
+import { Languages, AlertTriangle, CheckCircle, X } from 'lucide-react';
+import { Card, CardContent } from '../ui/card';
 import { Button } from '../ui/button';
 import { Badge } from '../ui/badge';
-import { useI18n } from '../../hooks/useI18n';
+import { useI18n } from '../../src/i18n';
 import { useAvailableLanguages } from '../../hooks/useAvailableLanguages';
 
 export function TranslationMissingBanner() {
@@ -45,8 +46,8 @@ export function TranslationMissingBanner() {
         exit={{ opacity: 0, y: -20 }}
         className="fixed top-20 left-1/2 -translate-x-1/2 z-40 w-full max-w-2xl px-4"
       >
-        <div className="bg-gradient-to-r from-amber-50 via-yellow-50 to-orange-50 border-2 border-amber-300 rounded-2xl shadow-2xl p-4 backdrop-blur-sm">
-          <div className="flex items-start gap-4">
+        <Card className="bg-gradient-to-r from-amber-50 via-yellow-50 to-orange-50 border-2 border-amber-300 rounded-2xl shadow-2xl p-4 backdrop-blur-sm">
+          <CardContent className="flex items-start gap-4">
             <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-amber-500 to-orange-500 flex items-center justify-center flex-shrink-0">
               <Languages className="w-5 h-5 text-white" />
             </div>
@@ -91,8 +92,8 @@ export function TranslationMissingBanner() {
             >
               <X className="w-4 h-4" />
             </Button>
-          </div>
-        </div>
+          </CardContent>
+        </Card>
       </motion.div>
     </AnimatePresence>
   );

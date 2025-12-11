@@ -1,6 +1,7 @@
+import { motion } from 'motion/react';
 import { useEffect, useRef } from 'react';
 import { CheckCircle } from 'lucide-react';
-import { useI18n } from '../../hooks/useI18n';
+import { useI18n } from '../../src/i18n';
 
 interface Section {
   id: number;

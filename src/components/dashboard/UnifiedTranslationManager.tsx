@@ -10,6 +10,8 @@ import { TranslateClientWorkerProfiles } from './TranslateClientWorkerProfiles';
 import { ImportClientWorkerTranslations } from './ImportClientWorkerTranslations';
 import { ValidateTranslations } from './ValidateTranslations';
 import { TranslationManager } from './TranslationManager';
+import { SeedFromSurveyConfig } from './SeedFromSurveyConfig';
+import { SmartSeedTranslations } from './SmartSeedTranslations';
 import { setTranslationProvider } from '../../services/aiTranslationService';
 import { TranslationProvider } from '../../contexts/TranslationContext';
 
@@ -247,6 +249,26 @@ export function UnifiedTranslationManager() {
                         // Reload translations after completion
                         if (window.location.reload) {
                           setTimeout(() => window.location.reload(), 2000);
+                        }
+                      }} />
+                    </div>
+
+                    {/* 🌱 NEW: Seed automatique depuis configuration */}
+                    <div className="mb-6">
+                      <SeedFromSurveyConfig onComplete={() => {
+                        // Reload translations after seeding
+                        if (window.location.reload) {
+                          setTimeout(() => window.location.reload(), 1000);
+                        }
+                      }} />
+                    </div>
+
+                    {/* 🌱 NEW: Smart Seed automatique */}
+                    <div className="mb-6">
+                      <SmartSeedTranslations onComplete={() => {
+                        // Reload translations after seeding
+                        if (window.location.reload) {
+                          setTimeout(() => window.location.reload(), 1000);
                         }
                       }} />
                     </div>

@@ -1,8 +1,8 @@
 import { motion } from 'motion/react';
-import { ArrowRight, Globe, Users, Clock } from 'lucide-react';
+import { ArrowRight, CheckCircle, Clock } from 'lucide-react';
 import { Button } from '../ui/button';
 import { Card, CardContent } from '../ui/card';
-import { useI18n } from '../../hooks/useI18n';
+import { useI18n } from '../../src/i18n';
 import { QUESTION_COUNT_BY_PROFILE, ESTIMATED_TIME_BY_PROFILE } from '../../config/survey-questions';
 import type { RespondentType } from '../../types/survey';
 
@@ -26,16 +26,10 @@ export function HeroSection({ onStart, respondentType }: HeroSectionProps) {
   
   const stats = [
     { 
-      icon: Globe, 
+      icon: CheckCircle, 
       labelKey: 'hero.stat.countries',
       fallback: '27 pays couverts',
       color: 'from-cyan-400 to-blue-500' 
-    },
-    { 
-      icon: Users, 
-      labelKey: 'hero.stat.agencies',
-      fallback: '500+ agences partenaires',
-      color: 'from-violet-400 to-purple-500' 
     },
     { 
       icon: Clock, 

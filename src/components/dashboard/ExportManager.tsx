@@ -1,20 +1,7 @@
-import { useState } from 'react';
-import { createPortal } from 'react-dom';
-import { motion } from 'motion/react';
-import {
-  X,
-  Download,
-  FileJson,
-  FileSpreadsheet,
-  Sparkles,
-  Check,
-  Copy,
-  AlertCircle
-} from 'lucide-react';
 import { Button } from '../ui/button';
 import { Card, CardContent } from '../ui/card';
 import { Badge } from '../ui/badge';
-import { Question } from '../../config/questions';
+import { Question } from '../../config/survey-questions-COMPLETE';
 
 interface ExportManagerProps {
   responses: any[];

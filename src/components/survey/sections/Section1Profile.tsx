@@ -1,9 +1,9 @@
 import { motion } from 'motion/react';
-import { Building2, Briefcase, UserCheck } from 'lucide-react';
+import { User } from 'lucide-react';
 import { SectionHeader } from '../SectionHeader';
 import { FormData } from '../../../App-Survey-Original';
 import { MultiProfileQuestionRenderer } from '../MultiProfileQuestionRenderer';
-import { useI18n } from '../../../hooks/useI18n';
+import { useI18n } from '../../../src/i18n';
 import type { RespondentType } from '../../../types/survey';
 
 interface Section1ProfileProps {
@@ -14,9 +14,9 @@ interface Section1ProfileProps {
 
 // Map des icônes selon le profil
 const PROFILE_ICONS: Record<RespondentType, any> = {
-  agency: Building2,
-  client: Briefcase,
-  worker: UserCheck,
+  agency: User,
+  client: User,
+  worker: User,
 };
 
 // Map des titres selon le profil

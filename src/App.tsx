@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import AppLanding from './App-Landing';
 import AppSurvey from './App-Survey-Original';
+import AppPushTranslations from './App-Push-Translations';
 import { Toaster } from './components/ui/sonner';
 
 export default function App() {
@@ -57,6 +58,15 @@ export default function App() {
     return (
       <>
         <AppSurvey />
+        <Toaster position="top-right" />
+      </>
+    );
+  }
+
+  if (currentPath === '/push-translations') {
+    return (
+      <>
+        <AppPushTranslations />
         <Toaster position="top-right" />
       </>
     );

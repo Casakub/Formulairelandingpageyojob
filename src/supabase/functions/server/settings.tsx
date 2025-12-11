@@ -2,6 +2,7 @@ import { Context } from "npm:hono";
 import * as kv from "./kv_store.tsx";
 
 const API_KEY_STORAGE_KEY = "anthropic_api_key";
+const OVERRIDES_STORAGE_KEY = "question_overrides";
 
 // Get API key status
 export async function getApiKeyStatus(c: Context) {
@@ -190,5 +191,78 @@ export async function getApiKey(): Promise<string | null> {
   } catch (error) {
     console.error("Error retrieving API key:", error);
     return null;
+  }
+}
+
+// 🐛 Get overrides debug info
+export async function getOverridesDebug(c: Context) {
+  try {
+    const overrides = await kv.get(OVERRIDES_STORAGE_KEY);
+    
+    if (!overrides) {
+      return c.json({
+        success: true,
+        overrides: {},
+        count: 0,
+        message: "Aucun override trouvé"
+      });
+    }
+
+    const overridesObj = typeof overrides === 'object' ? overrides : {};
+    const count = Object.keys(overridesObj).length;
+    
+    // Analyser les overrides problématiques (avec labels anglais)
+    const problematicOverrides: any[] = [];
+    
+    Object.entries(overridesObj).forEach(([id, override]: [string, any]) => {
+      if (override?.label || override?.placeholder || override?.description) {
+        problematicOverrides.push({
+          id,
+          hasEnglishLabel: !!override.label,
+          hasEnglishPlaceholder: !!override.placeholder,
+          hasEnglishDescription: !!override.description,
+          label: override.label,
+          placeholder: override.placeholder,
+          description: override.description,
+        });
+      }
+    });
+
+    return c.json({
+      success: true,
+      overrides: overridesObj,
+      count,
+      problematicCount: problematicOverrides.length,
+      problematicOverrides,
+      message: `${count} overrides trouvés (${problematicOverrides.length} avec labels anglais)`
+    });
+
+  } catch (error) {
+    console.error("Error getting overrides debug:", error);
+    return c.json({
+      success: false,
+      error: error instanceof Error ? error.message : "Unknown error"
+    }, 500);
+  }
+}
+
+// 🗑️ Delete ALL overrides
+export async function deleteAllOverrides(c: Context) {
+  try {
+    await kv.del(OVERRIDES_STORAGE_KEY);
+
+    console.log("✅ [settings.tsx] All overrides deleted successfully");
+
+    return c.json({
+      success: true,
+      message: "Tous les overrides ont été supprimés avec succès"
+    });
+
+  } catch (error) {
+    console.error("Error deleting overrides:", error);
+    return c.json({
+      success: false,
+      error: error instanceof Error ? error.message : "Unknown error"
+    }, 500);
   }
 }

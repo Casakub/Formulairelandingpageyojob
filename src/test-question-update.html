@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Test Question Update</title>
+  <style>
+    body {
+      font-family: system-ui, -apple-system, sans-serif;
+      max-width: 800px;
+      margin: 40px auto;
+      padding: 20px;
+      background: #f8fafc;
+    }
+    .container {
+      background: white;
+      padding: 30px;
+      border-radius: 12px;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    }
+    h1 {
+      color: #1e3a8a;
+      margin-bottom: 10px;
+    }
+    .section {
+      margin: 20px 0;
+      padding: 20px;
+      background: #f1f5f9;
+      border-radius: 8px;
+      border-left: 4px solid #06b6d4;
+    }
+    button {
+      background: linear-gradient(to right, #06b6d4, #1e3a8a);
+      color: white;
+      border: none;
+      padding: 12px 24px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: 600;
+      margin: 5px;
+      transition: all 0.3s;
+    }
+    button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(6, 182, 212, 0.5);
+    }
+    button:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+    pre {
+      background: #1e293b;
+      color: #e2e8f0;
+      padding: 15px;
+      border-radius: 8px;
+      overflow-x: auto;
+      font-size: 13px;
+    }
+    .success {
+      color: #10b981;
+      font-weight: 600;
+    }
+    .error {
+      color: #ef4444;
+      font-weight: 600;
+    }
+    .loading {
+      color: #06b6d4;
+      font-weight: 600;
+    }
+    input, textarea {
+      width: 100%;
+      padding: 10px;
+      border: 2px solid #e2e8f0;
+      border-radius: 6px;
+      font-family: inherit;
+      margin-top: 5px;
+    }
+    label {
+      font-weight: 600;
+      color: #334155;
+      display: block;
+      margin-top: 15px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>🧪 Test de Modification de Question</h1>
+    <p>Test du système de gestion des questions avec override dans KV store</p>
+
+    <!-- Section 1: Fetch question actuelle -->
+    <div class="section">
+      <h3>1️⃣ Charger la question actuelle</h3>
+      <button onclick="fetchQuestion()">Charger q1_nom</button>
+      <div id="fetchResult"></div>
+    </div>
+
+    <!-- Section 2: Modifier la question -->
+    <div class="section">
+      <h3>2️⃣ Modifier la question</h3>
+      
+      <label>Nouveau libellé (labelFallback):</label>
+      <input type="text" id="newLabel" placeholder="ex: Nom complet de votre organisation" value="Nom complet (TEST MODIFIÉ)">
+      
+      <label>Nouveau placeholder:</label>
+      <input type="text" id="newPlaceholder" placeholder="ex: YOJOB SARL" value="Entrez le nom complet (MODIFIÉ)">
+      
+      <label>Question obligatoire ?</label>
+      <select id="newRequired">
+        <option value="true">Oui (required = true)</option>
+        <option value="false">Non (required = false)</option>
+      </select>
+
+      <br><br>
+      <button onclick="updateQuestion()">💾 Sauvegarder les modifications</button>
+      <div id="updateResult"></div>
+    </div>
+
+    <!-- Section 3: Vérifier les données KV -->
+    <div class="section">
+      <h3>3️⃣ Vérifier dans le KV store</h3>
+      <button onclick="checkKVStore()">Lire question_config:q1_nom</button>
+      <button onclick="checkTranslation()">Lire i18n:fr:question:q1_nom</button>
+      <div id="kvResult"></div>
+    </div>
+
+    <!-- Section 4: Charger toutes les questions -->
+    <div class="section">
+      <h3>4️⃣ Charger toutes les questions (avec overrides)</h3>
+      <button onclick="fetchAllQuestions()">GET /questions</button>
+      <div id="allQuestionsResult"></div>
+    </div>
+  </div>
+
+  <script type="module">
+    import { projectId, publicAnonKey } from './utils/supabase/info.js';
+    
+    const API_BASE = `https://${projectId}.supabase.co/functions/v1/make-server-10092a63`;
+    
+    window.projectId = projectId;
+    window.publicAnonKey = publicAnonKey;
+    window.API_BASE = API_BASE;
+
+    // 1. Fetch question actuelle
+    window.fetchQuestion = async () => {
+      const resultDiv = document.getElementById('fetchResult');
+      resultDiv.innerHTML = '<p class="loading">⏳ Chargement...</p>';
+
+      try {
+        const response = await fetch(`${API_BASE}/questions/q1_nom`, {
+          headers: {
+            'Authorization': `Bearer ${publicAnonKey}`,
+          },
+        });
+
+        const data = await response.json();
+        
+        if (data.success) {
+          resultDiv.innerHTML = `
+            <p class="success">✅ Question chargée</p>
+            <pre>${JSON.stringify(data, null, 2)}</pre>
+          `;
+        } else {
+          resultDiv.innerHTML = `<p class="error">❌ Erreur: ${data.error}</p>`;
+        }
+      } catch (error) {
+        resultDiv.innerHTML = `<p class="error">❌ Erreur réseau: ${error.message}</p>`;
+      }
+    };
+
+    // 2. Update question
+    window.updateQuestion = async () => {
+      const resultDiv = document.getElementById('updateResult');
+      resultDiv.innerHTML = '<p class="loading">⏳ Sauvegarde en cours...</p>';
+
+      const newLabel = document.getElementById('newLabel').value;
+      const newPlaceholder = document.getElementById('newPlaceholder').value;
+      const newRequired = document.getElementById('newRequired').value === 'true';
+
+      const updateData = {
+        labelFallback: newLabel,
+        placeholderFallback: newPlaceholder,
+        required: newRequired,
+      };
+
+      try {
+        const response = await fetch(`${API_BASE}/questions/q1_nom`, {
+          method: 'PUT',
+          headers: {
+            'Authorization': `Bearer ${publicAnonKey}`,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(updateData),
+        });
+
+        const data = await response.json();
+        
+        if (data.success) {
+          resultDiv.innerHTML = `
+            <p class="success">✅ ${data.message}</p>
+            <pre>${JSON.stringify(data, null, 2)}</pre>
+          `;
+        } else {
+          resultDiv.innerHTML = `<p class="error">❌ Erreur: ${data.error}</p>`;
+        }
+      } catch (error) {
+        resultDiv.innerHTML = `<p class="error">❌ Erreur réseau: ${error.message}</p>`;
+      }
+    };
+
+    // 3. Check KV store
+    window.checkKVStore = async () => {
+      const resultDiv = document.getElementById('kvResult');
+      resultDiv.innerHTML = '<p class="loading">⏳ Lecture KV store...</p>';
+
+      try {
+        const response = await fetch(`${API_BASE}/kv-store/question_config:q1_nom`, {
+          headers: {
+            'Authorization': `Bearer ${publicAnonKey}`,
+          },
+        });
+
+        const data = await response.json();
+        
+        resultDiv.innerHTML = `
+          <p class="success">✅ Données KV (question_config:q1_nom)</p>
+          <pre>${JSON.stringify(data, null, 2)}</pre>
+        `;
+      } catch (error) {
+        resultDiv.innerHTML = `<p class="error">❌ Erreur: ${error.message}</p>`;
+      }
+    };
+
+    window.checkTranslation = async () => {
+      const resultDiv = document.getElementById('kvResult');
+      resultDiv.innerHTML = '<p class="loading">⏳ Lecture traduction...</p>';
+
+      try {
+        const response = await fetch(`${API_BASE}/kv-store/i18n:fr:question:q1_nom`, {
+          headers: {
+            'Authorization': `Bearer ${publicAnonKey}`,
+          },
+        });
+
+        const data = await response.json();
+        
+        resultDiv.innerHTML = `
+          <p class="success">✅ Traduction FR (i18n:fr:question:q1_nom)</p>
+          <pre>${JSON.stringify(data, null, 2)}</pre>
+        `;
+      } catch (error) {
+        resultDiv.innerHTML = `<p class="error">❌ Erreur: ${error.message}</p>`;
+      }
+    };
+
+    // 4. Fetch all questions
+    window.fetchAllQuestions = async () => {
+      const resultDiv = document.getElementById('allQuestionsResult');
+      resultDiv.innerHTML = '<p class="loading">⏳ Chargement de toutes les questions...</p>';
+
+      try {
+        const response = await fetch(`${API_BASE}/questions`, {
+          headers: {
+            'Authorization': `Bearer ${publicAnonKey}`,
+          },
+        });
+
+        const data = await response.json();
+        
+        if (data.success) {
+          const overrideCount = Object.keys(data.overrides || {}).length;
+          resultDiv.innerHTML = `
+            <p class="success">✅ ${data.count} override(s) trouvé(s)</p>
+            <pre>${JSON.stringify(data, null, 2)}</pre>
+          `;
+        } else {
+          resultDiv.innerHTML = `<p class="error">❌ Erreur: ${data.error}</p>`;
+        }
+      } catch (error) {
+        resultDiv.innerHTML = `<p class="error">❌ Erreur réseau: ${error.message}</p>`;
+      }
+    };
+  </script>
+</body>
+</html>

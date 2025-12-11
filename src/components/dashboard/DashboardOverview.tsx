@@ -13,6 +13,7 @@ import { toast } from 'sonner@2.0.3';
 import { AutoUploadTranslations } from './AutoUploadTranslations';
 import { UploadHeroTranslations } from './UploadHeroTranslations';
 import { UploadProgressTranslations } from './UploadProgressTranslations';
+import { PushTranslationsButton } from '../PushTranslationsButton';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select';
 import { ProfileDistributionChart } from './ProfileDistributionChart';
 import { ProfileSpecificMetrics } from './ProfileSpecificMetrics';
@@ -662,10 +663,11 @@ export function DashboardOverview() {
         className="mt-8"
       >
         <h2 className="text-slate-900 mb-4">Gestion des traductions</h2>
-        <div className="grid md:grid-cols-2 xl:grid-cols-2 gap-8">
+        <div className="grid md:grid-cols-2 gap-6">
           <UploadHeroTranslations />
           <UploadProgressTranslations />
           <AutoUploadTranslations />
+          <PushTranslationsButton />
         </div>
       </motion.div>
     </motion.div>
