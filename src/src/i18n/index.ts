@@ -62,14 +62,27 @@ export const SUPPORTED_LANGUAGES: LanguageMetadata[] = [
 
 /**
  * Naviguer dans un objet par chemin (ex: "questions.q1_nom.label")
+ * Supporte les clés avec caractères spéciaux (tirets, chiffres, etc.)
  */
 function getByPath(obj: any, path: string): any {
   const keys = path.split('.');
   let value = obj;
   
   for (const key of keys) {
-    if (value && typeof value === 'object' && key in value) {
-      value = value[key];
+    if (value && typeof value === 'object') {
+      // Essayer d'abord avec la clé telle quelle
+      if (key in value) {
+        value = value[key];
+      } else {
+        // Si la clé contient des caractères spéciaux, elle pourrait être définie différemment
+        // Par exemple, '1-50' pourrait être stocké comme une clé de propriété
+        const found = Object.keys(value).find(k => k === key);
+        if (found) {
+          value = value[found];
+        } else {
+          return undefined;
+        }
+      }
     } else {
       return undefined;
     }

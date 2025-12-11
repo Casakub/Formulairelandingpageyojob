@@ -1,10 +1,13 @@
 import { createClient, SupabaseClient } from '@supabase/supabase-js';
-import { projectId, publicAnonKey, supabaseUrl } from '../utils/supabase/info';
+import { projectId, publicAnonKey } from '../utils/supabase/info';
 import type { MarketResearchResponse } from './supabase';
 
 // =============================================================================
 // CLIENT SUPABASE PUBLIC (pour le formulaire - rôle anon uniquement)
 // =============================================================================
+
+// Construire l'URL Supabase à partir du projectId
+const supabaseUrl = `https://${projectId}.supabase.co`;
 
 // SINGLETON: Une seule instance du client public
 let publicClientInstance: SupabaseClient | null = null;

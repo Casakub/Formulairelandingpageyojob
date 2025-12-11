@@ -55,6 +55,94 @@ export const en: TranslationBundle = {
     },
   },
   
+  // Sections adaptées par profil
+  sectionContent: {
+    1: {
+      agency: {
+        title: '📋 Your Agency Profile',
+        description: 'Tell us about your temp agency and expertise',
+      },
+      client: {
+        title: '📋 Your Company Profile',
+        description: 'Tell us about your company and recruitment needs',
+      },
+      worker: {
+        title: '📋 Your Profile',
+        description: 'Tell us about your professional background',
+      },
+    },
+    2: {
+      agency: {
+        title: '💼 Posting Experience',
+        description: 'Your worker posting activity',
+      },
+      client: {
+        title: '💼 Your Recruitment Experience',
+        description: 'Your current recruitment and temp work practices',
+      },
+      worker: {
+        title: '💼 Your Temp Work Experience',
+        description: 'Your temporary work journey',
+      },
+    },
+    3: {
+      agency: {
+        title: '🎯 Needs and Tools',
+        description: 'Your challenges and current solutions',
+      },
+      client: {
+        title: '🎯 Your Current Needs',
+        description: 'Challenges and expectations in recruitment',
+      },
+      worker: {
+        title: '🎯 Your Expectations',
+        description: 'What matters to you in an assignment',
+      },
+    },
+    4: {
+      agency: {
+        title: '⭐ Interest in a European Platform',
+        description: 'Discover our vision for an innovative marketplace',
+      },
+      client: {
+        title: '⭐ Interest in a European Platform',
+        description: 'An innovative solution for your needs',
+      },
+      worker: {
+        title: '⭐ Your Interest in a Platform',
+        description: 'A platform to find your assignments easily',
+      },
+    },
+    5: {
+      agency: {
+        title: '🔮 Future Vision',
+        description: 'Budget and development prospects',
+      },
+      client: {
+        title: '🔮 Your Future Priorities',
+        description: 'Budget and recruitment strategy',
+      },
+      worker: {
+        title: '🔮 Your Goals',
+        description: 'Your upcoming professional projects',
+      },
+    },
+    6: {
+      agency: {
+        title: '📧 Stay in Touch',
+        description: 'Receive study results and stay informed',
+      },
+      client: {
+        title: '📧 Stay in Touch',
+        description: 'Receive results and our recommendations',
+      },
+      worker: {
+        title: '📧 Stay in Touch',
+        description: 'Receive results and opportunities',
+      },
+    },
+  },
+  
   // Header
   header: {
     title: 'YoJob',
@@ -151,30 +239,35 @@ export const en: TranslationBundle = {
     
     // Q1 : Nom
     q1_nom: {
+      ...fr.questions.q1_nom,
       label: 'Name',
       placeholder: 'Organization name or your full name',
     },
     
     // Q2 : Année création (AGENCY)
     q2_annee: {
+      ...fr.questions.q2_annee,
       label: 'Year of establishment',
       placeholder: '2015',
     },
     
     // Q2 : Année création (CLIENT)
     q2_annee_client: {
+      ...fr.questions.q2_annee_client,
       label: 'Year your company was established',
       placeholder: '2010',
     },
     
     // Q2 : Nationalité (WORKER)
     q2_nationalite: {
+      ...fr.questions.q2_nationalite,
       label: 'Your nationality',
       placeholder: 'E.g.: Polish, Romanian...',
     },
     
     // Q3 : Taille (AGENCY/CLIENT)
     q3_taille: {
+      ...fr.questions.q3_taille,
       label: 'Organization size',
       options: {
         '1-9': '1-9 employees',
@@ -186,6 +279,7 @@ export const en: TranslationBundle = {
     
     // Q3 : Expérience (WORKER)
     q3_experience: {
+      ...fr.questions.q3_experience,
       label: 'Years of temporary work experience',
       options: {
         '<1': 'Less than 1 year',
@@ -198,30 +292,35 @@ export const en: TranslationBundle = {
     
     // Q4 : Secteurs
     q4_secteurs: {
+      ...fr.questions.q4_secteurs,
       label: 'Main industry sectors',
       description: 'Select all relevant sectors',
     },
     
     // Q4 : Métiers (WORKER)
     q4_metiers: {
+      ...fr.questions.q4_metiers,
       label: 'Your occupations',
       description: 'Select all your occupations',
     },
     
     // Q5 : Pays (AGENCY)
     q5_pays: {
+      ...fr.questions.q5_pays,
       label: 'Country of your agency',
       placeholder: 'E.g.: Poland',
     },
     
     // Q5 : Localisation (CLIENT)
     q5_localisation: {
+      ...fr.questions.q5_localisation,
       label: 'Country where your company operates',
       placeholder: 'E.g.: France',
     },
     
     // Q5 : Pays travail (WORKER)
     q5_pays_travail: {
+      ...fr.questions.q5_pays_travail,
       label: 'Countries where you worked as temp worker',
       placeholder: 'E.g.: France, Germany, Belgium...',
     },
@@ -298,11 +397,11 @@ export const en: TranslationBundle = {
     q9_defi_client: {
       label: 'Your main challenge with European temp workers',
       options: {
-        admin: 'Administrative complexity',
+        trouver: 'Finding reliable agencies',
         conformite: 'Legal compliance',
-        cout: 'Costs',
-        langue: 'Language barriers',
         qualite: 'Quality/skills',
+        cout: 'Costs too high',
+        langues: 'Communication / Languages',
         autre: 'Other',
       },
     },
@@ -328,6 +427,7 @@ export const en: TranslationBundle = {
     
     // Q10 : Gestion (AGENCY)
     q10_gestion: {
+      ...fr.questions.q10_gestion,
       label: 'How do you manage posting declarations today?',
       options: {
         manuel: 'Manually (Excel, Word...)',
@@ -337,8 +437,22 @@ export const en: TranslationBundle = {
       },
     },
     
+    // Q10 : Agences (CLIENT)
+    q10_agences: {
+      ...fr.questions.q10_agences,
+      label: 'How many temporary work agencies do you use?',
+      options: {
+        '0': 'None',
+        '1': '1 agency',
+        '2-3': '2-3 agencies',
+        '4-10': '4-10 agencies',
+        '10+': 'More than 10',
+      },
+    },
+    
     // Q10 : Processus (CLIENT)
     q10_processus: {
+      ...fr.questions.q10_processus,
       label: 'How do you recruit temp workers?',
       options: {
         agence_fr: 'French temp agencies',
@@ -350,6 +464,7 @@ export const en: TranslationBundle = {
     
     // Q10 : Agence (WORKER)
     q10_agence: {
+      ...fr.questions.q10_agence,
       label: 'How do you find temp work?',
       options: {
         agence: 'Through temp agencies',
@@ -403,6 +518,19 @@ export const en: TranslationBundle = {
       },
     },
     
+    // Q12 : Budget client (CLIENT)
+    q12_budget_client: {
+      ...fr.questions.q12_budget_client,
+      label: 'Annual budget dedicated to temporary work',
+      options: {
+        '0-50k': '€0 - €50,000',
+        '50-200k': '€50,000 - €200,000',
+        '200-500k': '€200,000 - €500,000',
+        '500k+': '€500,000+',
+        'inconnu': "Don't know",
+      },
+    },
+    
     // Q12 : Satisfaction (CLIENT)
     q12_satisfaction: {
       label: 'Satisfaction with current temp agencies',
@@ -416,24 +544,51 @@ export const en: TranslationBundle = {
     
     // Q12 : Salaire (WORKER)
     q12_salaire: {
+      ...fr.questions.q12_salaire,
       label: 'Are you satisfied with your temp work salary?',
       options: {
-        tres_satisfait: 'Very satisfied',
-        satisfait: 'Satisfied',
-        neutre: 'Neutral',
-        insatisfait: 'Dissatisfied',
+        '<1500': 'Less than €1,500',
+        '1500-2500': '€1,500 - €2,500',
+        '2500-3500': '€2,500 - €3,500',
+        '3500+': '€3,500+',
       },
     },
     
     // Q13 : Manque à gagner (AGENCY)
     q13_manque_gagner: {
+      ...fr.questions.q13_manque_gagner,
       label: 'What percentage of revenue is lost due to administrative complexity?',
       options: {
-        '0': 'No impact',
-        '1-5': '1-5%',
-        '5-10': '5-10%',
-        '10-20': '10-20%',
-        '20+': 'More than 20%',
+        'non': 'No, not really',
+        'faible': 'Yes, low (< 5% revenue)',
+        'moyen': 'Yes, medium (5-15% revenue)',
+        'important': 'Yes, significant (> 15% revenue)',
+      },
+    },
+    
+    // Q13 : Satisfaction (CLIENT)
+    q13_satisfaction: {
+      ...fr.questions.q13_satisfaction,
+      label: 'Satisfaction with your current temp agencies',
+      options: {
+        'tres_satisfait': 'Very satisfied',
+        'satisfait': 'Satisfied',
+        'neutre': 'Neutral',
+        'insatisfait': 'Dissatisfied',
+        'tres_insatisfait': 'Very dissatisfied',
+      },
+    },
+    
+    // Q13 : Satisfaction worker (WORKER)
+    q13_satisfaction_worker: {
+      ...fr.questions.q13_satisfaction_worker,
+      label: 'Satisfaction with your current temp agencies',
+      options: {
+        'tres_satisfait': 'Very satisfied',
+        'satisfait': 'Satisfied',
+        'neutre': 'Neutral',
+        'insatisfait': 'Dissatisfied',
+        'tres_insatisfait': 'Very dissatisfied',
       },
     },
     
@@ -441,26 +596,98 @@ export const en: TranslationBundle = {
     
     // Q14 : Risques (AGENCY)
     q14_risques: {
+      ...fr.questions.q14_risques,
       label: 'Your main concerns',
       description: 'Select all that apply',
+      options: {
+        sanctions: 'Penalties/sanctions',
+        conformite: 'Multi-country compliance',
+        cout: 'Administrative costs',
+        delais: 'Processing times',
+        documentation: 'Document management',
+        aucun: 'No major concerns',
+      },
     },
     
     // Q14 : Besoins (CLIENT)
     q14_besoins_client: {
+      ...fr.questions.q14_besoins_client,
       label: 'Your main needs',
       description: 'Select all that apply',
+      options: {
+        fiabilite: 'Finding reliable agencies',
+        conformite: 'Legal compliance',
+        qualite: 'Quality/skills',
+        cout: 'Costs',
+        disponibilite: 'Candidate availability',
+        aucun: 'No major need',
+      },
     },
     
     // Q14 : Attentes (WORKER)
     q14_attentes: {
+      ...fr.questions.q14_attentes,
       label: 'Your expectations for temp work abroad',
       description: 'Select all that apply',
+      options: {
+        salaire: 'Better salary',
+        conditions: 'Better working conditions',
+        stabilite: 'Stability',
+        experience: 'International experience',
+        logement: 'Housing assistance',
+        aucun: 'No particular expectations',
+      },
+    },
+    
+    // Q14_risques_client options
+    q14_risques_client: {
+      ...fr.questions.q14_risques_client,
+      label: 'Your main concerns',
+      description: 'Select all that apply',
+      options: {
+        conformite: 'Legal compliance',
+        qualite: 'Quality/skills',
+        communication: 'Communication/Languages',
+        cout: 'Unexpected costs',
+        disponibilite: 'Candidate availability',
+        aucun: 'No major concerns',
+      },
+    },
+    
+    // Q14_risques_worker options
+    q14_risques_worker: {
+      ...fr.questions.q14_risques_worker,
+      label: 'What problems do you encounter most often?',
+      description: 'Select all that apply',
+      options: {
+        paiement: 'Payment delays',
+        conditions: 'Poor conditions',
+        contrat: 'Contracts not respected',
+        logement: 'Inadequate housing',
+        communication: 'Communication issues',
+        aucun: 'No major problems',
+      },
     },
     
     // Q15 : Problème
     q15_probleme: {
+      ...fr.questions.q15_probleme,
       label: 'What problem would you like to solve first?',
       placeholder: 'Describe your priority issue...',
+    },
+    
+    // Q15 : Besoins client (CLIENT)
+    q15_besoins_client: {
+      ...fr.questions.q15_besoins_client,
+      label: 'What are your priority needs?',
+      placeholder: 'E.g.: Find quickly, better quality, prices...',
+    },
+    
+    // Q15 : Améliorations (WORKER)
+    q15_ameliorations: {
+      ...fr.questions.q15_ameliorations,
+      label: 'What would you like to improve in your assignments?',
+      placeholder: 'E.g.: Salary, housing, support, stability...',
     },
     
     // Q16 : ERP (AGENCY)
@@ -528,47 +755,94 @@ export const en: TranslationBundle = {
     
     // Q18 : Score
     q18_score: {
+      ...fr.questions.q18_score,
       label: 'How interested are you in a European posting marketplace?',
       description: 'Rate from 1 (not interested) to 10 (very interested)',
     },
     
-    // Q19 : Features
+    // Q19 : Features (AGENCY)
     q19_features: {
-      label: 'Which features are most important to you?',
+      ...fr.questions.q19_features,
+      label: 'Most interesting features',
       description: 'Select your top 3 priorities',
+      options: {
+        sipsi: 'Automatic SIPSI declaration',
+        a1: 'A1 certificate management',
+        conformite: 'Compliance dashboard',
+        alertes: 'Alerts & renewals',
+        documents: 'Document centralization',
+        marketplace: 'Agency marketplace',
+        support: 'Multilingual expert support',
+        api: 'API integration (ERP)',
+      },
+    },
+    
+    // Q19 : Features CLIENT
+    q19_features_client: {
+      ...fr.questions.q19_features_client,
+      label: 'Most interesting features',
+      description: 'Select all that interest you',
+      options: {
+        recherche: 'Search for reliable agencies',
+        comparaison: 'Price/quality comparison',
+        avis: 'Verified reviews',
+        conformite: 'Compliance guarantee',
+        support: 'Dedicated support',
+        facturation: 'Centralized billing',
+        suivi: 'Real-time tracking',
+      },
+    },
+    
+    // Q19 : Features WORKER
+    q19_features_worker: {
+      ...fr.questions.q19_features_worker,
+      label: 'Most interesting features',
+      description: 'Select all that interest you',
+      options: {
+        recherche: 'Job search',
+        avis: 'Agency reviews',
+        logement: 'Housing assistance',
+        paiement: 'Secure payment',
+        support: 'Support in my language',
+        documents: 'Admin documents help',
+        formation: 'Training programs',
+      },
     },
     
     // Q20 : Prix
     q20_prix: {
+      ...fr.questions.q20_prix,
       label: 'Preferred pricing model',
       options: {
-        pourcentage: 'Commission per worker (%)',
-        fixe: 'Fixed monthly subscription',
-        volume: 'Tiered pricing by volume',
-        freemium: 'Free basic + paid premium',
+        mensuel: 'Fixed monthly subscription',
+        usage: 'Pay-as-you-go (usage-based)',
+        annuel: 'Annual plan (discount)',
+        gratuit: 'Free for workers',
       },
     },
     
     // Q21 : Budget mensuel
     q21_budget_mensuel: {
+      ...fr.questions.q21_budget_mensuel,
       label: 'Monthly budget for a complete SaaS solution',
       options: {
-        '0': 'Not willing to pay',
-        '1-100': '€1 - €100/month',
+        '0-100': '€0 - €100/month',
         '100-300': '€100 - €300/month',
-        '300-1000': '€300 - €1,000/month',
+        '300-500': '€300 - €500/month',
+        '500-1000': '€500 - €1,000/month',
         '1000+': 'More than €1,000/month',
       },
     },
     
     // Q22 : MVP
     q22_mvp: {
+      ...fr.questions.q22_mvp,
       label: 'Would you like to test an early version (MVP)?',
       options: {
-        oui_beta: 'Yes, as beta tester',
-        oui_payant: 'Yes, even if paid',
-        peut_etre: 'Maybe',
-        non: 'No',
+        oui_gratuit: 'Yes, for free',
+        oui_reduc: 'Yes, with a discount',
+        peut_etre: 'Maybe, depends on features',
+        non: 'No, not interested',
       },
     },
     
@@ -578,9 +852,10 @@ export const en: TranslationBundle = {
     q23_role: {
       label: 'How do you see your role in the European marketplace?',
       options: {
-        fournisseur: 'Worker provider',
-        client: 'Client/Buyer',
-        les_deux: 'Both',
+        decideur: 'Final decision maker',
+        influenceur: 'Influencer / Recommendation',
+        utilisateur: 'End user',
+        autre: 'Other',
       },
     },
     
@@ -602,9 +877,46 @@ export const en: TranslationBundle = {
     },
     
     // Section 6 - Contact
+    
+    // Q26 : Téléphone professionnel
+    q26_phone: {
+      label: 'Professional phone number',
+      placeholder: '+33 6 12 34 56 78',
+    },
+    
+    // Q27 : Prénom
+    q27_firstname: {
+      label: 'First name',
+      placeholder: 'Your first name',
+    },
+    
+    // Q28 : Nom
+    q28_lastname: {
+      label: 'Last name',
+      placeholder: 'Your last name',
+    },
+    
+    // Q29 : SIRET/SIREN
+    q29_siret: {
+      label: 'SIRET or SIREN (optional)',
+      placeholder: '123 456 789 00012',
+      description: 'For enrichment via Pappers/Société.com',
+    },
+    
+    // Q30 : Email
     email: {
       label: 'Your email (optional)',
       placeholder: 'your.email@example.com',
+    },
+    
+    // Q31 : Autorisation contact
+    autorise_contact: {
+      label: 'I agree to be contacted again',
+    },
+    
+    // Q32 : Rapport d'étude
+    souhaite_rapport: {
+      label: 'I would like to receive the study report',
     },
   },
   
@@ -614,3 +926,7 @@ export const en: TranslationBundle = {
     _translatedBy: 'Migration from translations-complete.ts',
   },
 };
+
+// 🐛 Debug: Vérifier la structure de q19_features_client
+console.log('[EN] q19_features_client structure:', JSON.stringify(en.questions.q19_features_client, null, 2));
+console.log('[EN] q19_features_client.options.recherche:', en.questions.q19_features_client?.options?.recherche);

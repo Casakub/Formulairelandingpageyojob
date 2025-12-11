@@ -46,9 +46,6 @@ function generateFrenchBundle(): TranslationBundle {
           translation.options[option.value] = option.labelFallback;
         }
       }
-      
-      // 🐛 Debug: Log pour vérifier que les options sont bien générées
-      console.log(`[fr.generated] Question ${question.id} generated with ${Object.keys(translation.options).length} options`);
     }
     
     // Métadonnées
@@ -59,8 +56,6 @@ function generateFrenchBundle(): TranslationBundle {
     
     questions[question.id] = translation;
   }
-  
-  console.log(`[fr.generated] Total questions generated: ${Object.keys(questions).length}`);
   
   return {
     nav: {

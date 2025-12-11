@@ -1,6 +1,7 @@
 import { motion } from 'motion/react';
 import { LucideIcon } from 'lucide-react';
 import type { RespondentType } from '../../types/survey';
+import { useI18n } from '../../src/i18n';
 
 interface SectionHeaderProps {
   icon: LucideIcon;
@@ -12,94 +13,6 @@ interface SectionHeaderProps {
   sectionNumber?: number;
 }
 
-// Titres et descriptions adaptés selon le profil
-const SECTION_CONTENT: Record<number, Record<RespondentType, { title: string; description: string }>> = {
-  1: {
-    agency: {
-      title: '📋 Profil de votre agence',
-      description: 'Présentez votre agence d\'intérim et votre expertise'
-    },
-    client: {
-      title: '📋 Profil de votre entreprise',
-      description: 'Présentez votre entreprise et vos besoins en recrutement'
-    },
-    worker: {
-      title: '📋 Votre profil',
-      description: 'Parlez-nous de votre parcours professionnel'
-    }
-  },
-  2: {
-    agency: {
-      title: '💼 Expérience en détachement',
-      description: 'Votre activité de détachement de travailleurs'
-    },
-    client: {
-      title: '💼 Votre expérience en recrutement',
-      description: 'Vos pratiques actuelles de recrutement et intérim'
-    },
-    worker: {
-      title: '💼 Votre expérience en intérim',
-      description: 'Votre parcours dans le travail temporaire'
-    }
-  },
-  3: {
-    agency: {
-      title: '🎯 Besoins et outils',
-      description: 'Vos défis et solutions actuelles'
-    },
-    client: {
-      title: '🎯 Vos besoins actuels',
-      description: 'Difficultés et attentes en matière de recrutement'
-    },
-    worker: {
-      title: '🎯 Vos attentes',
-      description: 'Ce qui compte pour vous dans une mission'
-    }
-  },
-  4: {
-    agency: {
-      title: '⭐ Intérêt pour une plateforme européenne',
-      description: 'Découvrez notre vision d\'une marketplace innovante'
-    },
-    client: {
-      title: '⭐ Intérêt pour une plateforme européenne',
-      description: 'Une solution innovante pour vos besoins'
-    },
-    worker: {
-      title: '⭐ Votre intérêt pour une plateforme',
-      description: 'Une plateforme pour trouver vos missions facilement'
-    }
-  },
-  5: {
-    agency: {
-      title: '🔮 Vision du futur',
-      description: 'Budget et perspectives de développement'
-    },
-    client: {
-      title: '🔮 Vos priorités futures',
-      description: 'Budget et stratégie de recrutement'
-    },
-    worker: {
-      title: '🔮 Vos objectifs',
-      description: 'Vos projets professionnels à venir'
-    }
-  },
-  6: {
-    agency: {
-      title: '📧 Restons en contact',
-      description: 'Recevez les résultats de l\'étude et restez informé'
-    },
-    client: {
-      title: '📧 Restons en contact',
-      description: 'Recevez les résultats et nos recommandations'
-    },
-    worker: {
-      title: '📧 Restons en contact',
-      description: 'Recevez les résultats et des opportunités'
-    }
-  }
-};
-
 export function SectionHeader({ 
   icon: Icon, 
   title, 
@@ -109,13 +22,20 @@ export function SectionHeader({
   respondentType = 'agency',
   sectionNumber
 }: SectionHeaderProps) {
-  // Si sectionNumber est fourni et qu'on a du contenu adapté, on l'utilise
-  const adaptedContent = sectionNumber && SECTION_CONTENT[sectionNumber]
-    ? SECTION_CONTENT[sectionNumber][respondentType]
-    : { title, description };
-
-  const displayTitle = adaptedContent.title;
-  const displayDescription = adaptedContent.description;
+  const { t, translate } = useI18n();
+  
+  // Si sectionNumber est fourni, on utilise les traductions i18n avec profil
+  let displayTitle = title;
+  let displayDescription = description;
+  
+  if (sectionNumber) {
+    // Chercher d'abord dans sectionContent avec profil
+    const titleKey = `sectionContent.${sectionNumber}.${respondentType}.title`;
+    const descKey = `sectionContent.${sectionNumber}.${respondentType}.description`;
+    
+    displayTitle = translate(titleKey, { fallback: title });
+    displayDescription = translate(descKey, { fallback: description });
+  }
 
   if (isPremium) {
     return (
