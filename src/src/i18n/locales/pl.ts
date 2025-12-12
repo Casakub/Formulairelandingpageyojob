@@ -295,12 +295,14 @@ export const pl: TranslationBundle = {
     optional: 'Opcjonalne',
     error: 'Błąd',
     success: 'Sukces',
-    completed: 'Ukończone',
-    inProgress: 'W toku',
-    notStarted: 'Nierozpoczęte',
+    completed: 'Ukończono',
+    inProgress: 'W trakcie',
+    notStarted: 'Nie rozpoczęto',
     profileAgency: 'Agencja pracy tymczasowej',
-    profileClient: 'Firma klient',
+    profileClient: 'Klient',
     profileWorker: 'Pracownik tymczasowy',
+    score_not_interested: 'Niezainteresowany',
+    score_very_interested: 'Bardzo zainteresowany',
   },
   
   // Sektory

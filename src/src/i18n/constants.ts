@@ -14,6 +14,18 @@ export const TRANSLATED_LANGUAGE_CODES = [
   'fr', // 🇫🇷 Français
   'en', // 🇬🇧 English
   'de', // 🇩🇪 Deutsch
+  'nl', // 🇳🇱 Nederlands
+  'cz', // 🇨🇿 Čeština
+  'sk', // 🇸🇰 Slovenčina
+  'hr', // 🇭🇷 Hrvatski
+  'sl', // 🇸🇮 Slovenščina
+  'lt', // 🇱🇹 Lietuvių
+  'lv', // 🇱🇻 Latviešu
+  'ee', // 🇪🇪 Eesti
+  'el', // 🇬🇷 Ελληνικά
+  'sv', // 🇸🇪 Svenska
+  'da', // 🇩🇰 Dansk
+  'fi', // 🇫🇮 Suomi
   'ro', // 🇷🇴 Română
   'pt', // 🇵🇹 Português
   'es', // 🇪🇸 Español

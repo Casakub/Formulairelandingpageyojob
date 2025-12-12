@@ -306,11 +306,13 @@ export const es: TranslationBundle = {
     error: 'Error',
     success: 'Éxito',
     completed: 'Completado',
-    inProgress: 'En curso',
+    inProgress: 'En progreso',
     notStarted: 'No iniciado',
     profileAgency: 'Agencia ETT',
-    profileClient: 'Empresa Cliente',
+    profileClient: 'Cliente',
     profileWorker: 'Trabajador Temporal',
+    score_not_interested: 'No interesado',
+    score_very_interested: 'Muy interesado',
   },
   
   // Sectores

@@ -1,5 +1,6 @@
 import { motion } from 'motion/react';
 import { useEffect, useState } from 'react';
+import { useI18n } from '../../../src/i18n';
 
 interface ScoreSelectorProps {
   value: number;
@@ -7,6 +8,7 @@ interface ScoreSelectorProps {
 }
 
 export function ScoreSelector({ value, onChange }: ScoreSelectorProps) {
+  const { t } = useI18n();
   const [showConfetti, setShowConfetti] = useState(false);
 
   useEffect(() => {
@@ -57,8 +59,8 @@ export function ScoreSelector({ value, onChange }: ScoreSelectorProps) {
         ))}
       </div>
       <div className="flex justify-between text-sm text-white/40 mt-3 px-1">
-        <span>Pas intéressé</span>
-        <span>Très intéressé</span>
+        <span>{t('common.score_not_interested', 'Pas intéressé')}</span>
+        <span>{t('common.score_very_interested', 'Très intéressé')}</span>
       </div>
     </div>
   );

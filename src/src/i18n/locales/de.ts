@@ -294,9 +294,11 @@ export const de: TranslationBundle = {
     completed: 'Abgeschlossen',
     inProgress: 'In Bearbeitung',
     notStarted: 'Nicht begonnen',
-    profileAgency: 'Zeitarbeitsfirma',
+    profileAgency: 'Zeitarbeitsagentur',
     profileClient: 'Kundenunternehmen',
-    profileWorker: 'Zeitarbeitskraft',
+    profileWorker: 'Zeitarbeiter',
+    score_not_interested: 'Nicht interessiert',
+    score_very_interested: 'Sehr interessiert',
   },
   
   // Sectors

@@ -23,6 +23,18 @@ import type {
 import { fr } from './locales/fr.generated';
 import { en } from './locales/en';
 import { de } from './locales/de';
+import { nl } from './locales/nl';
+import { cz } from './locales/cz';
+import { sk } from './locales/sk';
+import { hr } from './locales/hr';
+import { sl } from './locales/sl';
+import { lt } from './locales/lt';
+import { lv } from './locales/lv';
+import { ee } from './locales/ee';
+import { el } from './locales/el';
+import { sv } from './locales/sv';
+import { da } from './locales/da';
+import { fi } from './locales/fi';
 import { ro } from './locales/ro';
 import { pt } from './locales/pt';
 import { es } from './locales/es';
@@ -38,6 +50,18 @@ const TRANSLATIONS: Partial<TranslationsByLanguage> = {
   fr,
   en,
   de,
+  nl,
+  cz,
+  sk,
+  hr,
+  sl,
+  lt,
+  lv,
+  ee,
+  el,
+  sv,
+  da,
+  fi,
   ro,
   pt,
   es,
@@ -45,7 +69,6 @@ const TRANSLATIONS: Partial<TranslationsByLanguage> = {
   pl,
   bg,
   hu,
-  // Les autres langues seront ajoutées progressivement
 };
 
 /**

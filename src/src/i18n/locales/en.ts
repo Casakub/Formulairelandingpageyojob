@@ -296,7 +296,9 @@ export const en: TranslationBundle = {
     notStarted: 'Not Started',
     profileAgency: 'Temp Agency',
     profileClient: 'Client Company',
-    profileWorker: 'Temporary Worker',
+    profileWorker: 'Temp Worker',
+    score_not_interested: 'Not interested',
+    score_very_interested: 'Very interested',
   },
   
   // Sectors

@@ -260,6 +260,8 @@ function generateFrenchBundle(): TranslationBundle {
       profileAgency: 'Agence ETT',
       profileClient: 'Entreprise Cliente',
       profileWorker: 'Travailleur Intérimaire',
+      score_not_interested: 'Pas intéressé',
+      score_very_interested: 'Très intéressé',
     },
     
     sectors: {
