@@ -297,6 +297,8 @@ export const cz: TranslationBundle = {
     profileAgency: 'Agentura práce',
     profileClient: 'Klient',
     profileWorker: 'Agenturní pracovník',
+    score_not_interested: 'Nemám zájem',
+    score_very_interested: 'Velmi mě zajímá',
   },
   
   // Sectors
@@ -619,6 +621,19 @@ export const cz: TranslationBundle = {
       description: 'Vyberte více možností',
     },
     
+    // Q12 : Budget client (CLIENT)
+    q12_budget_client: {
+      ...fr.questions.q12_budget_client,
+      label: 'Roční rozpočet věnovaný agenturní práci',
+      options: {
+        '0-50k': '0 - 50 000 €',
+        '50-200k': '50 000 - 200 000 €',
+        '200-500k': '200 000 - 500 000 €',
+        '500k+': '500 000+ €',
+        'inconnu': 'Nevím',
+      },
+    },
+    
     // Q12 : Satisfaction (WORKER)
     q12_satisfaction: {
       label: 'Jak jste spokojeni se svými současnými pracovními podmínkami?',
@@ -654,6 +669,32 @@ export const cz: TranslationBundle = {
       },
     },
     
+    // Q13 : Satisfaction (CLIENT)
+    q13_satisfaction: {
+      ...fr.questions.q13_satisfaction,
+      label: 'Spokojenost s vašimi současnými agenturami',
+      options: {
+        'tres_satisfait': 'Velmi spokojený',
+        'satisfait': 'Spokojený',
+        'neutre': 'Neutrální',
+        'insatisfait': 'Málo spokojený',
+        'tres_insatisfait': 'Velmi nespokojený',
+      },
+    },
+    
+    // Q13 : Satisfaction worker (WORKER)
+    q13_satisfaction_worker: {
+      ...fr.questions.q13_satisfaction_worker,
+      label: 'Spokojenost s vašimi současnými agenturami',
+      options: {
+        'tres_satisfait': 'Velmi spokojený',
+        'satisfait': 'Spokojený',
+        'neutre': 'Neutrální',
+        'insatisfait': 'Málo spokojený',
+        'tres_insatisfait': 'Velmi nespokojený',
+      },
+    },
+    
     // Q13 : Durée worker (WORKER)
     q13_duree_worker: {
       label: 'Vaše preferovaná doba trvání zakázky',
@@ -666,6 +707,57 @@ export const cz: TranslationBundle = {
     },
     
     // Section 3 - Besoins/Potřeby
+    
+    // Q14 : Risques (AGENCY)
+    q14_risques: {
+      label: 'Vaše hlavní obavy',
+      description: 'Vyberte všechny relevantní možnosti',
+      options: {
+        amendes: 'Pokuty a sankce',
+        reputation: 'Pověst / Image',
+        penal: 'Trestní odpovědnost',
+        delais: 'Zpoždění misí',
+        clients: 'Ztráta klientů',
+        aucun: 'Žádné významné riziko',
+        sanctions: 'Pokuty/sankce',
+        conformite: 'Shoda ve více zemích',
+        cout: 'Administrativní náklady',
+        documentation: 'Správa dokumentů',
+        responsabilite: 'Trestní odpovědnost',
+        perte_clients: 'Ztráta klientů',
+      },
+    },
+    
+    // Q14 : Risques client (CLIENT)
+    q14_risques_client: {
+      ...fr.questions.q14_risques_client,
+      label: 'Jaká rizika vás nejvíce znepokojují?',
+      description: 'Vyberte všechny relevantní možnosti',
+      options: {
+        conformite: 'Nedodržení právních předpisů',
+        qualite: 'Nedostatečná kvalita',
+        communication: 'Komunikace/Jazyky',
+        cout: 'Neočekávané náklady',
+        disponibilite: 'Dostupnost kandidátů',
+        aucun: 'Žádné významné obavy',
+        fiabilite: 'Spolehlivost agentur',
+      },
+    },
+    
+    // Q14 : Risques worker (WORKER)
+    q14_risques_worker: {
+      ...fr.questions.q14_risques_worker,
+      label: 'S jakými problémy se nejčastěji setkáváte?',
+      description: 'Vyberte všechny relevantní možnosti',
+      options: {
+        paiement: 'Zpoždění plateb',
+        conditions: 'Špatné podmínky',
+        contrat: 'Nedodržené smlouvy',
+        logement: 'Nevyhovující ubytování',
+        communication: 'Problémy s komunikací',
+        aucun: 'Žádné velké problémy',
+      },
+    },
     
     // Q14 : Intérêt marketplace (AGENCY)
     q14_interet: {
@@ -699,6 +791,27 @@ export const cz: TranslationBundle = {
         neutre: 'Neutrální',
         pas_interesse: 'Nezainteresovaný',
       },
+    },
+    
+    // Q15 : Problème (AGENCY)
+    q15_probleme: {
+      ...fr.questions.q15_probleme,
+      label: 'Jaký problém byste chtěli vyřešit jako první?',
+      placeholder: 'Popište svůj prioritní problém...',
+    },
+    
+    // Q15 : Besoins client (CLIENT)
+    q15_besoins_client: {
+      ...fr.questions.q15_besoins_client,
+      label: 'Jaké jsou vaše prioritní potřeby?',
+      placeholder: 'Např.: Rychle najít, lepší kvalita, ceny...',
+    },
+    
+    // Q15 : Améliorations (WORKER)
+    q15_ameliorations: {
+      ...fr.questions.q15_ameliorations,
+      label: 'Co byste chtěli zlepšit na svých zakázkách?',
+      placeholder: 'Např.: Plat, ubytování, podpora, stabilita...',
     },
     
     // Q15 : Fonctionnalités (AGENCY)
@@ -780,48 +893,74 @@ export const cz: TranslationBundle = {
       },
     },
     
-    // Q17 : Prix (AGENCY)
-    q17_prix: {
-      label: 'Který cenový model se vám zdá nejvhodnější?',
+    // Q16 : ERP (AGENCY)
+    q16_erp: {
+      label: 'Používáte ERP/řídicí software?',
       options: {
-        commission: 'Provize za misi',
-        abonnement: 'Měsíční předplatné',
-        freemium: 'Zdarma + prémiové možnosti',
-        autre: 'Jiné',
+        sage: 'Sage',
+        sap: 'SAP',
+        cegid: 'Cegid',
+        bullhorn: 'Bullhorn / ATS',
+        autre: 'Jiný',
+        aucun: 'Žádný ERP',
+        oui: 'Ano',
+        non: 'Ne',
       },
     },
     
-    // Q17 : Services (CLIENT)
-    q17_services: {
-      label: 'Které služby byste nejvíce ocenili?',
-      description: 'Vyberte více možností',
+    // Q16 : Nom ERP
+    q16_nom_erp: {
+      label: 'Který software/ERP?',
+      placeholder: 'Např.: SAP, Odoo, vlastní...',
     },
     
-    // Q17 : Services worker (WORKER)
-    q17_services_worker: {
-      label: 'Které služby byste nejvíce ocenili?',
-      description: 'Vyberte více možností',
+    // Q16 : Critères (CLIENT)
+    q16_criteres: {
+      label: 'Vaše hlavní kritéria výběru personálních agentur',
+      description: 'Vyberte top 3',
     },
     
-    // Q18 : Recommandation (AGENCY)
-    q18_recommandation: {
-      label: 'Doporučili byste takovou platformu kolegům?',
+    // Q16 : Amélioration (WORKER)
+    q16_amelioration: {
+      label: 'Co by zlepšilo vaši zkušenost s agenturní prací?',
+      description: 'Vyberte všechny relevantní možnosti',
+    },
+    
+    // Q17 : Migration (AGENCY)
+    q17_migration: {
+      label: 'Jste připraveni změnit své pracovní nástroje?',
       options: {
-        certainement: 'Určitě',
-        probablement: 'Pravděpodobně',
-        peut_etre: 'Možná',
-        probablement_pas: 'Pravděpodobně ne',
+        oui: 'Ano, bez problému',
+        conditions: 'Ano, za určitých podmínek',
+        difficile: 'Obtížné, ale otevřený',
+        non: 'Ne, nepředstavitelné',
+        oui_rapidement: 'Ano, okamžitě',
+        oui_progressivement: 'Ano, postupně',
+        non_satisfait: 'Ne, spokojený se současnými nástroji',
+        non_peur: 'Ne, strach ze změny',
       },
     },
     
-    // Q18 : Recommandation client (CLIENT)
-    q18_recommandation_client: {
-      label: 'Doporučili byste takové řešení?',
+    // Q17 : Budget (CLIENT)
+    q17_budget: {
+      label: 'Měsíční rozpočet na platformu pro nábor',
       options: {
-        certainement: 'Určitě',
-        probablement: 'Pravděpodobně',
+        '0': 'Nejsem ochoten platit',
+        '1-100': '1 - 100 €/měsíc',
+        '100-500': '100 - 500 €/měsíc',
+        '500-1000': '500 - 1 000 €/měsíc',
+        '1000+': 'Více než 1 000 €/měsíc',
+      },
+    },
+    
+    // Q17 : Plateforme (WORKER)
+    q17_plateforme: {
+      label: 'Používali byste platformu pro hledání agenturní práce v zahraničí?',
+      options: {
+        oui_certainement: 'Ano, určitě',
+        oui_probablement: 'Ano, pravděpodobně',
         peut_etre: 'Možná',
-        probablement_pas: 'Pravděpodobně ne',
+        non: 'Ne',
       },
     },
     
@@ -836,37 +975,113 @@ export const cz: TranslationBundle = {
       },
     },
     
-    // Q19 : Test (AGENCY)
-    q19_test: {
-      label: 'Chtěli byste se zúčastnit beta fáze?',
+    // Section 4 - Intérêt YoJob
+    
+    // Q18 : Score
+    q18_score: {
+      ...fr.questions.q18_score,
+      label: 'Zájem o evropské tržiště pro vyslání (0-10)',
+      description: 'Hodnocení od 1 (nemám zájem) do 10 (velký zájem)',
+    },
+    
+    // Q19 : Features (AGENCY)
+    q19_features: {
+      ...fr.questions.q19_features,
+      label: 'Nejzajímavější funkce',
+      description: 'Vyberte své top 3 priority',
       options: {
-        oui_immediat: 'Ano, okamžitě',
-        oui_plus_tard: 'Ano, ale později',
-        non: 'Ne',
+        sipsi: 'Automatické hlášení SIPSI',
+        a1: 'Správa certifikátu A1',
+        conformite: 'Dashboard dodržování předpisů',
+        alertes: 'Upozornění a obnovení',
+        documents: 'Centralizace dokumentů',
+        marketplace: 'Tržiště agentur',
+        support: 'Vícejazyčná expertní podpora',
+        api: 'API integrace (ERP)',
       },
     },
     
-    // Q19 : Test client (CLIENT)
-    q19_test_client: {
-      label: 'Chtěli byste se zúčastnit testu?',
+    // Q19 : Features CLIENT
+    q19_features_client: {
+      ...fr.questions.q19_features_client,
+      label: 'Nejzajímavější funkce',
+      description: 'Vyberte všechny, které vás zajímají',
       options: {
-        oui_immediat: 'Ano, okamžitě',
-        oui_plus_tard: 'Ano, ale později',
-        non: 'Ne',
+        recherche: 'Hledání spolehlivých agentur',
+        comparaison: 'Porovnání ceny/kvality',
+        avis: 'Ověřené recenze',
+        conformite: 'Záruka dodržování předpisů',
+        support: 'Vyhrazená podpora',
+        facturation: 'Centralizovaná fakturace',
+        suivi: 'Sledování v reálném čase',
       },
     },
     
-    // Q19 : Test worker (WORKER)
-    q19_test_worker: {
-      label: 'Chtěli byste se zúčastnit testu?',
+    // Q19 : Features WORKER
+    q19_features_worker: {
+      ...fr.questions.q19_features_worker,
+      label: 'Nejzajímavější funkce',
+      description: 'Vyberte všechny, které vás zajímají',
       options: {
-        oui_immediat: 'Ano, okamžitě',
-        oui_plus_tard: 'Ano, ale později',
-        non: 'Ne',
+        recherche: 'Hledání práce',
+        avis: 'Hodnocení agentur',
+        logement: 'Pomoc s ubytováním',
+        paiement: 'Bezpečná platba',
+        support: 'Podpora v mém jazyce',
+        documents: 'Pomoc s administrativními dokumenty',
+        formation: 'Školicí programy',
       },
     },
     
-    // Section 4 - Vision Future
+    // Q20 : Prix
+    q20_prix: {
+      ...fr.questions.q20_prix,
+      label: 'Preferovaný cenový model',
+      options: {
+        mensuel: 'Pevné měsíční předplatné',
+        usage: 'Platba podle využití',
+        annuel: 'Roční plán (sleva)',
+        gratuit: 'Zdarma pro pracovníky',
+      },
+    },
+    
+    // Q21 : Budget mensuel
+    q21_budget_mensuel: {
+      ...fr.questions.q21_budget_mensuel,
+      label: 'Měsíční rozpočet na kompletní SaaS řešení',
+      options: {
+        '0-100': '0 - 100 €/měsíc',
+        '100-300': '100 - 300 €/měsíc',
+        '300-500': '300 - 500 €/měsíc',
+        '500-1000': '500 - 1 000 €/měsíc',
+        '1000+': 'Více než 1 000 €/měsíc',
+      },
+    },
+    
+    // Q22 : MVP
+    q22_mvp: {
+      ...fr.questions.q22_mvp,
+      label: 'Chtěli byste otestovat ranou verzi (MVP)?',
+      options: {
+        oui_gratuit: 'Ano, zdarma',
+        oui_reduc: 'Ano, se slevou',
+        peut_etre: 'Možná, závisí na funkcích',
+        non: 'Ne, nemám zájem',
+      },
+    },
+    
+    // Section 5 - Vision Future
+    
+    // Q23 : Rôle
+    q23_role: {
+      label: 'Jak vidíte svou roli na evropském trhu?',
+      options: {
+        decideur: 'Konečný rozhodovatel',
+        influenceur: 'Influencer / Doporučení',
+        utilisateur: 'Koncový uživatel',
+        autre: 'Jiné',
+      },
+    },
     
     // Q20 : Croissance (AGENCY)
     q20_croissance: {
@@ -1074,5 +1289,33 @@ export const cz: TranslationBundle = {
     service_administratif: {
       label: 'Administrativní podpora',
     },
+  },
+  
+  // Login
+  login: {
+    title: 'Přihlášení správce',
+    email: 'E-mail',
+    password: 'Heslo',
+    submit: 'Přihlásit se',
+    error: 'Neplatný e-mail nebo heslo',
+  },
+  
+  // Errors
+  errors: {
+    required: 'Toto pole je povinné',
+    email: 'Neplatný e-mail',
+    phone: 'Neplatné telefonní číslo',
+    min_length: 'Minimálně {min} znaků',
+    max_length: 'Maximálně {max} znaků',
+    network: 'Chyba sítě. Zkuste to znovu.',
+    unknown: 'Došlo k chybě. Zkuste to znovu.',
+  },
+  
+  _meta: {
+    _lastUpdated: '2024-12-12T12:30:00.000Z',
+    _origin: 'manual',
+    _translatedBy: 'YoJob Team - Czech (CZ) Complete Translation',
+    _locale: 'cs-CZ',
+    _completeness: 100,
   },
 };

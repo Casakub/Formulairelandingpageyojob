@@ -311,6 +311,8 @@ export const hu: TranslationBundle = {
     profileAgency: 'Munkaerő-kölcsönző ügynökség',
     profileClient: 'Ügyfél vállalat',
     profileWorker: 'Ideiglenes munkavállaló',
+    score_not_interested: 'Nem érdekel',
+    score_very_interested: 'Nagyon érdekel',
   },
   
   // Szektorok

@@ -969,6 +969,60 @@ export const ro: TranslationBundle = {
     
     // Section 6 - Contact
     
+    // Q22 : Email
+    q22_email: {
+      label: 'E-mail (opțional)',
+      placeholder: 'dvs@email.ro',
+      description: 'Pentru a primi rezultatele și a rămâne la curent cu proiectul',
+    },
+    
+    // Q22 : Email AGENCY
+    q22_email_agency: {
+      label: 'E-mail profesional (opțional)',
+      placeholder: 'contact@agentia-dvs.ro',
+      description: 'Pentru a primi rezultate și acces exclusiv la platformă',
+    },
+    
+    // Q22 : Email CLIENT
+    q22_email_client: {
+      label: 'E-mail profesional (opțional)',
+      placeholder: 'contact@compania-dvs.ro',
+      description: 'Pentru a primi recomandări adaptate nevoilor dvs.',
+    },
+    
+    // Q22 : Email WORKER
+    q22_email_worker: {
+      label: 'E-mail (opțional)',
+      placeholder: 'dvs@email.ro',
+      description: 'Pentru a primi oportunități de misiuni care se potrivesc profilului dvs.',
+    },
+    
+    // Q23 : Téléphone (optionnel)
+    q23_telephone: {
+      label: 'Telefon (opțional)',
+      placeholder: '+40 712 345 678',
+    },
+    
+    // Q24 : Commentaires
+    q24_commentaires: {
+      label: 'Comentarii sau sugestii suplimentare',
+      placeholder: 'Împărtășiți ideile, așteptările sau nevoile dvs. specifice...',
+    },
+    
+    // Q24 : Vision du marché dans les 3 prochaines années (ALL)
+    q24_evolution: {
+      label: 'Viziunea pieței în următorii 3 ani',
+      placeholder: 'Împărtășiți viziunea dvs...',
+    },
+    
+    // Q25 : Autres besoins ou suggestions (ALL)
+    q25_besoins: {
+      label: 'Alte necesități sau sugestii',
+      placeholder: 'Sugestiile dvs. ne interesează...',
+    },
+    
+    // SECTION 6 : CONTACT
+    
     // Q26 : Telefon profesional
     q26_phone: {
       label: 'Număr de telefon profesional',
@@ -987,19 +1041,74 @@ export const ro: TranslationBundle = {
       placeholder: 'Numele dvs.',
     },
     
-    // Q29 : Email
-    q29_email: {
-      label: 'E-mail profesional',
-      placeholder: 'email@companie.ro',
+    // Q29 : SIRET/SIREN (AGENCY & CLIENT - opțional)
+    q29_siret: {
+      label: 'CUI (Cod Unic de Identificare) (opțional)',
+      placeholder: 'RO12345678',
+      description: 'Pentru îmbogățire prin registrul comerțului',
     },
     
-    // Q30 : Optin
-    q30_optin: {
-      label: 'Doresc să primesc rezultatele studiului și actualizările YoJob',
-      options: {
-        oui: 'Da, țineți-mă la curent',
-        non: 'Nu mulțumesc',
-      },
+    // Q30 : Email profesional (ALL)
+    email: {
+      label: 'E-mail',
+      placeholder: 'email.dvs@exemplu.ro',
+    },
+    
+    // Q31 : Autorizare contact (ALL)
+    autorise_contact: {
+      label: 'Sunt de acord să fiu contactat din nou',
+    },
+    
+    // Q32 : Rapport d'étude (ALL)
+    souhaite_rapport: {
+      label: 'Aș dori să primesc raportul studiului',
+    },
+    
+    // Questions suplimentaire spécifice
+    
+    // Criterii de selecție (CLIENT)
+    critere_prix: {
+      label: 'Preț',
+    },
+    critere_qualite: {
+      label: 'Calitatea profilurilor',
+    },
+    critere_rapidite: {
+      label: 'Viteza de răspuns',
+    },
+    critere_conformite: {
+      label: 'Conformitate legală',
+    },
+    critere_flexibilite: {
+      label: 'Flexibilitate',
+    },
+    
+    // Servicii valorizate (CLIENT)
+    service_accompagnement: {
+      label: 'Însoțire personalizată',
+    },
+    service_garantie: {
+      label: 'Garanție de înlocuire',
+    },
+    service_formation: {
+      label: 'Formare prealabilă',
+    },
+    service_gestion: {
+      label: 'Gestionare administrativă',
+    },
+    
+    // Services worker
+    service_formation_worker: {
+      label: 'Formare și certificări',
+    },
+    service_logement: {
+      label: 'Asistență pentru cazare',
+    },
+    service_transport: {
+      label: 'Asistență pentru transport',
+    },
+    service_administratif: {
+      label: 'Asistență administrativă',
     },
   },
   
