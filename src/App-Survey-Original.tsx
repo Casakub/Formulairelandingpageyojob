@@ -1,16 +1,21 @@
 import { useState, useEffect } from 'react';
-import { motion, AnimatePresence } from 'motion/react';
+import { AnimatePresence, motion } from 'motion/react';
 import { ArrowRight, ChevronLeft, CheckCircle } from 'lucide-react';
 import { Button } from './components/ui/button';
 import { toast } from 'sonner@2.0.3';
 import { Toaster } from './components/ui/sonner';
-import { I18nProvider, useI18n } from './src/i18n';
+import { I18nProvider, useI18n, SUPPORTED_LANGUAGES } from './src/i18n';
+import { TRANSLATED_LANGUAGE_CODES } from './src/i18n/constants';
 import { QuestionsProvider } from './context/QuestionsContext';
 import { TranslationMissingBanner } from './components/survey/TranslationMissingBanner';
 import { AutoImportTranslations } from './components/AutoImportTranslations';
 import { AdminLogin } from './components/auth/AdminLogin';
-import DashboardApp from './DashboardApp';
+import { DashboardApp } from './App-Dashboard';
 import { SupabaseBanner } from './components/SupabaseBanner';
+import type { RespondentType } from './types/survey';
+import { saveResponsePublic } from './services/surveyService';
+import { extractCountry, getInterestLevel } from './utils/surveyHelpers';
+import { Section6Contact } from './components/survey/sections/Section6Contact';
 import { Header } from './components/survey/Header';
 import { HeroSection } from './components/survey/HeroSection';
 import { ConfirmationScreen } from './components/survey/ConfirmationScreen';
@@ -22,13 +27,6 @@ import { Section2Detachement } from './components/survey/sections/Section2Detach
 import { Section3Besoins } from './components/survey/sections/Section3Besoins';
 import { Section4Interet } from './components/survey/sections/Section4Interet';
 import { Section5Vision } from './components/survey/sections/Section5Vision';
-import { Section6Contact } from './components/survey/sections/Section6Contact';
-import { TranslationDebugPanel } from './components/survey/TranslationDebugPanel';
-import { saveResponsePublic } from './lib/supabase-public';
-import { extractCountry, getInterestLevel } from './utils/helpers';
-import type { RespondentType } from './types/survey';
-import './utils/diagnostic-supabase'; // Import diagnostic tool
-import './utils/override-debug'; // Import override debug tool
 
 export interface FormData {
   // Section 1: Profil
@@ -362,6 +360,11 @@ function AppContent({
 }: AppContentProps) {
   const { t, currentLang } = useI18n();
   
+  // Filtrer uniquement les langues traduites
+  const translatedLanguages = SUPPORTED_LANGUAGES.filter(lang => 
+    TRANSLATED_LANGUAGE_CODES.includes(lang.code)
+  );
+  
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-900 via-violet-900 to-cyan-900 relative overflow-hidden">
       {/* Background effects */}
@@ -396,6 +399,8 @@ function AppContent({
         {!respondentType && currentSection === 0 && (
           <RespondentSelector
             key="respondent-selector"
+            currentLanguage={currentLang}
+            availableLanguagesCount={translatedLanguages.length}
             onSelect={(type) => {
               setRespondentType(type);
               console.log('✅ Type de répondant sélectionné:', type);

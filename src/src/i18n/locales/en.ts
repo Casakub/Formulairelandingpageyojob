@@ -27,6 +27,36 @@ export const en: TranslationBundle = {
     back_to_site: 'Back to website',
   },
   
+  dashboard: {
+    title: 'YoJob',
+    subtitle: 'Dashboard',
+    tabs: {
+      overview: 'Overview',
+      results: 'Results',
+      questions: 'Questions',
+      translations: 'Translations',
+      export: 'Export',
+      integrations: 'Integrations',
+      cms: 'Form CMS',
+      settings: 'Settings',
+      prospects: 'Prospects',
+    },
+    badges: {
+      hub: '⭐ Hub',
+      new: '🆕 New',
+      beta: '🧪 Beta',
+    },
+    actions: {
+      logout: 'Logout',
+      back_to_survey: 'Back to survey',
+      toggle_sidebar: 'Collapse/Expand',
+    },
+    user: {
+      welcome: 'Welcome',
+      logged_in_as: 'Logged in as',
+    },
+  },
+  
   // Sections
   section: {
     1: {
@@ -166,6 +196,8 @@ export const en: TranslationBundle = {
     },
     footer: {
       info: 'questions • Anonymous • GDPR compliant',
+      anonymous: 'Anonymous',
+      gdpr: 'GDPR compliant',
     },
   },
   
@@ -179,6 +211,39 @@ export const en: TranslationBundle = {
     client_description: 'You are a company that employs temp workers',
     worker: 'Temp Worker',
     worker_description: 'You are a temp or posted worker',
+  },
+  
+  // Respondent Selector
+  selector: {
+    badge: '🌍 European Market Study - Recruitment & Temporary Work',
+    title: 'Share your European market experience',
+    subtitle: 'Select your profile to start the survey',
+    cta: 'Click to start →',
+    trust: {
+      secure: 'Secure data',
+      languages: '{count} languages available',
+      languages_suffix: 'languages available',
+      anonymous: 'Anonymous & confidential',
+    },
+  },
+  
+  // Respondent profiles for cards
+  respondent: {
+    agency: {
+      label: 'Temporary Work Agency',
+      description: 'You are a European temp agency. Share your posting experience.',
+      estimatedTime: '15 min',
+    },
+    client: {
+      label: 'Client Company',
+      description: 'You hire temp workers. Share your needs and expectations.',
+      estimatedTime: '10 min',
+    },
+    worker: {
+      label: 'Temporary Worker',
+      description: 'You work as a temp. Share your field experience.',
+      estimatedTime: '10 min',
+    },
   },
   
   // Buttons
@@ -440,13 +505,16 @@ export const en: TranslationBundle = {
     
     // Q10 : Gestion (AGENCY)
     q10_gestion: {
-      ...fr.questions.q10_gestion,
       label: 'How do you manage posting declarations today?',
       options: {
+        interne: 'Internal team',
+        externe: 'External service provider',
+        mixte: 'Mixed approach',
+        manuel: 'Manual management',
+        logiciel: 'Specialized software',
         manuel: 'Manually (Excel, Word...)',
         logiciel_interne: 'Internal software',
         prestataire: 'External service provider',
-        mixte: 'Mixed approach',
       },
     },
     
@@ -487,11 +555,26 @@ export const en: TranslationBundle = {
       },
     },
     
+    // Q10ter : Agences utilisées (WORKER)
+    q10_agences_worker: {
+      label: 'How many agencies do you work with?',
+      options: {
+        '1': 'Only 1 agency',
+        '2-3': '2-3 agencies',
+        '4-10': '4-10 agencies',
+        '10+': 'More than 10',
+      },
+    },
+    
     // Q11 : Incidents (AGENCY)
     q11_incidents: {
       label: 'Have you faced penalties or incidents related to posting compliance?',
       description: 'Your answer remains anonymous',
       options: {
+        jamais: 'No, never',
+        rarement: 'Rarely (1-2 times)',
+        parfois: 'Sometimes (3-5 times)',
+        souvent: 'Often (6+ times)',
         oui_souvent: 'Yes, frequently',
         oui_rare: 'Yes, occasionally',
         non: 'No',
@@ -523,6 +606,11 @@ export const en: TranslationBundle = {
     q12_budget: {
       label: 'Annual budget allocated to posting administrative management',
       options: {
+        '0-5k': '€0-5,000 / year',
+        '5-15k': '€5,000-15,000 / year',
+        '15-30k': '€15,000-30,000 / year',
+        '30k+': '€30,000+ / year',
+        inconnu: "I don't know",
         '0': 'Not specifically allocated',
         '1-5k': '€1,000 - €5,000',
         '5-20k': '€5,000 - €20,000',
@@ -609,16 +697,21 @@ export const en: TranslationBundle = {
     
     // Q14 : Risques (AGENCY)
     q14_risques: {
-      ...fr.questions.q14_risques,
       label: 'Your main concerns',
       description: 'Select all that apply',
       options: {
+        amendes: 'Fines and penalties',
+        reputation: 'Reputation / Image',
+        penal: 'Criminal liability',
+        delais: 'Mission delays',
+        clients: 'Loss of clients',
+        aucun: 'No major risk',
         sanctions: 'Penalties/sanctions',
         conformite: 'Multi-country compliance',
         cout: 'Administrative costs',
-        delais: 'Processing times',
         documentation: 'Document management',
-        aucun: 'No major concerns',
+        responsabilite: 'Criminal liability',
+        perte_clients: 'Loss of clients',
       },
     },
     
@@ -707,6 +800,12 @@ export const en: TranslationBundle = {
     q16_erp: {
       label: 'Do you use ERP/management software?',
       options: {
+        sage: 'Sage',
+        sap: 'SAP',
+        cegid: 'Cegid',
+        bullhorn: 'Bullhorn / ATS',
+        autre: 'Other',
+        aucun: 'No ERP',
         oui: 'Yes',
         non: 'No',
       },
@@ -734,6 +833,10 @@ export const en: TranslationBundle = {
     q17_migration: {
       label: 'Are you ready to change your work tools?',
       options: {
+        oui: 'Yes, no problem',
+        conditions: 'Yes, under conditions',
+        difficile: 'Difficult, but open',
+        non: 'No, not conceivable',
         oui_rapidement: 'Yes, immediately',
         oui_progressivement: 'Yes, gradually',
         non_satisfait: 'No, satisfied with current tools',

@@ -27,6 +27,36 @@ export const de: TranslationBundle = {
     back_to_site: 'Zurück zur Website',
   },
   
+  dashboard: {
+    title: 'YoJob',
+    subtitle: 'Dashboard',
+    tabs: {
+      overview: 'Übersicht',
+      results: 'Ergebnisse',
+      questions: 'Fragen',
+      translations: 'Übersetzungen',
+      export: 'Export',
+      integrations: 'Integrationen',
+      cms: 'Formular-CMS',
+      settings: 'Einstellungen',
+      prospects: 'Interessenten',
+    },
+    badges: {
+      hub: '⭐ Hub',
+      new: '🆕 Neu',
+      beta: '🧪 Beta',
+    },
+    actions: {
+      logout: 'Abmelden',
+      back_to_survey: 'Zurück zur Umfrage',
+      toggle_sidebar: 'Seitenleiste ein-/ausblenden',
+    },
+    user: {
+      welcome: 'Willkommen',
+      logged_in_as: 'Angemeldet als',
+    },
+  },
+  
   // Sections
   section: {
     1: {
@@ -166,6 +196,8 @@ export const de: TranslationBundle = {
     },
     footer: {
       info: 'Fragen • Anonym • DSGVO-konform',
+      anonymous: 'Anonym',
+      gdpr: 'DSGVO-konform',
     },
   },
   
@@ -179,6 +211,39 @@ export const de: TranslationBundle = {
     client_description: 'Sie sind ein Unternehmen, das Zeitarbeitskräfte beschäftigt',
     worker: 'Zeitarbeitskraft',
     worker_description: 'Sie sind eine Zeitarbeitskraft oder entsandter Arbeitnehmer',
+  },
+  
+  // Respondent Selector
+  selector: {
+    badge: '🌍 Europäische Marktstudie - Rekrutierung & Zeitarbeit',
+    title: 'Teilen Sie Ihre Erfahrung mit dem europäischen Markt',
+    subtitle: 'Wählen Sie Ihr Profil, um die Umfrage zu starten',
+    cta: 'Zum Starten klicken →',
+    trust: {
+      secure: 'Sichere Daten',
+      languages: '{count} verfügbare Sprachen',
+      languages_suffix: 'verfügbare Sprachen',
+      anonymous: 'Anonym & vertraulich',
+    },
+  },
+  
+  // Respondent profiles for cards
+  respondent: {
+    agency: {
+      label: 'Zeitarbeitsfirma',
+      description: 'Sie sind eine europäische Zeitarbeitsfirma. Teilen Sie Ihre Entsendungserfahrung.',
+      estimatedTime: '15 Min',
+    },
+    client: {
+      label: 'Kundenunternehmen',
+      description: 'Sie stellen Zeitarbeitskräfte ein. Teilen Sie Ihre Bedürfnisse und Erwartungen.',
+      estimatedTime: '10 Min',
+    },
+    worker: {
+      label: 'Zeitarbeitskraft',
+      description: 'Sie arbeiten als Zeitarbeitskraft. Teilen Sie Ihre praktischen Erfahrungen.',
+      estimatedTime: '10 Min',
+    },
   },
   
   // Buttons
@@ -475,9 +540,8 @@ export const de: TranslationBundle = {
       },
     },
     
-    // Q10 : Agence (WORKER)
+    // Q10 : Agentur (WORKER)
     q10_agence: {
-      ...fr.questions.q10_agence,
       label: 'Wie finden Sie Zeitarbeit?',
       options: {
         agence: 'Über Zeitarbeitsfirmen',
@@ -487,7 +551,18 @@ export const de: TranslationBundle = {
       },
     },
     
-    // Q11 : Incidents (AGENCY)
+    // Q10ter : Agenturen verwendet (WORKER)
+    q10_agences_worker: {
+      label: 'Mit wie vielen Agenturen arbeiten Sie?',
+      options: {
+        '1': 'Nur 1 Agentur',
+        '2-3': '2-3 Agenturen',
+        '4-10': '4-10 Agenturen',
+        '10+': 'Mehr als 10',
+      },
+    },
+    
+    // Q11 : Vorfälle (AGENTUR)
     q11_incidents: {
       label: 'Hatten Sie Strafen oder Vorfälle im Zusammenhang mit der Einhaltung von Entsendungsvorschriften?',
       description: 'Ihre Antwort bleibt anonymisiert',
@@ -607,18 +682,23 @@ export const de: TranslationBundle = {
     
     // Section 3 - Besoins
     
-    // Q14 : Risques (AGENCY)
+    // Q14 : Risiken (AGENCY)
     q14_risques: {
-      ...fr.questions.q14_risques,
       label: 'Ihre Hauptbedenken',
       description: 'Wählen Sie alle zutreffenden aus',
       options: {
+        amendes: 'Bußgelder und Strafen',
+        reputation: 'Ruf / Image',
+        penal: 'Strafrechtliche Haftung',
+        delais: 'Missionsverzögerungen',
+        clients: 'Verlust von Kunden',
+        aucun: 'Kein größeres Risiko',
         sanctions: 'Strafen/Sanktionen',
         conformite: 'Konformität in mehreren Ländern',
         cout: 'Verwaltungskosten',
-        delais: 'Bearbeitungszeiten',
         documentation: 'Dokumentenverwaltung',
-        aucun: 'Keine größeren Bedenken',
+        responsabilite: 'Strafrechtliche Haftung',
+        perte_clients: 'Verlust von Kunden',
       },
     },
     
@@ -707,6 +787,12 @@ export const de: TranslationBundle = {
     q16_erp: {
       label: 'Nutzen Sie ERP/Verwaltungssoftware?',
       options: {
+        sage: 'Sage',
+        sap: 'SAP',
+        cegid: 'Cegid',
+        bullhorn: 'Bullhorn / ATS',
+        autre: 'Andere',
+        aucun: 'Kein ERP',
         oui: 'Ja',
         non: 'Nein',
       },
@@ -734,6 +820,10 @@ export const de: TranslationBundle = {
     q17_migration: {
       label: 'Sind Sie bereit, Ihre Arbeitstools zu wechseln?',
       options: {
+        oui: 'Ja, kein Problem',
+        conditions: 'Ja, unter Bedingungen',
+        difficile: 'Schwierig, aber offen',
+        non: 'Nein, nicht denkbar',
         oui_rapidement: 'Ja, sofort',
         oui_progressivement: 'Ja, schrittweise',
         non_satisfait: 'Nein, zufrieden mit aktuellen Tools',

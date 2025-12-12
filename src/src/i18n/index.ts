@@ -23,6 +23,13 @@ import type {
 import { fr } from './locales/fr.generated';
 import { en } from './locales/en';
 import { de } from './locales/de';
+import { ro } from './locales/ro';
+import { pt } from './locales/pt';
+import { es } from './locales/es';
+import { it } from './locales/it';
+import { pl } from './locales/pl';
+import { bg } from './locales/bg';
+import { hu } from './locales/hu';
 
 /**
  * Toutes les traductions chargées
@@ -31,6 +38,13 @@ const TRANSLATIONS: Partial<TranslationsByLanguage> = {
   fr,
   en,
   de,
+  ro,
+  pt,
+  es,
+  it,
+  pl,
+  bg,
+  hu,
   // Les autres langues seront ajoutées progressivement
 };
 

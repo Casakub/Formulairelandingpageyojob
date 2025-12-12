@@ -9,8 +9,8 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from '../ui/tooltip';
-import { useI18n } from '../../src/i18n';
-import { useAvailableLanguages, getCompletionColor } from '../../hooks/useAvailableLanguages';
+import { useI18n, SUPPORTED_LANGUAGES } from '../../src/i18n';
+import { TRANSLATED_LANGUAGE_CODES } from '../../src/i18n/constants';
 
 interface HeaderProps {
   currentSection: number;
@@ -22,7 +22,18 @@ export function Header({ currentSection, progress, onDashboardClick }: HeaderPro
   const [isScrolled, setIsScrolled] = useState(false);
   const [isLangMenuOpen, setIsLangMenuOpen] = useState(false);
   const { currentLang, setLanguage, t } = useI18n();
-  const { availableLanguages, loading: languagesLoading } = useAvailableLanguages();
+  
+  // ✅ UTILISER LES LANGUES LOCALES DEPUIS /src/i18n
+  // Ne pas dépendre de Supabase pour les traductions du formulaire
+  const availableLanguages = SUPPORTED_LANGUAGES
+    .filter(lang => TRANSLATED_LANGUAGE_CODES.includes(lang.code as any))
+    .map(lang => ({
+      ...lang,
+      totalTranslations: 0,
+      questions: 0,
+      ui: 0,
+      completion: 100, // Toutes les langues traduites ont 100% de complétion
+    }));
 
   useEffect(() => {
     const handleScroll = () => {
@@ -104,9 +115,8 @@ export function Header({ currentSection, progress, onDashboardClick }: HeaderPro
                         ? 'text-gray-900 hover:text-cyan-600 hover:bg-cyan-50' 
                         : 'text-white hover:text-cyan-200 hover:bg-white/10'
                     }`}
-                    disabled={languagesLoading}
                   >
-                    {languagesLoading ? (
+                    {availableLanguages.length === 0 ? (
                       <Loader2 className="w-4 h-4 mr-2 animate-spin" />
                     ) : (
                       <Globe className="w-4 h-4 mr-2" />
@@ -129,7 +139,7 @@ export function Header({ currentSection, progress, onDashboardClick }: HeaderPro
                         transition={{ duration: 0.2 }}
                         className="absolute right-0 top-full mt-2 w-64 bg-white/95 backdrop-blur-xl rounded-2xl border-2 border-white/20 shadow-2xl overflow-hidden z-50"
                       >
-                        {languagesLoading ? (
+                        {availableLanguages.length === 0 ? (
                           <div className="p-8 flex flex-col items-center justify-center gap-3">
                             <Loader2 className="w-6 h-6 animate-spin text-cyan-500" />
                             <p className="text-sm text-slate-600">Chargement des langues...</p>
@@ -143,42 +153,71 @@ export function Header({ currentSection, progress, onDashboardClick }: HeaderPro
                         ) : (
                           <>
                             <div className="p-2 max-h-96 overflow-y-auto">
-                              {availableLanguages.map((lang) => (
+                              {availableLanguages
+                                .filter(lang => TRANSLATED_LANGUAGE_CODES.includes(lang.code))
+                                .map((lang) => (
                                 <motion.button
                                   key={lang.code}
                                   onClick={() => {
                                     setLanguage(lang.code);
                                     setIsLangMenuOpen(false);
                                   }}
-                                  whileHover={{ x: 4 }}
-                                  className={`w-full flex items-center justify-between px-4 py-3 rounded-xl transition-all ${
+                                  whileHover={{ x: 4, scale: 1.02 }}
+                                  whileTap={{ scale: 0.98 }}
+                                  className={`w-full flex items-center justify-between px-4 py-3.5 rounded-xl mb-1 transition-all ${
                                     currentLang === lang.code
-                                      ? 'bg-gradient-to-r from-cyan-500/10 to-violet-500/10 text-violet-600'
-                                      : 'hover:bg-slate-50 text-slate-700'
+                                      ? 'bg-gradient-to-r from-cyan-500/15 to-violet-500/15 border border-violet-400/30 shadow-lg shadow-violet-500/10'
+                                      : 'hover:bg-gradient-to-r hover:from-slate-50 hover:to-slate-100/50 border border-transparent'
                                   }`}
                                 >
                                   <div className="flex items-center gap-3 flex-1">
-                                    <span className="text-xl">{lang.flag}</span>
+                                    <span className="text-2xl">{lang.flag}</span>
                                     <div className="text-left flex-1">
-                                      <div className="text-sm">{lang.name}</div>
-                                      <div className="flex items-center gap-2 text-xs text-slate-500">
-                                        <span className="uppercase">{lang.code}</span>
-                                        <span className="text-slate-300">•</span>
-                                        <span className={getCompletionColor(lang.completion)}>
-                                          {lang.completion}%
+                                      <div className={`text-sm ${
+                                        currentLang === lang.code 
+                                          ? 'font-semibold text-violet-700' 
+                                          : 'font-medium text-slate-800'
+                                      }`}>
+                                        {lang.name}
+                                      </div>
+                                      <div className="flex items-center gap-2 mt-0.5">
+                                        <span className={`text-xs uppercase ${
+                                          currentLang === lang.code
+                                            ? 'text-violet-500 font-medium'
+                                            : 'text-slate-500'
+                                        }`}>
+                                          {lang.code}
                                         </span>
+                                        <span className="text-slate-300">•</span>
+                                        <div className={`text-xs font-medium px-2 py-0.5 rounded-full ${
+                                          lang.completion === 100
+                                            ? 'bg-gradient-to-r from-green-500 to-emerald-500 text-white'
+                                            : lang.completion >= 80
+                                            ? 'bg-gradient-to-r from-cyan-500 to-blue-500 text-white'
+                                            : lang.completion >= 50
+                                            ? 'bg-gradient-to-r from-yellow-400 to-orange-400 text-white'
+                                            : 'bg-gradient-to-r from-slate-300 to-slate-400 text-white'
+                                        }`}>
+                                          {lang.completion}%
+                                        </div>
                                       </div>
                                     </div>
                                   </div>
                                   {currentLang === lang.code && (
-                                    <Check className="w-4 h-4 text-cyan-500" />
+                                    <motion.div
+                                      initial={{ scale: 0 }}
+                                      animate={{ scale: 1 }}
+                                      className="flex items-center justify-center w-7 h-7 rounded-full bg-gradient-to-br from-cyan-400 to-violet-500 shadow-lg"
+                                    >
+                                      <Check className="w-4 h-4 text-white" strokeWidth={3} />
+                                    </motion.div>
                                   )}
                                 </motion.button>
                               ))}
                             </div>
                             <div className="px-4 py-3 bg-gradient-to-r from-cyan-50 to-violet-50 border-t border-slate-200">
                               <p className="text-xs text-slate-600">
-                                💡 {availableLanguages.length} {availableLanguages.length === 1 ? 'langue disponible' : 'langues disponibles'}
+                                💡 {availableLanguages.filter(lang => TRANSLATED_LANGUAGE_CODES.includes(lang.code)).length} {availableLanguages.filter(lang => TRANSLATED_LANGUAGE_CODES.includes(lang.code)).length === 1 ? 'langue disponible' : 'langues disponibles'}
                               </p>
                             </div>
                           </>

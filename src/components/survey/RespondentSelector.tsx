@@ -11,10 +11,12 @@ import { Card, CardContent } from '../ui/card';
 import { Badge } from '../ui/badge';
 import type { RespondentType, RespondentProfile } from '../../types/survey';
 import { RESPONDENT_PROFILES } from '../../types/survey';
+import { useI18n } from '../../src/i18n';
 
 interface RespondentSelectorProps {
   onSelect: (type: RespondentType) => void;
   currentLanguage?: string;
+  availableLanguagesCount?: number;
 }
 
 const ICON_MAP = {
@@ -41,8 +43,9 @@ const COLOR_MAP = {
   },
 };
 
-export function RespondentSelector({ onSelect, currentLanguage = 'fr' }: RespondentSelectorProps) {
+export function RespondentSelector({ onSelect, currentLanguage = 'fr', availableLanguagesCount = 23 }: RespondentSelectorProps) {
   const profiles: RespondentProfile[] = Object.values(RESPONDENT_PROFILES);
+  const { t } = useI18n(); // ✅ Le hook ne prend pas de paramètre, il utilise le contexte
 
   return (
     <section className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-900 via-violet-900 to-cyan-900 px-4 py-16">
@@ -56,15 +59,15 @@ export function RespondentSelector({ onSelect, currentLanguage = 'fr' }: Respond
           className="text-center mb-12"
         >
           <Badge className="mb-6 bg-white/10 backdrop-blur-sm border-white/20 text-white px-6 py-2">
-            🌍 Étude de marché européenne - Recrutement & Intérim
+            {t('selector.badge', '🌍 Étude de marché européen - Recrutement & Intérim')}
           </Badge>
           
           <h1 className="text-white mb-4">
-            Partagez votre expérience du marché européen
+            {t('selector.title', 'Partagez votre expérience du marché européen')}
           </h1>
           
           <p className="text-cyan-200 text-lg max-w-2xl mx-auto">
-            Sélectionnez votre profil pour commencer l'enquête
+            {t('selector.subtitle', 'Sélectionnez votre profil pour commencer l\'enquête')}
           </p>
         </motion.div>
 
@@ -106,29 +109,29 @@ export function RespondentSelector({ onSelect, currentLanguage = 'fr' }: Respond
 
                     {/* Title */}
                     <h3 className="text-white mb-3">
-                      {profile.label}
+                      {t(`respondent.${profile.type}.label`, profile.label)}
                     </h3>
 
                     {/* Description */}
                     <p className="text-cyan-200 text-sm mb-6 leading-relaxed">
-                      {profile.description}
+                      {t(`respondent.${profile.type}.description`, profile.description)}
                     </p>
 
                     {/* Stats */}
                     <div className="flex items-center justify-between text-sm">
                       <span className="text-white/60 flex items-center gap-1">
-                        <span>{profile.totalQuestions} questions</span>
+                        <span>{profile.totalQuestions} {t('hero.stat.questions', 'questions')}</span>
                       </span>
                       <span className={`${colors.text} flex items-center gap-1`}>
                         <Clock className="w-3.5 h-3.5" />
-                        <span>{profile.estimatedTime}</span>
+                        <span>{t(`respondent.${profile.type}.estimatedTime`, profile.estimatedTime)}</span>
                       </span>
                     </div>
 
                     {/* Hover indicator */}
                     <div className="mt-6 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
                       <span className="text-white text-sm font-medium">
-                        Cliquer pour démarrer →
+                        {t('selector.cta', 'Cliquer pour démarrer →')}
                       </span>
                     </div>
                   </CardContent>
@@ -147,15 +150,15 @@ export function RespondentSelector({ onSelect, currentLanguage = 'fr' }: Respond
         >
           <div className="flex items-center gap-2">
             <Shield className="w-4 h-4" />
-            <span>Données sécurisées</span>
+            <span>{t('selector.trust.secure', 'Données sécurisées')}</span>
           </div>
           <div className="flex items-center gap-2">
             <Globe className="w-4 h-4" />
-            <span>23 langues disponibles</span>
+            <span>{availableLanguagesCount} {t('selector.trust.languages_suffix', availableLanguagesCount === 1 ? 'langue disponible' : 'langues disponibles')}</span>
           </div>
           <div className="flex items-center gap-2">
             <Clock className="w-4 h-4" />
-            <span>Anonyme & confidentiel</span>
+            <span>{t('selector.trust.anonymous', 'Anonyme & confidentiel')}</span>
           </div>
         </motion.div>
 

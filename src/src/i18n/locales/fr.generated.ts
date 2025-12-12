@@ -69,6 +69,36 @@ function generateFrenchBundle(): TranslationBundle {
       back_to_site: 'Retour au site',
     },
     
+    dashboard: {
+      title: 'YoJob',
+      subtitle: 'Dashboard',
+      tabs: {
+        overview: 'Vue d\'ensemble',
+        results: 'Résultats',
+        questions: 'Questions',
+        translations: 'Traductions',
+        export: 'Export',
+        integrations: 'Intégrations',
+        cms: 'CMS Formulaire',
+        settings: 'Paramètres',
+        prospects: 'Prospects',
+      },
+      badges: {
+        hub: '⭐ Hub',
+        new: '🆕 Nouveau',
+        beta: '🧪 Bêta',
+      },
+      actions: {
+        logout: 'Se déconnecter',
+        back_to_survey: 'Retour au formulaire',
+        toggle_sidebar: 'Réduire/Agrandir',
+      },
+      user: {
+        welcome: 'Bienvenue',
+        logged_in_as: 'Connecté en tant que',
+      },
+    },
+    
     section: {
       1: {
         title: 'Profil Agence',
@@ -117,6 +147,8 @@ function generateFrenchBundle(): TranslationBundle {
       },
       footer: {
         info: 'questions • Anonyme • Conforme RGPD',
+        anonymous: 'Anonyme',
+        gdpr: 'Conforme RGPD',
       },
     },
     
@@ -129,6 +161,37 @@ function generateFrenchBundle(): TranslationBundle {
       client_description: 'Vous êtes une entreprise qui embauche des intérimaires',
       worker: 'Travailleur Intérimaire',
       worker_description: 'Vous êtes un travailleur intérimaire ou en détachement',
+    },
+    
+    selector: {
+      badge: '🌍 Étude de marché européen - Recrutement & Intérim',
+      title: 'Partagez votre expérience du marché européen',
+      subtitle: 'Sélectionnez votre profil pour commencer l\'enquête',
+      cta: 'Cliquer pour démarrer →',
+      trust: {
+        secure: 'Données sécurisées',
+        languages: '{count} langues disponibles',
+        languages_suffix: 'langues disponibles',
+        anonymous: 'Anonyme & confidentiel',
+      },
+    },
+    
+    respondent: {
+      agency: {
+        label: 'Agence de travail temporaire',
+        description: 'Vous êtes une agence ETT européenne. Partagez votre expérience du détachement.',
+        estimatedTime: '15 min',
+      },
+      client: {
+        label: 'Entreprise cliente',
+        description: 'Vous recrutez des intérimaires. Partagez vos besoins et attentes.',
+        estimatedTime: '10 min',
+      },
+      worker: {
+        label: 'Travailleur intérimaire',
+        description: 'Vous travaillez en intérim. Partagez votre expérience terrain.',
+        estimatedTime: '10 min',
+      },
     },
     
     button: {

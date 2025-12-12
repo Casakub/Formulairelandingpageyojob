@@ -188,7 +188,7 @@ export function HeroSection({ onStart, respondentType }: HeroSectionProps) {
             className="h-16 px-12 bg-white text-blue-900 hover:bg-cyan-50 rounded-full shadow-2xl hover:shadow-white/70 transition-all relative overflow-hidden group"
           >
             <span className="relative z-10 flex items-center gap-3 text-lg">
-              {getText('hero.cta.start', 'Commencer l\'enquête')}
+              {getText('hero.cta_start', 'Commencer l\'enquête')}
               <ArrowRight className="w-6 h-6" />
             </span>
             <div className="absolute inset-0 -translate-x-full group-hover:translate-x-full transition-transform duration-700 bg-gradient-to-r from-transparent via-cyan-200/40 to-transparent" />
