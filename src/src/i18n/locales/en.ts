@@ -156,6 +156,17 @@ export const en: TranslationBundle = {
     description: 'This survey takes about 10-15 minutes. Your answers will help us create a solution tailored to your sector.',
     cta_start: 'Start Survey',
     cta_dashboard: 'Access Dashboard',
+    badge: 'European market study',
+    stat: {
+      countries: '27 European countries',
+      questions: 'questions',
+      benchmark: 'Get the 2025 benchmark',
+      insights: 'Exclusive market insights',
+      opportunities: 'Priority access to jobs',
+    },
+    footer: {
+      info: 'questions • Anonymous • GDPR compliant',
+    },
   },
   
   // Respondent Type

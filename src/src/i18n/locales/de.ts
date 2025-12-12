@@ -156,6 +156,17 @@ export const de: TranslationBundle = {
     description: 'Diese Umfrage dauert etwa 10-15 Minuten. Ihre Antworten helfen uns, eine maßgeschneiderte Lösung für Ihre Branche zu entwickeln.',
     cta_start: 'Umfrage starten',
     cta_dashboard: 'Zum Dashboard',
+    badge: 'Europäische Marktstudie',
+    stat: {
+      countries: '27 europäische Länder',
+      questions: 'Fragen',
+      benchmark: 'Erhalten Sie den Benchmark 2025',
+      insights: 'Exklusive Markteinblicke',
+      opportunities: 'Prioritärer Zugang zu Stellenangeboten',
+    },
+    footer: {
+      info: 'Fragen • Anonym • DSGVO-konform',
+    },
   },
   
   // Respondent Type

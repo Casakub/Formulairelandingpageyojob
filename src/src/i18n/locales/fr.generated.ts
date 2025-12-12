@@ -107,6 +107,17 @@ function generateFrenchBundle(): TranslationBundle {
       description: 'Cette enquête prend environ 10-15 minutes. Vos réponses nous permettront de créer une solution adaptée à votre secteur.',
       cta_start: 'Commencer l\'enquête',
       cta_dashboard: 'Accéder au Dashboard',
+      badge: 'Étude de marché européen',
+      stat: {
+        countries: '27 pays européens',
+        questions: 'questions',
+        benchmark: 'Recevez le benchmark 2025',
+        insights: 'Insights marché exclusifs',
+        opportunities: 'Accès prioritaire aux offres',
+      },
+      footer: {
+        info: 'questions • Anonyme • Conforme RGPD',
+      },
     },
     
     respondent_type: {

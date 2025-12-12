@@ -1,5 +1,5 @@
 import { motion } from 'motion/react';
-import { ArrowRight, CheckCircle, Clock } from 'lucide-react';
+import { ArrowRight, CheckCircle, Clock, TrendingUp } from 'lucide-react';
 import { Button } from '../ui/button';
 import { Card, CardContent } from '../ui/card';
 import { useI18n } from '../../src/i18n';
@@ -24,87 +24,154 @@ export function HeroSection({ onStart, respondentType }: HeroSectionProps) {
   const questionCount = QUESTION_COUNT_BY_PROFILE[respondentType];
   const estimatedTime = ESTIMATED_TIME_BY_PROFILE[respondentType];
   
-  const stats = [
-    { 
-      icon: CheckCircle, 
-      labelKey: 'hero.stat.countries',
-      fallback: '27 pays couverts',
-      color: 'from-cyan-400 to-blue-500' 
-    },
-    { 
-      icon: Clock, 
-      labelKey: 'hero.stat.duration',
-      fallback: `${questionCount} questions • ${estimatedTime}`,
-      color: 'from-green-400 to-emerald-500' 
+  // 🎯 STATS ADAPTÉES PAR PROFIL - Marketing optimisé
+  const getStatsForProfile = () => {
+    switch (respondentType) {
+      case 'agency':
+        return [
+          { 
+            icon: CheckCircle, 
+            labelKey: 'hero.stat.countries',
+            fallback: '27 pays européens',
+            color: 'from-cyan-400 to-blue-500' 
+          },
+          { 
+            icon: Clock, 
+            label: `${questionCount} ${getText('hero.stat.questions', 'questions')} • ${estimatedTime}`,
+            color: 'from-green-400 to-emerald-500' 
+          },
+          { 
+            icon: TrendingUp, 
+            labelKey: 'hero.stat.benchmark',
+            fallback: 'Recevez le benchmark 2025',
+            color: 'from-violet-400 to-purple-500' 
+          }
+        ];
+      
+      case 'client':
+        return [
+          { 
+            icon: CheckCircle, 
+            labelKey: 'hero.stat.countries',
+            fallback: '27 pays européens',
+            color: 'from-cyan-400 to-blue-500' 
+          },
+          { 
+            icon: Clock, 
+            label: `${questionCount} ${getText('hero.stat.questions', 'questions')} • ${estimatedTime}`,
+            color: 'from-green-400 to-emerald-500' 
+          },
+          { 
+            icon: TrendingUp, 
+            labelKey: 'hero.stat.insights',
+            fallback: 'Insights marché exclusifs',
+            color: 'from-orange-400 to-amber-500' 
+          }
+        ];
+      
+      case 'worker':
+        return [
+          { 
+            icon: CheckCircle, 
+            labelKey: 'hero.stat.countries',
+            fallback: '27 pays disponibles',
+            color: 'from-cyan-400 to-blue-500' 
+          },
+          { 
+            icon: Clock, 
+            label: `${questionCount} ${getText('hero.stat.questions', 'questions')} • ${estimatedTime}`,
+            color: 'from-green-400 to-emerald-500' 
+          },
+          { 
+            icon: TrendingUp, 
+            labelKey: 'hero.stat.opportunities',
+            fallback: 'Accès prioritaire aux offres',
+            color: 'from-pink-400 to-rose-500' 
+          }
+        ];
+      
+      default:
+        return [
+          { 
+            icon: CheckCircle, 
+            labelKey: 'hero.stat.countries',
+            fallback: '27 pays couverts',
+            color: 'from-cyan-400 to-blue-500' 
+          },
+          { 
+            icon: Clock, 
+            label: `${questionCount} ${getText('hero.stat.questions', 'questions')} • ${estimatedTime}`,
+            color: 'from-green-400 to-emerald-500' 
+          }
+        ];
     }
-  ];
+  };
+
+  const stats = getStatsForProfile();
 
   return (
-    <motion.section
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      exit={{ opacity: 0 }}
-      className="relative z-10 min-h-screen flex items-center justify-center px-4 py-20"
-    >
-      <div className="max-w-5xl mx-auto text-center">
+    <section className="relative min-h-[90vh] flex items-center justify-center overflow-hidden py-20 px-4">
+      {/* Content */}
+      <div className="relative z-10 max-w-4xl mx-auto text-center">
         {/* Badge */}
         <motion.div
-          initial={{ scale: 0 }}
-          animate={{ scale: 1 }}
-          transition={{ type: 'spring', stiffness: 200, delay: 0.2 }}
-          className="inline-block mb-6"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6 }}
+          className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-white/10 backdrop-blur-sm border border-white/20 mb-8"
         >
-          <div className="inline-flex items-center px-6 py-3 rounded-full bg-white/10 backdrop-blur-sm border border-white/20 shadow-lg">
-            <span className="mr-2 text-2xl">📊</span>
-            <span className="text-white">{getText('hero.badge', 'Étude de marché européen')}</span>
-          </div>
+          <span className="text-2xl">📊</span>
+          <span className="text-white/90">{getText('hero.badge', 'Étude de marché européen')}</span>
         </motion.div>
 
         {/* Title */}
         <motion.h1
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.3 }}
-          className="text-white mb-6 px-4"
+          transition={{ duration: 0.6, delay: 0.1 }}
+          className="text-white mb-6"
         >
-          {getText('hero.title', 'Participez à l\'avenir du détachement européen')}
+          {getText('hero.title', 'Enquête de marché')}
         </motion.h1>
 
         {/* Subtitle */}
         <motion.p
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.4 }}
-          className="text-cyan-100 text-xl mb-12 max-w-3xl mx-auto px-4"
+          transition={{ duration: 0.6, delay: 0.2 }}
+          className="text-xl text-white/80 mb-12 max-w-2xl mx-auto"
         >
-          {getText('hero.subtitle', 'Votre avis façonne YoJob. 8 minutes pour transformer votre quotidien administratif.')}
+          {getText('hero.subtitle', 'Aidez-nous à mieux comprendre vos besoins')}
         </motion.p>
 
         {/* Stats Cards */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.5 }}
-          className="grid md:grid-cols-3 gap-4 mb-12 max-w-4xl mx-auto"
+          transition={{ duration: 0.6, delay: 0.3 }}
+          className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12"
         >
-          {stats.map((stat, index) => (
-            <motion.div
-              key={index}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.6 + index * 0.1 }}
-              whileHover={{ y: -8, scale: 1.02 }}
-            >
-              <Card className="border border-white/10 bg-white/5 backdrop-blur-sm hover:border-cyan-400/30 transition-all shadow-xl">
-                <CardContent className="p-6 flex flex-col items-center text-center gap-3">
-                  <div className={`w-14 h-14 rounded-xl bg-gradient-to-br ${stat.color} flex items-center justify-center shadow-lg`}>
-                    <stat.icon className="w-7 h-7 text-white" />
-                  </div>
-                  <p className="text-white">{getText(stat.labelKey, stat.fallback)}</p>
-                </CardContent>
-              </Card>
-            </motion.div>
-          ))}
+          {stats.map((stat, index) => {
+            const Icon = stat.icon;
+            return (
+              <motion.div
+                key={index}
+                whileHover={{ y: -8, scale: 1.02 }}
+                transition={{ duration: 0.3 }}
+              >
+                <Card className="border-white/10 bg-white/5 backdrop-blur-sm hover:bg-white/10 transition-all duration-300">
+                  <CardContent className="p-6 text-center">
+                    <div className={`inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-br ${stat.color} mb-4 shadow-lg`}>
+                      <Icon className="w-8 h-8 text-white" />
+                    </div>
+                    <p className="text-white">
+                      {stat.label || getText(stat.labelKey!, stat.fallback || '')}
+                    </p>
+                  </CardContent>
+                </Card>
+              </motion.div>
+            );
+          })}
         </motion.div>
 
         {/* CTA Button */}
@@ -135,9 +202,9 @@ export function HeroSection({ onStart, respondentType }: HeroSectionProps) {
           transition={{ delay: 1.1 }}
           className="text-white/60 text-sm mt-8"
         >
-          {getText('hero.footer.info', '26 questions • Anonyme • Conforme RGPD')}
+          {questionCount} {getText('hero.stat.questions', 'questions')} • {estimatedTime} • {getText('hero.footer.anonymous', 'Anonyme')} • {getText('hero.footer.gdpr', 'Conforme RGPD')}
         </motion.p>
       </div>
-    </motion.section>
+    </section>
   );
 }
