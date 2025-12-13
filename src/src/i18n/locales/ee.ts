@@ -642,16 +642,52 @@ export const ee: TranslationBundle = {
       },
     },
     
-    // Q13 : Budget client (CLIENT)
-    q13_budget_client: {
-      label: 'Milline on teie aastaeelarve ajutisele tööle?',
+    // Q12 : Budget client (CLIENT)
+    q12_budget_client: {
+      label: 'Aastane eelarve ajutisele tööle',
       options: {
-        '<50k': 'Vähem kui €50k',
-        '50-200k': '€50k - €200k',
-        '200-500k': '€200k - €500k',
-        '500k-1M': '€500k - €1M',
-        '1M+': 'Üle €1M',
+        '0-50k': '0-50 000 €',
+        '50-200k': '50 000-200 000 €',
+        '200-500k': '200 000-500 000 €',
+        '500k+': '500 000+ €',
+        'inconnu': 'Ei tea',
       },
+    },
+    
+    // Q13 : Satisfaction (CLIENT)
+    q13_satisfaction: {
+      ...fr.questions.q13_satisfaction,
+      label: 'Rahulolu praeguste agentuuridega',
+      options: {
+        'tres_satisfait': 'Väga rahul',
+        'satisfait': 'Rahul',
+        'neutre': 'Neutraalne',
+        'insatisfait': 'Veidi rahulolematu',
+        'tres_insatisfait': 'Väga rahulolematu',
+      },
+    },
+    
+    // Q14 : Risques client (CLIENT)
+    q14_risques_client: {
+      ...fr.questions.q14_risques_client,
+      label: 'Millised riskid teid kõige rohkem muret teevad?',
+      description: 'Valige kõik asjakohased',
+      options: {
+        conformite: 'Eeskirjade eiramine',
+        qualite: 'Ebapiisav kvaliteet',
+        communication: 'Suhtlemine/Keeled',
+        cout: 'Ootamatud kulud',
+        disponibilite: 'Kandidaatide kättesaadavus',
+        aucun: 'Suuri muresid pole',
+        fiabilite: 'Agentuuride usaldusväärsus',
+      },
+    },
+    
+    // Q15 : Besoins client (CLIENT)
+    q15_besoins_client: {
+      ...fr.questions.q15_besoins_client,
+      label: 'Mis on teie prioriteetsed vajadused?',
+      placeholder: 'Näiteks: Kiire leidmine, parem kvaliteet, hinnad...',
     },
     
     // Q13 : Durée worker (WORKER)
@@ -833,6 +869,101 @@ export const ee: TranslationBundle = {
         probablement: 'Tõenäoliselt',
         peut_etre: 'Võib-olla',
         probablement_pas: 'Tõenäoliselt mitte',
+      },
+    },
+    
+    // Q19 : Features (AGENCY)
+    q19_features: {
+      ...fr.questions.q19_features,
+      label: 'Kõige huvitavamad funktsioonid',
+      description: 'Valige kõik, mis teile meeldivad',
+      options: {
+        sipsi: 'Automaatne SIPSI deklareerimine',
+        a1: 'A1 sertifikaatide haldamine',
+        conformite: 'Vastavuse juhtpaneel',
+        alertes: 'Hoiatused ja pikendamised',
+        marketplace: 'Euroopa turg',
+        autre: 'Muu',
+      },
+    },
+    
+    // Q19 : Features client (CLIENT)
+    q19_features_client: {
+      ...fr.questions.q19_features_client,
+      label: 'Kõige huvitavamad funktsioonid',
+      description: 'Valige kõik, mis teile meeldivad',
+      options: {
+        recherche: 'Usaldusväärsete agentuuride otsing',
+        comparaison: 'Hinna/kvaliteedi võrdlus',
+        avis: 'Kontrollitud arvustused',
+        conformite: 'Vastavuse garantii',
+        suivi: 'Reaalajas jälgimine',
+        autre: 'Muu',
+      },
+    },
+    
+    // Q19 : Features worker (WORKER)
+    q19_features_worker: {
+      ...fr.questions.q19_features_worker,
+      label: 'Kõige huvitavamad funktsioonid',
+      description: 'Valige kõik, mis teile meeldivad',
+      options: {
+        recherche: 'Töövõttude otsing',
+        avis: 'Agentuuride arvustused',
+        logement: 'Abi elukoha leidmisel',
+        paiement: 'Turvaline maksmine',
+        documents: 'Abi halduslike dokumentidega',
+        formation: 'Kvalifikatsioonid andev koolitus',
+      },
+    },
+    
+    // Q20 : Prix (ALL)
+    q20_prix: {
+      ...fr.questions.q20_prix,
+      label: 'Eelistatud hinnamudel',
+      options: {
+        mensuel: 'Fikseeritud kuutellimus',
+        usage: 'Tasuta kasutuse eest (Pay-as-you-go)',
+        annuel: 'Aastane pakett (allahindlus)',
+        gratuit: 'Tasuta töötajatele',
+        freemium: 'Tasuta baas + premium',
+      },
+    },
+    
+    // Q21 : Budget mensuel (AGENCY & CLIENT)
+    q21_budget_mensuel: {
+      ...fr.questions.q21_budget_mensuel,
+      label: 'Vastuvõetav kuueelarve',
+      options: {
+        '0-100': '0-100 € / kuus',
+        '100-300': '100-300 € / kuus',
+        '300-500': '300-500 € / kuus',
+        '500-1000': '500-1 000 € / kuus',
+        '1000+': 'Üle 1 000 € / kuus',
+      },
+    },
+    
+    // Q22 : MVP (ALL)
+    q22_mvp: {
+      ...fr.questions.q22_mvp,
+      label: 'Kas olete valmis testima MVP-d (beeta versioon)?',
+      options: {
+        oui_gratuit: 'Jah, tasuta',
+        oui_reduc: 'Jah, allahindlusega',
+        peut_etre: 'Võib-olla, sõltuvalt funktsioonidest',
+        non: 'Ei, ei ole huvitatud',
+      },
+    },
+    
+    // Q23 : Role (AGENCY & CLIENT)
+    q23_role: {
+      ...fr.questions.q23_role,
+      label: 'Roll ostuotsuses',
+      options: {
+        decideur: 'Lõplik otsustaja',
+        influenceur: 'Mõjutaja / Soovitus',
+        utilisateur: 'Lõppkasutaja',
+        autre: 'Muu',
       },
     },
     
