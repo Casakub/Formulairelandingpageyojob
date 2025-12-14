@@ -488,13 +488,13 @@ export const hr: TranslationBundle = {
     
     // Q9 : Défi worker (WORKER)
     q9_defi_worker: {
-      label: 'Vaš glavni izazov s privremenim radom u inozemstvu',
+      label: 'Glavni izazov u vašim angažmanima',
       options: {
+        trouver: 'Pronalaženje angažmana',
         admin: 'Administrativna papirnata administracija',
-        langue: 'Jezična barijera',
-        logement: 'Pronalaženje smještaja',
-        transport: 'Prijevoz',
-        salaire: 'Problemi s plaćom/platom',
+        logement: 'Smještaj / Nastanitev',
+        langue: 'Lokalni jezik',
+        paiement: 'Plaćanja / Plaća',
         autre: 'Ostalo',
       },
     },
@@ -532,31 +532,7 @@ export const hr: TranslationBundle = {
         '10+': 'Više od 10',
       },
     },
-    
-    // Q10 : Processus (CLIENT)
-    q10_processus: {
-      ...fr.questions.q10_processus,
-      label: 'Kako zapošljavate agencijske radnike?',
-      options: {
-        agence_fr: 'Francuske agencije za zapošljavanje',
-        agence_euro: 'Europske agencije za zapošljavanje',
-        direct: 'Izravno zapošljavanje',
-        mixte: 'Mješovito',
-      },
-    },
-    
-    // Q10 : Agence (WORKER)
-    q10_agence: {
-      ...fr.questions.q10_agence,
-      label: 'Kako pronalazite privremeni rad?',
-      options: {
-        agence: 'Preko agencija za zapošljavanje',
-        bouche: 'Preporuka',
-        internet: 'Online portali za posao',
-        direct: 'Izravna prijava',
-      },
-    },
-    
+
     // Q10ter : Agences utilisées (WORKER)
     q10_agences_worker: {
       label: 'S koliko agencija surađujete?',
@@ -577,75 +553,24 @@ export const hr: TranslationBundle = {
         rarement: 'Rijetko (1-2 puta)',
         parfois: 'Ponekad (3-5 puta)',
         souvent: 'Često (6+ puta)',
-        oui_souvent: 'Da, često',
-        oui_rare: 'Da, povremeno',
-        non: 'Ne',
-      },
-    },
-    
-    // Q11 : Conformité (CLIENT)
-    q11_conformite: {
-      label: 'Provjeravate li pravnu usklađenost agencija za zapošljavanje?',
-      options: {
-        oui_systematique: 'Da, sustavno',
-        oui_parfois: 'Da, ponekad',
-        non: 'Ne',
-        ne_sait_pas: 'Ne znam',
-      },
-    },
-    
-    // Q11 : Problèmes (WORKER)
-    q11_problemes: {
-      label: 'Jeste li imali problema s privremenim radom u inozemstvu?',
-      options: {
-        oui_graves: 'Da, ozbiljne probleme',
-        oui_mineurs: 'Da, manje probleme',
-        non: 'Ne',
       },
     },
     
     // Q12 : Budget (AGENCY)
     q12_budget: {
-      label: 'Imate li proračun za vanjske usluge za upravljanje upućivanjem?',
+      label: 'Godišnji proračun dodijeljen administrativnom upravljanju upućivanja',
       options: {
-        oui_important: 'Da, značajan',
-        oui_modere: 'Da, umjeren',
-        non: 'Ne',
-        ne_sait_pas: 'Ne znam',
+        '0-5k': '0-5 000 € / godina',
+        '5-15k': '5 000-15 000 € / godina',
+        '15-30k': '15 000-30 000 € / godina',
+        '30k+': '30 000+ € / godina',
+        'inconnu': 'Ne znam',
       },
     },
-    
-    // Q12 : Critères (CLIENT)
-    q12_criteres: {
-      label: 'Koji su vaši glavni kriteriji pri odabiru agencije za zapošljavanje?',
-      description: 'Odaberite više opcija',
-    },
-    
-    // Q12 : Satisfaction (WORKER)
-    q12_satisfaction: {
-      label: 'Koliko ste zadovoljni svojim trenutnim radnim uvjetima?',
-      options: {
-        tres_satisfait: 'Vrlo zadovoljan',
-        satisfait: 'Zadovoljan',
-        neutre: 'Neutralan',
-        insatisfait: 'Nezadovoljan',
-      },
-    },
-    
-    // Q13 : Durée (AGENCY)
-    q13_duree: {
-      label: 'Prosječno trajanje vaših misija upućivanja',
-      options: {
-        '<1mois': 'Manje od 1 mjeseca',
-        '1-3mois': '1-3 mjeseca',
-        '3-6mois': '3-6 mjeseci',
-        '6-12mois': '6-12 mjeseci',
-        '12+mois': 'Više od 12 mjeseci',
-      },
-    },
-    
+
     // Q12 : Budget client (CLIENT)
     q12_budget_client: {
+      ...fr.questions.q12_budget_client,
       label: 'Godišnji proračun za privremeni rad',
       options: {
         '0-50k': '0-50 000 €',
@@ -655,15 +580,28 @@ export const hr: TranslationBundle = {
         'inconnu': 'Ne znam',
       },
     },
-    
-    // Q13 : Durée worker (WORKER)
-    q13_duree_worker: {
-      label: 'Vaše preferirano trajanje angažmana',
+
+    // Q12 : Salaire (WORKER)
+    q12_salaire: {
+      ...fr.questions.q12_salaire,
+      label: 'Prosječna mjesečna plaća vaših angažmana',
       options: {
-        court: 'Kratko (< 3 mjeseca)',
-        moyen: 'Srednje (3-6 mjeseci)',
-        long: 'Dugo (> 6 mjeseci)',
-        indifferent: 'Svejedno mi je',
+        '<1500': 'Manje od 1 500 €',
+        '1500-2500': '1 500-2 500 €',
+        '2500-3500': '2 500-3 500 €',
+        '3500+': '3 500+ €',
+      },
+    },
+
+    // Q13 : Manque à gagner (AGENCY)
+    q13_manque_gagner: {
+      ...fr.questions.q13_manque_gagner,
+      label: 'Koliki postotak prihoda je izgubljen zbog administrativne složenosti?',
+      options: {
+        'non': 'Ne, ne zapravo',
+        'faible': 'Da, nisko (< 5% prihoda)',
+        'moyen': 'Da, srednje (5-15% prihoda)',
+        'important': 'Da, značajno (> 15% prihoda)',
       },
     },
     
@@ -679,7 +617,7 @@ export const hr: TranslationBundle = {
         'tres_insatisfait': 'Vrlo nezadovoljan',
       },
     },
-    
+
     // Q13 : Satisfaction worker (WORKER)
     q13_satisfaction_worker: {
       ...fr.questions.q13_satisfaction_worker,
@@ -692,7 +630,7 @@ export const hr: TranslationBundle = {
         'tres_insatisfait': 'Vrlo nezadovoljan',
       },
     },
-    
+
     // Q14 : Risques (AGENCY)
     q14_risques: {
       ...fr.questions.q14_risques,
@@ -705,15 +643,9 @@ export const hr: TranslationBundle = {
         delais: 'Kašnjenja misija',
         clients: 'Gubitak klijenata',
         aucun: 'Nema značajnih rizika',
-        sanctions: 'Kazne/sankcije',
-        conformite: 'Usklađenost u više zemalja',
-        cout: 'Administrativni troškovi',
-        documentation: 'Upravljanje dokumentima',
-        responsabilite: 'Krivična odgovornost',
-        perte_clients: 'Gubitak klijenata',
       },
     },
-    
+
     // Q14 : Risques client (CLIENT)
     q14_risques_client: {
       ...fr.questions.q14_risques_client,
@@ -722,14 +654,13 @@ export const hr: TranslationBundle = {
       options: {
         conformite: 'Nepoštivanje propisa',
         qualite: 'Nedovoljna kvaliteta',
-        communication: 'Komunikacija/Jezici',
+        fiabilite: 'Pouzdanost agencija',
         cout: 'Neočekivani troškovi',
         disponibilite: 'Dostupnost kandidata',
         aucun: 'Nema značajnih briga',
-        fiabilite: 'Pouzdanost agencija',
       },
     },
-    
+
     // Q14 : Risques worker (WORKER)
     q14_risques_worker: {
       ...fr.questions.q14_risques_worker,
@@ -776,27 +707,13 @@ export const hr: TranslationBundle = {
         bullhorn: 'Bullhorn / ATS',
         autre: 'Drugi',
         aucun: 'Bez ERP-a',
-        oui: 'Da',
-        non: 'Ne',
       },
     },
-    
+
     // Q16 : Nom ERP
     q16_nom_erp: {
       label: 'Koji softver/ERP?',
       placeholder: 'Npr.: SAP, Odoo, vlastiti...',
-    },
-    
-    // Q16 : Critères (CLIENT)
-    q16_criteres: {
-      label: 'Vaši glavni kriteriji za odabir agencija za zapošljavanje',
-      description: 'Odaberite top 3',
-    },
-    
-    // Q16 : Amélioration (WORKER)
-    q16_amelioration: {
-      label: 'Što bi poboljšalo vaše iskustvo privremenog rada?',
-      description: 'Odaberite sve relevantne opcije',
     },
     
     // Q17 : Migration (AGENCY)
@@ -807,43 +724,16 @@ export const hr: TranslationBundle = {
         conditions: 'Da, pod određenim uvjetima',
         difficile: 'Teško, ali otvoren',
         non: 'Ne, nezamislivo',
-        oui_rapidement: 'Da, odmah',
-        oui_progressivement: 'Da, postupno',
-        non_satisfait: 'Ne, zadovoljan sam trenutnim alatima',
-        non_peur: 'Ne, strah od promjene',
-      },
-    },
-    
-    // Q17 : Budget (CLIENT)
-    q17_budget: {
-      label: 'Mjesečni proračun za platformu za zapošljavanje',
-      options: {
-        '0': 'Nisam spreman plaćati',
-        '1-100': '1-100 €/mjesec',
-        '100-500': '100-500 €/mjesec',
-        '500-1000': '500-1 000 €/mjesec',
-        '1000+': 'Više od 1 000 €/mjesec',
-      },
-    },
-    
-    // Q17 : Plateforme (WORKER)
-    q17_plateforme: {
-      label: 'Biste li koristili platformu za pronalaženje privremenog rada u inozemstvu?',
-      options: {
-        oui_certainement: 'Da, svakako',
-        oui_probablement: 'Da, vjerojatno',
-        peut_etre: 'Možda',
-        non: 'Ne',
       },
     },
     
     // Section 4 - Intérêt YoJob
-    
+
     // Q18 : Score
     q18_score: {
       ...fr.questions.q18_score,
-      label: 'Interes za europsko tržište za upućivanje (0-10)',
-      description: 'Ocjena od 1 (nezainteresiran) do 10 (veliki interes)',
+      label: 'Koliko vas zanima europsko tržište za upućivanje?',
+      description: 'Ocijenite od 1 (nije me zainteresiran) do 10 (vrlo me zanima)',
     },
     
     // Q19 : Features (AGENCY)
@@ -894,7 +784,7 @@ export const hr: TranslationBundle = {
         formation: 'Programi obuke',
       },
     },
-    
+
     // Q20 : Prix
     q20_prix: {
       ...fr.questions.q20_prix,
@@ -906,8 +796,8 @@ export const hr: TranslationBundle = {
         gratuit: 'Besplatno za radnike',
       },
     },
-    
-    // Q21 : Budget mensuel
+
+    // Q21 : Budget mensuel (AGENCY & CLIENT)
     q21_budget_mensuel: {
       ...fr.questions.q21_budget_mensuel,
       label: 'Mjesečni proračun za kompletno SaaS rješenje',
@@ -919,7 +809,7 @@ export const hr: TranslationBundle = {
         '1000+': 'Više od 1 000 €/mjesec',
       },
     },
-    
+
     // Q22 : MVP
     q22_mvp: {
       ...fr.questions.q22_mvp,
@@ -931,10 +821,8 @@ export const hr: TranslationBundle = {
         non: 'Ne, nisam zainteresiran',
       },
     },
-    
-    // Section 5 - Vision Future
-    
-    // Q23 : Rôle
+
+    // Q23 : Rôle (AGENCY & CLIENT)
     q23_role: {
       label: 'Kako vidite svoju ulogu na europskom tržištu?',
       options: {
@@ -944,415 +832,68 @@ export const hr: TranslationBundle = {
         autre: 'Ostalo',
       },
     },
-    
-    // Section 3 - Besoins/Potrebe
-    
-    // Q14 : Intérêt marketplace (AGENCY)
-    q14_interet: {
-      label: 'Biste li bili zainteresirani za europsku platformu za nuđenje svojih usluga?',
-      description: 'Tržište za povećanje vaše vidljivosti',
-      options: {
-        tres_interesse: 'Vrlo zainteresiran',
-        interesse: 'Zainteresiran',
-        neutre: 'Neutralan',
-        pas_interesse: 'Nezainteresiran',
-      },
-    },
-    
-    // Q14 : Intérêt plateforme (CLIENT)
-    q14_interet_client: {
-      label: 'Biste li bili zainteresirani za platformu za jednostavno pronalaženje europskih agencija?',
-      options: {
-        tres_interesse: 'Vrlo zainteresiran',
-        interesse: 'Zainteresiran',
-        neutre: 'Neutralan',
-        pas_interesse: 'Nezainteresiran',
-      },
-    },
-    
-    // Q14 : Intérêt worker (WORKER)
-    q14_interet_worker: {
-      label: 'Biste li bili zainteresirani za platformu za pronalaženje angažmana?',
-      options: {
-        tres_interesse: 'Vrlo zainteresiran',
-        interesse: 'Zainteresiran',
-        neutre: 'Neutralan',
-        pas_interesse: 'Nezainteresiran',
-      },
-    },
-    
-    // Q15 : Fonctionnalités (AGENCY)
-    q15_fonctionnalites: {
-      label: 'Koje funkcionalnosti bi bile najkorisnije?',
-      description: 'Odaberite više opcija',
-      options: {
-        marketplace: 'Tržište usluga',
-        admin: 'Automatizirana administracija',
-        conformite: 'Provjere usklađenosti',
-        payment: 'Integrirane uplate',
-        support: 'Višejezična podrška',
-        autre: 'Ostalo',
-      },
-    },
-    
-    // Q15 : Fonctionnalités client (CLIENT)
-    q15_fonctionnalites_client: {
-      label: 'Koje funkcionalnosti bi bile najkorisnije?',
-      description: 'Odaberite više opcija',
-      options: {
-        comparaison: 'Usporedba agencija',
-        avis: 'Provjerene recenzije',
-        suivi: 'Praćenje misija',
-        documentation: 'Centralizirana dokumentacija',
-        facturation: 'Upravljanje fakturama',
-        autre: 'Ostalo',
-      },
-    },
-    
-    // Q15 : Fonctionnalités worker (WORKER)
-    q15_fonctionnalites_worker: {
-      label: 'Koje funkcionalnosti bi bile najkorisnije?',
-      description: 'Odaberite više opcija',
-      options: {
-        recherche: 'Napredno pretraživanje angažmana',
-        alertes: 'Obavijesti o novim angažmanima',
-        documents: 'Upravljanje dokumentima',
-        avis: 'Ocjene agencija',
-        support: 'Višejezična podrška',
-        autre: 'Ostalo',
-      },
-    },
-    
-    // Q16 : Frein (AGENCY)
-    q16_frein: {
-      label: 'Koja bi bila vaša najveća prepreka za korištenje takve platforme?',
-      options: {
-        cout: 'Troškovi',
-        complexite: 'Prekomplicirana',
-        confiance: 'Nedostatak povjerenja',
-        changement: 'Ne želim mijenjati',
-        aucun: 'Nema prepreka',
-        autre: 'Ostalo',
-      },
-    },
-    
-    // Q16 : Frein client (CLIENT)
-    q16_frein_client: {
-      label: 'Koja bi bila vaša najveća prepreka?',
-      options: {
-        cout: 'Troškovi',
-        confiance: 'Povjerenje u agencije',
-        complexite: 'Prekomplicirana',
-        aucun: 'Nema prepreka',
-        autre: 'Ostalo',
-      },
-    },
-    
-    // Q16 : Frein worker (WORKER)
-    q16_frein_worker: {
-      label: 'Koja bi bila vaša najveća prepreka?',
-      options: {
-        complexite: 'Prekomplicirana',
-        confiance: 'Povjerenje u platformu',
-        acces: 'Pristup tehnologiji',
-        aucun: 'Nema prepreka',
-        autre: 'Ostalo',
-      },
-    },
-    
-    // Q17 : Prix (AGENCY)
-    q17_prix: {
-      label: 'Koji cjenovni model vam se čini najprikladnijim?',
-      options: {
-        commission: 'Provizija po misiji',
-        abonnement: 'Mjesečna pretplata',
-        freemium: 'Besplatno + premium opcije',
-        autre: 'Ostalo',
-      },
-    },
-    
-    // Q17 : Services (CLIENT)
-    q17_services: {
-      label: 'Koje usluge biste najviše cijenili?',
-      description: 'Odaberite više opcija',
-    },
-    
-    // Q17 : Services worker (WORKER)
-    q17_services_worker: {
-      label: 'Koje usluge biste najviše cijenili?',
-      description: 'Odaberite više opcija',
-    },
-    
-    // Q18 : Recommandation (AGENCY)
-    q18_recommandation: {
-      label: 'Biste li preporučili takvu platformu kolegama?',
-      options: {
-        certainement: 'Svakako',
-        probablement: 'Vjerojatno',
-        peut_etre: 'Možda',
-        probablement_pas: 'Vjerojatno ne',
-      },
-    },
-    
-    // Q18 : Recommandation client (CLIENT)
-    q18_recommandation_client: {
-      label: 'Biste li preporučili takvo rješenje?',
-      options: {
-        certainement: 'Svakako',
-        probablement: 'Vjerojatno',
-        peut_etre: 'Možda',
-        probablement_pas: 'Vjerojatno ne',
-      },
-    },
-    
-    // Q18 : Recommandation worker (WORKER)
-    q18_recommandation_worker: {
-      label: 'Biste li preporučili takvu platformu?',
-      options: {
-        certainement: 'Svakako',
-        probablement: 'Vjerojatno',
-        peut_etre: 'Možda',
-        probablement_pas: 'Vjerojatno ne',
-      },
-    },
-    
-    // Q19 : Test (AGENCY)
-    q19_test: {
-      label: 'Biste li željeli sudjelovati u beta fazi?',
-      options: {
-        oui_immediat: 'Da, odmah',
-        oui_plus_tard: 'Da, ali kasnije',
-        non: 'Ne',
-      },
-    },
-    
-    // Q19 : Test client (CLIENT)
-    q19_test_client: {
-      label: 'Biste li željeli sudjelovati u testiranju?',
-      options: {
-        oui_immediat: 'Da, odmah',
-        oui_plus_tard: 'Da, ali kasnije',
-        non: 'Ne',
-      },
-    },
-    
-    // Q19 : Test worker (WORKER)
-    q19_test_worker: {
-      label: 'Biste li željeli sudjelovati u testiranju?',
-      options: {
-        oui_immediat: 'Da, odmah',
-        oui_plus_tard: 'Da, ali kasnije',
-        non: 'Ne',
-      },
-    },
-    
-    // Section 4 - Vision Future
-    
-    // Q20 : Croissance (AGENCY)
-    q20_croissance: {
-      label: 'Kako vidite svoju aktivnost upućivanja u sljedećih 3 godine?',
-      options: {
-        forte_croissance: 'Snažan rast',
-        croissance: 'Umjeren rast',
-        stable: 'Stabilno',
-        decroissance: 'Pad',
-      },
-    },
-    
-    // Q20 : Évolution (CLIENT)
-    q20_evolution: {
-      label: 'Kako vidite razvoj svojih potreba za privremenim radom?',
-      options: {
-        hausse: 'Porast',
-        stable: 'Stabilno',
-        baisse: 'Pad',
-      },
-    },
-    
-    // Q20 : Projets (WORKER)
-    q20_projets: {
-      label: 'Koji su vaši projekti u sljedećim mjesecima?',
-      options: {
-        meme_secteur: 'Nastaviti u istom sektoru',
-        changer_secteur: 'Promijeniti sektor',
-        se_former: 'Obrazovati se',
-        entrepreneur: 'Postati poduzetnik',
-      },
-    },
-    
-    // Q21 : Budget évolution (AGENCY)
-    q21_budget_evolution: {
-      label: 'Planirate li povećati svoj proračun za vanjske usluge?',
-      options: {
-        oui_beaucoup: 'Da, značajno',
-        oui_peu: 'Da, malo',
-        non: 'Ne',
-        ne_sait_pas: 'Ne znam',
-      },
-    },
-    
-    // Q21 : Budget évolution client (CLIENT)
-    q21_budget_evolution_client: {
-      label: 'Planirate li povećati svoj proračun za zapošljavanje?',
-      options: {
-        oui_beaucoup: 'Da, značajno',
-        oui_peu: 'Da, malo',
-        non: 'Ne',
-      },
-    },
-    
-    // Q21 : Mobilité (WORKER)
-    q21_mobilite: {
-      label: 'Jeste li spremni preseliti se radi posla?',
-      options: {
-        oui_europe: 'Da, bilo gdje u Europi',
-        oui_proche: 'Da, susjedne zemlje',
-        non: 'Ne, samo moja zemlja',
-      },
-    },
-    
-    // Section 5 - Contact
-    
-    // Q22 : Email
-    q22_email: {
-      label: 'E-mail (neobavezno)',
-      placeholder: 'vas@email.hr',
-      description: 'Za primanje rezultata i informacija o projektu',
-    },
-    
-    // Q22 : Email AGENCY
-    q22_email_agency: {
-      label: 'Poslovni e-mail (neobavezno)',
-      placeholder: 'kontakt@vasaagencija.hr',
-      description: 'Za primanje rezultata i ekskluzivni pristup platformi',
-    },
-    
-    // Q22 : Email CLIENT
-    q22_email_client: {
-      label: 'Poslovni e-mail (neobavezno)',
-      placeholder: 'kontakt@vasa-tvrtka.hr',
-      description: 'Za primanje preporuka prilagođenih vašim potrebama',
-    },
-    
-    // Q22 : Email WORKER
-    q22_email_worker: {
-      label: 'E-mail (neobavezno)',
-      placeholder: 'vas@email.hr',
-      description: 'Za primanje prilika koje odgovaraju vašem profilu',
-    },
-    
-    // Q23 : Téléphone (optionnel)
-    q23_telephone: {
-      label: 'Telefon (neobavezno)',
-      placeholder: '+385 1 234 5678',
-    },
-    
-    // Q24 : Commentaires
-    q24_commentaires: {
-      label: 'Dodatne primjedbe ili prijedlozi',
-      placeholder: 'Podijelite svoje ideje, očekivanja ili specifične potrebe...',
-    },
-    
-    // Q24 : Vision du marché dans les 3 prochaines années (ALL)
+
+    // Section 5 - Vision Future
+
+    // Q24 : Évolution (AGENCY & CLIENT)
     q24_evolution: {
       label: 'Vizija tržišta u sljedeće 3 godine',
       placeholder: 'Podijelite svoju viziju...',
     },
-    
+
+    // Q24 : Aspirations (WORKER)
+    q24_aspirations: {
+      label: 'Vaše buduće profesionalne težnje',
+      placeholder: 'Npr.: Stalni ugovor, povratak u zemlju, obrazovanje...',
+    },
+
     // Q25 : Autres besoins ou suggestions (ALL)
     q25_besoins: {
       label: 'Druge potrebe ili prijedlozi',
       placeholder: 'Vaši prijedlozi nas zanimaju...',
     },
-    
-    // SECTION 6 : CONTACT
-    
+
+    // Section 6 - Contact
+
     // Q26 : Téléphone professionnel (AGENCY & CLIENT)
     q26_phone: {
       label: 'Poslovni telefon',
       placeholder: '+385 1 234 5678',
     },
-    
+
     // Q27 : Prénom (ALL)
     q27_firstname: {
       label: 'Ime',
       placeholder: 'Vaše ime',
     },
-    
+
     // Q28 : Nom (ALL)
     q28_lastname: {
       label: 'Prezime',
       placeholder: 'Vaše prezime',
     },
-    
+
     // Q29 : SIRET/SIREN (AGENCY & CLIENT - optionnel)
     q29_siret: {
       label: 'OIB (neobavezno)',
       placeholder: '12345678901',
       description: 'Za obogaćivanje preko sudskog registra',
     },
-    
+
     // Q30 : Email professionnel (ALL)
     email: {
       label: 'Email',
       placeholder: 'vas.email@primjer.hr',
     },
-    
+
     // Q31 : Autorisation contact (ALL)
     autorise_contact: {
       label: 'Pristajem da me ponovno kontaktirate',
     },
-    
+
     // Q32 : Rapport d'étude (ALL)
     souhaite_rapport: {
       label: 'Želio/la bih primiti izvještaj studije',
-    },
-    
-    // Questions additionnelles spécifiques
-    
-    // Critères de sélection (CLIENT)
-    critere_prix: {
-      label: 'Cijena',
-    },
-    critere_qualite: {
-      label: 'Kvaliteta profila',
-    },
-    critere_rapidite: {
-      label: 'Brzina odgovora',
-    },
-    critere_conformite: {
-      label: 'Pravna usklađenost',
-    },
-    critere_flexibilite: {
-      label: 'Fleksibilnost',
-    },
-    
-    // Services valorisés (CLIENT)
-    service_accompagnement: {
-      label: 'Osobna podrška',
-    },
-    service_garantie: {
-      label: 'Jamstvo zamjene',
-    },
-    service_formation: {
-      label: 'Prethodna obuka',
-    },
-    service_gestion: {
-      label: 'Administrativno upravljanje',
-    },
-    
-    // Services worker
-    service_formation_worker: {
-      label: 'Obuka i certifikacije',
-    },
-    service_logement: {
-      label: 'Pomoć sa smještajem',
-    },
-    service_transport: {
-      label: 'Podrška za prijevoz',
-    },
-    service_administratif: {
-      label: 'Administrativna podrška',
     },
   },
 };

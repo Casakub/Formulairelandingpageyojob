@@ -488,13 +488,13 @@ export const en: TranslationBundle = {
     
     // Q9 : Défi worker (WORKER)
     q9_defi_worker: {
-      label: 'Your main challenge with temp work abroad',
+      label: 'Your main challenge in your assignments',
       options: {
+        trouver: 'Finding assignments',
         admin: 'Administrative paperwork',
-        langue: 'Language barrier',
-        logement: 'Finding accommodation',
-        transport: 'Transportation',
-        salaire: 'Payment/salary issues',
+        logement: 'Housing / Accommodation',
+        langue: 'Local language',
+        paiement: 'Payments / Salary',
         autre: 'Other',
       },
     },
@@ -1044,7 +1044,3 @@ export const en: TranslationBundle = {
     _translatedBy: 'Migration from translations-complete.ts',
   },
 };
-
-// 🐛 Debug: Vérifier la structure de q19_features_client
-console.log('[EN] q19_features_client structure:', JSON.stringify(en.questions.q19_features_client, null, 2));
-console.log('[EN] q19_features_client.options.recherche:', en.questions.q19_features_client?.options?.recherche);
