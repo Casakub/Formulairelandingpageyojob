@@ -864,6 +864,12 @@ export const hu: TranslationBundle = {
       },
     },
     
+    // Q24bis : Aspirációk (WORKER)
+    q24_aspirations: {
+      label: 'Jövőbeli szakmai törekvései',
+      placeholder: 'Pl.: határozatlan idejű szerződés, hazatérés, képzés...',
+    },
+    
     // Q25: Igények
     q25_besoins: {
       label: 'Egyéb igények vagy megjegyzések',

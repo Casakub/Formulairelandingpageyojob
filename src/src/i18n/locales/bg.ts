@@ -864,6 +864,12 @@ export const bg: TranslationBundle = {
       },
     },
     
+    // Q24bis : Аспирации (WORKER)
+    q24_aspirations: {
+      label: 'Вашите бъдещи професионални стремежи',
+      placeholder: 'Напр.: постоянен договор, завръщане в страната, обучение...',
+    },
+    
     // Q25: Нужди
     q25_besoins: {
       label: 'Други нужди или коментари',

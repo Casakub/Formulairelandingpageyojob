@@ -897,6 +897,12 @@ export const pt: TranslationBundle = {
       },
     },
     
+    // Q24bis : Aspirações (WORKER)
+    q24_aspirations: {
+      label: 'As suas aspirações profissionais futuras',
+      placeholder: 'Ex.: contrato permanente, regresso ao país, formação...',
+    },
+    
     // Q25 : Besoins
     q25_besoins: {
       label: 'Outras necessidades ou comentários',

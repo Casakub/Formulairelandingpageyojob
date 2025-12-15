@@ -882,6 +882,12 @@ export const de: TranslationBundle = {
       },
     },
     
+    // Q24bis : Zukunftsaspirationen (WORKER)
+    q24_aspirations: {
+      label: 'Ihre zukünftigen beruflichen Wünsche',
+      placeholder: 'Z.B.: unbefristeter Vertrag, Rückkehr ins Heimatland, Weiterbildung...',
+    },
+    
     // Q25 : Besoins
     q25_besoins: {
       label: 'Weitere Bedürfnisse oder Kommentare',

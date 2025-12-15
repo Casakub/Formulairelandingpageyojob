@@ -102,7 +102,7 @@ export const en: TranslationBundle = {
     stat: {
       countries: '27 European countries',
       questions: 'questions',
-      benchmark: 'Get the 2026 benchmark',
+      benchmark: 'Get the 2025 benchmark',
       insights: 'Exclusive market insights',
       opportunities: 'Priority access to jobs',
     },
@@ -881,6 +881,12 @@ export const en: TranslationBundle = {
         maintien: 'Maintain current countries',
         reduction: 'Reduce international scope',
       },
+    },
+    
+    // Q24bis : Aspirations (WORKER)
+    q24_aspirations: {
+      label: 'Your future professional aspirations',
+      placeholder: 'e.g.: full-time contract, return to home country, training...',
     },
     
     // Q25 : Besoins
