@@ -32,31 +32,66 @@ export interface FormData {
   // Section 1: Profil
   q1_nom: string;
   q2_annee: string;
+  q2_annee_client: string;
+  q2_nationalite: string;
   q3_taille: string;
+  q3_experience: string;
   q4_secteurs: string[];
+  q4_metiers: string[];
   
   // Section 2: Détachement
   q5_pays: string;
+  q5_localisation: string;
+  q5_pays_travail: string;
   q6_volume: string;
+  q6_volume_client: string;
+  q6_frequence: string;
   q7_origine: string;
   q8_destinations: string;
+  q8_nationalites: string;
   q9_defi: string;
+  q9_defi_client: string;
+  q9_defi_worker: string;
   q9_autre: string;
   q10_gestion: string;
+  q10_agences: string;
+  q10_processus: string;
+  q10_agence: string;
+  q10_agences_worker: string;
   q11_incidents: string;
+  q11_conformite: string;
+  q11_problemes: string;
   
   // Section 3: Besoins
   q12_budget: string;
+  q12_budget_client: string;
+  q12_satisfaction: string;
+  q12_salaire: string;
   q13_manque_gagner: string;
-  q14_risques: string;
+  q13_satisfaction: string;
+  q13_satisfaction_worker: string;
+  q14_risques: string[];
+  q14_besoins_client: string[];
+  q14_attentes: string[];
+  q14_risques_client: string[];
+  q14_risques_worker: string[];
   q15_probleme: string;
+  q15_besoins_client: string;
+  q15_ameliorations: string;
   q16_erp: string;
+  q16_nom_erp: string;
   q16_autre: string;
+  q16_criteres: string[];
+  q16_amelioration: string[];
   q17_migration: string;
+  q17_budget: string;
+  q17_plateforme: string;
   
   // Section 4: Intérêt
   q18_score: number;
   q19_features: string[];
+  q19_features_client: string[];
+  q19_features_worker: string[];
   q20_prix: string;
   q21_budget_mensuel: string;
   q22_mvp: string;
@@ -93,25 +128,60 @@ export default function AppSurveyOriginal() {
   const [formData, setFormData] = useState<FormData>({
     q1_nom: '',
     q2_annee: '',
+    q2_annee_client: '',
+    q2_nationalite: '',
     q3_taille: '',
+    q3_experience: '',
     q4_secteurs: [],
+    q4_metiers: [],
     q5_pays: '',
+    q5_localisation: '',
+    q5_pays_travail: '',
     q6_volume: '',
+    q6_volume_client: '',
+    q6_frequence: '',
     q7_origine: '',
     q8_destinations: '',
+    q8_nationalites: '',
     q9_defi: '',
+    q9_defi_client: '',
+    q9_defi_worker: '',
     q9_autre: '',
     q10_gestion: '',
+    q10_agences: '',
+    q10_processus: '',
+    q10_agence: '',
+    q10_agences_worker: '',
     q11_incidents: '',
+    q11_conformite: '',
+    q11_problemes: '',
     q12_budget: '',
+    q12_budget_client: '',
+    q12_satisfaction: '',
+    q12_salaire: '',
     q13_manque_gagner: '',
-    q14_risques: '',
+    q13_satisfaction: '',
+    q13_satisfaction_worker: '',
+    q14_risques: [],
+    q14_besoins_client: [],
+    q14_attentes: [],
+    q14_risques_client: [],
+    q14_risques_worker: [],
     q15_probleme: '',
+    q15_besoins_client: '',
+    q15_ameliorations: '',
     q16_erp: '',
+    q16_nom_erp: '',
     q16_autre: '',
+    q16_criteres: [],
+    q16_amelioration: [],
     q17_migration: '',
+    q17_budget: '',
+    q17_plateforme: '',
     q18_score: 0,
     q19_features: [],
+    q19_features_client: [],
+    q19_features_worker: [],
     q20_prix: '',
     q21_budget_mensuel: '',
     q22_mvp: '',
@@ -201,10 +271,25 @@ export default function AppSurveyOriginal() {
       const responseId = `YJ-2025-${Math.floor(Math.random() * 1000000).toString().padStart(6, '0')}`;
       
       // Enriched metadata
-      const country = extractCountry(formData.q5_pays);
-      const sector = formData.q4_secteurs[0] || 'Non spécifié';
-      const companySize = parseInt(formData.q3_taille?.match(/\d+/)?.[0] || '0');
-      const detachmentExperience = formData.q6_volume === 'Pas encore' ? 'Non' : 'Oui';
+      const country = extractCountry(formData.q5_pays || formData.q5_localisation || formData.q5_pays_travail);
+      const sector = respondentType === 'worker'
+        ? (formData.q4_metiers[0] || 'Non spécifié')
+        : (formData.q4_secteurs[0] || 'Non spécifié');
+      const companySize = respondentType === 'worker'
+        ? 0
+        : parseInt(formData.q3_taille?.match(/\d+/)?.[0] || '0', 10);
+      const detachmentExperience = (() => {
+        if (respondentType === 'agency') {
+          return formData.q6_volume === '0' || formData.q6_volume === 'Pas encore' ? 'Non' : formData.q6_volume ? 'Oui' : 'Non';
+        }
+        if (respondentType === 'client') {
+          return formData.q6_volume_client === '0' ? 'Non' : formData.q6_volume_client ? 'Oui' : 'Non';
+        }
+        if (respondentType === 'worker') {
+          return formData.q6_frequence === 'jamais' ? 'Non' : formData.q6_frequence ? 'Oui' : 'Non';
+        }
+        return 'Non';
+      })();
       const interestLevel = getInterestLevel(formData.q18_score);
       const completionTime = Math.floor((Date.now() - startTime) / 1000);
       
