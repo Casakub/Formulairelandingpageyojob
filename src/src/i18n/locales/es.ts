@@ -86,93 +86,6 @@ export const es: TranslationBundle = {
   },
   
   // Secciones adaptadas por perfil
-  sectionContent: {
-    1: {
-      agency: {
-        title: '📋 Perfil de su Agencia',
-        description: 'Cuéntenos sobre su agencia de trabajo temporal y experiencia',
-      },
-      client: {
-        title: '📋 Perfil de su Empresa',
-        description: 'Cuéntenos sobre su empresa y necesidades de contratación',
-      },
-      worker: {
-        title: '📋 Su Perfil',
-        description: 'Cuéntenos sobre su trayectoria profesional',
-      },
-    },
-    2: {
-      agency: {
-        title: '💼 Experiencia de Desplazamiento',
-        description: 'Su actividad de desplazamiento de trabajadores',
-      },
-      client: {
-        title: '💼 Su Experiencia de Contratación',
-        description: 'Sus prácticas actuales de contratación y trabajo temporal',
-      },
-      worker: {
-        title: '💼 Su Experiencia de Trabajo Temporal',
-        description: 'Su trayectoria en el trabajo temporal',
-      },
-    },
-    3: {
-      agency: {
-        title: '🎯 Necesidades y Herramientas',
-        description: 'Sus desafíos y soluciones actuales',
-      },
-      client: {
-        title: '🎯 Sus Necesidades Actuales',
-        description: 'Desafíos y expectativas en la contratación',
-      },
-      worker: {
-        title: '🎯 Sus Expectativas',
-        description: 'Lo que es importante para usted en una misión',
-      },
-    },
-    4: {
-      agency: {
-        title: '✨ Interés en YoJob',
-        description: 'Lo que busca en una solución digital',
-      },
-      client: {
-        title: '✨ Interés en YoJob',
-        description: 'Funcionalidades y prioridades',
-      },
-      worker: {
-        title: '✨ Interés en YoJob',
-        description: 'Lo que facilitaría su búsqueda de trabajo',
-      },
-    },
-    5: {
-      agency: {
-        title: '🔮 Visión de Futuro',
-        description: 'Sus planes y ambiciones',
-      },
-      client: {
-        title: '🔮 Visión de Futuro',
-        description: 'Sus proyectos de desarrollo',
-      },
-      worker: {
-        title: '🔮 Visión de Futuro',
-        description: 'Sus proyectos profesionales',
-      },
-    },
-    6: {
-      agency: {
-        title: '📬 Información de Contacto',
-        description: 'Para hacerle seguimiento y enviar los resultados',
-      },
-      client: {
-        title: '📬 Información de Contacto',
-        description: 'Para hacerle seguimiento y enviar los resultados',
-      },
-      worker: {
-        title: '📬 Información de Contacto',
-        description: 'Para hacerle seguimiento y enviar los resultados',
-      },
-    },
-  },
-  
   header: {
     title: 'YoJob',
     subtitle: 'Estudio de mercado',
@@ -524,10 +437,11 @@ export const es: TranslationBundle = {
       ...fr.questions.q10_gestion,
       label: '¿Cómo gestiona las declaraciones de desplazamiento hoy?',
       options: {
-        manuel: 'Manualmente (Excel, Word...)',
-        logiciel_interne: 'Software interno',
-        prestataire: 'Proveedor de servicios externo',
+        interne: 'Equipo interno',
+        externe: 'Proveedor externo',
         mixte: 'Enfoque mixto',
+        manuel: 'Gestión manual',
+        logiciel: 'Software especializado',
       },
     },
     
@@ -581,12 +495,14 @@ export const es: TranslationBundle = {
     
     // Q11 : Incidentes (AGENCY)
     q11_incidents: {
+      ...fr.questions.q11_incidents,
       label: '¿Ha enfrentado sanciones o incidentes relacionados con conformidad de desplazamiento?',
       description: 'Su respuesta permanece anónima',
       options: {
-        oui_souvent: 'Sí, frecuentemente',
-        oui_rare: 'Sí, ocasionalmente',
-        non: 'No',
+        jamais: 'No, nunca',
+        rarement: 'Raramente (1-2 veces)',
+        parfois: 'A veces (3-5 veces)',
+        souvent: 'A menudo (6+ veces)',
       },
     },
     
@@ -613,13 +529,14 @@ export const es: TranslationBundle = {
     
     // Q12 : Presupuesto (AGENCY)
     q12_budget: {
+      ...fr.questions.q12_budget,
       label: 'Presupuesto anual asignado a la gestión administrativa de desplazamiento',
       options: {
-        '0': 'No específicamente asignado',
-        '1-5k': '€1.000 - €5.000',
-        '5-20k': '€5.000 - €20.000',
-        '20-50k': '€20.000 - €50.000',
-        '50k+': 'Más de €50.000',
+        '0-5k': '€0-5.000 / año',
+        '5-15k': '€5.000-15.000 / año',
+        '15-30k': '€15.000-30.000 / año',
+        '30k+': 'Más de €30.000 / año',
+        inconnu: 'No lo sé',
       },
     },
     
@@ -701,6 +618,7 @@ export const es: TranslationBundle = {
     
     // Q14 : Riesgos (AGENCY)
     q14_risques: {
+      ...fr.questions.q14_risques,
       label: 'Sus principales preocupaciones',
       description: 'Seleccione todas las que apliquen',
       options: {
@@ -710,10 +628,6 @@ export const es: TranslationBundle = {
         delais: 'Retrasos en misiones',
         clients: 'Pérdida de clientes',
         aucun: 'Sin riesgo importante',
-        sanctions: 'Sanciones/penalizaciones',
-        conformite: 'Conformidad multipaís',
-        cout: 'Costes administrativos',
-        documentation: 'Gestión de documentos',
       },
     },
     
@@ -800,10 +714,15 @@ export const es: TranslationBundle = {
     
     // Q16 : ERP (AGENCY)
     q16_erp: {
+      ...fr.questions.q16_erp,
       label: '¿Utiliza software de gestión ERP?',
       options: {
-        oui: 'Sí',
-        non: 'No',
+        sage: 'Sage',
+        sap: 'SAP',
+        cegid: 'Cegid',
+        bullhorn: 'Bullhorn / ATS',
+        autre: 'Otro',
+        aucun: 'Ningún ERP',
       },
     },
     
@@ -827,12 +746,13 @@ export const es: TranslationBundle = {
     
     // Q17 : Migración (AGENCY)
     q17_migration: {
+      ...fr.questions.q17_migration,
       label: '¿Está listo para cambiar sus herramientas de trabajo?',
       options: {
-        oui_rapidement: 'Sí, inmediatamente',
-        oui_progressivement: 'Sí, gradualmente',
-        non_satisfait: 'No, satisfecho con las herramientas actuales',
-        non_peur: 'No, miedo al cambio',
+        oui: 'Sí, sin problema',
+        conditions: 'Sí, bajo condiciones',
+        difficile: 'Difícil, pero abierto',
+        non: 'No, no es concebible',
       },
     },
     
@@ -951,18 +871,6 @@ export const es: TranslationBundle = {
         oui_reduc: 'Sí, con descuento',
         peut_etre: 'Quizás, depende de las características',
         non: 'No, no interesado',
-      },
-    },
-    
-    // Q23 : Plazo
-    q23_delai: {
-      label: '¿Cuándo le gustaría empezar?',
-      options: {
-        'immediat': 'Inmediatamente',
-        '1-3mois': 'En 1-3 meses',
-        '3-6mois': 'En 3-6 meses',
-        '6-12mois': 'En 6-12 meses',
-        'plus_tard': 'Más tarde',
       },
     },
     

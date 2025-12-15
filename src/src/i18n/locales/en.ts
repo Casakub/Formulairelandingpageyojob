@@ -85,94 +85,6 @@ export const en: TranslationBundle = {
     },
   },
   
-  // Sections adaptées par profil
-  sectionContent: {
-    1: {
-      agency: {
-        title: '📋 Your Agency Profile',
-        description: 'Tell us about your temp agency and expertise',
-      },
-      client: {
-        title: '📋 Your Company Profile',
-        description: 'Tell us about your company and recruitment needs',
-      },
-      worker: {
-        title: '📋 Your Profile',
-        description: 'Tell us about your professional background',
-      },
-    },
-    2: {
-      agency: {
-        title: '💼 Posting Experience',
-        description: 'Your worker posting activity',
-      },
-      client: {
-        title: '💼 Your Recruitment Experience',
-        description: 'Your current recruitment and temp work practices',
-      },
-      worker: {
-        title: '💼 Your Temp Work Experience',
-        description: 'Your temporary work journey',
-      },
-    },
-    3: {
-      agency: {
-        title: '🎯 Needs and Tools',
-        description: 'Your challenges and current solutions',
-      },
-      client: {
-        title: '🎯 Your Current Needs',
-        description: 'Challenges and expectations in recruitment',
-      },
-      worker: {
-        title: '🎯 Your Expectations',
-        description: 'What matters to you in an assignment',
-      },
-    },
-    4: {
-      agency: {
-        title: '⭐ Interest in a European Platform',
-        description: 'Discover our vision for an innovative marketplace',
-      },
-      client: {
-        title: '⭐ Interest in a European Platform',
-        description: 'An innovative solution for your needs',
-      },
-      worker: {
-        title: '⭐ Your Interest in a Platform',
-        description: 'A platform to find your assignments easily',
-      },
-    },
-    5: {
-      agency: {
-        title: '🔮 Future Vision',
-        description: 'Budget and development prospects',
-      },
-      client: {
-        title: '🔮 Your Future Priorities',
-        description: 'Budget and recruitment strategy',
-      },
-      worker: {
-        title: '🔮 Your Goals',
-        description: 'Your upcoming professional projects',
-      },
-    },
-    6: {
-      agency: {
-        title: '📧 Stay in Touch',
-        description: 'Receive study results and stay informed',
-      },
-      client: {
-        title: '📧 Stay in Touch',
-        description: 'Receive results and our recommendations',
-      },
-      worker: {
-        title: '📧 Stay in Touch',
-        description: 'Receive results and opportunities',
-      },
-    },
-  },
-  
   // Header
   header: {
     title: 'YoJob',
@@ -190,7 +102,7 @@ export const en: TranslationBundle = {
     stat: {
       countries: '27 European countries',
       questions: 'questions',
-      benchmark: 'Get the 2025 benchmark',
+      benchmark: 'Get the 2026 benchmark',
       insights: 'Exclusive market insights',
       opportunities: 'Priority access to jobs',
     },
@@ -507,6 +419,7 @@ export const en: TranslationBundle = {
     
     // Q10 : Gestion (AGENCY)
     q10_gestion: {
+      ...fr.questions.q10_gestion,
       label: 'How do you manage posting declarations today?',
       options: {
         interne: 'Internal team',
@@ -514,9 +427,6 @@ export const en: TranslationBundle = {
         mixte: 'Mixed approach',
         manuel: 'Manual management',
         logiciel: 'Specialized software',
-        manuel: 'Manually (Excel, Word...)',
-        logiciel_interne: 'Internal software',
-        prestataire: 'External service provider',
       },
     },
     
@@ -570,6 +480,7 @@ export const en: TranslationBundle = {
     
     // Q11 : Incidents (AGENCY)
     q11_incidents: {
+      ...fr.questions.q11_incidents,
       label: 'Have you faced penalties or incidents related to posting compliance?',
       description: 'Your answer remains anonymous',
       options: {
@@ -577,9 +488,6 @@ export const en: TranslationBundle = {
         rarement: 'Rarely (1-2 times)',
         parfois: 'Sometimes (3-5 times)',
         souvent: 'Often (6+ times)',
-        oui_souvent: 'Yes, frequently',
-        oui_rare: 'Yes, occasionally',
-        non: 'No',
       },
     },
     
@@ -606,6 +514,7 @@ export const en: TranslationBundle = {
     
     // Q12 : Budget (AGENCY)
     q12_budget: {
+      ...fr.questions.q12_budget,
       label: 'Annual budget allocated to posting administrative management',
       options: {
         '0-5k': '€0-5,000 / year',
@@ -613,11 +522,6 @@ export const en: TranslationBundle = {
         '15-30k': '€15,000-30,000 / year',
         '30k+': '€30,000+ / year',
         inconnu: "I don't know",
-        '0': 'Not specifically allocated',
-        '1-5k': '€1,000 - €5,000',
-        '5-20k': '€5,000 - €20,000',
-        '20-50k': '€20,000 - €50,000',
-        '50k+': 'More than €50,000',
       },
     },
     
@@ -699,6 +603,7 @@ export const en: TranslationBundle = {
     
     // Q14 : Risques (AGENCY)
     q14_risques: {
+      ...fr.questions.q14_risques,
       label: 'Your main concerns',
       description: 'Select all that apply',
       options: {
@@ -708,12 +613,6 @@ export const en: TranslationBundle = {
         delais: 'Mission delays',
         clients: 'Loss of clients',
         aucun: 'No major risk',
-        sanctions: 'Penalties/sanctions',
-        conformite: 'Multi-country compliance',
-        cout: 'Administrative costs',
-        documentation: 'Document management',
-        responsabilite: 'Criminal liability',
-        perte_clients: 'Loss of clients',
       },
     },
     
@@ -800,6 +699,7 @@ export const en: TranslationBundle = {
     
     // Q16 : ERP (AGENCY)
     q16_erp: {
+      ...fr.questions.q16_erp,
       label: 'Do you use ERP/management software?',
       options: {
         sage: 'Sage',
@@ -808,8 +708,6 @@ export const en: TranslationBundle = {
         bullhorn: 'Bullhorn / ATS',
         autre: 'Other',
         aucun: 'No ERP',
-        oui: 'Yes',
-        non: 'No',
       },
     },
     
@@ -833,16 +731,13 @@ export const en: TranslationBundle = {
     
     // Q17 : Migration (AGENCY)
     q17_migration: {
+      ...fr.questions.q17_migration,
       label: 'Are you ready to change your work tools?',
       options: {
         oui: 'Yes, no problem',
         conditions: 'Yes, under conditions',
         difficile: 'Difficult, but open',
         non: 'No, not conceivable',
-        oui_rapidement: 'Yes, immediately',
-        oui_progressivement: 'Yes, gradually',
-        non_satisfait: 'No, satisfied with current tools',
-        non_peur: 'No, afraid of change',
       },
     },
     

@@ -85,94 +85,6 @@ export const de: TranslationBundle = {
     },
   },
   
-  // Sections adaptées par profil
-  sectionContent: {
-    1: {
-      agency: {
-        title: '📋 Ihr Agenturprofil',
-        description: 'Erzählen Sie uns von Ihrer Zeitarbeitsfirma und Ihrer Expertise',
-      },
-      client: {
-        title: '📋 Ihr Unternehmensprofil',
-        description: 'Erzählen Sie uns von Ihrem Unternehmen und Ihren Personalbedürfnissen',
-      },
-      worker: {
-        title: '📋 Ihr Profil',
-        description: 'Erzählen Sie uns von Ihrem beruflichen Werdegang',
-      },
-    },
-    2: {
-      agency: {
-        title: '💼 Entsendungserfahrung',
-        description: 'Ihre Aktivität im Bereich Arbeitnehmerentsendung',
-      },
-      client: {
-        title: '💼 Ihre Rekrutierungserfahrung',
-        description: 'Ihre aktuellen Praktiken bei Rekrutierung und Zeitarbeit',
-      },
-      worker: {
-        title: '💼 Ihre Zeitarbeitserfahrung',
-        description: 'Ihr Werdegang in der Zeitarbeit',
-      },
-    },
-    3: {
-      agency: {
-        title: '🎯 Bedürfnisse und Tools',
-        description: 'Ihre Herausforderungen und aktuellen Lösungen',
-      },
-      client: {
-        title: '🎯 Ihre aktuellen Bedürfnisse',
-        description: 'Herausforderungen und Erwartungen bei der Personalbeschaffung',
-      },
-      worker: {
-        title: '🎯 Ihre Erwartungen',
-        description: 'Was Ihnen bei einem Einsatz wichtig ist',
-      },
-    },
-    4: {
-      agency: {
-        title: '⭐ Interesse an einer europäischen Plattform',
-        description: 'Entdecken Sie unsere Vision eines innovativen Marktplatzes',
-      },
-      client: {
-        title: '⭐ Interesse an einer europäischen Plattform',
-        description: 'Eine innovative Lösung für Ihre Bedürfnisse',
-      },
-      worker: {
-        title: '⭐ Ihr Interesse an einer Plattform',
-        description: 'Eine Plattform, um Ihre Einsätze einfach zu finden',
-      },
-    },
-    5: {
-      agency: {
-        title: '🔮 Zukunftsvision',
-        description: 'Budget und Entwicklungsaussichten',
-      },
-      client: {
-        title: '🔮 Ihre zukünftigen Prioritäten',
-        description: 'Budget und Rekrutierungsstrategie',
-      },
-      worker: {
-        title: '🔮 Ihre Ziele',
-        description: 'Ihre anstehenden beruflichen Projekte',
-      },
-    },
-    6: {
-      agency: {
-        title: '📧 In Kontakt bleiben',
-        description: 'Erhalten Sie die Studienergebnisse und bleiben Sie informiert',
-      },
-      client: {
-        title: '📧 In Kontakt bleiben',
-        description: 'Erhalten Sie die Ergebnisse und unsere Empfehlungen',
-      },
-      worker: {
-        title: '📧 In Kontakt bleiben',
-        description: 'Erhalten Sie die Ergebnisse und Möglichkeiten',
-      },
-    },
-  },
-  
   // Header
   header: {
     title: 'YoJob',
@@ -510,10 +422,11 @@ export const de: TranslationBundle = {
       ...fr.questions.q10_gestion,
       label: 'Wie verwalten Sie heute Entsendungsmeldungen?',
       options: {
-        manuel: 'Manuell (Excel, Word...)',
-        logiciel_interne: 'Interne Software',
-        prestataire: 'Externer Dienstleister',
+        interne: 'Internes Team',
+        externe: 'Externer Dienstleister',
         mixte: 'Gemischter Ansatz',
+        manuel: 'Manuelle Verwaltung',
+        logiciel: 'Spezialisierte Software',
       },
     },
     
@@ -566,12 +479,14 @@ export const de: TranslationBundle = {
     
     // Q11 : Vorfälle (AGENTUR)
     q11_incidents: {
+      ...fr.questions.q11_incidents,
       label: 'Hatten Sie Strafen oder Vorfälle im Zusammenhang mit der Einhaltung von Entsendungsvorschriften?',
       description: 'Ihre Antwort bleibt anonymisiert',
       options: {
-        oui_souvent: 'Ja, häufig',
-        oui_rare: 'Ja, gelegentlich',
-        non: 'Nein',
+        jamais: 'Nein, nie',
+        rarement: 'Selten (1-2 Mal)',
+        parfois: 'Manchmal (3-5 Mal)',
+        souvent: 'Oft (6+ Mal)',
       },
     },
     
@@ -598,13 +513,14 @@ export const de: TranslationBundle = {
     
     // Q12 : Budget (AGENCY)
     q12_budget: {
+      ...fr.questions.q12_budget,
       label: 'Jährliches Budget für Verwaltung von Entsendungen',
       options: {
-        '0': 'Nicht speziell zugewiesen',
-        '1-5k': '1.000 € - 5.000 €',
-        '5-20k': '5.000 € - 20.000 €',
-        '20-50k': '20.000 € - 50.000 €',
-        '50k+': 'Mehr als 50.000 €',
+        '0-5k': '0-5.000 € / Jahr',
+        '5-15k': '5.000-15.000 € / Jahr',
+        '15-30k': '15.000-30.000 € / Jahr',
+        '30k+': '30.000+ € / Jahr',
+        inconnu: 'Weiß nicht',
       },
     },
     
@@ -686,6 +602,7 @@ export const de: TranslationBundle = {
     
     // Q14 : Risiken (AGENCY)
     q14_risques: {
+      ...fr.questions.q14_risques,
       label: 'Ihre Hauptbedenken',
       description: 'Wählen Sie alle zutreffenden aus',
       options: {
@@ -695,12 +612,6 @@ export const de: TranslationBundle = {
         delais: 'Missionsverzögerungen',
         clients: 'Verlust von Kunden',
         aucun: 'Kein größeres Risiko',
-        sanctions: 'Strafen/Sanktionen',
-        conformite: 'Konformität in mehreren Ländern',
-        cout: 'Verwaltungskosten',
-        documentation: 'Dokumentenverwaltung',
-        responsabilite: 'Strafrechtliche Haftung',
-        perte_clients: 'Verlust von Kunden',
       },
     },
     
@@ -787,6 +698,7 @@ export const de: TranslationBundle = {
     
     // Q16 : ERP (AGENCY)
     q16_erp: {
+      ...fr.questions.q16_erp,
       label: 'Nutzen Sie ERP/Verwaltungssoftware?',
       options: {
         sage: 'Sage',
@@ -795,8 +707,6 @@ export const de: TranslationBundle = {
         bullhorn: 'Bullhorn / ATS',
         autre: 'Andere',
         aucun: 'Kein ERP',
-        oui: 'Ja',
-        non: 'Nein',
       },
     },
     
@@ -820,16 +730,13 @@ export const de: TranslationBundle = {
     
     // Q17 : Migration (AGENCY)
     q17_migration: {
+      ...fr.questions.q17_migration,
       label: 'Sind Sie bereit, Ihre Arbeitstools zu wechseln?',
       options: {
         oui: 'Ja, kein Problem',
         conditions: 'Ja, unter Bedingungen',
         difficile: 'Schwierig, aber offen',
         non: 'Nein, nicht denkbar',
-        oui_rapidement: 'Ja, sofort',
-        oui_progressivement: 'Ja, schrittweise',
-        non_satisfait: 'Nein, zufrieden mit aktuellen Tools',
-        non_peur: 'Nein, Angst vor Veränderung',
       },
     },
     
