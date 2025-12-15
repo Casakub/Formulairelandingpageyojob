@@ -488,13 +488,13 @@ export const cz: TranslationBundle = {
     
     // Q9 : Défi worker (WORKER)
     q9_defi_worker: {
-      label: 'Vaše hlavní výzva s agenturní prací v zahraničí',
+      label: 'Vaše hlavní výzva na zakázkách',
       options: {
+        trouver: 'Hledání zakázek',
         admin: 'Administrativní papírování',
-        langue: 'Jazyková bariéra',
-        logement: 'Hledání ubytování',
-        transport: 'Doprava',
-        salaire: 'Problémy s výplatou/platem',
+        logement: 'Ubytování / Bydlení',
+        langue: 'Místní jazyk',
+        paiement: 'Platby / Plat',
         autre: 'Jiné',
       },
     },
@@ -533,6 +533,30 @@ export const cz: TranslationBundle = {
       },
     },
     
+    // Q10 : Processus (CLIENT)
+    q10_processus: {
+      ...fr.questions.q10_processus,
+      label: 'Jak najímáte agenturní pracovníky?',
+      options: {
+        agence_fr: 'Francouzské personální agentury',
+        agence_euro: 'Evropské personální agentury',
+        direct: 'Přímý nábor',
+        mixte: 'Smíšeně',
+      },
+    },
+
+    // Q10 : Agence (WORKER)
+    q10_agence: {
+      ...fr.questions.q10_agence,
+      label: 'Jak hledáte agenturní práci?',
+      options: {
+        agence: 'Přes personální agentury',
+        bouche: 'Doporučení',
+        internet: 'Online pracovní portály',
+        direct: 'Přímé podání žádosti',
+      },
+    },
+
     // Q10ter : Agences utilisées (WORKER)
     q10_agences_worker: {
       label: 'S kolika agenturami spolupracujete?',
@@ -543,7 +567,7 @@ export const cz: TranslationBundle = {
         '10+': 'Více než 10',
       },
     },
-    
+
     // Q11 : Incidents (AGENCY)
     q11_incidents: {
       label: 'Měli jste pokuty nebo incidenty související s dodržováním předpisů pro vyslání?',
@@ -558,7 +582,28 @@ export const cz: TranslationBundle = {
         non: 'Ne',
       },
     },
-    
+
+    // Q11 : Conformité (CLIENT)
+    q11_conformite: {
+      label: 'Ověřujete právní shodu personálních agentur?',
+      options: {
+        oui_systematique: 'Ano, systematicky',
+        oui_parfois: 'Ano, někdy',
+        non: 'Ne',
+        ne_sait_pas: 'Nevím',
+      },
+    },
+
+    // Q11 : Problèmes (WORKER)
+    q11_problemes: {
+      label: 'Měli jste problémy s agenturní prací v zahraničí?',
+      options: {
+        oui_graves: 'Ano, závažné problémy',
+        oui_mineurs: 'Ano, drobné problémy',
+        non: 'Ne',
+      },
+    },
+
     // Q12 : Budget (AGENCY)
     q12_budget: {
       label: 'Máte rozpočet na externí služby pro správu vyslání?',
@@ -582,7 +627,42 @@ export const cz: TranslationBundle = {
         'inconnu': 'Nevím',
       },
     },
-    
+
+    // Q12 : Satisfaction (CLIENT)
+    q12_satisfaction: {
+      label: 'Spokojenost se současnými personálními agenturami',
+      options: {
+        tres_satisfait: 'Velmi spokojený',
+        satisfait: 'Spokojený',
+        neutre: 'Neutrální',
+        insatisfait: 'Nespokojený',
+      },
+    },
+
+    // Q12 : Salaire (WORKER)
+    q12_salaire: {
+      ...fr.questions.q12_salaire,
+      label: 'Jste spokojeni se svým platem z agenturní práce?',
+      options: {
+        '<1500': 'Méně než 1 500 €',
+        '1500-2500': '1 500 - 2 500 €',
+        '2500-3500': '2 500 - 3 500 €',
+        '3500+': '3 500+ €',
+      },
+    },
+
+    // Q13 : Manque à gagner (AGENCY)
+    q13_manque_gagner: {
+      ...fr.questions.q13_manque_gagner,
+      label: 'Jaké procento tržeb ztrácíte kvůli administrativní složitosti?',
+      options: {
+        'non': 'Ne, ne opravdu',
+        'faible': 'Ano, nízké (< 5% tržeb)',
+        'moyen': 'Ano, střední (5-15% tržeb)',
+        'important': 'Ano, významné (> 15% tržeb)',
+      },
+    },
+
     // Q13 : Satisfaction (CLIENT)
     q13_satisfaction: {
       ...fr.questions.q13_satisfaction,
@@ -661,7 +741,37 @@ export const cz: TranslationBundle = {
         aucun: 'Žádné velké problémy',
       },
     },
-    
+
+    // Q14 : Besoins (CLIENT)
+    q14_besoins_client: {
+      ...fr.questions.q14_besoins_client,
+      label: 'Vaše hlavní potřeby',
+      description: 'Vyberte všechny relevantní možnosti',
+      options: {
+        fiabilite: 'Najít spolehlivé agentury',
+        conformite: 'Právní shoda',
+        qualite: 'Kvalita/dovednosti',
+        cout: 'Náklady',
+        disponibilite: 'Dostupnost kandidátů',
+        aucun: 'Žádné významné potřeby',
+      },
+    },
+
+    // Q14 : Attentes (WORKER)
+    q14_attentes: {
+      ...fr.questions.q14_attentes,
+      label: 'Vaše očekávání od agenturní práce v zahraničí',
+      description: 'Vyberte všechny relevantní možnosti',
+      options: {
+        salaire: 'Lepší plat',
+        conditions: 'Lepší pracovní podmínky',
+        stabilite: 'Stabilita',
+        experience: 'Mezinárodní zkušenosti',
+        logement: 'Pomoc s bydlením',
+        aucun: 'Žádná zvláštní očekávání',
+      },
+    },
+
     // Q15 : Problème (AGENCY)
     q15_probleme: {
       ...fr.questions.q15_probleme,
@@ -703,7 +813,19 @@ export const cz: TranslationBundle = {
       label: 'Který software/ERP?',
       placeholder: 'Např.: SAP, Odoo, vlastní...',
     },
-    
+
+    // Q16 : Critères (CLIENT)
+    q16_criteres: {
+      label: 'Vaše hlavní kritéria pro výběr personálních agentur',
+      description: 'Vyberte svá top 3',
+    },
+
+    // Q16 : Amélioration (WORKER)
+    q16_amelioration: {
+      label: 'Co by zlepšilo vaše zkušenosti s agenturní prací?',
+      description: 'Vyberte všechny relevantní možnosti',
+    },
+
     // Q17 : Migration (AGENCY)
     q17_migration: {
       label: 'Jste připraveni změnit své pracovní nástroje?',
@@ -718,7 +840,30 @@ export const cz: TranslationBundle = {
         non_peur: 'Ne, strach ze změny',
       },
     },
-    
+
+    // Q17 : Budget (CLIENT)
+    q17_budget: {
+      label: 'Měsíční rozpočet na platformu pro agenturní nábor',
+      options: {
+        '0': 'Nejsem ochoten platit',
+        '1-100': '1 - 100 €/měsíc',
+        '100-500': '100 - 500 €/měsíc',
+        '500-1000': '500 - 1 000 €/měsíc',
+        '1000+': 'Více než 1 000 €/měsíc',
+      },
+    },
+
+    // Q17 : Plateforme (WORKER)
+    q17_plateforme: {
+      label: 'Použili byste platformu pro hledání agenturní práce v zahraničí?',
+      options: {
+        oui_certainement: 'Ano, určitě',
+        oui_probablement: 'Ano, pravděpodobně',
+        peut_etre: 'Možná',
+        non: 'Ne',
+      },
+    },
+
     // Section 4 - Intérêt YoJob
     
     // Q18 : Score
