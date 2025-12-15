@@ -488,13 +488,13 @@ export const de: TranslationBundle = {
     
     // Q9 : Défi worker (WORKER)
     q9_defi_worker: {
-      label: 'Ihre Hauptherausforderung bei Zeitarbeit im Ausland',
+      label: 'Ihre Hauptherausforderung bei Ihren Einsätzen',
       options: {
+        trouver: 'Einsätze finden',
         admin: 'Verwaltungspapiere',
-        langue: 'Sprachbarriere',
-        logement: 'Unterkunft finden',
-        transport: 'Transport',
-        salaire: 'Zahlungs-/Gehaltsprobleme',
+        logement: 'Unterkunft / Wohnung',
+        langue: 'Landessprache',
+        paiement: 'Zahlungen / Gehalt',
         autre: 'Andere',
       },
     },
@@ -569,6 +569,10 @@ export const de: TranslationBundle = {
       label: 'Hatten Sie Strafen oder Vorfälle im Zusammenhang mit der Einhaltung von Entsendungsvorschriften?',
       description: 'Ihre Antwort bleibt anonymisiert',
       options: {
+        jamais: 'Nein, niemals',
+        rarement: 'Selten (1-2 Mal)',
+        parfois: 'Manchmal (3-5 Mal)',
+        souvent: 'Oft (6+ Mal)',
         oui_souvent: 'Ja, häufig',
         oui_rare: 'Ja, gelegentlich',
         non: 'Nein',
