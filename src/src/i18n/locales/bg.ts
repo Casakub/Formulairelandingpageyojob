@@ -311,6 +311,8 @@ export const bg: TranslationBundle = {
     profileAgency: 'Агенция за временна заетост',
     profileClient: 'Компания клиент',
     profileWorker: 'Временен работник',
+    score_not_interested: 'Не се интересувам',
+    score_very_interested: 'Много се интересувам',
   },
   
   // Сектори
@@ -489,13 +491,13 @@ export const bg: TranslationBundle = {
     
     // Q9: Предизвикателство работник (WORKER)
     q9_defi_worker: {
-      label: 'Вашето основно предизвикателство с временната работа в чужбина',
+      label: 'Вашето основно предизвикателство в мисиите Ви',
       options: {
+        trouver: 'Намиране на мисии',
         admin: 'Административни процедури',
-        langue: 'Езикова бариера',
-        logement: 'Намиране на жилище',
-        transport: 'Транспорт',
-        salaire: 'Проблеми с плащането/заплатата',
+        logement: 'Настаняване / Жилище',
+        langue: 'Местен език',
+        paiement: 'Плащания / Заплата',
         autre: 'Друго',
       },
     },
@@ -567,6 +569,10 @@ export const bg: TranslationBundle = {
       label: 'Сблъсквали ли сте се със санкции или инциденти, свързани със съответствието на командироването?',
       description: 'Вашият отговор остава анонимен',
       options: {
+        jamais: 'Не, никога',
+        rarement: 'Рядко (1-2 пъти)',
+        parfois: 'Понякога (3-5 пъти)',
+        souvent: 'Често (6+ пъти)',
         oui_souvent: 'Да, често',
         oui_rare: 'Да, понякога',
         non: 'Не',
@@ -692,6 +698,8 @@ export const bg: TranslationBundle = {
         conformite: 'Съответствие в множество държави',
         cout: 'Административни разходи',
         documentation: 'Управление на документи',
+        responsabilite: 'Наказателна отговорност',
+        perte_clients: 'Загуба на клиенти',
       },
     },
     
