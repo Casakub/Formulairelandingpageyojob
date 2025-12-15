@@ -85,94 +85,6 @@ export const it: TranslationBundle = {
     },
   },
   
-  // Sezioni adattate per profilo
-  sectionContent: {
-    1: {
-      agency: {
-        title: '📋 Profilo della Sua Agenzia',
-        description: 'Ci racconti della sua agenzia di lavoro interinale e della sua esperienza',
-      },
-      client: {
-        title: '📋 Profilo della Sua Azienda',
-        description: 'Ci racconti della sua azienda e delle esigenze di assunzione',
-      },
-      worker: {
-        title: '📋 Il Suo Profilo',
-        description: 'Ci racconti del suo percorso professionale',
-      },
-    },
-    2: {
-      agency: {
-        title: '💼 Esperienza di Distacco',
-        description: 'La sua attività di distacco di lavoratori',
-      },
-      client: {
-        title: '💼 La Sua Esperienza di Assunzione',
-        description: 'Le sue pratiche attuali di assunzione e lavoro interinale',
-      },
-      worker: {
-        title: '💼 La Sua Esperienza di Lavoro Interinale',
-        description: 'Il suo percorso nel lavoro interinale',
-      },
-    },
-    3: {
-      agency: {
-        title: '🎯 Esigenze e Strumenti',
-        description: 'Le sue sfide e soluzioni attuali',
-      },
-      client: {
-        title: '🎯 Le Sue Esigenze Attuali',
-        description: 'Sfide e aspettative nell\'assunzione',
-      },
-      worker: {
-        title: '🎯 Le Sue Aspettative',
-        description: 'Cosa è importante per lei in una missione',
-      },
-    },
-    4: {
-      agency: {
-        title: '✨ Interesse per YoJob',
-        description: 'Cosa cerca in una soluzione digitale',
-      },
-      client: {
-        title: '✨ Interesse per YoJob',
-        description: 'Funzionalità e priorità',
-      },
-      worker: {
-        title: '✨ Interesse per YoJob',
-        description: 'Cosa faciliterebbe la sua ricerca di lavoro',
-      },
-    },
-    5: {
-      agency: {
-        title: '🔮 Visione Futura',
-        description: 'I suoi piani e ambizioni',
-      },
-      client: {
-        title: '🔮 Visione Futura',
-        description: 'I suoi progetti di sviluppo',
-      },
-      worker: {
-        title: '🔮 Visione Futura',
-        description: 'I suoi progetti professionali',
-      },
-    },
-    6: {
-      agency: {
-        title: '📬 Informazioni di Contatto',
-        description: 'Per seguirla e inviarle i risultati',
-      },
-      client: {
-        title: '📬 Informazioni di Contatto',
-        description: 'Per seguirla e inviarle i risultati',
-      },
-      worker: {
-        title: '📬 Informazioni di Contatto',
-        description: 'Per seguirla e inviarle i risultati',
-      },
-    },
-  },
-  
   header: {
     title: 'YoJob',
     subtitle: 'Studio di mercato',
@@ -504,11 +416,11 @@ export const it: TranslationBundle = {
     q9_defi_worker: {
       label: 'La sua principale sfida con il lavoro interinale all\'estero',
       options: {
+        trouver: 'Trovare incarichi',
         admin: 'Pratiche amministrative',
         langue: 'Barriera linguistica',
         logement: 'Trovare alloggio',
-        transport: 'Trasporto',
-        salaire: 'Problemi di pagamento/salario',
+        paiement: 'Problemi di pagamento/salario',
         autre: 'Altro',
       },
     },
@@ -524,10 +436,11 @@ export const it: TranslationBundle = {
       ...fr.questions.q10_gestion,
       label: 'Come gestisce le dichiarazioni di distacco oggi?',
       options: {
-        manuel: 'Manualmente (Excel, Word...)',
-        logiciel_interne: 'Software interno',
-        prestataire: 'Fornitore di servizi esterno',
+        interne: 'Team interno',
+        externe: 'Fornitore esterno',
         mixte: 'Approccio misto',
+        manuel: 'Gestione manuale',
+        logiciel: 'Software specializzato',
       },
     },
     
@@ -581,12 +494,14 @@ export const it: TranslationBundle = {
     
     // Q11 : Incidenti (AGENCY)
     q11_incidents: {
+      ...fr.questions.q11_incidents,
       label: 'Ha affrontato sanzioni o incidenti relativi alla conformità del distacco?',
       description: 'La sua risposta rimane anonima',
       options: {
-        oui_souvent: 'Sì, frequentemente',
-        oui_rare: 'Sì, occasionalmente',
-        non: 'No',
+        jamais: 'No, mai',
+        rarement: 'Raramente (1-2 volte)',
+        parfois: 'A volte (3-5 volte)',
+        souvent: 'Spesso (6+ volte)',
       },
     },
     
@@ -613,13 +528,14 @@ export const it: TranslationBundle = {
     
     // Q12 : Budget (AGENCY)
     q12_budget: {
+      ...fr.questions.q12_budget,
       label: 'Budget annuale allocato alla gestione amministrativa del distacco',
       options: {
-        '0': 'Non specificamente allocato',
-        '1-5k': '€1.000 - €5.000',
-        '5-20k': '€5.000 - €20.000',
-        '20-50k': '€20.000 - €50.000',
-        '50k+': 'Più di €50.000',
+        '0-5k': '€0-5.000 / anno',
+        '5-15k': '€5.000-15.000 / anno',
+        '15-30k': '€15.000-30.000 / anno',
+        '30k+': '€30.000+ / anno',
+        inconnu: 'Non so',
       },
     },
     
@@ -701,6 +617,7 @@ export const it: TranslationBundle = {
     
     // Q14 : Rischi (AGENCY)
     q14_risques: {
+      ...fr.questions.q14_risques,
       label: 'Le sue principali preoccupazioni',
       description: 'Selezioni tutte quelle applicabili',
       options: {
@@ -710,10 +627,6 @@ export const it: TranslationBundle = {
         delais: 'Ritardi nelle missioni',
         clients: 'Perdita di clienti',
         aucun: 'Nessun rischio importante',
-        sanctions: 'Sanzioni/penalità',
-        conformite: 'Conformità multi-paese',
-        cout: 'Costi amministrativi',
-        documentation: 'Gestione dei documenti',
       },
     },
     
@@ -800,10 +713,15 @@ export const it: TranslationBundle = {
     
     // Q16 : ERP (AGENCY)
     q16_erp: {
+      ...fr.questions.q16_erp,
       label: 'Utilizza software di gestione ERP?',
       options: {
-        oui: 'Sì',
-        non: 'No',
+        sage: 'Sage',
+        sap: 'SAP',
+        cegid: 'Cegid',
+        bullhorn: 'Bullhorn / ATS',
+        autre: 'Altro',
+        aucun: 'Nessun ERP',
       },
     },
     
@@ -827,12 +745,13 @@ export const it: TranslationBundle = {
     
     // Q17 : Migrazione (AGENCY)
     q17_migration: {
+      ...fr.questions.q17_migration,
       label: 'È pronto a cambiare i suoi strumenti di lavoro?',
       options: {
-        oui_rapidement: 'Sì, immediatamente',
-        oui_progressivement: 'Sì, gradualmente',
-        non_satisfait: 'No, soddisfatto degli strumenti attuali',
-        non_peur: 'No, paura del cambiamento',
+        oui: 'Sì, nessun problema',
+        conditions: 'Sì, a condizioni',
+        difficile: 'Difficile, ma aperto',
+        non: 'No, non è pensabile',
       },
     },
     

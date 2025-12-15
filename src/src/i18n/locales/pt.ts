@@ -85,94 +85,6 @@ export const pt: TranslationBundle = {
     },
   },
   
-  // Sections adaptées par profil
-  sectionContent: {
-    1: {
-      agency: {
-        title: '📋 Perfil da Sua Agência',
-        description: 'Conte-nos sobre a sua agência de trabalho temporário e experiência',
-      },
-      client: {
-        title: '📋 Perfil da Sua Empresa',
-        description: 'Conte-nos sobre a sua empresa e necessidades de recrutamento',
-      },
-      worker: {
-        title: '📋 O Seu Perfil',
-        description: 'Conte-nos sobre o seu percurso profissional',
-      },
-    },
-    2: {
-      agency: {
-        title: '💼 Experiência de Destacamento',
-        description: 'A sua atividade de destacamento de trabalhadores',
-      },
-      client: {
-        title: '💼 A Sua Experiência de Recrutamento',
-        description: 'As suas práticas atuais de recrutamento e trabalho temporário',
-      },
-      worker: {
-        title: '💼 A Sua Experiência de Trabalho Temporário',
-        description: 'O seu percurso no trabalho temporário',
-      },
-    },
-    3: {
-      agency: {
-        title: '🎯 Necessidades e Ferramentas',
-        description: 'Os seus desafios e soluções atuais',
-      },
-      client: {
-        title: '🎯 As Suas Necessidades Atuais',
-        description: 'Desafios e expectativas no recrutamento',
-      },
-      worker: {
-        title: '🎯 As Suas Expectativas',
-        description: 'O que é importante para si numa missão',
-      },
-    },
-    4: {
-      agency: {
-        title: '✨ Interesse no YoJob',
-        description: 'O que procura numa solução digital',
-      },
-      client: {
-        title: '✨ Interesse no YoJob',
-        description: 'Funcionalidades e prioridades',
-      },
-      worker: {
-        title: '✨ Interesse no YoJob',
-        description: 'O que facilitaria a sua procura de trabalho',
-      },
-    },
-    5: {
-      agency: {
-        title: '🔮 Visão de Futuro',
-        description: 'Os seus planos e ambições',
-      },
-      client: {
-        title: '🔮 Visão de Futuro',
-        description: 'Os seus projetos de desenvolvimento',
-      },
-      worker: {
-        title: '🔮 Visão de Futuro',
-        description: 'Os seus projetos profissionais',
-      },
-    },
-    6: {
-      agency: {
-        title: '📬 Informações de Contacto',
-        description: 'Para o acompanharmos e enviar os resultados',
-      },
-      client: {
-        title: '📬 Informações de Contacto',
-        description: 'Para o acompanharmos e enviar os resultados',
-      },
-      worker: {
-        title: '📬 Informações de Contacto',
-        description: 'Para o acompanharmos e enviar os resultados',
-      },
-    },
-  },
-  
   header: {
     title: 'YoJob',
     subtitle: 'Estudo de mercado',
@@ -504,11 +416,11 @@ export const pt: TranslationBundle = {
     q9_defi_worker: {
       label: 'O seu principal desafio com trabalho temporário no estrangeiro',
       options: {
+        trouver: 'Encontrar missões',
         admin: 'Burocracia administrativa',
         langue: 'Barreira linguística',
         logement: 'Encontrar alojamento',
-        transport: 'Transporte',
-        salaire: 'Problemas de pagamento/salário',
+        paiement: 'Problemas de pagamento/salário',
         autre: 'Outro',
       },
     },
@@ -524,10 +436,11 @@ export const pt: TranslationBundle = {
       ...fr.questions.q10_gestion,
       label: 'Como gere as declarações de destacamento hoje?',
       options: {
-        manuel: 'Manualmente (Excel, Word...)',
-        logiciel_interne: 'Software interno',
-        prestataire: 'Prestador de serviços externo',
+        interne: 'Equipa interna',
+        externe: 'Prestador externo',
         mixte: 'Abordagem mista',
+        manuel: 'Gestão manual',
+        logiciel: 'Software especializado',
       },
     },
     
@@ -581,12 +494,14 @@ export const pt: TranslationBundle = {
     
     // Q11 : Incidents (AGENCY)
     q11_incidents: {
+      ...fr.questions.q11_incidents,
       label: 'Já enfrentou penalizações ou incidentes relacionados com conformidade de destacamento?',
       description: 'A sua resposta permanece anónima',
       options: {
-        oui_souvent: 'Sim, frequentemente',
-        oui_rare: 'Sim, ocasionalmente',
-        non: 'Não',
+        jamais: 'Não, nunca',
+        rarement: 'Raramente (1-2 vezes)',
+        parfois: 'Às vezes (3-5 vezes)',
+        souvent: 'Frequentemente (6+ vezes)',
       },
     },
     
@@ -613,13 +528,14 @@ export const pt: TranslationBundle = {
     
     // Q12 : Budget (AGENCY)
     q12_budget: {
+      ...fr.questions.q12_budget,
       label: 'Orçamento anual alocado à gestão administrativa de destacamento',
       options: {
-        '0': 'Não especificamente alocado',
-        '1-5k': '€1.000 - €5.000',
-        '5-20k': '€5.000 - €20.000',
-        '20-50k': '€20.000 - €50.000',
-        '50k+': 'Mais de €50.000',
+        '0-5k': '€0-5.000 / ano',
+        '5-15k': '€5.000-15.000 / ano',
+        '15-30k': '€15.000-30.000 / ano',
+        '30k+': '€30.000+ / ano',
+        inconnu: 'Não sei',
       },
     },
     
@@ -701,6 +617,7 @@ export const pt: TranslationBundle = {
     
     // Q14 : Risques (AGENCY)
     q14_risques: {
+      ...fr.questions.q14_risques,
       label: 'As suas principais preocupações',
       description: 'Selecione todas as que se aplicam',
       options: {
@@ -710,10 +627,6 @@ export const pt: TranslationBundle = {
         delais: 'Atrasos nas missões',
         clients: 'Perda de clientes',
         aucun: 'Nenhum risco maior',
-        sanctions: 'Penalizações/sanções',
-        conformite: 'Conformidade multi-país',
-        cout: 'Custos administrativos',
-        documentation: 'Gestão de documentos',
       },
     },
     
@@ -800,10 +713,15 @@ export const pt: TranslationBundle = {
     
     // Q16 : ERP (AGENCY)
     q16_erp: {
+      ...fr.questions.q16_erp,
       label: 'Utiliza software de gestão ERP?',
       options: {
-        oui: 'Sim',
-        non: 'Não',
+        sage: 'Sage',
+        sap: 'SAP',
+        cegid: 'Cegid',
+        bullhorn: 'Bullhorn / ATS',
+        autre: 'Outro',
+        aucun: 'Nenhum ERP',
       },
     },
     
@@ -827,12 +745,13 @@ export const pt: TranslationBundle = {
     
     // Q17 : Migration (AGENCY)
     q17_migration: {
+      ...fr.questions.q17_migration,
       label: 'Está pronto para mudar as suas ferramentas de trabalho?',
       options: {
-        oui_rapidement: 'Sim, imediatamente',
-        oui_progressivement: 'Sim, gradualmente',
-        non_satisfait: 'Não, satisfeito com as ferramentas atuais',
-        non_peur: 'Não, receio de mudança',
+        oui: 'Sim, sem problema',
+        conditions: 'Sim, sob condições',
+        difficile: 'Difícil, mas aberto',
+        non: 'Não, não é concebível',
       },
     },
     
@@ -951,18 +870,6 @@ export const pt: TranslationBundle = {
         oui_reduc: 'Sim, com desconto',
         peut_etre: 'Talvez, depende das funcionalidades',
         non: 'Não, não interessado',
-      },
-    },
-    
-    // Q23 : Délai
-    q23_delai: {
-      label: 'Quando gostaria de começar?',
-      options: {
-        'immediat': 'Imediatamente',
-        '1-3mois': 'Em 1-3 meses',
-        '3-6mois': 'Em 3-6 meses',
-        '6-12mois': 'Em 6-12 meses',
-        'plus_tard': 'Mais tarde',
       },
     },
     
