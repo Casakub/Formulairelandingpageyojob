@@ -85,94 +85,6 @@ export const hr: TranslationBundle = {
     },
   },
   
-  // Sections adaptées par profil
-  sectionContent: {
-    1: {
-      agency: {
-        title: '📋 Vaš poslovni profil',
-        description: 'Recite nam o vašoj agenciji i stručnosti',
-      },
-      client: {
-        title: '📋 Vaš poslovni profil',
-        description: 'Recite nam o vašoj tvrtki i potrebama zapošljavanja',
-      },
-      worker: {
-        title: '📋 Vaš profil',
-        description: 'Recite nam o vašoj profesionalnoj pozadini',
-      },
-    },
-    2: {
-      agency: {
-        title: '💼 Aktivnost upućivanja',
-        description: 'Vaše iskustvo s upućivanjem radnika',
-      },
-      client: {
-        title: '💼 Vaše iskustvo zapošljavanja',
-        description: 'Vaše trenutno zapošljavanje i privremeni rad',
-      },
-      worker: {
-        title: '💼 Vaše iskustvo privremenog rada',
-        description: 'Vaš put kao agencijski radnik',
-      },
-    },
-    3: {
-      agency: {
-        title: '🎯 Potrebe i alati',
-        description: 'Vaši izazovi i trenutna rješenja',
-      },
-      client: {
-        title: '🎯 Vaše trenutne potrebe',
-        description: 'Izazovi i očekivanja pri zapošljavanju',
-      },
-      worker: {
-        title: '🎯 Vaša očekivanja',
-        description: 'Što vam je važno kod angažmana',
-      },
-    },
-    4: {
-      agency: {
-        title: '⭐ Interes za europsku platformu',
-        description: 'Otkrijte našu viziju inovativnog tržišta',
-      },
-      client: {
-        title: '⭐ Interes za europsku platformu',
-        description: 'Inovativno rješenje za vaše potrebe',
-      },
-      worker: {
-        title: '⭐ Vaš interes za platformu',
-        description: 'Platforma za jednostavno pronalaženje angažmana',
-      },
-    },
-    5: {
-      agency: {
-        title: '🔮 Buduća vizija',
-        description: 'Proračun i izgledi razvoja',
-      },
-      client: {
-        title: '🔮 Vaši budući prioriteti',
-        description: 'Proračun i strategija zapošljavanja',
-      },
-      worker: {
-        title: '🔮 Vaši ciljevi',
-        description: 'Vaši nadolazeći profesionalni projekti',
-      },
-    },
-    6: {
-      agency: {
-        title: '📧 Ostanite u kontaktu',
-        description: 'Primite rezultate studije i budite obaviješteni',
-      },
-      client: {
-        title: '📧 Ostanite u kontaktu',
-        description: 'Primite rezultate i naše preporuke',
-      },
-      worker: {
-        title: '📧 Ostanite u kontaktu',
-        description: 'Primite rezultate i prilike',
-      },
-    },
-  },
-  
   // Header
   header: {
     title: 'YoJob',
@@ -507,6 +419,7 @@ export const hr: TranslationBundle = {
     
     // Q10 : Gestion (AGENCY)
     q10_gestion: {
+      ...fr.questions.q10_gestion,
       label: 'Kako danas upravljate prijavama za upućivanje?',
       options: {
         interne: 'Interni tim',
@@ -514,9 +427,6 @@ export const hr: TranslationBundle = {
         mixte: 'Mješoviti pristup',
         manuel: 'Ručno upravljanje',
         logiciel: 'Specijalizirani softver',
-        manuel: 'Ručno (Excel, Word...)',
-        logiciel_interne: 'Interni softver',
-        prestataire: 'Vanjski pružatelj usluga',
       },
     },
     
