@@ -85,94 +85,6 @@ export const hu: TranslationBundle = {
     },
   },
   
-  // Szekciók tartalma profil szerint
-  sectionContent: {
-    1: {
-      agency: {
-        title: '📋 Az Ön ügynökségének profilja',
-        description: 'Mondja el nekünk a munkaerő-kölcsönzési ügynökségéről és tapasztalatairól',
-      },
-      client: {
-        title: '📋 Vállalata profilja',
-        description: 'Mondja el nekünk a vállalatáról és toborzási igényeiről',
-      },
-      worker: {
-        title: '📋 Az Ön profilja',
-        description: 'Mondja el nekünk szakmai múltjáról',
-      },
-    },
-    2: {
-      agency: {
-        title: '💼 Kiküldetési tapasztalat',
-        description: 'Az Ön munkavállalói kiküldetési tevékenysége',
-      },
-      client: {
-        title: '💼 Az Ön toborzási tapasztalata',
-        description: 'Jelenlegi toborzási és munkaerő-kölcsönzési gyakorlatai',
-      },
-      worker: {
-        title: '💼 Az Ön munkaerő-kölcsönzési tapasztalata',
-        description: 'Az Ön útja az ideiglenes munkában',
-      },
-    },
-    3: {
-      agency: {
-        title: '🎯 Igények és eszközök',
-        description: 'Az Ön kihívásai és jelenlegi megoldásai',
-      },
-      client: {
-        title: '🎯 Az Ön jelenlegi igényei',
-        description: 'Kihívások és elvárások a toborzásban',
-      },
-      worker: {
-        title: '🎯 Az Ön elvárásai',
-        description: 'Mi fontos Önnek egy megbízásban',
-      },
-    },
-    4: {
-      agency: {
-        title: '✨ Érdeklődés a YoJob iránt',
-        description: 'Mit keres egy digitális megoldásban',
-      },
-      client: {
-        title: '✨ Érdeklődés a YoJob iránt',
-        description: 'Funkciók és prioritások',
-      },
-      worker: {
-        title: '✨ Érdeklődés a YoJob iránt',
-        description: 'Mi könnyítené meg az Ön álláskeresését',
-      },
-    },
-    5: {
-      agency: {
-        title: '🔮 Jövőbeli jövőkép',
-        description: 'Az Ön tervei és ambíciói',
-      },
-      client: {
-        title: '🔮 Jövőbeli jövőkép',
-        description: 'Az Ön fejlesztési projektjei',
-      },
-      worker: {
-        title: '🔮 Jövőbeli jövőkép',
-        description: 'Az Ön szakmai projektjei',
-      },
-    },
-    6: {
-      agency: {
-        title: '📬 Kapcsolattartási információk',
-        description: 'Hogy kapcsolatba léphessünk Önnel és elküldhessük az eredményeket',
-      },
-      client: {
-        title: '📬 Kapcsolattartási információk',
-        description: 'Hogy kapcsolatba léphessünk Önnel és elküldhessük az eredményeket',
-      },
-      worker: {
-        title: '📬 Kapcsolattartási információk',
-        description: 'Hogy kapcsolatba léphessünk Önnel és elküldhessük az eredményeket',
-      },
-    },
-  },
-  
   header: {
     title: 'YoJob',
     subtitle: 'Piaci felmérés',
@@ -493,11 +405,11 @@ export const hu: TranslationBundle = {
     q9_defi_worker: {
       label: 'Fő kihívása a külföldön végzett ideiglenes munkával',
       options: {
+        trouver: 'Megbízások megtalálása',
         admin: 'Adminisztratív eljárások',
         langue: 'Nyelvi korlát',
         logement: 'Szállás megtalálása',
-        transport: 'Közlekedés',
-        salaire: 'Fizetési/bér problémák',
+        paiement: 'Fizetési/bér problémák',
         autre: 'Egyéb',
       },
     },
@@ -510,12 +422,14 @@ export const hu: TranslationBundle = {
     
     // Q10: Kezelés (AGENCY)
     q10_gestion: {
+      ...fr.questions.q10_gestion,
       label: 'Hogyan kezeli a kiküldetési nyilatkozatokat ma?',
       options: {
-        manuel: 'Kézileg (Excel, Word...)',
-        logiciel_interne: 'Belső szoftver',
-        prestataire: 'Külső szolgáltató',
+        interne: 'Belső csapat',
+        externe: 'Külső szolgáltató',
         mixte: 'Vegyes megközelítés',
+        manuel: 'Kézi kezelés',
+        logiciel: 'Speciális szoftver',
       },
     },
     
@@ -566,12 +480,14 @@ export const hu: TranslationBundle = {
     
     // Q11: Incidensek (AGENCY)
     q11_incidents: {
+      ...fr.questions.q11_incidents,
       label: 'Szembesült már szankciókkal vagy incidensekkel a kiküldetési megfeleléssel kapcsolatban?',
       description: 'Az Ön válasza névtelen marad',
       options: {
-        oui_souvent: 'Igen, gyakran',
-        oui_rare: 'Igen, néha',
-        non: 'Nem',
+        jamais: 'Nem, soha',
+        rarement: 'Ritkán (1-2 alkalommal)',
+        parfois: 'Néha (3-5 alkalommal)',
+        souvent: 'Gyakran (6+ alkalommal)',
       },
     },
     
@@ -598,13 +514,14 @@ export const hu: TranslationBundle = {
     
     // Q12: Költségvetés (AGENCY)
     q12_budget: {
+      ...fr.questions.q12_budget,
       label: 'A kiküldetés adminisztratív kezelésére szánt éves költségvetés',
       options: {
-        '0': 'Nincs külön elkülönítve',
-        '1-5k': '€1,000 - €5,000',
-        '5-20k': '€5,000 - €20,000',
-        '20-50k': '€20,000 - €50,000',
-        '50k+': 'Több mint €50,000',
+        '0-5k': '0-5 000 € / év',
+        '5-15k': '5 000-15 000 € / év',
+        '15-30k': '15 000-30 000 € / év',
+        '30k+': '30 000+ € / év',
+        inconnu: 'Nem tudom',
       },
     },
     
@@ -681,6 +598,7 @@ export const hu: TranslationBundle = {
     
     // Q14: Kockázatok (AGENCY)
     q14_risques: {
+      ...fr.questions.q14_risques,
       label: 'Fő aggályai',
       description: 'Válasszon ki minden vonatkozót',
       options: {
@@ -690,10 +608,6 @@ export const hu: TranslationBundle = {
         delais: 'Megbízások késései',
         clients: 'Ügyfelek elvesztése',
         aucun: 'Nincs jelentős kockázat',
-        sanctions: 'Szankciók/büntetések',
-        conformite: 'Megfelelés több országban',
-        cout: 'Adminisztratív költségek',
-        documentation: 'Dokumentumkezelés',
       },
     },
     
@@ -773,10 +687,15 @@ export const hu: TranslationBundle = {
     
     // Q16: ERP (AGENCY)
     q16_erp: {
+      ...fr.questions.q16_erp,
       label: 'Használ ERP menedzsment szoftvert?',
       options: {
-        oui: 'Igen',
-        non: 'Nem',
+        sage: 'Sage',
+        sap: 'SAP',
+        cegid: 'Cegid',
+        bullhorn: 'Bullhorn / ATS',
+        autre: 'Egyéb',
+        aucun: 'Nincs ERP',
       },
     },
     
@@ -800,12 +719,13 @@ export const hu: TranslationBundle = {
     
     // Q17: Migráció (AGENCY)
     q17_migration: {
+      ...fr.questions.q17_migration,
       label: 'Hajlandó lenne lecserélni munkavégzési eszközeit?',
       options: {
-        oui_rapidement: 'Igen, azonnal',
-        oui_progressivement: 'Igen, fokozatosan',
-        non_satisfait: 'Nem, elégedett vagyok a jelenlegi eszközökkel',
-        non_peur: 'Nem, félek a változástól',
+        oui: 'Igen, nem probléma',
+        conditions: 'Igen, feltételekkel',
+        difficile: 'Nehéz, de nyitott',
+        non: 'Nem, nem elképzelhető',
       },
     },
     
@@ -917,18 +837,6 @@ export const hu: TranslationBundle = {
         oui_reduc: 'Igen, kedvezménnyel',
         peut_etre: 'Talán, függ a funkcióktól',
         non: 'Nem, nem érdekel',
-      },
-    },
-    
-    // Q23: Határidő
-    q23_delai: {
-      label: 'Mikor szeretne kezdeni?',
-      options: {
-        'immediat': 'Azonnal',
-        '1-3mois': '1-3 hónapon belül',
-        '3-6mois': '3-6 hónapon belül',
-        '6-12mois': '6-12 hónapon belül',
-        'plus_tard': 'Később',
       },
     },
     
