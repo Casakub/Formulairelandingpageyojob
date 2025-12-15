@@ -297,6 +297,8 @@ export const da: TranslationBundle = {
     profileAgency: 'Vikarbureau',
     profileClient: 'Klient',
     profileWorker: 'Bureauansat',
+    score_not_interested: 'Ikke interesseret',
+    score_very_interested: 'Meget interesseret',
   },
   
   // Sectors
@@ -486,13 +488,13 @@ export const da: TranslationBundle = {
     
     // Q9 : Défi worker (WORKER)
     q9_defi_worker: {
-      label: 'Din primære udfordring med vikararbejde i udlandet',
+      label: 'Din primære udfordring på dine opgaver',
       options: {
+        trouver: 'At finde opgaver',
         admin: 'Administrativt papirarbejde',
-        langue: 'Sprogbarriere',
-        logement: 'At finde bolig',
-        transport: 'Transport',
-        salaire: 'Betalings-/lønproblemer',
+        logement: 'Bolig / Indkvartering',
+        langue: 'Lokalt sprog',
+        paiement: 'Betalinger / Løn',
         autre: 'Andet',
       },
     },
@@ -1086,5 +1088,331 @@ export const da: TranslationBundle = {
     service_administratif: {
       label: 'Administrativ support',
     },
+
+    // === QUESTIONS MANQUANTES HARMONISÉES AVEC EN ===
+
+    // Q12 : Salaire (WORKER)
+    q12_salaire: {
+      ...fr.questions.q12_salaire,
+      label: 'Er du tilfreds med din løn fra vikararbejde?',
+      options: {
+        '<1500': 'Mindre end €1.500',
+        '1500-2500': '€1.500 - €2.500',
+        '2500-3500': '€2.500 - €3.500',
+        '3500+': '€3.500+',
+      },
+    },
+
+    // Q13 : Manque à gagner (AGENCY)
+    q13_manque_gagner: {
+      ...fr.questions.q13_manque_gagner,
+      label: 'Hvilken procentdel af omsætningen mister du pga. administrativ kompleksitet?',
+      options: {
+        'non': 'Nej, ikke rigtig',
+        'faible': 'Ja, lav (< 5% omsætning)',
+        'moyen': 'Ja, moderat (5-15% omsætning)',
+        'important': 'Ja, betydelig (> 15% omsætning)',
+      },
+    },
+
+    // Q13 : Satisfaction (CLIENT)
+    q13_satisfaction: {
+      ...fr.questions.q13_satisfaction,
+      label: 'Tilfredshed med dine nuværende vikarbureauer',
+      options: {
+        'tres_satisfait': 'Meget tilfreds',
+        'satisfait': 'Tilfreds',
+        'neutre': 'Neutral',
+        'insatisfait': 'Utilfreds',
+        'tres_insatisfait': 'Meget utilfreds',
+      },
+    },
+
+    // Q13 : Satisfaction worker (WORKER)
+    q13_satisfaction_worker: {
+      ...fr.questions.q13_satisfaction_worker,
+      label: 'Tilfredshed med dine nuværende vikarbureauer',
+      options: {
+        'tres_satisfait': 'Meget tilfreds',
+        'satisfait': 'Tilfreds',
+        'neutre': 'Neutral',
+        'insatisfait': 'Utilfreds',
+        'tres_insatisfait': 'Meget utilfreds',
+      },
+    },
+
+    // Q14 : Risques (AGENCY)
+    q14_risques: {
+      label: 'Dine primære bekymringer',
+      description: 'Vælg alle relevante',
+      options: {
+        amendes: 'Bøder og sanktioner',
+        reputation: 'Omdømme / Image',
+        penal: 'Straffeansvar',
+        delais: 'Forsinkelser i opgaver',
+        clients: 'Tab af kunder',
+        aucun: 'Ingen væsentlig risiko',
+        sanctions: 'Sanktioner/straffe',
+        conformite: 'Overholdelse i flere lande',
+        cout: 'Administrative omkostninger',
+        documentation: 'Dokumentstyring',
+        responsabilite: 'Straffeansvar',
+        perte_clients: 'Tab af kunder',
+      },
+    },
+
+    // Q14 : Besoins (CLIENT)
+    q14_besoins_client: {
+      ...fr.questions.q14_besoins_client,
+      label: 'Dine primære behov',
+      description: 'Vælg alle relevante',
+      options: {
+        fiabilite: 'Finde pålidelige bureauer',
+        conformite: 'Juridisk overholdelse',
+        qualite: 'Kvalitet/kompetencer',
+        cout: 'Omkostninger',
+        disponibilite: 'Kandidattilgængelighed',
+        aucun: 'Ingen væsentlige behov',
+      },
+    },
+
+    // Q14 : Attentes (WORKER)
+    q14_attentes: {
+      ...fr.questions.q14_attentes,
+      label: 'Dine forventninger til vikararbejde i udlandet',
+      description: 'Vælg alle relevante',
+      options: {
+        salaire: 'Bedre løn',
+        conditions: 'Bedre arbejdsforhold',
+        stabilite: 'Stabilitet',
+        experience: 'International erfaring',
+        logement: 'Hjælp til bolig',
+        aucun: 'Ingen særlige forventninger',
+      },
+    },
+
+    // Q14 : Risques client (CLIENT)
+    q14_risques_client: {
+      ...fr.questions.q14_risques_client,
+      label: 'Dine primære bekymringer',
+      description: 'Vælg alle relevante',
+      options: {
+        conformite: 'Juridisk overholdelse',
+        qualite: 'Kvalitet/kompetencer',
+        communication: 'Kommunikation/Sprog',
+        cout: 'Uventede omkostninger',
+        disponibilite: 'Kandidattilgængelighed',
+        aucun: 'Ingen væsentlige bekymringer',
+      },
+    },
+
+    // Q14 : Risques worker (WORKER)
+    q14_risques_worker: {
+      ...fr.questions.q14_risques_worker,
+      label: 'Hvilke problemer oplever du oftest?',
+      description: 'Vælg alle relevante',
+      options: {
+        paiement: 'Betalingsforsinkelser',
+        conditions: 'Dårlige forhold',
+        contrat: 'Kontrakter ikke overholdt',
+        logement: 'Utilstrækkelig bolig',
+        communication: 'Kommunikationsproblemer',
+        aucun: 'Ingen store problemer',
+      },
+    },
+
+    // Q15 : Problème (AGENCY)
+    q15_probleme: {
+      ...fr.questions.q15_probleme,
+      label: 'Hvilket problem vil du løse først?',
+      placeholder: 'Beskriv dit prioritetsproblem...',
+    },
+
+    // Q15 : Besoins client (CLIENT)
+    q15_besoins_client: {
+      ...fr.questions.q15_besoins_client,
+      label: 'Hvad er dine prioriterede behov?',
+      placeholder: 'F.eks.: Finde hurtigt, bedre kvalitet, priser...',
+    },
+
+    // Q15 : Améliorations (WORKER)
+    q15_ameliorations: {
+      ...fr.questions.q15_ameliorations,
+      label: 'Hvad vil du gerne forbedre ved dine opgaver?',
+      placeholder: 'F.eks.: Løn, bolig, support, stabilitet...',
+    },
+
+    // Q16 : ERP (AGENCY)
+    q16_erp: {
+      label: 'Bruger I ERP/styringssoftware?',
+      options: {
+        oui: 'Ja',
+        non: 'Nej',
+      },
+    },
+
+    // Q16 : Nom ERP
+    q16_nom_erp: {
+      label: 'Hvilken software/ERP?',
+      placeholder: 'F.eks.: SAP, Odoo, specialudviklet...',
+    },
+
+    // Q16 : Critères (CLIENT)
+    q16_criteres: {
+      label: 'Dine vigtigste udvælgelseskriterier for vikarbureauer',
+      description: 'Vælg dine top 3',
+    },
+
+    // Q16 : Amélioration (WORKER)
+    q16_amelioration: {
+      label: 'Hvad ville forbedre din vikaroplevelse?',
+      description: 'Vælg alle relevante',
+    },
+
+    // Q17 : Migration (AGENCY)
+    q17_migration: {
+      label: 'Er du klar til at skifte dine arbejdsværktøjer?',
+      options: {
+        oui_rapidement: 'Ja, med det samme',
+        oui_progressivement: 'Ja, gradvist',
+        non_satisfait: 'Nej, tilfreds med nuværende værktøjer',
+        non_peur: 'Nej, bange for forandring',
+      },
+    },
+
+    // Q17 : Budget (CLIENT)
+    q17_budget: {
+      label: 'Månedligt budget for en vikarrekrutteringsplatform',
+      options: {
+        '0': 'Ikke villig til at betale',
+        '1-100': '€1 - €100/måned',
+        '100-500': '€100 - €500/måned',
+        '500-1000': '€500 - €1.000/måned',
+        '1000+': 'Over €1.000/måned',
+      },
+    },
+
+    // Q17 : Plateforme (WORKER)
+    q17_plateforme: {
+      label: 'Ville du bruge en platform til at finde vikararbejde i udlandet?',
+      options: {
+        oui_certainement: 'Ja, helt sikkert',
+        oui_probablement: 'Ja, sandsynligvis',
+        peut_etre: 'Måske',
+        non: 'Nej',
+      },
+    },
+
+    // Q18 : Score
+    q18_score: {
+      ...fr.questions.q18_score,
+      label: 'Hvor interesseret er du i en europæisk udstationeringsmarkedsplads?',
+      description: 'Vurder fra 1 (ikke interesseret) til 10 (meget interesseret)',
+    },
+
+    // Q19 : Features (AGENCY)
+    q19_features: {
+      ...fr.questions.q19_features,
+      label: 'Mest interessante funktioner',
+      description: 'Vælg dine top 3 prioriteter',
+      options: {
+        sipsi: 'Automatisk SIPSI-erklæring',
+        a1: 'A1-certifikatstyring',
+        conformite: 'Overholdelses-dashboard',
+        alertes: 'Advarsler og fornyelser',
+        documents: 'Dokumentcentralisering',
+        marketplace: 'Bureaumarkedsplads',
+        support: 'Flersproget ekspertsupport',
+        api: 'API-integration (ERP)',
+      },
+    },
+
+    // Q19 : Features CLIENT
+    q19_features_client: {
+      ...fr.questions.q19_features_client,
+      label: 'Mest interessante funktioner',
+      description: 'Vælg alle der interesserer dig',
+      options: {
+        recherche: 'Søg efter pålidelige bureauer',
+        comparaison: 'Pris/kvalitetssammenligning',
+        avis: 'Verificerede anmeldelser',
+        conformite: 'Overholdelsesgaranti',
+        support: 'Dedikeret support',
+        facturation: 'Centraliseret fakturering',
+        suivi: 'Realtidssporing',
+      },
+    },
+
+    // Q19 : Features WORKER
+    q19_features_worker: {
+      ...fr.questions.q19_features_worker,
+      label: 'Mest interessante funktioner',
+      description: 'Vælg alle der interesserer dig',
+      options: {
+        recherche: 'Jobsøgning',
+        avis: 'Bureauanmeldelser',
+        logement: 'Hjælp til bolig',
+        paiement: 'Sikker betaling',
+        support: 'Support på mit sprog',
+        documents: 'Hjælp med administrative dokumenter',
+        formation: 'Træningsprogrammer',
+      },
+    },
+
+    // Q20 : Prix
+    q20_prix: {
+      ...fr.questions.q20_prix,
+      label: 'Foretrukken prismodel',
+      options: {
+        mensuel: 'Fast månedligt abonnement',
+        usage: 'Betal efter forbrug',
+        annuel: 'Årlig plan (rabat)',
+        gratuit: 'Gratis for arbejdere',
+      },
+    },
+
+    // Q21 : Budget mensuel
+    q21_budget_mensuel: {
+      ...fr.questions.q21_budget_mensuel,
+      label: 'Månedligt budget for en komplet SaaS-løsning',
+      options: {
+        '0-100': '€0 - €100/måned',
+        '100-300': '€100 - €300/måned',
+        '300-500': '€300 - €500/måned',
+        '500-1000': '€500 - €1.000/måned',
+        '1000+': 'Over €1.000/måned',
+      },
+    },
+
+    // Q22 : MVP
+    q22_mvp: {
+      ...fr.questions.q22_mvp,
+      label: 'Vil du gerne teste en tidlig version (MVP)?',
+      options: {
+        oui_gratuit: 'Ja, gratis',
+        oui_reduc: 'Ja, med rabat',
+        peut_etre: 'Måske, afhængigt af funktioner',
+        non: 'Nej, ikke interesseret',
+      },
+    },
+
+    // Q23 : Rôle
+    q23_role: {
+      label: 'Hvordan ser du din rolle på det europæiske marked?',
+      options: {
+        decideur: 'Endelig beslutningstager',
+        influenceur: 'Influencer / Anbefaling',
+        utilisateur: 'Slutbruger',
+        autre: 'Andet',
+      },
+    },
+  },
+
+  _meta: {
+    _lastUpdated: '2024-12-15T10:00:00.000Z',
+    _origin: 'manual',
+    _translatedBy: 'YoJob Team - Danish (DA) Complete Translation',
+    _locale: 'da-DK',
+    _completeness: 100,
   },
 };
