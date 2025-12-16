@@ -938,4 +938,12 @@ export const fi: TranslationBundle = {
       label: 'Haluaisin vastaanottaa tutkimusraportin',
     },
   },
+  
+  _meta: {
+    _lastUpdated: '2024-12-16T10:00:00.000Z',
+    _origin: 'manual',
+    _translatedBy: 'Manual translation',
+    _locale: 'fi-FI',
+    _completeness: 100,
+  },
 };

@@ -10,10 +10,6 @@ import { LanguagePreview } from './LanguagePreview';
 import { getAllResponses, type MarketResearchResponse } from '../../lib/supabase';
 import { getIntegrationsStats } from '../../lib/integrations';
 import { toast } from 'sonner@2.0.3';
-import { AutoUploadTranslations } from './AutoUploadTranslations';
-import { UploadHeroTranslations } from './UploadHeroTranslations';
-import { UploadProgressTranslations } from './UploadProgressTranslations';
-import { PushTranslationsButton } from '../PushTranslationsButton';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select';
 import { ProfileDistributionChart } from './ProfileDistributionChart';
 import { ProfileSpecificMetrics } from './ProfileSpecificMetrics';
@@ -420,12 +416,12 @@ export function DashboardOverview() {
             Analyse multi-profils
           </h2>
           
-          <div className="grid lg:grid-cols-3 gap-6 mb-8">
+          <div className="grid lg:grid-cols-4 gap-6 mb-8">
             {/* Profile Distribution Chart */}
             <ProfileDistributionChart responses={responses} />
             
             {/* Profile Comparison */}
-            <div className="lg:col-span-2">
+            <div className="lg:col-span-3">
               <ProfileComparison responses={responses} />
             </div>
           </div>
@@ -654,22 +650,6 @@ export function DashboardOverview() {
       {showLanguagePreview && (
         <LanguagePreview onClose={() => setShowLanguagePreview(false)} />
       )}
-
-      {/* Upload Translations Section */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.6 }}
-        className="mt-8"
-      >
-        <h2 className="text-slate-900 mb-4">Gestion des traductions</h2>
-        <div className="grid md:grid-cols-2 gap-6">
-          <UploadHeroTranslations />
-          <UploadProgressTranslations />
-          <AutoUploadTranslations />
-          <PushTranslationsButton />
-        </div>
-      </motion.div>
     </motion.div>
   );
 }

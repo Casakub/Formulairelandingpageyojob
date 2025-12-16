@@ -935,14 +935,14 @@ export const el: TranslationBundle = {
     
     // Q32 : Rapport d'étude
     souhaite_rapport: {
-      label: 'Θα ήθελα να λάβω την αναφορά της μελέτης',
+      label: 'Θα ήθελα να λάβω την έκθεση της μελέτης',
     },
   },
 
   _meta: {
-    _lastUpdated: '2024-12-12T10:00:00.000Z',
+    _lastUpdated: '2024-12-16T10:00:00.000Z',
     _origin: 'manual',
-    _translatedBy: 'YoJob Team - Greek (EL) Complete Translation',
+    _translatedBy: 'Manual translation',
     _locale: 'el-GR',
     _completeness: 100,
   },

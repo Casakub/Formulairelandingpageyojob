@@ -224,7 +224,20 @@ export function DynamicResultsOverview() {
       } else if (question.type === 'multiselect' || question.type === 'checkbox') {
         const distribution: Record<string, number> = {};
         values.forEach(v => {
-          const items = Array.isArray(v) ? v : v.split(',').map((s: string) => s.trim());
+          // Gestion robuste des différents types de valeurs
+          let items: string[] = [];
+          if (Array.isArray(v)) {
+            items = v;
+          } else if (typeof v === 'string') {
+            items = v.split(',').map((s: string) => s.trim());
+          } else if (v && typeof v === 'object') {
+            // Si c'est un objet, essayer de le convertir en array
+            items = Object.values(v).filter(Boolean).map(String);
+          } else if (v) {
+            // Dernier recours : convertir en string
+            items = [String(v)];
+          }
+          
           items.forEach((item: string) => {
             if (item) {
               distribution[item] = (distribution[item] || 0) + 1;

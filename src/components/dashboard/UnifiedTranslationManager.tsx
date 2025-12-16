@@ -4,7 +4,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../ui
 import { Badge } from '../ui/badge';
 import { Button } from '../ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../ui/tabs';
-import { Globe, Sparkles, FileText, Languages, Info, Settings, CheckCircle } from 'lucide-react';
+import { Globe, Sparkles, FileText, Languages, Info, Settings, CheckCircle, Upload, Wrench } from 'lucide-react';
 import { LandingContentManagerUnified } from './LandingContentManagerUnified';
 import { TranslateClientWorkerProfiles } from './TranslateClientWorkerProfiles';
 import { ImportClientWorkerTranslations } from './ImportClientWorkerTranslations';
@@ -14,6 +14,10 @@ import { SeedFromSurveyConfig } from './SeedFromSurveyConfig';
 import { SmartSeedTranslations } from './SmartSeedTranslations';
 import { setTranslationProvider } from '../../services/aiTranslationService';
 import { TranslationProvider } from '../../contexts/TranslationContext';
+import { AutoUploadTranslations } from './AutoUploadTranslations';
+import { UploadHeroTranslations } from './UploadHeroTranslations';
+import { UploadProgressTranslations } from './UploadProgressTranslations';
+import { PushTranslationsButton } from '../PushTranslationsButton';
 
 /**
  * 🌍 Unified Translation Manager
@@ -327,6 +331,43 @@ export function UnifiedTranslationManager() {
           </div>
         </CardContent>
       </Card>
+
+      {/* ========== SECTION OUTILS DE GESTION ========== */}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.4 }}
+      >
+        <Card className="border-orange-200 bg-gradient-to-br from-orange-50 to-amber-50 shadow-lg">
+          <CardHeader className="border-b border-orange-100">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-orange-500 to-amber-500 flex items-center justify-center">
+                <Wrench className="w-5 h-5 text-white" />
+              </div>
+              <div>
+                <CardTitle className="text-slate-900 flex items-center gap-2">
+                  🔧 Outils de gestion des traductions
+                  <Badge className="bg-orange-100 text-orange-700 border-orange-300">
+                    <Upload className="w-3 h-3 mr-1" />
+                    Upload & Push
+                  </Badge>
+                </CardTitle>
+                <CardDescription>
+                  Uploadez et déployez vos traductions vers le système i18n
+                </CardDescription>
+              </div>
+            </div>
+          </CardHeader>
+          <CardContent className="p-6">
+            <div className="grid md:grid-cols-2 gap-6">
+              <UploadHeroTranslations />
+              <UploadProgressTranslations />
+              <AutoUploadTranslations />
+              <PushTranslationsButton />
+            </div>
+          </CardContent>
+        </Card>
+      </motion.div>
     </div>
   );
 }
