@@ -85,94 +85,6 @@ export const ee: TranslationBundle = {
     },
   },
   
-  // Sections adaptées par profil
-  sectionContent: {
-    1: {
-      agency: {
-        title: '📋 Teie ettevõtte profiil',
-        description: 'Rääkige meile oma agentuurist ja pädevusest',
-      },
-      client: {
-        title: '📋 Teie ettevõtte profiil',
-        description: 'Rääkige meile oma ettevõttest ja värbamisvajadustest',
-      },
-      worker: {
-        title: '📋 Teie profiil',
-        description: 'Rääkige meile oma tööalasest taustast',
-      },
-    },
-    2: {
-      agency: {
-        title: '💼 Lähetamise tegevus',
-        description: 'Teie kogemus töötajate lähetamisega',
-      },
-      client: {
-        title: '💼 Teie värbamiskogemus',
-        description: 'Teie praegune värbamine ja ajutine töö',
-      },
-      worker: {
-        title: '💼 Teie ajutise töö kogemus',
-        description: 'Teie tee agentuuri töötajana',
-      },
-    },
-    3: {
-      agency: {
-        title: '🎯 Vajadused ja tööriistad',
-        description: 'Teie väljakutsed ja praegused lahendused',
-      },
-      client: {
-        title: '🎯 Teie praegused vajadused',
-        description: 'Väljakutsed ja ootused värbamisel',
-      },
-      worker: {
-        title: '🎯 Teie ootused',
-        description: 'Mis on teile töövõtul tähtis',
-      },
-    },
-    4: {
-      agency: {
-        title: '⭐ Huvi Euroopa platvormi vastu',
-        description: 'Avastage meie uuenduslik turu visioon',
-      },
-      client: {
-        title: '⭐ Huvi Euroopa platvormi vastu',
-        description: 'Uuenduslik lahendus teie vajadustele',
-      },
-      worker: {
-        title: '⭐ Teie huvi platvormi vastu',
-        description: 'Platvorm lihtsamaks töövõttude otsimiseks',
-      },
-    },
-    5: {
-      agency: {
-        title: '🔮 Tuleviku visioon',
-        description: 'Eelarve ja arenguväljavaated',
-      },
-      client: {
-        title: '🔮 Teie tulevikuprioriteedid',
-        description: 'Eelarve ja värbamisstrateegia',
-      },
-      worker: {
-        title: '🔮 Teie eesmärgid',
-        description: 'Teie eelseisvad kutselised projektid',
-      },
-    },
-    6: {
-      agency: {
-        title: '📧 Hoidke ühendust',
-        description: 'Saage uuringu tulemused ja olge informeeritud',
-      },
-      client: {
-        title: '📧 Hoidke ühendust',
-        description: 'Saage tulemused ja meie soovitused',
-      },
-      worker: {
-        title: '📧 Hoidke ühendust',
-        description: 'Saage tulemused ja võimalused',
-      },
-    },
-  },
-  
   // Header
   header: {
     title: 'YoJob',
@@ -297,6 +209,8 @@ export const ee: TranslationBundle = {
     profileAgency: 'Tööhõiveagentuur',
     profileClient: 'Klient',
     profileWorker: 'Agentuuri töötaja',
+    score_not_interested: 'Ei ole huvitatud',
+    score_very_interested: 'Väga huvitatud',
   },
   
   // Sectors
@@ -340,7 +254,7 @@ export const ee: TranslationBundle = {
     q2_nationalite: {
       ...fr.questions.q2_nationalite,
       label: 'Teie kodakondsus',
-      placeholder: 'nt: poola, rumeenia...',
+      placeholder: 'Nt: poola, rumeenia...',
     },
     
     // Q3 : Taille (AGENCY/CLIENT)
@@ -386,21 +300,21 @@ export const ee: TranslationBundle = {
     q5_pays: {
       ...fr.questions.q5_pays,
       label: 'Teie agentuuri riik',
-      placeholder: 'nt: Poola',
+      placeholder: 'Nt: Poola',
     },
     
     // Q5 : Localisation (CLIENT)
     q5_localisation: {
       ...fr.questions.q5_localisation,
       label: 'Riik, kus teie ettevõte tegutseb',
-      placeholder: 'nt: Prantsusmaa',
+      placeholder: 'Nt: Prantsusmaa',
     },
     
     // Q5 : Pays travail (WORKER)
     q5_pays_travail: {
       ...fr.questions.q5_pays_travail,
       label: 'Riigid, kus olete töötanud agentuuri töötajana',
-      placeholder: 'nt: Prantsusmaa, Saksamaa, Belgia...',
+      placeholder: 'Nt: Prantsusmaa, Saksamaa, Belgia...',
     },
     
     // Q6 : Volume (AGENCY)
@@ -443,20 +357,20 @@ export const ee: TranslationBundle = {
     // Q7 : Origine (AGENCY)
     q7_origine: {
       label: 'Kust pärinevad teie lähetatud töötajad?',
-      placeholder: 'nt: Poola, Rumeenia, Bulgaaria...',
+      placeholder: 'Nt: Poola, Rumeenia, Bulgaaria...',
     },
     
     // Q8 : Destinations (AGENCY)
     q8_destinations: {
       label: 'Sihtriigid',
-      description: 'Riigid, kuhu lähete töötajaid',
-      placeholder: 'nt: Prantsusmaa, Saksamaa, Belgia, Holland...',
+      description: 'Riigid, kuhu lähetate töötajaid',
+      placeholder: 'Nt: Prantsusmaa, Saksamaa, Belgia, Holland...',
     },
     
     // Q8 : Nationalités (CLIENT)
     q8_nationalites: {
       label: 'Agentuuri töötajate kodakondsused, keda tööle võtate',
-      placeholder: 'nt: poola, rumeenia, bulgaaria...',
+      placeholder: 'Nt: poola, rumeenia, bulgaaria...',
     },
     
     // Q9 : Défi (AGENCY)
@@ -486,35 +400,33 @@ export const ee: TranslationBundle = {
     
     // Q9 : Défi worker (WORKER)
     q9_defi_worker: {
-      label: 'Teie peamine väljakutse ajutise tööga välismaal',
+      label: 'Teie peamine väljakutse oma töövõttudel',
       options: {
-        admin: 'Haldustöö',
-        langue: 'Keelebarjäär',
-        logement: 'Elukoha leidmine',
-        transport: 'Transport',
-        salaire: 'Maksete/palga probleemid',
+        trouver: 'Töövõttude leidmine',
+        admin: 'Administratiivne paberimajandus',
+        logement: 'Majutus / elukoht',
+        langue: 'Kohalik keel',
+        paiement: 'Maksete / palga probleemid',
         autre: 'Muu',
       },
     },
     
     // Q9 : Autre
     q9_autre: {
-      label: 'Täpsustage oma peamine väljakutse',
+      label: 'Palun täpsustage oma peamine väljakutse',
       placeholder: 'Kirjeldage oma peamist väljakutset...',
     },
     
     // Q10 : Gestion (AGENCY)
     q10_gestion: {
-      label: 'Kuidas täna haldatakse lähetamistaotlusi?',
+      ...fr.questions.q10_gestion,
+      label: 'Kuidas haldate täna lähetamise deklaratsioone?',
       options: {
         interne: 'Sisemine meeskond',
         externe: 'Väline teenusepakkuja',
         mixte: 'Segatud lähenemine',
         manuel: 'Käsitsi haldamine',
         logiciel: 'Spetsialiseeritud tarkvara',
-        manuel: 'Käsitsi (Excel, Word...)',
-        logiciel_interne: 'Sisemine tarkvara',
-        prestataire: 'Väline teenusepakkuja',
       },
     },
     
@@ -524,7 +436,7 @@ export const ee: TranslationBundle = {
       label: 'Kui palju tööhõiveagentuure kasutate?',
       options: {
         '0': 'Mitte ühtegi',
-        '1': '1 agentuuri',
+        '1': '1 agentuur',
         '2-3': '2-3 agentuuri',
         '4-10': '4-10 agentuuri',
         '10+': 'Üle 10',
@@ -534,7 +446,7 @@ export const ee: TranslationBundle = {
     // Q10 : Processus (CLIENT)
     q10_processus: {
       ...fr.questions.q10_processus,
-      label: 'Kuidas võtate tööle agentuuri töötajaid?',
+      label: 'Kuidas värbate agentuuri töötajaid?',
       options: {
         agence_fr: 'Prantsuse tööhõiveagentuurid',
         agence_euro: 'Euroopa tööhõiveagentuurid',
@@ -546,18 +458,18 @@ export const ee: TranslationBundle = {
     // Q10 : Agence (WORKER)
     q10_agence: {
       ...fr.questions.q10_agence,
-      label: 'Kuidas otsite ajutist tööd?',
+      label: 'Kuidas leiate ajutist tööd?',
       options: {
         agence: 'Läbi tööhõiveagentuuride',
-        bouche: 'Soovitus',
-        internet: 'Veebipõhised töökohta pakkuvad portaalid',
-        direct: 'Otsene avaldus',
+        bouche: 'Suust suhu soovitused',
+        internet: 'Veebipõhised tööportaalid',
+        direct: 'Otsene kandideerimine',
       },
     },
     
     // Q10ter : Agences utilisées (WORKER)
     q10_agences_worker: {
-      label: 'Kui paljude agentuuridega teete koostööd?',
+      label: 'Mitu agentuuri te kasutate?',
       options: {
         '1': 'Ainult 1 agentuur',
         '2-3': '2-3 agentuuri',
@@ -568,22 +480,20 @@ export const ee: TranslationBundle = {
     
     // Q11 : Incidents (AGENCY)
     q11_incidents: {
-      label: 'Kas olete saanud trahve või intsidente seoses lähetamise vastavusega?',
+      ...fr.questions.q11_incidents,
+      label: 'Kas olete kokku puutunud trahvide või intsidentidega seoses lähetamise vastavusega?',
       description: 'Teie vastus jääb anonüümseks',
       options: {
         jamais: 'Ei, mitte kunagi',
         rarement: 'Harva (1-2 korda)',
         parfois: 'Mõnikord (3-5 korda)',
         souvent: 'Sageli (6+ korda)',
-        oui_souvent: 'Jah, sageli',
-        oui_rare: 'Jah, aeg-ajalt',
-        non: 'Ei',
       },
     },
     
     // Q11 : Conformité (CLIENT)
     q11_conformite: {
-      label: 'Kas kontrollite tööhõiveagentuuride juriidilist vastavust?',
+      label: 'Kas kontrollite agentuuride juriidilist vastavust?',
       options: {
         oui_systematique: 'Jah, süstemaatiliselt',
         oui_parfois: 'Jah, mõnikord',
@@ -604,24 +514,33 @@ export const ee: TranslationBundle = {
     
     // Q12 : Budget (AGENCY)
     q12_budget: {
-      label: 'Kas teil on eelarve välistele teenustele lähetamise haldamiseks?',
+      ...fr.questions.q12_budget,
+      label: 'Aastane eelarve lähetamise halduseks',
       options: {
-        oui_important: 'Jah, märkimisväärne',
-        oui_modere: 'Jah, mõõdukas',
-        non: 'Ei',
-        ne_sait_pas: 'Ei tea',
+        '0-5k': '0-5 000 € / aasta',
+        '5-15k': '5 000-15 000 € / aasta',
+        '15-30k': '15 000-30 000 € / aasta',
+        '30k+': '30 000+ € / aasta',
+        inconnu: 'Ei tea',
       },
     },
     
-    // Q12 : Critères (CLIENT)
-    q12_criteres: {
-      label: 'Mis on teie peamised kriteeriumid tööhõiveagentuuri valimisel?',
-      description: 'Valige mitu varianti',
+    // Q12 : Budget client (CLIENT)
+    q12_budget_client: {
+      ...fr.questions.q12_budget_client,
+      label: 'Aastane eelarve ajutisele tööle',
+      options: {
+        '0-50k': '0 - 50 000 €',
+        '50-200k': '50 000 - 200 000 €',
+        '200-500k': '200 000 - 500 000 €',
+        '500k+': '500 000+ €',
+        'inconnu': 'Ei tea',
+      },
     },
     
-    // Q12 : Satisfaction (WORKER)
+    // Q12 : Satisfaction (CLIENT)
     q12_satisfaction: {
-      label: 'Kui rahul olete oma praeguste töötingimustega?',
+      label: 'Rahulolu praeguste agentuuridega',
       options: {
         tres_satisfait: 'Väga rahul',
         satisfait: 'Rahul',
@@ -630,335 +549,321 @@ export const ee: TranslationBundle = {
       },
     },
     
-    // Q13 : Durée (AGENCY)
-    q13_duree: {
-      label: 'Teie lähetamise töövõttude keskmine kestus',
+    // Q12 : Salaire (WORKER)
+    q12_salaire: {
+      ...fr.questions.q12_salaire,
+      label: 'Kas olete rahul oma ajutise töö palgaga?',
       options: {
-        '<1mois': 'Vähem kui 1 kuu',
-        '1-3mois': '1-3 kuud',
-        '3-6mois': '3-6 kuud',
-        '6-12mois': '6-12 kuud',
-        '12+mois': 'Üle 12 kuu',
+        '<1500': 'Alla €1 500',
+        '1500-2500': '€1 500 - €2 500',
+        '2500-3500': '€2 500 - €3 500',
+        '3500+': '€3 500+',
       },
     },
     
-    // Q12 : Budget client (CLIENT)
-    q12_budget_client: {
-      label: 'Aastane eelarve ajutisele tööle',
+    // Q13 : Manque à gagner (AGENCY)
+    q13_manque_gagner: {
+      ...fr.questions.q13_manque_gagner,
+      label: 'Milline protsent käibest kaob haldusliku keerukuse tõttu?',
       options: {
-        '0-50k': '0-50 000 €',
-        '50-200k': '50 000-200 000 €',
-        '200-500k': '200 000-500 000 €',
-        '500k+': '500 000+ €',
-        'inconnu': 'Ei tea',
+        'non': 'Ei, mitte eriti',
+        'faible': 'Jah, madal (< 5% käibest)',
+        'moyen': 'Jah, keskmine (5-15% käibest)',
+        'important': 'Jah, märkimisväärne (> 15% käibest)',
       },
     },
     
     // Q13 : Satisfaction (CLIENT)
     q13_satisfaction: {
       ...fr.questions.q13_satisfaction,
-      label: 'Rahulolu praeguste agentuuridega',
+      label: 'Rahulolu oma praeguste agentuuridega',
       options: {
         'tres_satisfait': 'Väga rahul',
         'satisfait': 'Rahul',
         'neutre': 'Neutraalne',
-        'insatisfait': 'Veidi rahulolematu',
+        'insatisfait': 'Rahulolematu',
         'tres_insatisfait': 'Väga rahulolematu',
       },
     },
     
-    // Q14 : Risques client (CLIENT)
+    // Q13 : Satisfaction worker (WORKER)
+    q13_satisfaction_worker: {
+      ...fr.questions.q13_satisfaction_worker,
+      label: 'Rahulolu oma praeguste agentuuridega',
+      options: {
+        'tres_satisfait': 'Väga rahul',
+        'satisfait': 'Rahul',
+        'neutre': 'Neutraalne',
+        'insatisfait': 'Rahulolematu',
+        'tres_insatisfait': 'Väga rahulolematu',
+      },
+    },
+    
+    // Section 3 - Besoins
+    
+    // Q14 : Risques (AGENCY)
+    q14_risques: {
+      ...fr.questions.q14_risques,
+      label: 'Teie peamised mured',
+      description: 'Valige kõik, mis sobivad',
+      options: {
+        amendes: 'Trahvid ja sanktsioonid',
+        reputation: 'Maine / Imago',
+        penal: 'Kriminaalvastutus',
+        delais: 'Töövõttude viivitused',
+        clients: 'Klientide kaotus',
+        aucun: 'Olulisi riske pole',
+      },
+    },
+    
+    // Q14 : Besoins (CLIENT)
+    q14_besoins_client: {
+      ...fr.questions.q14_besoins_client,
+      label: 'Teie peamised vajadused',
+      description: 'Valige kõik, mis sobivad',
+      options: {
+        fiabilite: 'Usaldusväärsete agentuuride leidmine',
+        conformite: 'Juriidiline vastavus',
+        qualite: 'Kvaliteet/oskused',
+        cout: 'Kulud',
+        disponibilite: 'Kandidaatide kättesaadavus',
+        aucun: 'Olulisi vajadusi pole',
+      },
+    },
+    
+    // Q14 : Attentes (WORKER)
+    q14_attentes: {
+      ...fr.questions.q14_attentes,
+      label: 'Teie ootused ajutise töö suhtes välismaal',
+      description: 'Valige kõik, mis sobivad',
+      options: {
+        salaire: 'Parem palk',
+        conditions: 'Paremad töötingimused',
+        stabilite: 'Stabiilsus',
+        experience: 'Rahvusvaheline kogemus',
+        logement: 'Abi elamispinnaga',
+        aucun: 'Erilisi ootusi pole',
+      },
+    },
+    
+    // Q14_risques_client options
     q14_risques_client: {
       ...fr.questions.q14_risques_client,
-      label: 'Millised riskid teid kõige rohkem muret teevad?',
-      description: 'Valige kõik asjakohased',
+      label: 'Teie peamised mured',
+      description: 'Valige kõik, mis sobivad',
       options: {
-        conformite: 'Eeskirjade eiramine',
-        qualite: 'Ebapiisav kvaliteet',
-        communication: 'Suhtlemine/Keeled',
+        conformite: 'Juriidiline vastavus',
+        qualite: 'Kvaliteet/oskused',
+        communication: 'Suhtlus/keeled',
         cout: 'Ootamatud kulud',
         disponibilite: 'Kandidaatide kättesaadavus',
-        aucun: 'Suuri muresid pole',
-        fiabilite: 'Agentuuride usaldusväärsus',
+        aucun: 'Olulisi muresid pole',
       },
+    },
+    
+    // Q14_risques_worker options
+    q14_risques_worker: {
+      ...fr.questions.q14_risques_worker,
+      label: 'Milliste probleemidega kohtute kõige sagedamini?',
+      description: 'Valige kõik, mis sobivad',
+      options: {
+        paiement: 'Maksete viivitused',
+        conditions: 'Halvad töötingimused',
+        contrat: 'Lepingute mittejärgimine',
+        logement: 'Ebapiisav elamispind',
+        communication: 'Suhtlusprobleemid',
+        aucun: 'Suuri probleeme pole',
+      },
+    },
+    
+    // Q15 : Problème
+    q15_probleme: {
+      ...fr.questions.q15_probleme,
+      label: 'Millise probleemi soovite esimesena lahendada?',
+      placeholder: 'Kirjeldage oma prioriteetset probleemi...',
     },
     
     // Q15 : Besoins client (CLIENT)
     q15_besoins_client: {
       ...fr.questions.q15_besoins_client,
-      label: 'Mis on teie prioriteetsed vajadused?',
-      placeholder: 'Näiteks: Kiire leidmine, parem kvaliteet, hinnad...',
+      label: 'Millised on teie prioriteetsed vajadused?',
+      placeholder: 'Nt: kiire leidmine, parem kvaliteet, hinnad...',
     },
     
-    // Q13 : Durée worker (WORKER)
-    q13_duree_worker: {
-      label: 'Teie eelistatud töövõtu kestus',
-      options: {
-        court: 'Lühike (< 3 kuud)',
-        moyen: 'Keskmine (3-6 kuud)',
-        long: 'Pikk (> 6 kuud)',
-        indifferent: 'Ükskõik',
-      },
+    // Q15 : Améliorations (WORKER)
+    q15_ameliorations: {
+      ...fr.questions.q15_ameliorations,
+      label: 'Mida soovite oma töövõttudel parandada?',
+      placeholder: 'Nt: palk, majutus, tugi, stabiilsus...',
     },
     
-    // Section 3 - Besoins/Potrebe
-    
-    // Q14 : Intérêt marketplace (AGENCY)
-    q14_interet: {
-      label: 'Kas teid huvitaks Euroopa platvorm oma teenuste pakkumiseks?',
-      description: 'Turg teie nähtavuse suurendamiseks',
+    // Q16 : ERP (AGENCY)
+    q16_erp: {
+      ...fr.questions.q16_erp,
+      label: 'Kas kasutate ERP/juhtimistarkvara?',
       options: {
-        tres_interesse: 'Väga huvitatud',
-        interesse: 'Huvitatud',
-        neutre: 'Neutraalne',
-        pas_interesse: 'Ei ole huvitatud',
-      },
-    },
-    
-    // Q14 : Intérêt plateforme (CLIENT)
-    q14_interet_client: {
-      label: 'Kas teid huvitaks platvorm Euroopa agentuuride lihtsaks leidmiseks?',
-      options: {
-        tres_interesse: 'Väga huvitatud',
-        interesse: 'Huvitatud',
-        neutre: 'Neutraalne',
-        pas_interesse: 'Ei ole huvitatud',
-      },
-    },
-    
-    // Q14 : Intérêt worker (WORKER)
-    q14_interet_worker: {
-      label: 'Kas teid huvitaks platvorm töövõttude otsimiseks?',
-      options: {
-        tres_interesse: 'Väga huvitatud',
-        interesse: 'Huvitatud',
-        neutre: 'Neutraalne',
-        pas_interesse: 'Ei ole huvitatud',
-      },
-    },
-    
-    // Q15 : Fonctionnalités (AGENCY)
-    q15_fonctionnalites: {
-      label: 'Millised funktsioonid oleksid kõige kasulikumad?',
-      description: 'Valige mitu varianti',
-      options: {
-        marketplace: 'Teenuste turg',
-        admin: 'Automatiseeritud haldamine',
-        conformite: 'Vastavuse kontrollid',
-        payment: 'Integreeritud maksed',
-        support: 'Mitmekeelne tugi',
+        sage: 'Sage',
+        sap: 'SAP',
+        cegid: 'Cegid',
+        bullhorn: 'Bullhorn / ATS',
         autre: 'Muu',
+        aucun: 'ERP puudub',
       },
     },
     
-    // Q15 : Fonctionnalités client (CLIENT)
-    q15_fonctionnalites_client: {
-      label: 'Millised funktsioonid oleksid kõige kasulikumad?',
-      description: 'Valige mitu varianti',
+    // Q16 : Nom ERP
+    q16_nom_erp: {
+      label: 'Millist tarkvara/ERP-d?',
+      placeholder: 'Nt: SAP, Odoo, kohandatud...',
+    },
+    
+    // Q16 : Critères (CLIENT)
+    q16_criteres: {
+      label: 'Teie peamised valikukriteeriumid agentuuridele',
+      description: 'Valige oma 3 olulisemat',
+    },
+    
+    // Q16 : Amélioration (WORKER)
+    q16_amelioration: {
+      label: 'Mis parandaks teie ajutise töö kogemust?',
+      description: 'Valige kõik, mis sobivad',
+    },
+    
+    // Q17 : Migration (AGENCY)
+    q17_migration: {
+      ...fr.questions.q17_migration,
+      label: 'Kas olete valmis oma töövahendeid vahetama?',
       options: {
-        comparaison: 'Agentuuride võrdlus',
-        avis: 'Kontrollitud arvustused',
-        suivi: 'Töövõttude jälgimine',
-        documentation: 'Tsentraliseeritud dokumentatsioon',
-        facturation: 'Arvete haldamine',
-        autre: 'Muu',
+        oui: 'Jah, probleemideta',
+        conditions: 'Jah, tingimustel',
+        difficile: 'Raske, kuid avatud',
+        non: 'Ei, ei ole mõeldav',
       },
     },
     
-    // Q15 : Fonctionnalités worker (WORKER)
-    q15_fonctionnalites_worker: {
-      label: 'Millised funktsioonid oleksid kõige kasulikumad?',
-      description: 'Valige mitu varianti',
+    // Q17 : Budget (CLIENT)
+    q17_budget: {
+      label: 'Igakuine eelarve ajutise töö platvormile',
       options: {
-        recherche: 'Täiustatud töövõttude otsing',
-        alertes: 'Teated uutest töövõttudest',
-        documents: 'Dokumentide haldamine',
-        avis: 'Agentuuride hinnangud',
-        support: 'Mitmekeelne tugi',
-        autre: 'Muu',
+        '0': 'Pole valmis maksma',
+        '1-100': '€1 - €100/kuus',
+        '100-500': '€100 - €500/kuus',
+        '500-1000': '€500 - €1 000/kuus',
+        '1000+': 'Üle €1 000/kuus',
       },
     },
     
-    // Q16 : Frein (AGENCY)
-    q16_frein: {
-      label: 'Mis oleks teie suurim takistus sellise platvormi kasutamisel?',
+    // Q17 : Plateforme (WORKER)
+    q17_plateforme: {
+      label: 'Kas kasutaksite platvormi ajutise töö leidmiseks välismaal?',
       options: {
-        cout: 'Kulud',
-        complexite: 'Liiga keeruline',
-        confiance: 'Usalduse puudumine',
-        changement: 'Ei taha muuta',
-        aucun: 'Takistusi pole',
-        autre: 'Muu',
-      },
-    },
-    
-    // Q16 : Frein client (CLIENT)
-    q16_frein_client: {
-      label: 'Mis oleks teie suurim takistus?',
-      options: {
-        cout: 'Kulud',
-        confiance: 'Usaldus agentuuride vastu',
-        complexite: 'Liiga keeruline',
-        aucun: 'Takistusi pole',
-        autre: 'Muu',
-      },
-    },
-    
-    // Q16 : Frein worker (WORKER)
-    q16_frein_worker: {
-      label: 'Mis oleks teie suurim takistus?',
-      options: {
-        complexite: 'Liiga keeruline',
-        confiance: 'Usaldus platvormi vastu',
-        acces: 'Juurdepääs tehnoloogiale',
-        aucun: 'Takistusi pole',
-        autre: 'Muu',
-      },
-    },
-    
-    // Q17 : Prix (AGENCY)
-    q17_prix: {
-      label: 'Milline hinnakujunduse mudel tundub teile kõige sobivam?',
-      options: {
-        commission: 'Vahendustasu töövõtu kohta',
-        abonnement: 'Kuutellimus',
-        freemium: 'Tasuta + premium funktsioonid',
-        autre: 'Muu',
-      },
-    },
-    
-    // Q17 : Services (CLIENT)
-    q17_services: {
-      label: 'Milliseid teenuseid hindaksite kõige rohkem?',
-      description: 'Valige mitu varianti',
-    },
-    
-    // Q17 : Services worker (WORKER)
-    q17_services_worker: {
-      label: 'Milliseid teenuseid hindaksite kõige rohkem?',
-      description: 'Valige mitu varianti',
-    },
-    
-    // Q18 : Recommandation (AGENCY)
-    q18_recommandation: {
-      label: 'Kas soovitaksite sellist platvormi kolleegidele?',
-      options: {
-        certainement: 'Kindlasti',
-        probablement: 'Tõenäoliselt',
+        oui_certainement: 'Jah, kindlasti',
+        oui_probablement: 'Jah, tõenäoliselt',
         peut_etre: 'Võib-olla',
-        probablement_pas: 'Tõenäoliselt mitte',
+        non: 'Ei',
       },
     },
     
-    // Q18 : Recommandation client (CLIENT)
-    q18_recommandation_client: {
-      label: 'Kas soovitaksite sellist lahendust?',
-      options: {
-        certainement: 'Kindlasti',
-        probablement: 'Tõenäoliselt',
-        peut_etre: 'Võib-olla',
-        probablement_pas: 'Tõenäoliselt mitte',
-      },
-    },
+    // Section 4 - Intérêt YoJob
     
-    // Q18 : Recommandation worker (WORKER)
-    q18_recommandation_worker: {
-      label: 'Kas soovitaksite sellist platvormi?',
-      options: {
-        certainement: 'Kindlasti',
-        probablement: 'Tõenäoliselt',
-        peut_etre: 'Võib-olla',
-        probablement_pas: 'Tõenäoliselt mitte',
-      },
+    // Q18 : Score
+    q18_score: {
+      ...fr.questions.q18_score,
+      label: 'Kui huvitatud olete Euroopa lähetusplatvormist?',
+      description: 'Hinnang 1 (ei ole huvitatud) kuni 10 (väga huvitatud)',
     },
     
     // Q19 : Features (AGENCY)
     q19_features: {
       ...fr.questions.q19_features,
       label: 'Kõige huvitavamad funktsioonid',
-      description: 'Valige kõik, mis teile meeldivad',
+      description: 'Valige oma 3 tähtsaimat prioriteeti',
       options: {
         sipsi: 'Automaatne SIPSI deklareerimine',
-        a1: 'A1 sertifikaatide haldamine',
+        a1: 'A1 sertifikaadi haldus',
         conformite: 'Vastavuse juhtpaneel',
-        alertes: 'Hoiatused ja pikendamised',
-        marketplace: 'Euroopa turg',
-        autre: 'Muu',
+        alertes: 'Hoiatused ja uuendamised',
+        documents: 'Dokumentide tsentraliseerimine',
+        marketplace: 'Agentuuride turg',
+        support: 'Mitmekeelne eksperttugi',
+        api: 'API integratsioon (ERP)',
       },
     },
     
-    // Q19 : Features client (CLIENT)
+    // Q19 : Features CLIENT
     q19_features_client: {
       ...fr.questions.q19_features_client,
       label: 'Kõige huvitavamad funktsioonid',
-      description: 'Valige kõik, mis teile meeldivad',
+      description: 'Valige kõik, mis teid huvitavad',
       options: {
         recherche: 'Usaldusväärsete agentuuride otsing',
         comparaison: 'Hinna/kvaliteedi võrdlus',
         avis: 'Kontrollitud arvustused',
         conformite: 'Vastavuse garantii',
+        support: 'Pühendatud tugi',
+        facturation: 'Tsentraliseeritud arveldamine',
         suivi: 'Reaalajas jälgimine',
-        autre: 'Muu',
       },
     },
     
-    // Q19 : Features worker (WORKER)
+    // Q19 : Features WORKER
     q19_features_worker: {
       ...fr.questions.q19_features_worker,
       label: 'Kõige huvitavamad funktsioonid',
-      description: 'Valige kõik, mis teile meeldivad',
+      description: 'Valige kõik, mis teid huvitavad',
       options: {
-        recherche: 'Töövõttude otsing',
-        avis: 'Agentuuride arvustused',
-        logement: 'Abi elukoha leidmisel',
-        paiement: 'Turvaline maksmine',
-        documents: 'Abi halduslike dokumentidega',
-        formation: 'Kvalifikatsioonid andev koolitus',
+        recherche: 'Tööotsing',
+        avis: 'Agentuuride hinnangud',
+        logement: 'Abi elamispinnaga',
+        paiement: 'Turvalised maksed',
+        support: 'Tugi minu keeles',
+        documents: 'Abi haldusdokumentidega',
+        formation: 'Koolitusprogrammid',
       },
     },
     
-    // Q20 : Prix (ALL)
+    // Q20 : Prix
     q20_prix: {
       ...fr.questions.q20_prix,
       label: 'Eelistatud hinnamudel',
       options: {
         mensuel: 'Fikseeritud kuutellimus',
-        usage: 'Tasuta kasutuse eest (Pay-as-you-go)',
-        annuel: 'Aastane pakett (allahindlus)',
+        usage: 'Makse vastavalt kasutusele',
+        annuel: 'Aastaplaan (soodustus)',
         gratuit: 'Tasuta töötajatele',
-        freemium: 'Tasuta baas + premium',
       },
     },
     
-    // Q21 : Budget mensuel (AGENCY & CLIENT)
+    // Q21 : Budget mensuel
     q21_budget_mensuel: {
       ...fr.questions.q21_budget_mensuel,
-      label: 'Vastuvõetav kuueelarve',
+      label: 'Igakuine eelarve täielikule SaaS-lahendusele',
       options: {
-        '0-100': '0-100 € / kuus',
-        '100-300': '100-300 € / kuus',
-        '300-500': '300-500 € / kuus',
-        '500-1000': '500-1 000 € / kuus',
-        '1000+': 'Üle 1 000 € / kuus',
+        '0-100': '€0 - €100/kuus',
+        '100-300': '€100 - €300/kuus',
+        '300-500': '€300 - €500/kuus',
+        '500-1000': '€500 - €1 000/kuus',
+        '1000+': 'Üle €1 000/kuus',
       },
     },
     
-    // Q22 : MVP (ALL)
+    // Q22 : MVP
     q22_mvp: {
       ...fr.questions.q22_mvp,
-      label: 'Kas olete valmis testima MVP-d (beeta versioon)?',
+      label: 'Kas soovite testida varajast versiooni (MVP)?',
       options: {
         oui_gratuit: 'Jah, tasuta',
-        oui_reduc: 'Jah, allahindlusega',
-        peut_etre: 'Võib-olla, sõltuvalt funktsioonidest',
+        oui_reduc: 'Jah, soodustusega',
+        peut_etre: 'Võib-olla, sõltub funktsioonidest',
         non: 'Ei, ei ole huvitatud',
       },
     },
     
-    // Q23 : Role (AGENCY & CLIENT)
+    // Section 5 - Vision Future
+    
+    // Q23 : Rôle
     q23_role: {
-      ...fr.questions.q23_role,
-      label: 'Roll ostuotsuses',
+      label: 'Kuidas näete oma rolli Euroopa turul?',
       options: {
         decideur: 'Lõplik otsustaja',
         influenceur: 'Mõjutaja / Soovitus',
@@ -967,243 +872,70 @@ export const ee: TranslationBundle = {
       },
     },
     
-    // Q19 : Test (AGENCY)
-    q19_test: {
-      label: 'Kas sooviksite osaleda beeta faasis?',
-      options: {
-        oui_immediat: 'Jah, kohe',
-        oui_plus_tard: 'Jah, aga hiljem',
-        non: 'Ei',
-      },
-    },
-    
-    // Q19 : Test client (CLIENT)
-    q19_test_client: {
-      label: 'Kas sooviksite osaleda testimises?',
-      options: {
-        oui_immediat: 'Jah, kohe',
-        oui_plus_tard: 'Jah, aga hiljem',
-        non: 'Ei',
-      },
-    },
-    
-    // Q19 : Test worker (WORKER)
-    q19_test_worker: {
-      label: 'Kas sooviksite osaleda testimises?',
-      options: {
-        oui_immediat: 'Jah, kohe',
-        oui_plus_tard: 'Jah, aga hiljem',
-        non: 'Ei',
-      },
-    },
-    
-    // Section 4 - Vision Future
-    
-    // Q20 : Croissance (AGENCY)
-    q20_croissance: {
-      label: 'Kuidas näete oma lähetamise tegevust järgmise 3 aasta jooksul?',
-      options: {
-        forte_croissance: 'Tugev kasv',
-        croissance: 'Mõõdukas kasv',
-        stable: 'Stabiilne',
-        decroissance: 'Langus',
-      },
-    },
-    
-    // Q20 : Évolution (CLIENT)
-    q20_evolution: {
-      label: 'Kuidas näete oma ajutise töö vajaduste arengut?',
-      options: {
-        hausse: 'Tõus',
-        stable: 'Stabiilne',
-        baisse: 'Langus',
-      },
-    },
-    
-    // Q20 : Projets (WORKER)
-    q20_projets: {
-      label: 'Mis on teie projektid lähikuudel?',
-      options: {
-        meme_secteur: 'Jätkata samas sektoris',
-        changer_secteur: 'Vahetada sektorit',
-        se_former: 'Õppida',
-        entrepreneur: 'Saada ettevõtjaks',
-      },
-    },
-    
-    // Q21 : Budget évolution (AGENCY)
-    q21_budget_evolution: {
-      label: 'Kas plaanite oma eelarvet välistele teenustele suurendada?',
-      options: {
-        oui_beaucoup: 'Jah, märkimisväärselt',
-        oui_peu: 'Jah, veidi',
-        non: 'Ei',
-        ne_sait_pas: 'Ei tea',
-      },
-    },
-    
-    // Q21 : Budget évolution client (CLIENT)
-    q21_budget_evolution_client: {
-      label: 'Kas plaanite oma värbamise eelarvet suurendada?',
-      options: {
-        oui_beaucoup: 'Jah, märkimisväärselt',
-        oui_peu: 'Jah, veidi',
-        non: 'Ei',
-      },
-    },
-    
-    // Q21 : Mobilité (WORKER)
-    q21_mobilite: {
-      label: 'Kas olete valmis kolima töö pärast?',
-      options: {
-        oui_europe: 'Jah, kuhuiganes Euroopas',
-        oui_proche: 'Jah, naaberriikides',
-        non: 'Ei, ainult oma riigis',
-      },
-    },
-    
-    // Section 5 - Contact
-    
-    // Q22 : Email
-    q22_email: {
-      label: 'E-post (valikuline)',
-      placeholder: 'teie@email.ee',
-      description: 'Tulemuste ja projekti teabe saamiseks',
-    },
-    
-    // Q22 : Email AGENCY
-    q22_email_agency: {
-      label: 'Äri e-post (valikuline)',
-      placeholder: 'kontakt@teieagentuur.ee',
-      description: 'Tulemuste ja eksklusiivse juurdepääsu saamiseks platvormile',
-    },
-    
-    // Q22 : Email CLIENT
-    q22_email_client: {
-      label: 'Äri e-post (valikuline)',
-      placeholder: 'kontakt@teie-ettevõte.ee',
-      description: 'Teie vajadustele kohandatud soovituste saamiseks',
-    },
-    
-    // Q22 : Email WORKER
-    q22_email_worker: {
-      label: 'E-post (valikuline)',
-      placeholder: 'teie@email.ee',
-      description: 'Teie profiilile vastavate võimaluste saamiseks',
-    },
-    
-    // Q23 : Téléphone (optionnel)
-    q23_telephone: {
-      label: 'Telefon (valikuline)',
-      placeholder: '+372 1234 5678',
-    },
-    
-    // Q24 : Commentaires
-    q24_commentaires: {
-      label: 'Täiendavad märkused või ettepanekud',
-      placeholder: 'Jagage oma ideid, ootusi või konkreetseid vajadusi...',
-    },
-    
-    // Q24 : Vision du marché dans les 3 prochaines années (ALL)
+    // Q24 : Évolution
     q24_evolution: {
-      label: 'Turu visioon järgmise 3 aasta jooksul',
-      placeholder: 'Jagage oma visiooni...',
+      label: 'Teie rahvusvahelise laienemise plaanid',
+      options: {
+        oui_rapide: 'Jah, 6 kuu jooksul',
+        oui_lent: 'Jah, 1-2 aasta jooksul',
+        maintien: 'Säilitada praegused riigid',
+        reduction: 'Vähendada rahvusvahelist ulatust',
+      },
     },
     
-    // Q25 : Autres besoins ou suggestions (ALL)
+    // Q24bis : Aspirations (WORKER)
+    q24_aspirations: {
+      label: 'Teie tulevased professionaalsed püüdlused',
+      placeholder: 'Nt: tähtajatu leping, naasmine koduriiki, koolitus...',
+    },
+    
+    // Q25 : Besoins
     q25_besoins: {
-      label: 'Muud vajadused või ettepanekud',
-      placeholder: 'Teie ettepanekud huvitavad meid...',
+      label: 'Muud vajadused või kommentaarid',
+      placeholder: 'Jagage muid tagasisidet või vajadusi...',
     },
     
-    // SECTION 6 : CONTACT
+    // Section 6 - Contact
     
-    // Q26 : Téléphone professionnel (AGENCY & CLIENT)
+    // Q26 : Téléphone professionnel
     q26_phone: {
-      label: 'Ettevõtte telefon',
+      label: 'Professionaalne telefoninumber',
       placeholder: '+372 1234 5678',
     },
     
-    // Q27 : Prénom (ALL)
+    // Q27 : Prénom
     q27_firstname: {
       label: 'Eesnimi',
       placeholder: 'Teie eesnimi',
     },
     
-    // Q28 : Nom (ALL)
+    // Q28 : Nom
     q28_lastname: {
       label: 'Perekonnanimi',
       placeholder: 'Teie perekonnanimi',
     },
     
-    // Q29 : SIRET/SIREN (AGENCY & CLIENT - optionnel)
+    // Q29 : SIRET/SIREN
     q29_siret: {
       label: 'Registrikood (valikuline)',
       placeholder: '12345678',
-      description: 'Rikastamiseks äriregistri kaudu',
+      description: 'Ettevõtte registri põhjal rikastamiseks',
     },
     
-    // Q30 : Email professionnel (ALL)
+    // Q30 : Email
     email: {
-      label: 'E-post',
+      label: 'Teie e-post',
       placeholder: 'teie.email@naide.ee',
     },
     
-    // Q31 : Autorisation contact (ALL)
+    // Q31 : Autorisation contact
     autorise_contact: {
-      label: 'Nõustun uuesti kontakteerumisega',
+      label: 'Nõustun, et minuga võetakse uuesti ühendust',
     },
     
-    // Q32 : Rapport d'étude (ALL)
+    // Q32 : Rapport d'étude
     souhaite_rapport: {
       label: 'Soovin saada uuringu aruande',
-    },
-    
-    // Questions additionnelles spécifiques
-    
-    // Critères de sélection (CLIENT)
-    critere_prix: {
-      label: 'Hind',
-    },
-    critere_qualite: {
-      label: 'Profiilide kvaliteet',
-    },
-    critere_rapidite: {
-      label: 'Vastamise kiirus',
-    },
-    critere_conformite: {
-      label: 'Juriidiline vastavus',
-    },
-    critere_flexibilite: {
-      label: 'Paindlikkus',
-    },
-    
-    // Services valorisés (CLIENT)
-    service_accompagnement: {
-      label: 'Isiklik tugi',
-    },
-    service_garantie: {
-      label: 'Asendamise garantii',
-    },
-    service_formation: {
-      label: 'Eelkoolitus',
-    },
-    service_gestion: {
-      label: 'Haldushaldus',
-    },
-    
-    // Services worker
-    service_formation_worker: {
-      label: 'Koolitused ja sertifikaadid',
-    },
-    service_logement: {
-      label: 'Abi elukoha leidmisel',
-    },
-    service_transport: {
-      label: 'Transpordi tugi',
-    },
-    service_administratif: {
-      label: 'Halduslik tugi',
     },
   },
 };
