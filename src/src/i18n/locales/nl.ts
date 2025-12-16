@@ -59,118 +59,12 @@ export const nl: TranslationBundle = {
   
   // Sections
   section: {
-    1: {
-      title: 'Profiel',
-      description: '4 vragen • 2 min',
-    },
-    2: {
-      title: 'Ervaring',
-      description: '7 vragen • 3 min',
-    },
-    3: {
-      title: 'Behoeften',
-      description: '6 vragen • 2 min',
-    },
-    4: {
-      title: 'Interesse YoJob',
-      description: '6 vragen • 3 min',
-    },
-    5: {
-      title: 'Toekomstvisie',
-      description: '2 vragen • 1 min',
-    },
-    6: {
-      title: 'Contact',
-      description: '1 vraag • 1 min',
-    },
-  },
-  
-  // Sections adaptées par profil
-  sectionContent: {
-    1: {
-      agency: {
-        title: '📋 Uw Bedrijfsprofiel',
-        description: 'Vertel ons over uw uitzendbureau en expertise',
-      },
-      client: {
-        title: '📋 Uw Bedrijfsprofiel',
-        description: 'Vertel ons over uw bedrijf en wervingsbehoeften',
-      },
-      worker: {
-        title: '📋 Uw Profiel',
-        description: 'Vertel ons over uw professionele achtergrond',
-      },
-    },
-    2: {
-      agency: {
-        title: '💼 Detacheringsactiviteit',
-        description: 'Uw ervaring met het detacheren van werknemers',
-      },
-      client: {
-        title: '💼 Uw Wervingservaring',
-        description: 'Uw huidige werving en uitzendpraktijken',
-      },
-      worker: {
-        title: '💼 Uw Uitzendervaring',
-        description: 'Uw reis als uitzendkracht',
-      },
-    },
-    3: {
-      agency: {
-        title: '🎯 Behoeften en Hulpmiddelen',
-        description: 'Uw uitdagingen en huidige oplossingen',
-      },
-      client: {
-        title: '🎯 Uw Huidige Behoeften',
-        description: 'Uitdagingen en verwachtingen bij werving',
-      },
-      worker: {
-        title: '🎯 Uw Verwachtingen',
-        description: 'Wat voor u belangrijk is bij een opdracht',
-      },
-    },
-    4: {
-      agency: {
-        title: '⭐ Interesse in een Europees Platform',
-        description: 'Ontdek onze visie voor een innovatieve marktplaats',
-      },
-      client: {
-        title: '⭐ Interesse in een Europees Platform',
-        description: 'Een innovatieve oplossing voor uw behoeften',
-      },
-      worker: {
-        title: '⭐ Uw Interesse in een Platform',
-        description: 'Een platform om gemakkelijk opdrachten te vinden',
-      },
-    },
-    5: {
-      agency: {
-        title: '🔮 Toekomstvisie',
-        description: 'Budget en ontwikkelingsvooruitzichten',
-      },
-      client: {
-        title: '🔮 Uw Toekomstprioriteiten',
-        description: 'Budget en wervingsstrategie',
-      },
-      worker: {
-        title: '🔮 Uw Doelen',
-        description: 'Uw aankomende professionele projecten',
-      },
-    },
-    6: {
-      agency: {
-        title: '📧 Blijf op de Hoogte',
-        description: 'Ontvang studieresultaten en blijf geïnformeerd',
-      },
-      client: {
-        title: '📧 Blijf op de Hoogte',
-        description: 'Ontvang resultaten en onze aanbevelingen',
-      },
-      worker: {
-        title: '📧 Blijf op de Hoogte',
-        description: 'Ontvang resultaten en kansen',
-      },
-    },
+    1: { title: 'Profiel', description: '4 vragen • 2 min' },
+    2: { title: 'Ervaring', description: '7 vragen • 3 min' },
+    3: { title: 'Behoeften', description: '6 vragen • 2 min' },
+    4: { title: 'Interesse YoJob', description: '6 vragen • 3 min' },
+    5: { title: 'Toekomstvisie', description: '2 vragen • 1 min' },
+    6: { title: 'Contact', description: '1 vraag • 1 min' },
   },
   
   // Header
@@ -206,11 +100,11 @@ export const nl: TranslationBundle = {
     title: 'Wie bent u?',
     subtitle: 'Selecteer uw profiel om de vragen te personaliseren',
     agency: 'Uitzendbureau',
-    agency_description: 'U bent een uitzendbureau of detacheringsbureau',
+    agency_description: 'U bent een uitzend- of detacheringsbureau',
     client: 'Opdrachtgever',
     client_description: 'U bent een bedrijf dat uitzendkrachten inzet',
     worker: 'Uitzendkracht',
-    worker_description: 'U bent een uitzendkracht of gedetacheerde werknemer',
+    worker_description: 'U bent een uitzend- of gedetacheerde werknemer',
   },
   
   // Respondent Selector
@@ -231,7 +125,7 @@ export const nl: TranslationBundle = {
   respondent: {
     agency: {
       label: 'Uitzendbureau',
-      description: 'U bent een Europees uitzendbureau. Deel uw detacheringservaring.',
+      description: 'Deel uw detacheringservaring als Europees bureau.',
       estimatedTime: '15 min',
     },
     client: {
@@ -493,8 +387,7 @@ export const nl: TranslationBundle = {
         admin: 'Administratief papierwerk',
         langue: 'Taalbarrière',
         logement: 'Huisvesting vinden',
-        transport: 'Vervoer',
-        salaire: 'Betaling/salarisproblemen',
+        paiement: 'Betaling/salaris',
         autre: 'Andere',
       },
     },
@@ -507,6 +400,7 @@ export const nl: TranslationBundle = {
     
     // Q10 : Gestion (AGENCY)
     q10_gestion: {
+      ...fr.questions.q10_gestion,
       label: 'Hoe beheert u detacheringsaangiften vandaag?',
       options: {
         interne: 'Intern team',
@@ -514,12 +408,9 @@ export const nl: TranslationBundle = {
         mixte: 'Gemengde aanpak',
         manuel: 'Handmatige beheer',
         logiciel: 'Gespecialiseerde software',
-        manuel: 'Handmatig (Excel, Word...)',
-        logiciel_interne: 'Interne software',
-        prestataire: 'Externe dienstverlener',
       },
     },
-    
+
     // Q10 : Agences (CLIENT)
     q10_agences: {
       ...fr.questions.q10_agences,
@@ -570,6 +461,7 @@ export const nl: TranslationBundle = {
     
     // Q11 : Incidents (AGENCY)
     q11_incidents: {
+      ...fr.questions.q11_incidents,
       label: 'Hebt u boetes of incidenten gehad met betrekking tot detacheringsnaleving?',
       description: 'Uw antwoord blijft anoniem',
       options: {
@@ -577,12 +469,9 @@ export const nl: TranslationBundle = {
         rarement: 'Zelden (1-2 keer)',
         parfois: 'Soms (3-5 keer)',
         souvent: 'Vaak (6+ keer)',
-        oui_souvent: 'Ja, frequent',
-        oui_rare: 'Ja, af en toe',
-        non: 'Nee',
       },
     },
-    
+
     // Q11 : Conformité (CLIENT)
     q11_conformite: {
       label: 'Controleert u de wettelijke naleving van uitzendbureaus?',
@@ -606,15 +495,17 @@ export const nl: TranslationBundle = {
     
     // Q12 : Budget (AGENCY)
     q12_budget: {
-      label: 'Heeft u budget voor externe diensten voor detacheringsbeheer?',
+      ...fr.questions.q12_budget,
+      label: 'Jaarlijks budget toegewezen aan administratief beheer van detacheringsdossiers',
       options: {
-        oui_important: 'Ja, significant',
-        oui_modere: 'Ja, matig',
-        non: 'Nee',
-        ne_sait_pas: 'Weet niet',
+        '0-5k': '€0-5.000 / jaar',
+        '5-15k': '€5.000-15.000 / jaar',
+        '15-30k': '€15.000-30.000 / jaar',
+        '30k+': '€30.000+ / jaar',
+        inconnu: 'Weet ik niet',
       },
     },
-    
+
     // Q12 : Budget client (CLIENT)
     q12_budget_client: {
       ...fr.questions.q12_budget_client,
@@ -628,51 +519,34 @@ export const nl: TranslationBundle = {
       },
     },
     
-    // Q12 : Critères (CLIENT)
-    q12_criteres: {
-      label: 'Wat zijn uw belangrijkste criteria bij het kiezen van een uitzendbureau?',
-      description: 'Selecteer meerdere keuzes',
-    },
-    
-    // Q12 : Satisfaction (WORKER)
-    q12_satisfaction: {
-      label: 'Hoe tevreden bent u met uw huidige werkomstandigheden?',
+    // Q12 : Salaire (WORKER)
+    q12_salaire: {
+      ...fr.questions.q12_salaire,
+      label: 'Bent u tevreden met uw salaris als uitzendkracht?',
       options: {
-        tres_satisfait: 'Zeer tevreden',
-        satisfait: 'Tevreden',
-        neutre: 'Neutraal',
-        insatisfait: 'Ontevreden',
+        '<1500': 'Minder dan €1.500',
+        '1500-2500': '€1.500 - €2.500',
+        '2500-3500': '€2.500 - €3.500',
+        '3500+': '€3.500+',
       },
     },
     
-    // Q13 : Durée (AGENCY)
-    q13_duree: {
-      label: 'Gemiddelde duur van uw detacheringsmissies',
+    // Q13 : Manque à gagner (AGENCY)
+    q13_manque_gagner: {
+      ...fr.questions.q13_manque_gagner,
+      label: 'Welk percentage omzet gaat verloren door administratieve complexiteit?',
       options: {
-        '<1mois': 'Minder dan 1 maand',
-        '1-3mois': '1-3 maanden',
-        '3-6mois': '3-6 maanden',
-        '6-12mois': '6-12 maanden',
-        '12+mois': 'Meer dan 12 maanden',
-      },
-    },
-    
-    // Q13 : Budget client (CLIENT)
-    q13_budget_client: {
-      label: 'Wat is uw jaarlijkse budget voor uitzendwerk?',
-      options: {
-        '<50k': 'Minder dan €50k',
-        '50-200k': '€50k - €200k',
-        '200-500k': '€200k - €500k',
-        '500k-1M': '€500k - €1M',
-        '1M+': 'Meer dan €1M',
+        'non': 'Nee, niet echt',
+        'faible': 'Ja, laag (< 5% omzet)',
+        'moyen': 'Ja, gemiddeld (5-15% omzet)',
+        'important': 'Ja, aanzienlijk (> 15% omzet)',
       },
     },
     
     // Q13 : Satisfaction (CLIENT)
     q13_satisfaction: {
       ...fr.questions.q13_satisfaction,
-      label: 'Tevredenheid met uw huidige uitzendbureaus',
+      label: 'Tevredenheid over uw huidige uitzendbureaus',
       options: {
         'tres_satisfait': 'Zeer tevreden',
         'satisfait': 'Tevreden',
@@ -685,7 +559,7 @@ export const nl: TranslationBundle = {
     // Q13 : Satisfaction worker (WORKER)
     q13_satisfaction_worker: {
       ...fr.questions.q13_satisfaction_worker,
-      label: 'Tevredenheid met uw huidige uitzendbureaus',
+      label: 'Tevredenheid over uw huidige uitzendbureaus',
       options: {
         'tres_satisfait': 'Zeer tevreden',
         'satisfait': 'Tevreden',
@@ -695,21 +569,11 @@ export const nl: TranslationBundle = {
       },
     },
     
-    // Q13 : Durée worker (WORKER)
-    q13_duree_worker: {
-      label: 'Uw favoriete opdrachtduur',
-      options: {
-        court: 'Kort (< 3 maanden)',
-        moyen: 'Middellang (3-6 maanden)',
-        long: 'Lang (> 6 maanden)',
-        indifferent: 'Maakt niet uit',
-      },
-    },
-    
     // Section 3 - Besoins/Behoeften
     
     // Q14 : Risques (AGENCY)
     q14_risques: {
+      ...fr.questions.q14_risques,
       label: 'Uw belangrijkste zorgen',
       description: 'Selecteer alles wat van toepassing is',
       options: {
@@ -719,15 +583,9 @@ export const nl: TranslationBundle = {
         delais: 'Missievertragingen',
         clients: 'Verlies van klanten',
         aucun: 'Geen groot risico',
-        sanctions: 'Boetes/sancties',
-        conformite: 'Naleving in meerdere landen',
-        cout: 'Administratieve kosten',
-        documentation: 'Documentbeheer',
-        responsabilite: 'Strafrechtelijke aansprakelijkheid',
-        perte_clients: 'Verlies van klanten',
       },
     },
-    
+
     // Q14 : Besoins (CLIENT)
     q14_besoins_client: {
       ...fr.questions.q14_besoins_client,
@@ -806,143 +664,76 @@ export const nl: TranslationBundle = {
     q15_ameliorations: {
       ...fr.questions.q15_ameliorations,
       label: 'Welke verbeteringen zou u wensen?',
-      placeholder: 'Bijv.: Betere ondersteuning, hogere salarissen...',
+      placeholder: 'Bijv.: Salaris, huisvesting, ondersteuning, stabiliteit...',
     },
     
-    // Q14 : Intérêt marketplace (AGENCY)
-    q14_interet: {
-      label: 'Zou u geïnteresseerd zijn in een Europees platform om uw diensten aan te bieden?',
-      description: 'Een marketplace om uw zichtbaarheid te vergroten',
+    // Q16 : ERP (AGENCY)
+    q16_erp: {
+      ...fr.questions.q16_erp,
+      label: 'Gebruikt u ERP/beheersoftware?',
       options: {
-        tres_interesse: 'Zeer geïnteresseerd',
-        interesse: 'Geïnteresseerd',
-        neutre: 'Neutraal',
-        pas_interesse: 'Niet geïnteresseerd',
-      },
-    },
-    
-    // Q14 : Intérêt plateforme (CLIENT)
-    q14_interet_client: {
-      label: 'Zou u geïnteresseerd zijn in een platform om gemakkelijk Europese bureaus te vinden?',
-      options: {
-        tres_interesse: 'Zeer geïnteresseerd',
-        interesse: 'Geïnteresseerd',
-        neutre: 'Neutraal',
-        pas_interesse: 'Niet geïnteresseerd',
-      },
-    },
-    
-    // Q14 : Intérêt worker (WORKER)
-    q14_interet_worker: {
-      label: 'Zou u geïnteresseerd zijn in een platform om opdrachten te vinden?',
-      options: {
-        tres_interesse: 'Zeer geïnteresseerd',
-        interesse: 'Geïnteresseerd',
-        neutre: 'Neutraal',
-        pas_interesse: 'Niet geïnteresseerd',
-      },
-    },
-    
-    // Q15 : Fonctionnalités (AGENCY)
-    q15_fonctionnalites: {
-      label: 'Welke functionaliteiten zouden het nuttigst zijn?',
-      description: 'Selecteer meerdere keuzes',
-      options: {
-        marketplace: 'Marketplace voor diensten',
-        admin: 'Geautomatiseerd administratief beheer',
-        conformite: 'Nalevingscontroles',
-        payment: 'Geïntegreerde betalingen',
-        support: 'Meertalige ondersteuning',
+        sage: 'Sage',
+        sap: 'SAP',
+        cegid: 'Cegid',
+        bullhorn: 'Bullhorn / ATS',
         autre: 'Andere',
+        aucun: 'Geen ERP',
       },
     },
-    
-    // Q15 : Fonctionnalités client (CLIENT)
-    q15_fonctionnalites_client: {
-      label: 'Welke functionaliteiten zouden het nuttigst zijn?',
-      description: 'Selecteer meerdere keuzes',
+
+    // Q16 : Nom ERP
+    q16_nom_erp: {
+      label: 'Welke software/ERP?',
+      placeholder: 'Bijv.: SAP, Odoo, eigen...',
+    },
+
+    // Q16 : Critères (CLIENT)
+    q16_criteres: {
+      label: 'Uw belangrijkste selectiecriteria voor uitzendbureaus',
+      description: 'Kies uw top 3',
+    },
+
+    // Q16 : Amélioration (WORKER)
+    q16_amelioration: {
+      label: 'Wat zou uw ervaring met uitzendwerk verbeteren?',
+      description: 'Selecteer alle toepasselijke opties',
+    },
+
+    // Section 4 - Intérêt YoJob
+
+    // Q17 : Migration (AGENCY)
+    q17_migration: {
+      ...fr.questions.q17_migration,
+      label: 'Bent u bereid uw werktools te veranderen?',
       options: {
-        comparaison: 'Vergelijking van bureaus',
-        avis: 'Geverifieerde beoordelingen',
-        suivi: 'Missie tracking',
-        documentation: 'Gecentraliseerde documentatie',
-        facturation: 'Factuurbeheer',
-        autre: 'Andere',
+        oui: 'Ja, geen probleem',
+        conditions: 'Ja, onder voorwaarden',
+        difficile: 'Moeilijk, maar wel open',
+        non: 'Nee, niet mogelijk',
       },
     },
-    
-    // Q15 : Fonctionnalités worker (WORKER)
-    q15_fonctionnalites_worker: {
-      label: 'Welke functionaliteiten zouden het nuttigst zijn?',
-      description: 'Selecteer meerdere keuzes',
+
+    // Q17 : Budget (CLIENT)
+    q17_budget: {
+      label: 'Maandelijks budget voor een platform voor tijdelijke werving',
       options: {
-        recherche: 'Geavanceerd zoeken naar opdrachten',
-        alertes: 'Meldingen voor nieuwe opdrachten',
-        documents: 'Beheer van documenten',
-        avis: 'Beoordelingen van bureaus',
-        support: 'Meertalige ondersteuning',
-        autre: 'Andere',
+        '0': 'Niet bereid te betalen',
+        '1-100': '€1 - €100/maand',
+        '100-500': '€100 - €500/maand',
+        '500-1000': '€500 - €1.000/maand',
+        '1000+': 'Meer dan €1.000/maand',
       },
     },
-    
-    // Q16 : Frein (AGENCY)
-    q16_frein: {
-      label: 'Wat zou uw grootste bezwaar zijn om zo\'n platform te gebruiken?',
+
+    // Q17 : Plateforme (WORKER)
+    q17_plateforme: {
+      label: 'Zou u een platform gebruiken om uitzendwerk in het buitenland te vinden?',
       options: {
-        cout: 'Kosten',
-        complexite: 'Te complex',
-        confiance: 'Gebrek aan vertrouwen',
-        changement: 'Niet willen veranderen',
-        aucun: 'Geen bezwaar',
-        autre: 'Andere',
+        oui_certainement: 'Ja, zeker',
+        oui_probablement: 'Ja, waarschijnlijk',
+        peut_etre: 'Misschien',
+        non: 'Nee',
       },
-    },
-    
-    // Q16 : Frein client (CLIENT)
-    q16_frein_client: {
-      label: 'Wat zou uw grootste bezwaar zijn?',
-      options: {
-        cout: 'Kosten',
-        confiance: 'Vertrouwen in bureaus',
-        complexite: 'Te ingewikkeld',
-        aucun: 'Geen bezwaar',
-        autre: 'Andere',
-      },
-    },
-    
-    // Q16 : Frein worker (WORKER)
-    q16_frein_worker: {
-      label: 'Wat zou uw grootste bezwaar zijn?',
-      options: {
-        complexite: 'Te ingewikkeld',
-        confiance: 'Vertrouwen in het platform',
-        acces: 'Toegang tot technologie',
-        aucun: 'Geen bezwaar',
-        autre: 'Andere',
-      },
-    },
-    
-    // Q17 : Prix (AGENCY)
-    q17_prix: {
-      label: 'Welk prijsmodel lijkt u het meest geschikt?',
-      options: {
-        commission: 'Commissie per missie',
-        abonnement: 'Maandelijks abonnement',
-        freemium: 'Gratis + premium opties',
-        autre: 'Andere',
-      },
-    },
-    
-    // Q17 : Services (CLIENT)
-    q17_services: {
-      label: 'Welke diensten zou u het meest waarderen?',
-      description: 'Selecteer meerdere keuzes',
-    },
-    
-    // Q17 : Services worker (WORKER)
-    q17_services_worker: {
-      label: 'Welke diensten zou u het meest waarderen?',
-      description: 'Selecteer meerdere keuzes',
     },
     
     // Section 4 - Intérêt YoJob
@@ -1015,29 +806,6 @@ export const nl: TranslationBundle = {
       },
     },
     
-    // Q20 : Prix client (CLIENT)
-    q20_prix_client: {
-      ...fr.questions.q20_prix_client,
-      label: 'Voorkeur prijsmodel',
-      options: {
-        commission: 'Commissie per indienstneming',
-        abonnement: 'Maandabonnement',
-        gratuit: 'Gratis met premium opties',
-        autre: 'Andere',
-      },
-    },
-    
-    // Q20 : Prix worker (WORKER)
-    q20_prix_worker: {
-      ...fr.questions.q20_prix_worker,
-      label: 'Zou u bereid zijn te betalen voor premium functies?',
-      options: {
-        oui: 'Ja',
-        non: 'Nee, moet gratis zijn',
-        depende: 'Hangt van de prijs af',
-      },
-    },
-    
     // Q21 : Budget mensuel
     q21_budget_mensuel: {
       ...fr.questions.q21_budget_mensuel,
@@ -1048,41 +816,6 @@ export const nl: TranslationBundle = {
         '300-500': '€300 - €500/maand',
         '500-1000': '€500 - €1.000/maand',
         '1000+': 'Meer dan €1.000/maand',
-      },
-    },
-    
-    // Q21 : Waitlist (AGENCY)
-    q21_waitlist: {
-      ...fr.questions.q21_waitlist,
-      label: 'Wilt u op de hoogte gehouden worden van de lancering?',
-      options: {
-        oui_priorite: 'Ja, met prioritaire toegang',
-        oui: 'Ja',
-        peut_etre: 'Misschien',
-        non: 'Nee',
-      },
-    },
-    
-    // Q21 : Waitlist client (CLIENT)
-    q21_waitlist_client: {
-      ...fr.questions.q21_waitlist_client,
-      label: 'Wilt u op de hoogte gehouden worden?',
-      options: {
-        oui_demo: 'Ja, met een demo',
-        oui: 'Ja',
-        peut_etre: 'Misschien',
-        non: 'Nee',
-      },
-    },
-    
-    // Q21 : Waitlist worker (WORKER)
-    q21_waitlist_worker: {
-      ...fr.questions.q21_waitlist_worker,
-      label: 'Wilt u op de hoogte gehouden worden?',
-      options: {
-        oui: 'Ja',
-        peut_etre: 'Misschien',
-        non: 'Nee',
       },
     },
     
@@ -1100,10 +833,9 @@ export const nl: TranslationBundle = {
     
     // Section 5 - Vision Future
     
-    // Q23 : Rôle dans la décision d'achat (AGENCY & CLIENT)
+    // Q23 : Rôle
     q23_role: {
-      ...fr.questions.q23_role,
-      label: 'Rol in de aankoopbeslissing',
+      label: 'Hoe ziet u uw rol op de Europese marktplaats?',
       options: {
         decideur: 'Eindverantwoordelijke beslisser',
         influenceur: 'Beïnvloeder / Adviseur',
@@ -1112,222 +844,70 @@ export const nl: TranslationBundle = {
       },
     },
     
-    // Q20 : Croissance (AGENCY) - Section 5 Vision
-    q20_croissance: {
-      label: 'Hoe ziet u uw detacheringsactiviteit de komende 3 jaar?',
+    // Q24 : Évolution
+    q24_evolution: {
+      label: 'Uw internationale uitbreidingsplannen',
       options: {
-        forte_croissance: 'Sterke groei',
-        croissance_moderee: 'Gematigde groei',
-        stable: 'Stabiel',
-        decroissance: 'Afname',
+        oui_rapide: 'Ja, binnen 6 maanden',
+        oui_lent: 'Ja, binnen 1-2 jaar',
+        maintien: 'Huidige landen behouden',
+        reduction: 'Internationale dekking verminderen',
       },
     },
     
-    // Q18 : Recommandation (AGENCY)
-    q18_recommandation: {
-      label: 'Zou u zo\'n platform aanbevelen aan collega\'s?',
-      options: {
-        certainement: 'Zeker',
-        probablement: 'Waarschijnlijk',
-        peut_etre: 'Misschien',
-        probablement_pas: 'Waarschijnlijk niet',
-      },
+    // Q24bis : Aspirations (WORKER)
+    q24_aspirations: {
+      label: 'Uw toekomstige professionele ambities',
+      placeholder: 'Bijv.: vast contract, terugkeer naar het land, opleiding...',
     },
     
-    // Q18 : Recommandation client (CLIENT)
-    q18_recommandation_client: {
-      label: 'Zou u zo\'n oplossing aanbevelen?',
-      options: {
-        certainement: 'Zeker',
-        probablement: 'Waarschijnlijk',
-        peut_etre: 'Misschien',
-        probablement_pas: 'Waarschijnlijk niet',
-      },
+    // Q25 : Besoins
+    q25_besoins: {
+      label: 'Andere behoeften of opmerkingen',
+      placeholder: 'Deel andere feedback of behoeften...',
     },
     
-    // Q18 : Recommandation worker (WORKER)
-    q18_recommandation_worker: {
-      label: 'Zou u zo\'n platform aanbevelen?',
-      options: {
-        certainement: 'Zeker',
-        probablement: 'Waarschijnlijk',
-        peut_etre: 'Misschien',
-        probablement_pas: 'Waarschijnlijk niet',
-      },
-    },
+    // Section 6 - Contact
     
-    // Q19 : Test (AGENCY)
-    q19_test: {
-      label: 'Zou u willen deelnemen aan een bètafase?',
-      options: {
-        oui_immediat: 'Ja, onmiddellijk',
-        oui_plus_tard: 'Ja, maar later',
-        non: 'Nee',
-      },
-    },
-    
-    // Q19 : Test client (CLIENT)
-    q19_test_client: {
-      label: 'Zou u willen deelnemen aan een test?',
-      options: {
-        oui_immediat: 'Ja, onmiddellijk',
-        oui_plus_tard: 'Ja, maar later',
-        non: 'Nee',
-      },
-    },
-    
-    // Q19 : Test worker (WORKER)
-    q19_test_worker: {
-      label: 'Zou u willen deelnemen aan een test?',
-      options: {
-        oui_immediat: 'Ja, onmiddellijk',
-        oui_plus_tard: 'Ja, maar later',
-        non: 'Nee',
-      },
-    },
-    
-    // Section 5 - Contact
-    
-    // Q22 : Email
-    q22_email: {
-      label: 'E-mail (optioneel)',
-      placeholder: 'uw@email.com',
-      description: 'Om resultaten te ontvangen en op de hoogte te blijven van het project',
-    },
-    
-    // Q22 : Email AGENCY
-    q22_email_agency: {
-      label: 'Professioneel e-mailadres (optioneel)',
-      placeholder: 'contact@uwbureau.com',
-      description: 'Om resultaten te ontvangen en exclusieve toegang tot het platform',
-    },
-    
-    // Q22 : Email CLIENT
-    q22_email_client: {
-      label: 'Professioneel e-mailadres (optioneel)',
-      placeholder: 'contact@uwbedrijf.com',
-      description: 'Om aanbevelingen te ontvangen op maat van uw behoeften',
-    },
-    
-    // Q22 : Email WORKER
-    q22_email_worker: {
-      label: 'E-mail (optioneel)',
-      placeholder: 'uw@email.com',
-      description: 'Om opdrachtkansen te ontvangen die bij uw profiel passen',
-    },
-    
-    // Q23 : Téléphone (optioneel)
-    q23_telephone: {
-      label: 'Telefoon (optioneel)',
+    // Q26 : Téléphone professionnel
+    q26_phone: {
+      label: 'Zakelijk telefoonnummer',
       placeholder: '+31 6 12 34 56 78',
     },
     
-    // Q24 : Commentaires
-    q24_commentaires: {
-      label: 'Aanvullende opmerkingen of suggesties',
-      placeholder: 'Deel uw ideeën, verwachtingen of specifieke behoeften...',
-    },
-    
-    // Q24 : Vision du marché dans les 3 prochaines années (ALL)
-    q24_evolution: {
-      label: 'Marktvisie in de komende 3 jaar',
-      placeholder: 'Deel uw visie...',
-    },
-    
-    // Q25 : Autres besoins ou suggestions (ALL)
-    q25_besoins: {
-      label: 'Andere behoeften of suggesties',
-      placeholder: 'Uw suggesties interesseren ons...',
-    },
-    
-    // SECTION 6 : CONTACT
-    
-    // Q26 : Téléphone professionnel (AGENCY & CLIENT)
-    q26_phone: {
-      label: 'Zakelijk telefoon',
-      placeholder: '+31 20 123 4567',
-    },
-    
-    // Q27 : Prénom (ALL)
+    // Q27 : Prénom
     q27_firstname: {
       label: 'Voornaam',
       placeholder: 'Uw voornaam',
     },
     
-    // Q28 : Nom (ALL)
+    // Q28 : Nom
     q28_lastname: {
       label: 'Achternaam',
       placeholder: 'Uw achternaam',
     },
     
-    // Q29 : SIRET/SIREN (AGENCY & CLIENT - optionnel)
+    // Q29 : SIRET/SIREN
     q29_siret: {
       label: 'KVK-nummer (optioneel)',
       placeholder: '12345678',
       description: 'Voor verrijking via Kamer van Koophandel',
     },
     
-    // Q30 : Email professionnel (ALL)
+    // Q30 : Email
     email: {
       label: 'E-mail',
       placeholder: 'uw.email@voorbeeld.nl',
     },
     
-    // Q31 : Autorisation contact (ALL)
+    // Q31 : Autorisation contact
     autorise_contact: {
       label: 'Ik ga akkoord om opnieuw gecontacteerd te worden',
     },
     
-    // Q32 : Rapport d'étude (ALL)
+    // Q32 : Rapport d'étude
     souhaite_rapport: {
-      label: 'Ik zou graag het onderzoeksrapport ontvangen',
-    },
-    
-    // Questions additionnelles spécifiques
-    
-    // Critères de sélection (CLIENT)
-    critere_prix: {
-      label: 'Prijs',
-    },
-    critere_qualite: {
-      label: 'Kwaliteit van profielen',
-    },
-    critere_rapidite: {
-      label: 'Reactiesnelheid',
-    },
-    critere_conformite: {
-      label: 'Wettelijke naleving',
-    },
-    critere_flexibilite: {
-      label: 'Flexibiliteit',
-    },
-    
-    // Services valorisés (CLIENT)
-    service_accompagnement: {
-      label: 'Persoonlijke begeleiding',
-    },
-    service_garantie: {
-      label: 'Vervangingsgarantie',
-    },
-    service_formation: {
-      label: 'Voorafgaande training',
-    },
-    service_gestion: {
-      label: 'Administratief beheer',
-    },
-    
-    // Services worker
-    service_formation_worker: {
-      label: 'Opleiding en certificeringen',
-    },
-    service_logement: {
-      label: 'Hulp bij huisvesting',
-    },
-    service_transport: {
-      label: 'Vervoersondersteuning',
-    },
-    service_administratif: {
-      label: 'Administratieve ondersteuning',
+      label: 'Ik wil graag het onderzoeksrapport ontvangen',
     },
   },
 };
