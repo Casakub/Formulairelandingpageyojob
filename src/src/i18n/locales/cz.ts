@@ -85,94 +85,6 @@ export const cz: TranslationBundle = {
     },
   },
   
-  // Sections adaptées par profil
-  sectionContent: {
-    1: {
-      agency: {
-        title: '📋 Váš firemní profil',
-        description: 'Řekněte nám o vaší agentuře a odbornosti',
-      },
-      client: {
-        title: '📋 Váš firemní profil',
-        description: 'Řekněte nám o vaší společnosti a potřebách náboru',
-      },
-      worker: {
-        title: '📋 Váš profil',
-        description: 'Řekněte nám o vašem profesním zázemí',
-      },
-    },
-    2: {
-      agency: {
-        title: '💼 Aktivita vyslání',
-        description: 'Vaše zkušenosti s vysíláním pracovníků',
-      },
-      client: {
-        title: '💼 Vaše zkušenosti s náborem',
-        description: 'Vaše současné nábory a dočasné zaměstnávání',
-      },
-      worker: {
-        title: '💼 Vaše zkušenosti na agenturách',
-        description: 'Vaše cesta jako agenturní pracovník',
-      },
-    },
-    3: {
-      agency: {
-        title: '🎯 Potřeby a nástroje',
-        description: 'Vaše výzvy a současná řešení',
-      },
-      client: {
-        title: '🎯 Vaše současné potřeby',
-        description: 'Výzvy a očekávání při náboru',
-      },
-      worker: {
-        title: '🎯 Vaše očekávání',
-        description: 'Co je pro vás důležité u zakázky',
-      },
-    },
-    4: {
-      agency: {
-        title: '⭐ Zájem o evropskou platformu',
-        description: 'Objevte naši vizi inovativního tržiště',
-      },
-      client: {
-        title: '⭐ Zájem o evropskou platformu',
-        description: 'Inovativní řešení pro vaše potřeby',
-      },
-      worker: {
-        title: '⭐ Váš zájem o platformu',
-        description: 'Platforma pro snadné hledání zakázek',
-      },
-    },
-    5: {
-      agency: {
-        title: '🔮 Budoucí vize',
-        description: 'Rozpočet a vyhlídky rozvoje',
-      },
-      client: {
-        title: '🔮 Vaše budoucí priority',
-        description: 'Rozpočet a náborová strategie',
-      },
-      worker: {
-        title: '🔮 Vaše cíle',
-        description: 'Vaše nadcházející profesní projekty',
-      },
-    },
-    6: {
-      agency: {
-        title: '📧 Zůstaňte v kontaktu',
-        description: 'Získejte výsledky studie a zůstaňte informováni',
-      },
-      client: {
-        title: '📧 Zůstaňte v kontaktu',
-        description: 'Získejte výsledky a naše doporučení',
-      },
-      worker: {
-        title: '📧 Zůstaňte v kontaktu',
-        description: 'Získejte výsledky a příležitosti',
-      },
-    },
-  },
-  
   // Header
   header: {
     title: 'YoJob',
@@ -507,6 +419,7 @@ export const cz: TranslationBundle = {
     
     // Q10 : Gestion (AGENCY)
     q10_gestion: {
+      ...fr.questions.q10_gestion,
       label: 'Jak dnes spravujete přihlášky k vyslání?',
       options: {
         interne: 'Interní tým',
@@ -514,9 +427,6 @@ export const cz: TranslationBundle = {
         mixte: 'Smíšený přístup',
         manuel: 'Ruční správa',
         logiciel: 'Specializovaný software',
-        manuel: 'Ručně (Excel, Word...)',
-        logiciel_interne: 'Interní software',
-        prestataire: 'Externí poskytovatel služeb',
       },
     },
     
@@ -567,19 +477,17 @@ export const cz: TranslationBundle = {
         '10+': 'Více než 10',
       },
     },
-
+    
     // Q11 : Incidents (AGENCY)
     q11_incidents: {
+      ...fr.questions.q11_incidents,
       label: 'Měli jste pokuty nebo incidenty související s dodržováním předpisů pro vyslání?',
       description: 'Vaše odpověď zůstane anonymní',
       options: {
         jamais: 'Ne, nikdy',
         rarement: 'Zřídka (1-2x)',
         parfois: 'Někdy (3-5x)',
-        souvent: 'Často (6+x)',
-        oui_souvent: 'Ano, často',
-        oui_rare: 'Ano, občas',
-        non: 'Ne',
+        souvent: 'Často (6+)',
       },
     },
 
@@ -606,12 +514,14 @@ export const cz: TranslationBundle = {
 
     // Q12 : Budget (AGENCY)
     q12_budget: {
-      label: 'Máte rozpočet na externí služby pro správu vyslání?',
+      ...fr.questions.q12_budget,
+      label: 'Roční rozpočet na administrativní správu vyslání',
       options: {
-        oui_important: 'Ano, významný',
-        oui_modere: 'Ano, mírný',
-        non: 'Ne',
-        ne_sait_pas: 'Nevím',
+        '0-5k': '0-5 000 € / rok',
+        '5-15k': '5 000-15 000 € / rok',
+        '15-30k': '15 000-30 000 € / rok',
+        '30k+': '30 000+ € / rok',
+        inconnu: 'Nevím',
       },
     },
     
@@ -693,6 +603,7 @@ export const cz: TranslationBundle = {
     
     // Q14 : Risques (AGENCY)
     q14_risques: {
+      ...fr.questions.q14_risques,
       label: 'Vaše hlavní obavy',
       description: 'Vyberte všechny relevantní možnosti',
       options: {
@@ -702,12 +613,6 @@ export const cz: TranslationBundle = {
         delais: 'Zpoždění misí',
         clients: 'Ztráta klientů',
         aucun: 'Žádné významné riziko',
-        sanctions: 'Pokuty/sankce',
-        conformite: 'Shoda ve více zemích',
-        cout: 'Administrativní náklady',
-        documentation: 'Správa dokumentů',
-        responsabilite: 'Trestní odpovědnost',
-        perte_clients: 'Ztráta klientů',
       },
     },
     
@@ -723,7 +628,6 @@ export const cz: TranslationBundle = {
         cout: 'Neočekávané náklady',
         disponibilite: 'Dostupnost kandidátů',
         aucun: 'Žádné významné obavy',
-        fiabilite: 'Spolehlivost agentur',
       },
     },
     
@@ -795,6 +699,7 @@ export const cz: TranslationBundle = {
     
     // Q16 : ERP (AGENCY)
     q16_erp: {
+      ...fr.questions.q16_erp,
       label: 'Používáte ERP/řídicí software?',
       options: {
         sage: 'Sage',
@@ -803,8 +708,6 @@ export const cz: TranslationBundle = {
         bullhorn: 'Bullhorn / ATS',
         autre: 'Jiný',
         aucun: 'Žádný ERP',
-        oui: 'Ano',
-        non: 'Ne',
       },
     },
     
@@ -828,16 +731,13 @@ export const cz: TranslationBundle = {
 
     // Q17 : Migration (AGENCY)
     q17_migration: {
+      ...fr.questions.q17_migration,
       label: 'Jste připraveni změnit své pracovní nástroje?',
       options: {
         oui: 'Ano, bez problému',
         conditions: 'Ano, za určitých podmínek',
         difficile: 'Obtížné, ale otevřený',
         non: 'Ne, nepředstavitelné',
-        oui_rapidement: 'Ano, okamžitě',
-        oui_progressivement: 'Ano, postupně',
-        non_satisfait: 'Ne, spokojený se současnými nástroji',
-        non_peur: 'Ne, strach ze změny',
       },
     },
 
@@ -972,12 +872,21 @@ export const cz: TranslationBundle = {
       },
     },
     
-    // Section 5 - Contact
-    
-    // Q24 : Vision du marché dans les 3 prochaines années (ALL)
+    // Q24 : Évolution
     q24_evolution: {
-      label: 'Vize trhu v příštích 3 letech',
-      placeholder: 'Sdílejte svou vizi...',
+      label: 'Vaše mezinárodní plány expanze',
+      options: {
+        oui_rapide: 'Ano, do 6 měsíců',
+        oui_lent: 'Ano, do 1-2 let',
+        maintien: 'Zachovat současné země',
+        reduction: 'Omezit mezinárodní rozsah',
+      },
+    },
+    
+    // Q24bis : Aspirace (WORKER)
+    q24_aspirations: {
+      label: 'Vaše budoucí profesní ambice',
+      placeholder: 'Např.: trvalý úvazek, návrat do země, školení...',
     },
     
     // Q25 : Autres besoins ou suggestions (ALL)
@@ -1028,58 +937,6 @@ export const cz: TranslationBundle = {
     souhaite_rapport: {
       label: 'Chtěl(a) bych obdržet zprávu o studii',
     },
-    
-    // Questions additionnelles spécifiques
-    critere_qualite: {
-      label: 'Kvalita profilů',
-    },
-    critere_rapidite: {
-      label: 'Rychlost reakce',
-    },
-    critere_conformite: {
-      label: 'Právní shoda',
-    },
-    critere_flexibilite: {
-      label: 'Flexibilita',
-    },
-    service_garantie: {
-      label: 'Záruka náhrady',
-    },
-    service_formation: {
-      label: 'Předběžné školení',
-    },
-    service_gestion: {
-      label: 'Administrativní správa',
-    },
-    service_logement: {
-      label: 'Pomoc s ubytováním',
-    },
-    service_transport: {
-      label: 'Dopravní podpora',
-    },
-    service_administratif: {
-      label: 'Administrativní podpora',
-    },
-  },
-  
-  // Login
-  login: {
-    title: 'Přihlášení správce',
-    email: 'E-mail',
-    password: 'Heslo',
-    submit: 'Přihlásit se',
-    error: 'Neplatný e-mail nebo heslo',
-  },
-  
-  // Errors
-  errors: {
-    required: 'Toto pole je povinné',
-    email: 'Neplatný e-mail',
-    phone: 'Neplatné telefonní číslo',
-    min_length: 'Minimálně {min} znaků',
-    max_length: 'Maximálně {max} znaků',
-    network: 'Chyba sítě. Zkuste to znovu.',
-    unknown: 'Došlo k chybě. Zkuste to znovu.',
   },
   
   _meta: {

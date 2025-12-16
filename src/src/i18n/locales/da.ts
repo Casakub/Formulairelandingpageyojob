@@ -85,94 +85,6 @@ export const da: TranslationBundle = {
     },
   },
 
-  // Sections adaptées par profil
-  sectionContent: {
-    1: {
-      agency: {
-        title: '📋 Din bureuprofil',
-        description: 'Fortæl os om dit vikarbureau og ekspertise',
-      },
-      client: {
-        title: '📋 Din virksomhedsprofil',
-        description: 'Fortæl os om din virksomhed og rekrutteringsbehov',
-      },
-      worker: {
-        title: '📋 Din profil',
-        description: 'Fortæl os om din faglige baggrund',
-      },
-    },
-    2: {
-      agency: {
-        title: '💼 Udstationeringserfaring',
-        description: 'Din aktivitet med udstationering af arbejdere',
-      },
-      client: {
-        title: '💼 Din rekrutteringserfaring',
-        description: 'Din nuværende rekruttering og vikararbejde',
-      },
-      worker: {
-        title: '💼 Din vikarerfaring',
-        description: 'Din rejse som vikaransat',
-      },
-    },
-    3: {
-      agency: {
-        title: '🎯 Behov og værktøjer',
-        description: 'Dine udfordringer og nuværende løsninger',
-      },
-      client: {
-        title: '🎯 Dine nuværende behov',
-        description: 'Udfordringer og forventninger til rekruttering',
-      },
-      worker: {
-        title: '🎯 Dine forventninger',
-        description: 'Hvad der er vigtigt for dig i en opgave',
-      },
-    },
-    4: {
-      agency: {
-        title: '⭐ Interesse for europæisk platform',
-        description: 'Opdag vores vision for en innovativ markedsplads',
-      },
-      client: {
-        title: '⭐ Interesse for europæisk platform',
-        description: 'En innovativ løsning til dine behov',
-      },
-      worker: {
-        title: '⭐ Din interesse for platformen',
-        description: 'En platform til nemt at finde dine opgaver',
-      },
-    },
-    5: {
-      agency: {
-        title: '🔮 Fremtidsvision',
-        description: 'Budget og udviklingsmuligheder',
-      },
-      client: {
-        title: '🔮 Dine fremtidige prioriteter',
-        description: 'Budget og rekrutteringsstrategi',
-      },
-      worker: {
-        title: '🔮 Dine mål',
-        description: 'Dine kommende faglige projekter',
-      },
-    },
-    6: {
-      agency: {
-        title: '📧 Hold kontakten',
-        description: 'Modtag undersøgelsesresultaterne og bliv informeret',
-      },
-      client: {
-        title: '📧 Hold kontakten',
-        description: 'Modtag resultaterne og vores anbefalinger',
-      },
-      worker: {
-        title: '📧 Hold kontakten',
-        description: 'Modtag resultaterne og muligheder',
-      },
-    },
-  },
-
   // Header
   header: {
     title: 'YoJob',
@@ -507,6 +419,7 @@ export const da: TranslationBundle = {
 
     // Q10 : Gestion (AGENCY)
     q10_gestion: {
+      ...fr.questions.q10_gestion,
       label: 'Hvordan håndterer I udstationeringsanmeldelser i dag?',
       options: {
         interne: 'Internt team',
@@ -514,8 +427,6 @@ export const da: TranslationBundle = {
         mixte: 'Blandet tilgang',
         manuel: 'Manuel håndtering',
         logiciel: 'Specialiseret software',
-        logiciel_interne: 'Intern software',
-        prestataire: 'Ekstern tjenesteudbyder',
       },
     },
 
@@ -569,6 +480,7 @@ export const da: TranslationBundle = {
 
     // Q11 : Incidents (AGENCY)
     q11_incidents: {
+      ...fr.questions.q11_incidents,
       label: 'Har I oplevet bøder eller hændelser relateret til udstationeringsoverholdelse?',
       description: 'Dit svar forbliver anonymt',
       options: {
@@ -576,9 +488,6 @@ export const da: TranslationBundle = {
         rarement: 'Sjældent (1-2 gange)',
         parfois: 'Nogle gange (3-5 gange)',
         souvent: 'Ofte (6+ gange)',
-        oui_souvent: 'Ja, ofte',
-        oui_rare: 'Ja, lejlighedsvis',
-        non: 'Nej',
       },
     },
 
@@ -605,6 +514,7 @@ export const da: TranslationBundle = {
 
     // Q12 : Budget (AGENCY)
     q12_budget: {
+      ...fr.questions.q12_budget,
       label: 'Årligt budget til administrativ håndtering af udstationering',
       options: {
         '0-5k': '€0-5.000 / år',
@@ -612,11 +522,6 @@ export const da: TranslationBundle = {
         '15-30k': '€15.000-30.000 / år',
         '30k+': '€30.000+ / år',
         inconnu: 'Ved ikke',
-        '0': 'Ikke specifikt allokeret',
-        '1-5k': '€1.000 - €5.000',
-        '5-20k': '€5.000 - €20.000',
-        '20-50k': '€20.000 - €50.000',
-        '50k+': 'Mere end €50.000',
       },
     },
 
@@ -698,6 +603,7 @@ export const da: TranslationBundle = {
 
     // Q14 : Risques (AGENCY)
     q14_risques: {
+      ...fr.questions.q14_risques,
       label: 'Dine primære bekymringer',
       description: 'Vælg alle der gælder',
       options: {
@@ -707,12 +613,6 @@ export const da: TranslationBundle = {
         delais: 'Opgaveforsinkelser',
         clients: 'Tab af kunder',
         aucun: 'Ingen væsentlig risiko',
-        sanctions: 'Sanktioner/straffe',
-        conformite: 'Overholdelse i flere lande',
-        cout: 'Administrative omkostninger',
-        documentation: 'Dokumenthåndtering',
-        responsabilite: 'Strafferetligt ansvar',
-        perte_clients: 'Tab af kunder',
       },
     },
 
@@ -799,6 +699,7 @@ export const da: TranslationBundle = {
 
     // Q16 : ERP (AGENCY)
     q16_erp: {
+      ...fr.questions.q16_erp,
       label: 'Bruger I ERP/styringssoftware?',
       options: {
         sage: 'Sage',
@@ -807,8 +708,6 @@ export const da: TranslationBundle = {
         bullhorn: 'Bullhorn / ATS',
         autre: 'Andet',
         aucun: 'Ingen ERP',
-        oui: 'Ja',
-        non: 'Nej',
       },
     },
 
@@ -832,16 +731,13 @@ export const da: TranslationBundle = {
 
     // Q17 : Migration (AGENCY)
     q17_migration: {
+      ...fr.questions.q17_migration,
       label: 'Er du klar til at skifte dine arbejdsværktøjer?',
       options: {
         oui: 'Ja, intet problem',
         conditions: 'Ja, under visse betingelser',
         difficile: 'Svært, men åben',
         non: 'Nej, ikke tænkeligt',
-        oui_rapidement: 'Ja, med det samme',
-        oui_progressivement: 'Ja, gradvist',
-        non_satisfait: 'Nej, tilfreds med nuværende værktøjer',
-        non_peur: 'Nej, bange for forandring',
       },
     },
 
@@ -985,6 +881,12 @@ export const da: TranslationBundle = {
         maintien: 'Beholde nuværende lande',
         reduction: 'Reducere internationalt omfang',
       },
+    },
+    
+    // Q24bis : Ambitioner (WORKER)
+    q24_aspirations: {
+      label: 'Dine fremtidige karriereambitioner',
+      placeholder: 'Fx: fast kontrakt, tilbage til hjemlandet, uddannelse...',
     },
 
     // Q25 : Besoins
