@@ -6,12 +6,7 @@ import { Button } from '../ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../ui/tabs';
 import { Globe, Sparkles, FileText, Languages, Info, Settings, CheckCircle, Upload, Wrench } from 'lucide-react';
 import { LandingContentManagerUnified } from './LandingContentManagerUnified';
-import { TranslateClientWorkerProfiles } from './TranslateClientWorkerProfiles';
-import { ImportClientWorkerTranslations } from './ImportClientWorkerTranslations';
-import { ValidateTranslations } from './ValidateTranslations';
-import { TranslationManager } from './TranslationManager';
-import { SeedFromSurveyConfig } from './SeedFromSurveyConfig';
-import { SmartSeedTranslations } from './SmartSeedTranslations';
+import { SurveyTranslationDashboard } from './SurveyTranslationDashboard';
 import { setTranslationProvider } from '../../services/aiTranslationService';
 import { TranslationProvider } from '../../contexts/TranslationContext';
 import { AutoUploadTranslations } from './AutoUploadTranslations';
@@ -234,62 +229,7 @@ export function UnifiedTranslationManager() {
                     exit={{ opacity: 0, x: -20 }}
                     transition={{ duration: 0.3 }}
                   >
-                    <div className="mb-4 p-4 bg-purple-50 border border-purple-200 rounded-lg">
-                      <div className="flex items-start gap-3">
-                        <FileText className="w-5 h-5 text-purple-600 flex-shrink-0 mt-0.5" />
-                        <div>
-                          <h4 className="text-slate-900 mb-1">Formulaire d'enquête de marché</h4>
-                          <p className="text-slate-600 text-sm">
-                            Traduisez les 26 questions de votre enquête pour atteindre 27 000 agences ETT
-                            dans 27 pays européens. Gestion par pays avec sélection automatique des langues.
-                          </p>
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* 🚀 NEW: Traduction automatique CLIENT & WORKER */}
-                    <div className="mb-6">
-                      <TranslateClientWorkerProfiles onComplete={() => {
-                        // Reload translations after completion
-                        if (window.location.reload) {
-                          setTimeout(() => window.location.reload(), 2000);
-                        }
-                      }} />
-                    </div>
-
-                    {/* 🌱 NEW: Seed automatique depuis configuration */}
-                    <div className="mb-6">
-                      <SeedFromSurveyConfig onComplete={() => {
-                        // Reload translations after seeding
-                        if (window.location.reload) {
-                          setTimeout(() => window.location.reload(), 1000);
-                        }
-                      }} />
-                    </div>
-
-                    {/* 🌱 NEW: Smart Seed automatique */}
-                    <div className="mb-6">
-                      <SmartSeedTranslations onComplete={() => {
-                        // Reload translations after seeding
-                        if (window.location.reload) {
-                          setTimeout(() => window.location.reload(), 1000);
-                        }
-                      }} />
-                    </div>
-
-                    {/* ✅ Valider les traductions CLIENT & WORKER */}
-                    <div className="mb-6">
-                      <ValidateTranslations />
-                    </div>
-
-                    {/* 📥 Importer les traductions CLIENT & WORKER */}
-                    <div className="mb-6">
-                      <ImportClientWorkerTranslations />
-                    </div>
-
-                    <TranslationProvider>
-                      <TranslationManager />
-                    </TranslationProvider>
+                    <SurveyTranslationDashboard />
                   </motion.div>
                 )}
               </AnimatePresence>
