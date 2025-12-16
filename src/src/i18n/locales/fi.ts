@@ -85,94 +85,6 @@ export const fi: TranslationBundle = {
     },
   },
   
-  // Sections adaptées par profil
-  sectionContent: {
-    1: {
-      agency: {
-        title: '📋 Yrityksenne profiili',
-        description: 'Kerro meille toimistostasi ja sen osaamisesta',
-      },
-      client: {
-        title: '📋 Yrityksenne profiili',
-        description: 'Kerro meille yrityksestäsi ja rekrytointitarpeista',
-      },
-      worker: {
-        title: '📋 Profiilisi',
-        description: 'Kerro meille ammatillisesta taustastasi',
-      },
-    },
-    2: {
-      agency: {
-        title: '💼 Lähettämistoiminta',
-        description: 'Kokemuksesi työntekijöiden lähettämisestä',
-      },
-      client: {
-        title: '💼 Rekrytointikokemuksesi',
-        description: 'Nykyinen rekrytointisi ja vuokratyö',
-      },
-      worker: {
-        title: '💼 Vuokratyökokemuksesi',
-        description: 'Matkasi toimiston työntekijänä',
-      },
-    },
-    3: {
-      agency: {
-        title: '🎯 Tarpeet ja työkalut',
-        description: 'Haasteesi ja nykyiset ratkaisut',
-      },
-      client: {
-        title: '🎯 Nykyiset tarpeesi',
-        description: 'Haasteet ja odotukset rekrytoinnissa',
-      },
-      worker: {
-        title: '🎯 Odotuksesi',
-        description: 'Mikä on sinulle tärkeää tehtävässä',
-      },
-    },
-    4: {
-      agency: {
-        title: '⭐ Kiinnostus eurooppalaista alustaa kohtaan',
-        description: 'Tutustu innovatiiviseen markkinavisoomme',
-      },
-      client: {
-        title: '⭐ Kiinnostus eurooppalaista alustaa kohtaan',
-        description: 'Innovatiivinen ratkaisu tarpeisiisi',
-      },
-      worker: {
-        title: '⭐ Kiinnostuksesi alustaan',
-        description: 'Alusta helpompaan tehtävien hakuun',
-      },
-    },
-    5: {
-      agency: {
-        title: '🔮 Tulevaisuuden visio',
-        description: 'Budjetti ja kehitysnäkymät',
-      },
-      client: {
-        title: '🔮 Tulevaisuuden prioriteettisi',
-        description: 'Budjetti ja rekrytointistrategia',
-      },
-      worker: {
-        title: '🔮 Tavoitteesi',
-        description: 'Tulevat ammatilliset projektisi',
-      },
-    },
-    6: {
-      agency: {
-        title: '📧 Pysy yhteydessä',
-        description: 'Vastaanota tutkimustulokset ja pysy ajan tasalla',
-      },
-      client: {
-        title: '📧 Pysy yhteydessä',
-        description: 'Vastaanota tulokset ja suosituksemme',
-      },
-      worker: {
-        title: '📧 Pysy yhteydessä',
-        description: 'Vastaanota tulokset ja mahdollisuudet',
-      },
-    },
-  },
-  
   // Header
   header: {
     title: 'YoJob',
@@ -297,6 +209,8 @@ export const fi: TranslationBundle = {
     profileAgency: 'Työvoimatoimisto',
     profileClient: 'Asiakas',
     profileWorker: 'Toimiston työntekijä',
+    score_not_interested: 'Ei kiinnosta',
+    score_very_interested: 'Erittäin kiinnostunut',
   },
   
   // Sectors
@@ -505,16 +419,14 @@ export const fi: TranslationBundle = {
     
     // Q10 : Gestion (AGENCY)
     q10_gestion: {
-      label: 'Miten hallitsette lähettämishakemuksia tänään?',
+      ...fr.questions.q10_gestion,
+      label: 'Miten hallitsette lähettämisilmoitukset tänään?',
       options: {
         interne: 'Sisäinen tiimi',
         externe: 'Ulkoinen palveluntarjoaja',
-        mixte: 'Sekoitettu lähestymistapa',
+        mixte: 'Sekamuotoinen',
         manuel: 'Manuaalinen hallinta',
         logiciel: 'Erikoistunut ohjelmisto',
-        manuel: 'Manuaalisesti (Excel, Word...)',
-        logiciel_interne: 'Sisäinen ohjelmisto',
-        prestataire: 'Ulkoinen palveluntarjoaja',
       },
     },
     
@@ -568,16 +480,14 @@ export const fi: TranslationBundle = {
     
     // Q11 : Incidents (AGENCY)
     q11_incidents: {
-      label: 'Oletko saanut sakkoja tai tapauksia liittyen lähettämisen noudattamiseen?',
+      ...fr.questions.q11_incidents,
+      label: 'Oletteko kohdanneet sakkoja tai tapauksia lähettämisen vaatimustenmukaisuudessa?',
       description: 'Vastauksesi pysyy anonyyminä',
       options: {
         jamais: 'Ei, ei koskaan',
         rarement: 'Harvoin (1-2 kertaa)',
         parfois: 'Joskus (3-5 kertaa)',
         souvent: 'Usein (6+ kertaa)',
-        oui_souvent: 'Kyllä, usein',
-        oui_rare: 'Kyllä, satunnaisesti',
-        non: 'Ei',
       },
     },
     
@@ -604,36 +514,33 @@ export const fi: TranslationBundle = {
     
     // Q12 : Budget (AGENCY)
     q12_budget: {
-      label: 'Onko teillä budjettia ulkoisille palveluille lähettämisen hallintaan?',
+      ...fr.questions.q12_budget,
+      label: 'Vuotuinen budjetti lähettämisen hallintaan',
       options: {
-        oui_important: 'Kyllä, merkittävä',
-        oui_modere: 'Kyllä, kohtalainen',
-        non: 'Ei',
-        ne_sait_pas: 'En tiedä',
-      },
-    },
-    
-    // Q12 : Critères (CLIENT)
-    q12_criteres: {
-      label: 'Mitkä ovat tärkeimmät kriteerit työvoimatoimiston valinnassa?',
-      description: 'Valitse useita vaihtoehtoja',
-    },
-    
-    // Q12 : Budget client (CLIENT) - Version intérim
-    q12_budget_client: {
-      label: 'Vuosibudjetti vuokratyöhön',
-      options: {
-        '0-50k': '0-50 000 €',
-        '50-200k': '50 000-200 000 €',
-        '200-500k': '200 000-500 000 €',
-        '500k+': '500 000+ €',
+        '0-5k': '0-5 000 € / vuosi',
+        '5-15k': '5 000-15 000 € / vuosi',
+        '15-30k': '15 000-30 000 € / vuosi',
+        '30k+': '30 000+ € / vuosi',
         inconnu: 'En tiedä',
       },
     },
     
-    // Q12 : Satisfaction (WORKER)
+    // Q12 : Budget client (CLIENT)
+    q12_budget_client: {
+      ...fr.questions.q12_budget_client,
+      label: 'Vuotuinen budjetti vuokratyöhön',
+      options: {
+        '0-50k': '0 - 50 000 €',
+        '50-200k': '50 000 - 200 000 €',
+        '200-500k': '200 000 - 500 000 €',
+        '500k+': '500 000+ €',
+        'inconnu': 'En tiedä',
+      },
+    },
+    
+    // Q12 : Satisfaction (CLIENT)
     q12_satisfaction: {
-      label: 'Kuinka tyytyväinen olet nykyisiin työoloihisi?',
+      label: 'Tyytyväisyys nykyisiin työvoimatoimistoihin',
       options: {
         tres_satisfait: 'Erittäin tyytyväinen',
         satisfait: 'Tyytyväinen',
@@ -642,449 +549,393 @@ export const fi: TranslationBundle = {
       },
     },
     
-    // Q13 : Durée (AGENCY)
-    q13_duree: {
-      label: 'Lähettämistehtäviesi keskimääräinen kesto',
+    // Q12 : Salaire (WORKER)
+    q12_salaire: {
+      ...fr.questions.q12_salaire,
+      label: 'Oletko tyytyväinen vuokratyön palkkaasi?',
       options: {
-        '<1mois': 'Alle 1 kuukausi',
-        '1-3mois': '1-3 kuukautta',
-        '3-6mois': '3-6 kuukautta',
-        '6-12mois': '6-12 kuukautta',
-        '12+mois': 'Yli 12 kuukautta',
+        '<1500': 'Alle 1 500 €',
+        '1500-2500': '1 500 - 2 500 €',
+        '2500-3500': '2 500 - 3 500 €',
+        '3500+': '3 500+ €',
       },
     },
     
-    // Q13 : Budget client (CLIENT)
-    q13_budget_client: {
-      label: 'Mikä on vuosibudjettinne vuokratyöhön?',
+    // Q13 : Manque à gagner (AGENCY)
+    q13_manque_gagner: {
+      ...fr.questions.q13_manque_gagner,
+      label: 'Kuinka suuri prosenttiosuus liikevaihdosta menetetään hallinnollisen monimutkaisuuden vuoksi?',
       options: {
-        '<50k': 'Alle €50k',
-        '50-200k': '€50k - €200k',
-        '200-500k': '€200k - €500k',
-        '500k-1M': '€500k - €1M',
-        '1M+': 'Yli €1M',
+        'non': 'Ei, ei juurikaan',
+        'faible': 'Kyllä, pieni (< 5 % liikevaihdosta)',
+        'moyen': 'Kyllä, keskitaso (5-15 % liikevaihdosta)',
+        'important': 'Kyllä, merkittävä (> 15 % liikevaihdosta)',
       },
     },
     
-    // Q13 : Durée worker (WORKER)
-    q13_duree_worker: {
-      label: 'Suosimasi tehtävän kesto',
+    // Q13 : Satisfaction (CLIENT)
+    q13_satisfaction: {
+      ...fr.questions.q13_satisfaction,
+      label: 'Tyytyväisyys nykyisiin toimistoihisi',
       options: {
-        court: 'Lyhyt (< 3 kuukautta)',
-        moyen: 'Keskipitkä (3-6 kuukautta)',
-        long: 'Pitkä (> 6 kuukautta)',
-        indifferent: 'Ei väliä',
+        'tres_satisfait': 'Erittäin tyytyväinen',
+        'satisfait': 'Tyytyväinen',
+        'neutre': 'Neutraali',
+        'insatisfait': 'Tyytymätön',
+        'tres_insatisfait': 'Erittäin tyytymätön',
       },
     },
     
-    // Section 3 - Besoins/Potrebe
-    
-    // Q14 : Intérêt marketplace (AGENCY)
-    q14_interet: {
-      label: 'Olisitko kiinnostunut eurooppalaisesta alustasta palvelujesi tarjoamiseen?',
-      description: 'Markkinapaikka näkyvyytesi lisäämiseksi',
+    // Q13 : Satisfaction worker (WORKER)
+    q13_satisfaction_worker: {
+      ...fr.questions.q13_satisfaction_worker,
+      label: 'Tyytyväisyys nykyisiin toimistoihisi',
       options: {
-        tres_interesse: 'Erittäin kiinnostunut',
-        interesse: 'Kiinnostunut',
-        neutre: 'Neutraali',
-        pas_interesse: 'Ei kiinnostunut',
+        'tres_satisfait': 'Erittäin tyytyväinen',
+        'satisfait': 'Tyytyväinen',
+        'neutre': 'Neutraali',
+        'insatisfait': 'Tyytymätön',
+        'tres_insatisfait': 'Erittäin tyytymätön',
       },
     },
     
-    // Q14 : Intérêt plateforme (CLIENT)
-    q14_interet_client: {
-      label: 'Olisitko kiinnostunut alustasta eurooppalaisten toimistojen helpoksi löytämiseksi?',
+    // Section 3 - Besoins
+    
+    // Q14 : Risques (AGENCY)
+    q14_risques: {
+      ...fr.questions.q14_risques,
+      label: 'Suurimmat huolenaiheesi',
+      description: 'Valitse kaikki sopivat',
       options: {
-        tres_interesse: 'Erittäin kiinnostunut',
-        interesse: 'Kiinnostunut',
-        neutre: 'Neutraali',
-        pas_interesse: 'Ei kiinnostunut',
+        amendes: 'Sakot ja rangaistukset',
+        reputation: 'Maine / Imago',
+        penal: 'Rikosoikeudellinen vastuu',
+        delais: 'Tehtävien viivästykset',
+        clients: 'Asiakkaiden menetys',
+        aucun: 'Ei merkittävää riskiä',
       },
     },
     
-    // Q14 : Intérêt worker (WORKER)
-    q14_interet_worker: {
-      label: 'Olisitko kiinnostunut alustasta tehtävien hakuun?',
+    // Q14 : Besoins (CLIENT)
+    q14_besoins_client: {
+      ...fr.questions.q14_besoins_client,
+      label: 'Suurimmat tarpeenne',
+      description: 'Valitse kaikki sopivat',
       options: {
-        tres_interesse: 'Erittäin kiinnostunut',
-        interesse: 'Kiinnostunut',
-        neutre: 'Neutraali',
-        pas_interesse: 'Ei kiinnostunut',
-      },
-    },
-    
-    // Q15 : Fonctionnalités (AGENCY)
-    q15_fonctionnalites: {
-      label: 'Mitkä ominaisuudet olisivat hyödyllisimpiä?',
-      description: 'Valitse useita vaihtoehtoja',
-      options: {
-        marketplace: 'Palvelujen markkinapaikka',
-        admin: 'Automatisoitu hallinto',
-        conformite: 'Noudattamisen tarkistukset',
-        payment: 'Integroidut maksut',
-        support: 'Monikielinen tuki',
-        autre: 'Muu',
-      },
-    },
-    
-    // Q15 : Fonctionnalités client (CLIENT)
-    q15_fonctionnalites_client: {
-      label: 'Mitkä ominaisuudet olisivat hyödyllisimpiä?',
-      description: 'Valitse useita vaihtoehtoja',
-      options: {
-        comparaison: 'Toimistojen vertailu',
-        avis: 'Vahvistetut arvostelut',
-        suivi: 'Tehtävien seuranta',
-        documentation: 'Keskitetty dokumentaatio',
-        facturation: 'Laskujen hallinta',
-        autre: 'Muu',
-      },
-    },
-    
-    // Q15 : Fonctionnalités worker (WORKER)
-    q15_fonctionnalites_worker: {
-      label: 'Mitkä ominaisuudet olisivat hyödyllisimpiä?',
-      description: 'Valitse useita vaihtoehtoja',
-      options: {
-        recherche: 'Edistynyt tehtävien haku',
-        alertes: 'Ilmoitukset uusista tehtävistä',
-        documents: 'Asiakirjojen hallinta',
-        avis: 'Toimistojen arvioinnit',
-        support: 'Monikielinen tuki',
-        autre: 'Muu',
-      },
-    },
-    
-    // Q16 : Frein (AGENCY)
-    q16_frein: {
-      label: 'Mikä olisi suurin esteesi tällaisen alustan käytölle?',
-      options: {
+        fiabilite: 'Luotettavien toimistojen löytäminen',
+        conformite: 'Juridinen noudattaminen',
+        qualite: 'Laatu/taidot',
         cout: 'Kustannukset',
-        complexite: 'Liian monimutkainen',
-        confiance: 'Luottamuksen puute',
-        changement: 'En halua muuttaa',
-        aucun: 'Ei esteitä',
-        autre: 'Muu',
+        disponibilite: 'Kandidaattien saatavuus',
+        aucun: 'Ei suurta tarvetta',
       },
     },
     
-    // Q16 : Frein client (CLIENT)
-    q16_frein_client: {
-      label: 'Mikä olisi suurin esteesi?',
+    // Q14 : Attentes (WORKER)
+    q14_attentes: {
+      ...fr.questions.q14_attentes,
+      label: 'Odotuksesi vuokratyöstä ulkomailla',
+      description: 'Valitse kaikki sopivat',
       options: {
-        cout: 'Kustannukset',
-        confiance: 'Luottamus toimistoihin',
-        complexite: 'Liian monimutkainen',
-        aucun: 'Ei esteitä',
-        autre: 'Muu',
+        salaire: 'Parempi palkka',
+        conditions: 'Paremmat työolosuhteet',
+        stabilite: 'Stabiilisuus',
+        experience: 'Kansainvälinen kokemus',
+        logement: 'Asumisen tuki',
+        aucun: 'Ei erityisiä odotuksia',
       },
     },
     
-    // Q16 : Frein worker (WORKER)
-    q16_frein_worker: {
-      label: 'Mikä olisi suurin esteesi?',
+    // Q14_risques_client options
+    q14_risques_client: {
+      ...fr.questions.q14_risques_client,
+      label: 'Suurimmat huolenaiheesi',
+      description: 'Valitse kaikki sopivat',
       options: {
-        complexite: 'Liian monimutkainen',
-        confiance: 'Luottamus alustaan',
-        acces: 'Pääsy teknologiaan',
-        aucun: 'Ei esteitä',
-        autre: 'Muu',
+        conformite: 'Juridinen noudattaminen',
+        qualite: 'Laatu/taidot',
+        communication: 'Viestintä/Kielet',
+        cout: 'Ennakoimattomat kustannukset',
+        disponibilite: 'Kandidaattien saatavuus',
+        aucun: 'Ei merkittäviä huolia',
       },
     },
     
-    // Q17 : Prix (AGENCY)
-    q17_prix: {
-      label: 'Mikä hinnoittelumalli vaikuttaa sinulle sopivimmalta?',
+    // Q14_risques_worker options
+    q14_risques_worker: {
+      ...fr.questions.q14_risques_worker,
+      label: 'Mihin ongelmiin törmäät useimmiten?',
+      description: 'Valitse kaikki sopivat',
       options: {
-        commission: 'Palkkio per tehtävä',
-        abonnement: 'Kuukausitilaus',
-        freemium: 'Ilmainen + premium-ominaisuudet',
-        autre: 'Muu',
+        paiement: 'Maksuviiveet',
+        conditions: 'Huonot olosuhteet',
+        contrat: 'Sopimusten rikkominen',
+        logement: 'Riittämätön majoitus',
+        communication: 'Viestintäongelmat',
+        aucun: 'Ei suuria ongelmia',
       },
     },
     
-    // Q17 : Services (CLIENT)
-    q17_services: {
-      label: 'Mitä palveluita arvostat eniten?',
-      description: 'Valitse useita vaihtoehtoja',
+    // Q15 : Problème
+    q15_probleme: {
+      ...fr.questions.q15_probleme,
+      label: 'Minkä ongelman haluaisit ratkaista ensin?',
+      placeholder: 'Kuvaile ensisijaista ongelmaasi...',
     },
     
-    // Q17 : Services worker (WORKER)
-    q17_services_worker: {
-      label: 'Mitä palveluita arvostat eniten?',
-      description: 'Valitse useita vaihtoehtoja',
+    // Q15 : Besoins client (CLIENT)
+    q15_besoins_client: {
+      ...fr.questions.q15_besoins_client,
+      label: 'Mitkä ovat prioriteettitarpeesi?',
+      placeholder: 'Esim.: Nopea löytäminen, parempi laatu, hinnat...',
     },
     
-    // Q18 : Recommandation (AGENCY)
-    q18_recommandation: {
-      label: 'Suosittelisitko tällaista alustaa kollegoille?',
+    // Q15 : Améliorations (WORKER)
+    q15_ameliorations: {
+      ...fr.questions.q15_ameliorations,
+      label: 'Mitä haluaisit parantaa tehtävissäsi?',
+      placeholder: 'Esim.: Palkka, majoitus, tuki, vakaus...',
+    },
+    
+    // Q16 : ERP (AGENCY)
+    q16_erp: {
+      ...fr.questions.q16_erp,
+      label: 'Käytättekö ERP-/hallintaohjelmistoa?',
       options: {
-        certainement: 'Ehdottomasti',
-        probablement: 'Todennäköisesti',
+        sage: 'Sage',
+        sap: 'SAP',
+        cegid: 'Cegid',
+        bullhorn: 'Bullhorn / ATS',
+        autre: 'Muu',
+        aucun: 'Ei ERP:tä',
+      },
+    },
+    
+    // Q16 : Nom ERP
+    q16_nom_erp: {
+      label: 'Mikä ohjelmisto/ERP?',
+      placeholder: 'Esim.: SAP, Odoo, räätälöity...',
+    },
+    
+    // Q16 : Critères (CLIENT)
+    q16_criteres: {
+      label: 'Tärkeimmät valintakriteerisi toimistoille',
+      description: 'Valitse 3 tärkeintä',
+    },
+    
+    // Q16 : Amélioration (WORKER)
+    q16_amelioration: {
+      label: 'Mikä parantaisi vuokratyökokemustasi?',
+      description: 'Valitse kaikki sopivat',
+    },
+    
+    // Q17 : Migration (AGENCY)
+    q17_migration: {
+      ...fr.questions.q17_migration,
+      label: 'Oletteko valmiita vaihtamaan työkalujanne?',
+      options: {
+        oui: 'Kyllä, ilman ongelmaa',
+        conditions: 'Kyllä, tietyin ehdoin',
+        difficile: 'Vaikeaa, mutta avoin',
+        non: 'Ei, ei ole mahdollista',
+      },
+    },
+    
+    // Q17 : Budget (CLIENT)
+    q17_budget: {
+      label: 'Kuukausibudjetti vuokratyöalustalle',
+      options: {
+        '0': 'En ole valmis maksamaan',
+        '1-100': '€1 - €100/kk',
+        '100-500': '€100 - €500/kk',
+        '500-1000': '€500 - €1 000/kk',
+        '1000+': 'Yli €1 000/kk',
+      },
+    },
+    
+    // Q17 : Plateforme (WORKER)
+    q17_plateforme: {
+      label: 'Käyttäisitkö alustaa vuokratyön löytämiseen ulkomailla?',
+      options: {
+        oui_certainement: 'Kyllä, ehdottomasti',
+        oui_probablement: 'Kyllä, todennäköisesti',
         peut_etre: 'Ehkä',
-        probablement_pas: 'Todennäköisesti ei',
-      },
-    },
-    
-    // Q18 : Recommandation client (CLIENT)
-    q18_recommandation_client: {
-      label: 'Suosittelisitko tällaista ratkaisua?',
-      options: {
-        certainement: 'Ehdottomasti',
-        probablement: 'Todennäköisesti',
-        peut_etre: 'Ehkä',
-        probablement_pas: 'Todennäköisesti ei',
-      },
-    },
-    
-    // Q18 : Recommandation worker (WORKER)
-    q18_recommandation_worker: {
-      label: 'Suosittelisitko tällaista alustaa?',
-      options: {
-        certainement: 'Ehdottomasti',
-        probablement: 'Todennäköisesti',
-        peut_etre: 'Ehkä',
-        probablement_pas: 'Todennäköisesti ei',
-      },
-    },
-    
-    // Q19 : Test (AGENCY)
-    q19_test: {
-      label: 'Haluaisitko osallistua beeta-vaiheeseen?',
-      options: {
-        oui_immediat: 'Kyllä, heti',
-        oui_plus_tard: 'Kyllä, mutta myöhemmin',
         non: 'Ei',
       },
     },
     
-    // Q19 : Test client (CLIENT)
-    q19_test_client: {
-      label: 'Haluaisitko osallistua testaukseen?',
+    // Section 4 - Intérêt YoJob
+    
+    // Q18 : Score
+    q18_score: {
+      ...fr.questions.q18_score,
+      label: 'Kuinka kiinnostunut olet eurooppalaisesta lähettämisalustasta?',
+      description: 'Arvioi 1 (ei kiinnosta) - 10 (erittäin kiinnostunut)',
+    },
+    
+    // Q19 : Features (AGENCY)
+    q19_features: {
+      ...fr.questions.q19_features,
+      label: 'Kiinnostavimmat ominaisuudet',
+      description: 'Valitse 3 tärkeintä prioriteettia',
       options: {
-        oui_immediat: 'Kyllä, heti',
-        oui_plus_tard: 'Kyllä, mutta myöhemmin',
-        non: 'Ei',
+        sipsi: 'Automaattinen SIPSI-ilmoitus',
+        a1: 'A1-todistusten hallinta',
+        conformite: 'Compliance-hallintapaneeli',
+        alertes: 'Hälytykset ja uusinnat',
+        documents: 'Dokumenttien keskittäminen',
+        marketplace: 'Toimistojen markkinapaikka',
+        support: 'Monikielinen asiantuntijatuki',
+        api: 'API-integraatio (ERP)',
       },
     },
     
-    // Q19 : Test worker (WORKER)
-    q19_test_worker: {
-      label: 'Haluaisitko osallistua testaukseen?',
+    // Q19 : Features CLIENT
+    q19_features_client: {
+      ...fr.questions.q19_features_client,
+      label: 'Kiinnostavimmat ominaisuudet',
+      description: 'Valitse kaikki, jotka kiinnostavat',
       options: {
-        oui_immediat: 'Kyllä, heti',
-        oui_plus_tard: 'Kyllä, mutta myöhemmin',
-        non: 'Ei',
+        recherche: 'Luotettavien toimistojen etsintä',
+        comparaison: 'Hinta/laatu -vertailu',
+        avis: 'Vahvistetut arviot',
+        conformite: 'Compliance-takuu',
+        support: 'Oma tuki',
+        facturation: 'Keskitetty laskutus',
+        suivi: 'Reaaliaikainen seuranta',
       },
     },
     
-    // Section 4 - Vision Future
-    
-    // Q20 : Croissance (AGENCY)
-    q20_croissance: {
-      label: 'Miten näet lähettämistoimintasi seuraavan 3 vuoden aikana?',
+    // Q19 : Features WORKER
+    q19_features_worker: {
+      ...fr.questions.q19_features_worker,
+      label: 'Kiinnostavimmat ominaisuudet',
+      description: 'Valitse kaikki, jotka kiinnostavat',
       options: {
-        forte_croissance: 'Voimakas kasvu',
-        croissance: 'Kohtalainen kasvu',
-        stable: 'Vakaa',
-        decroissance: 'Lasku',
+        recherche: 'Työnhaku',
+        avis: 'Toimistojen arviot',
+        logement: 'Apua majoituksessa',
+        paiement: 'Turvallinen maksu',
+        support: 'Tuki omalla kielelläni',
+        documents: 'Apua hallinnollisissa dokumenteissa',
+        formation: 'Koulutusohjelmat',
       },
     },
     
-    // Q20 : Évolution (CLIENT)
-    q20_evolution: {
-      label: 'Miten näet vuokratyötarpeidesi kehityksen?',
+    // Q20 : Prix
+    q20_prix: {
+      ...fr.questions.q20_prix,
+      label: 'Suosittu hinnoittelumalli',
       options: {
-        hausse: 'Nousu',
-        stable: 'Vakaa',
-        baisse: 'Lasku',
+        mensuel: 'Kiinteä kuukausitilaus',
+        usage: 'Pay-as-you-go (käytön mukaan)',
+        annuel: 'Vuosipaketti (alennus)',
+        gratuit: 'Ilmainen työntekijöille',
       },
     },
     
-    // Q20 : Projets (WORKER)
-    q20_projets: {
-      label: 'Mitkä ovat projektisi tulevina kuukausina?',
+    // Q21 : Budget mensuel
+    q21_budget_mensuel: {
+      ...fr.questions.q21_budget_mensuel,
+      label: 'Kuukausibudjetti täydelliselle SaaS-ratkaisulle',
       options: {
-        meme_secteur: 'Jatkaa samalla sektorilla',
-        changer_secteur: 'Vaihtaa sektoria',
-        se_former: 'Kouluttautua',
-        entrepreneur: 'Ryhtyä yrittäjäksi',
+        '0-100': '€0 - €100/kk',
+        '100-300': '€100 - €300/kk',
+        '300-500': '€300 - €500/kk',
+        '500-1000': '€500 - €1 000/kk',
+        '1000+': 'Yli €1 000/kk',
       },
     },
     
-    // Q21 : Budget évolution (AGENCY)
-    q21_budget_evolution: {
-      label: 'Aiotteko lisätä budjettia ulkoisille palveluille?',
+    // Q22 : MVP
+    q22_mvp: {
+      ...fr.questions.q22_mvp,
+      label: 'Haluaisitko testata varhaista versiota (MVP)?',
       options: {
-        oui_beaucoup: 'Kyllä, merkittävästi',
-        oui_peu: 'Kyllä, hieman',
-        non: 'Ei',
-        ne_sait_pas: 'En tiedä',
+        oui_gratuit: 'Kyllä, ilmaiseksi',
+        oui_reduc: 'Kyllä, alennuksella',
+        peut_etre: 'Ehkä, riippuu ominaisuuksista',
+        non: 'Ei, ei kiinnosta',
       },
     },
     
-    // Q21 : Budget évolution client (CLIENT)
-    q21_budget_evolution_client: {
-      label: 'Aiotteko lisätä rekrytointibudjettia?',
+    // Section 5 - Vision Future
+    
+    // Q23 : Rôle
+    q23_role: {
+      label: 'Miten näet roolisi eurooppalaisella markkinalla?',
       options: {
-        oui_beaucoup: 'Kyllä, merkittävästi',
-        oui_peu: 'Kyllä, hieman',
-        non: 'Ei',
+        decideur: 'Lopullinen päättäjä',
+        influenceur: 'Vaikuttaja / Suosittelija',
+        utilisateur: 'Loppukäyttäjä',
+        autre: 'Muu',
       },
     },
     
-    // Q21 : Mobilité (WORKER)
-    q21_mobilite: {
-      label: 'Oletko valmis muuttamaan työn vuoksi?',
-      options: {
-        oui_europe: 'Kyllä, minne tahansa Eurooppaan',
-        oui_proche: 'Kyllä, naapurimaihin',
-        non: 'Ei, vain omassa maassani',
-      },
-    },
-    
-    // Section 5 - Contact
-    
-    // Q22 : Email
-    q22_email: {
-      label: 'Sähköposti (valinnainen)',
-      placeholder: 'sinun@email.fi',
-      description: 'Tulosten ja projektin tietojen vastaanottamiseksi',
-    },
-    
-    // Q22 : Email AGENCY
-    q22_email_agency: {
-      label: 'Yrityksen sähköposti (valinnainen)',
-      placeholder: 'yhteystiedot@sinuntoimisto.fi',
-      description: 'Tulosten ja eksklusiivisen pääsyn vastaanottamiseksi alustalle',
-    },
-    
-    // Q22 : Email CLIENT
-    q22_email_client: {
-      label: 'Yrityksen sähköposti (valinnainen)',
-      placeholder: 'yhteystiedot@sinun-yritys.fi',
-      description: 'Tarpeisiisi räätälöityjen suositusten vastaanottamiseksi',
-    },
-    
-    // Q22 : Email WORKER
-    q22_email_worker: {
-      label: 'Sähköposti (valinnainen)',
-      placeholder: 'sinun@email.fi',
-      description: 'Profiiliisi sopivien mahdollisuuksien vastaanottamiseksi',
-    },
-    
-    // Q23 : Téléphone (optionnel)
-    q23_telephone: {
-      label: 'Puhelin (valinnainen)',
-      placeholder: '+358 40 123 4567',
-    },
-    
-    // Q24 : Commentaires
-    q24_commentaires: {
-      label: 'Lisäkommentit tai ehdotukset',
-      placeholder: 'Jaa ideasi, odotuksesi tai erityiset tarpeesi...',
-    },
-    
-    // Q24 : Vision du marché dans les 3 prochaines années (ALL)
+    // Q24 : Évolution
     q24_evolution: {
-      label: 'Markkinanäkymä seuraavien 3 vuoden aikana',
-      placeholder: 'Jaa näkemyksesi...',
+      label: 'Kansainvälisen laajentumisen suunnitelmasi',
+      options: {
+        oui_rapide: 'Kyllä, 6 kuukauden sisällä',
+        oui_lent: 'Kyllä, 1-2 vuoden sisällä',
+        maintien: 'Pidetään nykyiset maat',
+        reduction: 'Supistetaan kansainvälistä laajuutta',
+      },
     },
     
-    // Q25 : Autres besoins ou suggestions (ALL)
+    // Q24bis : Aspirations (WORKER)
+    q24_aspirations: {
+      label: 'Tulevat ammatilliset tavoitteesi',
+      placeholder: 'Esim.: vakituinen sopimus, paluu kotimaahan, koulutus...',
+    },
+    
+    // Q25 : Besoins
     q25_besoins: {
-      label: 'Muut tarpeet tai ehdotukset',
-      placeholder: 'Ehdotuksesi kiinnostavat meitä...',
+      label: 'Muut tarpeet tai kommentit',
+      placeholder: 'Jaa muuta palautetta tai tarpeita...',
     },
     
-    // SECTION 6 : CONTACT
+    // Section 6 - Contact
     
-    // Q26 : Téléphone professionnel (AGENCY & CLIENT)
+    // Q26 : Téléphone professionnel
     q26_phone: {
-      label: 'Yrityksen puhelinnumero',
+      label: 'Ammatillinen puhelinnumero',
       placeholder: '+358 40 123 4567',
     },
     
-    // Q27 : Prénom (ALL)
+    // Q27 : Prénom
     q27_firstname: {
       label: 'Etunimi',
       placeholder: 'Etunimesi',
     },
     
-    // Q28 : Nom (ALL)
+    // Q28 : Nom
     q28_lastname: {
       label: 'Sukunimi',
       placeholder: 'Sukunimesi',
     },
     
-    // Q29 : SIRET/SIREN (AGENCY & CLIENT - optionnel)
+    // Q29 : SIRET/SIREN
     q29_siret: {
       label: 'Y-tunnus (valinnainen)',
       placeholder: '1234567-8',
-      description: 'Rikastuttamiseen PRH/YTJ kautta',
+      description: 'Tietojen rikastamiseen PRH/YTJ kautta',
     },
     
-    // Q30 : Email professionnel (ALL)
+    // Q30 : Email
     email: {
-      label: 'Sähköposti',
+      label: 'Sähköpostisi',
       placeholder: 'sinun.email@esimerkki.fi',
     },
     
-    // Q31 : Autorisation contact (ALL)
+    // Q31 : Autorisation contact
     autorise_contact: {
       label: 'Hyväksyn yhteydenoton uudelleen',
     },
     
-    // Q32 : Rapport d'étude (ALL)
+    // Q32 : Rapport d'étude
     souhaite_rapport: {
-      label: 'Haluaisin saada tutkimusraportin',
-    },
-    
-    // Questions additionnelles spécifiques
-    
-    // Critères de sélection (CLIENT)
-    critere_prix: {
-      label: 'Hinta',
-    },
-    critere_qualite: {
-      label: 'Profiilin laatu',
-    },
-    critere_rapidite: {
-      label: 'Vastausnopeus',
-    },
-    critere_conformite: {
-      label: 'Juridinen noudattaminen',
-    },
-    critere_flexibilite: {
-      label: 'Joustavuus',
-    },
-    
-    // Services valorisés (CLIENT)
-    service_accompagnement: {
-      label: 'Henkilökohtainen tuki',
-    },
-    service_garantie: {
-      label: 'Korvaustakuu',
-    },
-    service_formation: {
-      label: 'Ennakkokoulutus',
-    },
-    service_gestion: {
-      label: 'Hallinnollinen käsittely',
-    },
-    
-    // Services worker
-    service_formation_worker: {
-      label: 'Koulutukset ja sertifikaatit',
-    },
-    service_logement: {
-      label: 'Apu asumisessa',
-    },
-    service_transport: {
-      label: 'Kuljetustuki',
-    },
-    service_administratif: {
-      label: 'Hallinnollinen tuki',
+      label: 'Haluaisin vastaanottaa tutkimusraportin',
     },
   },
 };

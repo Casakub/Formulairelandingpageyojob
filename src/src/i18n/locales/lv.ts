@@ -1,9 +1,9 @@
 /**
- * 🇱🇻 TRADUCTIONS LETTONES (LV)
- * 
- * Traductions complètes pour le letton
- * Base: translations-complete.ts
- * 
+ * 🇱🇻 LATVIEŠU TULKOJUMI (LV)
+ *
+ * Pilns latviešu tulkojums
+ * Bāze: en.ts (tāda pati struktūra)
+ *
  * @version 2.0.0
  * @created 2024-12-12T10:00:00.000Z
  */
@@ -12,10 +12,10 @@ import type { TranslationBundle } from '../types';
 import { fr } from './fr.generated';
 
 export const lv: TranslationBundle = {
-  // Hérite de FR pour les clés manquantes
+  // Mantot trūkstošās atslēgas no FR
   ...fr,
-  
-  // Navigation
+
+  // Navigācija
   nav: {
     section1: 'Profils',
     section2: 'Pieredze',
@@ -26,7 +26,7 @@ export const lv: TranslationBundle = {
     dashboard: 'Vadības panelis',
     back_to_site: 'Atpakaļ uz vietni',
   },
-  
+
   dashboard: {
     title: 'YoJob',
     subtitle: 'Vadības panelis',
@@ -37,7 +37,7 @@ export const lv: TranslationBundle = {
       translations: 'Tulkojumi',
       export: 'Eksports',
       integrations: 'Integrācijas',
-      cms: 'CMS veidlapa',
+      cms: 'Formas CMS',
       settings: 'Iestatījumi',
       prospects: 'Potenciālie klienti',
     },
@@ -56,296 +56,193 @@ export const lv: TranslationBundle = {
       logged_in_as: 'Pieteicies kā',
     },
   },
-  
-  // Sections
+
+  // Sadaļas
   section: {
-    1: {
-      title: 'Profils',
-      description: '4 jautājumi • 2 min',
-    },
-    2: {
-      title: 'Pieredze',
-      description: '7 jautājumi • 3 min',
-    },
-    3: {
-      title: 'Vajadzības',
-      description: '6 jautājumi • 2 min',
-    },
-    4: {
-      title: 'Interese par YoJob',
-      description: '6 jautājumi • 3 min',
-    },
-    5: {
-      title: 'Nākotnes vīzija',
-      description: '2 jautājumi • 1 min',
-    },
-    6: {
-      title: 'Kontakti',
-      description: '1 jautājums • 1 min',
-    },
+    1: { title: 'Aģentūras profils', description: '4 jautājumi • 2 min' },
+    2: { title: 'Norīkošana', description: '7 jautājumi • 3 min' },
+    3: { title: 'Vajadzības', description: '6 jautājumi • 2 min' },
+    4: { title: 'YoJob interese', description: '6 jautājumi • 3 min' },
+    5: { title: 'Nākotnes vīzija', description: '2 jautājumi • 1 min' },
+    6: { title: 'Kontakti', description: '1 jautājums • 1 min' },
   },
-  
-  // Sections adaptées par profil
-  sectionContent: {
-    1: {
-      agency: {
-        title: '📋 Jūsu uzņēmuma profils',
-        description: 'Pastāstiet mums par savu aģentūru un kompetenci',
-      },
-      client: {
-        title: '📋 Jūsu uzņēmuma profils',
-        description: 'Pastāstiet mums par savu uzņēmumu un darbā pieņemšanas vajadzībām',
-      },
-      worker: {
-        title: '📋 Jūsu profils',
-        description: 'Pastāstiet mums par savu profesionālo pieredzi',
-      },
-    },
-    2: {
-      agency: {
-        title: '💼 Norīkošanas darbība',
-        description: 'Jūsu pieredze darbinieku norīkošanā',
-      },
-      client: {
-        title: '💼 Jūsu darbā pieņemšanas pieredze',
-        description: 'Jūsu pašreizējā darbā pieņemšana un pagaidu darbs',
-      },
-      worker: {
-        title: '💼 Jūsu pagaidu darba pieredze',
-        description: 'Jūsu ceļš kā aģentūras darbinieka',
-      },
-    },
-    3: {
-      agency: {
-        title: '🎯 Vajadzības un rīki',
-        description: 'Jūsu izaicinājumi un pašreizējie risinājumi',
-      },
-      client: {
-        title: '🎯 Jūsu pašreizējās vajadzības',
-        description: 'Izaicinājumi un cerības darbā pieņemšanā',
-      },
-      worker: {
-        title: '🎯 Jūsu cerības',
-        description: 'Kas jums ir svarīgi uzdevumā',
-      },
-    },
-    4: {
-      agency: {
-        title: '⭐ Interese par Eiropas platformu',
-        description: 'Atklājiet mūsu inovatīvā tirgus vīziju',
-      },
-      client: {
-        title: '⭐ Interese par Eiropas platformu',
-        description: 'Inovatīvs risinājums jūsu vajadzībām',
-      },
-      worker: {
-        title: '⭐ Jūsu interese par platformu',
-        description: 'Platforma vieglai uzdevumu meklēšanai',
-      },
-    },
-    5: {
-      agency: {
-        title: '🔮 Nākotnes vīzija',
-        description: 'Budžets un attīstības perspektīvas',
-      },
-      client: {
-        title: '🔮 Jūsu nākotnes prioritātes',
-        description: 'Budžets un darbā pieņemšanas stratēģija',
-      },
-      worker: {
-        title: '🔮 Jūsu mērķi',
-        description: 'Jūsu gaidāmie profesionālie projekti',
-      },
-    },
-    6: {
-      agency: {
-        title: '📧 Saglabājiet kontaktu',
-        description: 'Saņemiet pētījuma rezultātus un esiet informēts',
-      },
-      client: {
-        title: '📧 Saglabājiet kontaktu',
-        description: 'Saņemiet rezultātus un mūsu ieteikumus',
-      },
-      worker: {
-        title: '📧 Saglabājiet kontaktu',
-        description: 'Saņemiet rezultātus un iespējas',
-      },
-    },
-  },
-  
-  // Header
+
+  // Galvene
   header: {
     title: 'YoJob',
     subtitle: 'Tirgus pētījums',
   },
-  
+
   // Hero
   hero: {
     title: 'Tirgus aptauja',
-    subtitle: 'Palīdziet mums labāk saprast jūsu vajadzības',
-    description: 'Šī aptauja ilgst aptuveni 10-15 minūtes. Jūsu atbildes palīdzēs mums izveidot risinājumu, kas pielāgots jūsu nozarei.',
+    subtitle: 'Palīdziet mums labāk izprast jūsu vajadzības',
+    description:
+      'Aptauja aizņem apmēram 10–15 minūtes. Jūsu atbildes palīdzēs izveidot risinājumu, kas pielāgots jūsu nozarei.',
     cta_start: 'Sākt aptauju',
     cta_dashboard: 'Atvērt vadības paneli',
     badge: 'Eiropas tirgus pētījums',
     stat: {
       countries: '27 Eiropas valstis',
       questions: 'jautājumi',
-      benchmark: 'Iegūstiet 2025. gada etalonu',
+      benchmark: 'Saņemiet 2025. gada etalonu',
       insights: 'Ekskluzīvi tirgus ieskati',
-      opportunities: 'Prioritāra piekļuve darbiem',
+      opportunities: 'Prioritāra piekļuve darbavietām',
     },
     footer: {
-      info: 'jautājumi • Anonīmi • Atbilst VDAR',
+      info: 'jautājumi • Anonīmi • VDAR atbilstība',
       anonymous: 'Anonīmi',
-      gdpr: 'Atbilst VDAR',
+      gdpr: 'VDAR atbilstība',
     },
   },
-  
-  // Respondent Type
+
+  // Respondenta veids
   respondent_type: {
     title: 'Kas jūs esat?',
-    subtitle: 'Izvēlieties savu profilu jautājumu pielāgošanai',
-    agency: 'Nodarbinātības aģentūra',
-    agency_description: 'Jūs esat pagaidu nodarbinātības vai norīkošanas aģentūra',
-    client: 'Klients',
-    client_description: 'Jūs esat uzņēmums, kas nodarbina aģentūras darbiniekus',
-    worker: 'Aģentūras darbinieks',
-    worker_description: 'Jūs esat aģentūras vai norīkots darbinieks',
+    subtitle: 'Izvēlieties savu profilu, lai personalizētu jautājumus',
+    agency: 'Paglaba aģentūra',
+    agency_description: 'Jūs esat pagaidu vai norīkošanas aģentūra',
+    client: 'Klienta uzņēmums',
+    client_description: 'Jūs esat uzņēmums, kas nodarbina pagaidu darbiniekus',
+    worker: 'Pagaidu darbinieks',
+    worker_description: 'Jūs esat pagaidu vai norīkotais darbinieks',
   },
-  
-  // Respondent Selector
+
+  // Profila izvēle
   selector: {
-    badge: '🌍 Eiropas tirgus pētījums - Nodarbinātība un Pagaidu darbs',
-    title: 'Dalieties ar savu pieredzi Eiropas tirgū',
-    subtitle: 'Izvēlieties savu profilu aptaujas sākšanai',
-    cta: 'Noklikšķiniet, lai sāktu →',
+    badge: '🌍 Eiropas tirgus pētījums – Personāla atlase un pagaidu darbs',
+    title: 'Dalieties savā pieredzē Eiropas tirgū',
+    subtitle: 'Izvēlieties profilu un sāciet aptauju',
+    cta: 'Klikšķiniet, lai sāktu →',
     trust: {
-      secure: 'Drošie dati',
+      secure: 'Droši dati',
       languages: '{count} pieejamās valodas',
       languages_suffix: 'pieejamās valodas',
       anonymous: 'Anonīmi un konfidenciāli',
     },
   },
-  
-  // Respondent profiles for cards
+
+  // Kartīšu profili
   respondent: {
     agency: {
-      label: 'Nodarbinātības aģentūra',
-      description: 'Jūs esat Eiropas pagaidu nodarbinātības aģentūra. Dalieties ar savu norīkošanas pieredzi.',
+      label: 'Paglaba aģentūra',
+      description:
+        'Jūs esat Eiropas pagaidu nodarbinātības aģentūra. Dalieties norīkošanas pieredzē.',
       estimatedTime: '15 min',
     },
     client: {
-      label: 'Klients',
-      description: 'Jūs nodarbināt aģentūras darbiniekus. Dalieties ar savām vajadzībām un cerībām.',
+      label: 'Klienta uzņēmums',
+      description: 'Jūs nodarbināt pagaidu darbiniekus. Dalieties vajadzībās un gaidās.',
       estimatedTime: '10 min',
     },
     worker: {
-      label: 'Aģentūras darbinieks',
-      description: 'Jūs strādājat kā aģentūras darbinieks. Dalieties ar savu pieredzi no vietas.',
+      label: 'Pagaidu darbinieks',
+      description: 'Jūs strādājat kā pagaidu darbinieks. Dalieties praktiskajā pieredzē.',
       estimatedTime: '10 min',
     },
   },
-  
-  // Buttons
+
+  // Pogas
   button: {
     previous: 'Iepriekšējais',
     next: 'Nākamais',
-    submit: 'Nosūtīt atbildes',
-    submitting: 'Nosuta...',
+    submit: 'Iesniegt atbildes',
+    submitting: 'Notiek iesniegšana...',
     back: 'Atpakaļ',
     start: 'Sākt',
   },
-  
-  // Confirmation
+
+  // Apstiprinājums
   confirmation: {
-    title: 'Paldies par piedalīšanos!',
-    subtitle: 'Jūsu atbildes ir veiksmīgi saglabātas',
-    message: 'Pašlaik analizējam visas atbildes, lai izveidotu risinājumu, kas pilnībā pielāgots jūsu vajadzībām.',
+    title: 'Paldies par dalību!',
+    subtitle: 'Jūsu atbildes ir saglabātas',
+    message:
+      'Mēs analizējam visus atbildes, lai izveidotu risinājumu, kas perfekti atbilst jūsu vajadzībām.',
     cta_back: 'Atpakaļ uz sākumlapu',
-    cta_dashboard: 'Rādīt vadības paneli',
+    cta_dashboard: 'Skatīt vadības paneli',
   },
-  
+
   // Progress
   progress: {
     section: 'Sadaļa',
     question: 'Jautājums',
     section_completed: 'Sadaļa pabeigta',
-    questions_remaining: '{count} atlikušo jautājumu',
-    time_remaining: 'Aptuveni {time} atlicis',
+    questions_remaining: '{count} jautājumi atlikuši',
+    time_remaining: 'Apmēram {time} atlicis',
   },
-  
-  // Common translations
+
+  // Kopīgie tulkojumi
   common: {
     oui: 'Jā',
     non: 'Nē',
     autre: 'Cits',
     loading: 'Ielādē...',
-    submit: 'Nosūtīt',
+    submit: 'Iesniegt',
     next: 'Nākamais',
     previous: 'Iepriekšējais',
     skip: 'Izlaist',
     save: 'Saglabāt',
     cancel: 'Atcelt',
     close: 'Aizvērt',
-    required: 'Obligāts',
-    optional: 'Neobligāts',
+    required: 'Obligāti',
+    optional: 'Nav obligāti',
     error: 'Kļūda',
-    success: 'Panākums',
+    success: 'Veiksmīgi',
     completed: 'Pabeigts',
     inProgress: 'Procesā',
     notStarted: 'Nav sākts',
-    profileAgency: 'Nodarbinātības aģentūra',
-    profileClient: 'Klients',
-    profileWorker: 'Aģentūras darbinieks',
-    score_not_interested: 'Neinteresē',
+    profileAgency: 'Paglaba aģentūra',
+    profileClient: 'Klienta uzņēmums',
+    profileWorker: 'Pagaidu darbinieks',
+    score_not_interested: 'Nav ieinteresēts',
     score_very_interested: 'Ļoti ieinteresēts',
   },
-  
-  // Sectors
+
+  // Nozares
   sectors: {
-    btp: 'Celtniecība',
-    industrie: 'Rūpniecība',
+    btp: 'Būvniecība',
+    industrie: 'Ražošana',
     logistique: 'Loģistika',
     hotellerie: 'Viesmīlība',
-    sante: 'Veselības aprūpe',
+    sante: 'Veselība',
     agriculture: 'Lauksaimniecība',
     tech: 'Tehnoloģijas/IT',
-    autres: 'Cits',
+    autres: 'Citi',
   },
-  
-  // Questions - hérite de FR puis surcharge avec traductions LV
+
+  // Jautājumi – pārņem no FR, pēc tam pārraksta uz LV
   questions: {
     ...fr.questions,
-    
-    // Q1 : Nom
+
+    // Q1 : Nosaukums
     q1_nom: {
       ...fr.questions.q1_nom,
       label: 'Nosaukums',
       placeholder: 'Organizācijas nosaukums vai jūsu pilnais vārds',
     },
-    
-    // Q2 : Année création (AGENCY)
+
+    // Q2 : Dibināšanas gads (AGENCY)
     q2_annee: {
       ...fr.questions.q2_annee,
       label: 'Dibināšanas gads',
       placeholder: '2015',
     },
-    
-    // Q2 : Année création (CLIENT)
+
+    // Q2 : Dibināšanas gads (CLIENT)
     q2_annee_client: {
       ...fr.questions.q2_annee_client,
       label: 'Jūsu uzņēmuma dibināšanas gads',
       placeholder: '2010',
     },
-    
-    // Q2 : Nationalité (WORKER)
+
+    // Q2 : Pilsonība (WORKER)
     q2_nationalite: {
       ...fr.questions.q2_nationalite,
       label: 'Jūsu pilsonība',
-      placeholder: 'piemēram: poļu, rumāņu...',
+      placeholder: 'Piem.: poļu, rumāņu...',
     },
-    
-    // Q3 : Taille (AGENCY/CLIENT)
+
+    // Q3 : Organizācijas lielums (AGENCY/CLIENT)
     q3_taille: {
       ...fr.questions.q3_taille,
       label: 'Organizācijas lielums',
@@ -356,70 +253,70 @@ export const lv: TranslationBundle = {
         '250+': '250+ darbinieki',
       },
     },
-    
-    // Q3 : Expérience (WORKER)
+
+    // Q3 : Pieredze (WORKER)
     q3_experience: {
       ...fr.questions.q3_experience,
-      label: 'Pagaidu darba pieredzes gadi',
+      label: 'Pagaidu darba pieredze (gadi)',
       options: {
-        '<1': 'Mazāk par 1 gadu',
+        '<1': 'Mazāk nekā 1 gads',
         '1-3': '1-3 gadi',
         '3-5': '3-5 gadi',
         '5-10': '5-10 gadi',
         '10+': 'Vairāk nekā 10 gadi',
       },
     },
-    
-    // Q4 : Secteurs
+
+    // Q4 : Nozares
     q4_secteurs: {
       ...fr.questions.q4_secteurs,
-      label: 'Galvenie sektori',
-      description: 'Izvēlieties visus atbilstošos sektorus',
+      label: 'Galvenās nozares',
+      description: 'Izvēlieties visas atbilstošās nozares',
     },
-    
-    // Q4 : Métiers (WORKER)
+
+    // Q4 : Profesijas (WORKER)
     q4_metiers: {
       ...fr.questions.q4_metiers,
       label: 'Jūsu profesijas',
       description: 'Izvēlieties visas savas profesijas',
     },
-    
-    // Q5 : Pays (AGENCY)
+
+    // Q5 : Valsts (AGENCY)
     q5_pays: {
       ...fr.questions.q5_pays,
       label: 'Jūsu aģentūras valsts',
-      placeholder: 'piemēram: Polija',
+      placeholder: 'Piem.: Polija',
     },
-    
-    // Q5 : Localisation (CLIENT)
+
+    // Q5 : Lokācija (CLIENT)
     q5_localisation: {
       ...fr.questions.q5_localisation,
-      label: 'Valsts, kurā darbojas jūsu uzņēmums',
-      placeholder: 'piemēram: Francija',
+      label: 'Valsts, kur darbojas jūsu uzņēmums',
+      placeholder: 'Piem.: Francija',
     },
-    
-    // Q5 : Pays travail (WORKER)
+
+    // Q5 : Darba valstis (WORKER)
     q5_pays_travail: {
       ...fr.questions.q5_pays_travail,
-      label: 'Valstis, kurās esat strādājis kā aģentūras darbinieks',
-      placeholder: 'piemēram: Francija, Vācija, Beļģija...',
+      label: 'Valstis, kur strādājāt kā pagaidu darbinieks',
+      placeholder: 'Piem.: Francija, Vācija, Beļģija...',
     },
-    
-    // Q6 : Volume (AGENCY)
+
+    // Q6 : Apjoms (AGENCY)
     q6_volume: {
-      label: 'Gada norīkoto darbinieku apjoms',
+      label: 'Gada norīkoto darbinieku skaits',
       options: {
-        '0': 'Vēl neviens',
+        '0': 'Pagaidām nav',
         '1-50': '1-50 darbinieki',
         '51-200': '51-200 darbinieki',
         '201-500': '201-500 darbinieki',
         '500+': 'Vairāk nekā 500',
       },
     },
-    
-    // Q6 : Volume client (CLIENT)
+
+    // Q6 : Apjoms klientam (CLIENT)
     q6_volume_client: {
-      label: 'Cik aģentūras darbiniekus nodarbināt gadā?',
+      label: 'Cik pagaidu darbiniekus nodarbina gadā?',
       options: {
         '0': 'Pašlaik nevienu',
         '1-10': '1-10 cilvēki',
@@ -428,56 +325,54 @@ export const lv: TranslationBundle = {
         '200+': '200+ cilvēki',
       },
     },
-    
-    // Q6 : Fréquence (WORKER)
+
+    // Q6 : Biežums (WORKER)
     q6_frequence: {
-      label: 'Cik bieži strādājat kā aģentūras darbinieks?',
+      label: 'Cik bieži strādājat kā pagaidu darbinieks?',
       options: {
         permanent: 'Regulāri (visu gadu)',
         saisonnier: 'Sezonāli (noteiktos mēnešos)',
-        occasionnel: 'Reizēm',
+        occasionnel: 'Gadījuma rakstura',
         jamais: 'Vēl nekad (meklēju)',
       },
     },
-    
-    // Section 2 - Détachement/Experience
-    
-    // Q7 : Origine (AGENCY)
+
+    // Q7 : Izcelsme (AGENCY)
     q7_origine: {
       label: 'No kurienes nāk jūsu norīkotie darbinieki?',
-      placeholder: 'piemēram: Polija, Rumānija, Bulgārija...',
+      placeholder: 'Piem.: Polija, Rumānija, Bulgārija...',
     },
-    
-    // Q8 : Destinations (AGENCY)
+
+    // Q8 : Galamērķi (AGENCY)
     q8_destinations: {
       label: 'Galamērķa valstis',
       description: 'Valstis, uz kurām norīkojat darbiniekus',
-      placeholder: 'piemēram: Francija, Vācija, Beļģija, Nīderlande...',
+      placeholder: 'Piem.: Francija, Vācija, Beļģija, Nīderlande...',
     },
-    
-    // Q8 : Nationalités (CLIENT)
+
+    // Q8 : Pilsonības (CLIENT)
     q8_nationalites: {
-      label: 'Aģentūras darbinieku, kurus nodarbināt, pilsonības',
-      placeholder: 'piemēram: poļu, rumāņu, bulgāru...',
+      label: 'Pagaidu darbinieku pilsonības, kurus nodarbināt',
+      placeholder: 'Piem.: poļu, rumāņu, bulgāru...',
     },
-    
-    // Q9 : Défi (AGENCY)
+
+    // Q9 : Izaicinājums (AGENCY)
     q9_defi: {
-      label: 'Jūsu galvenais izaicinājums ar starptautisko norīkošanu',
+      label: 'Galvenais izaicinājums starptautiskā norīkošanā',
       options: {
-        admin: 'Administratīvā sarežģītība (A1, SIPSI...)',
-        conformite: 'Atbilstība noteikumiem vairākās valstīs',
+        admin: 'Administratīvs sarežģītums (A1, SIPSI...)',
+        conformite: 'Prasību ievērošana vairākās valstīs',
         cout: 'Vadības izmaksas un laiks',
         langues: 'Valodu barjeras',
         autre: 'Cits',
       },
     },
-    
-    // Q9 : Défi client (CLIENT)
+
+    // Q9 : Izaicinājums klientam (CLIENT)
     q9_defi_client: {
-      label: 'Jūsu galvenais izaicinājums ar Eiropas aģentūras darbiniekiem',
+      label: 'Galvenais izaicinājums ar Eiropas pagaidu darbiniekiem',
       options: {
-        trouver: 'Uzticamu aģentūru meklēšana',
+        trouver: 'Uzticamu aģentūru atrašana',
         conformite: 'Juridiskā atbilstība',
         qualite: 'Kvalitāte/prasmes',
         cout: 'Pārāk augstas izmaksas',
@@ -485,79 +380,77 @@ export const lv: TranslationBundle = {
         autre: 'Cits',
       },
     },
-    
-    // Q9 : Défi worker (WORKER)
+
+    // Q9 : Izaicinājums darbiniekam (WORKER)
     q9_defi_worker: {
-      label: 'Jūsu galvenais izaicinājums ar pagaidu darbu ārzemēs',
+      label: 'Galvenais izaicinājums jūsu uzdevumos',
       options: {
-        admin: 'Administratīvā dokumentācija',
-        langue: 'Valodu barjera',
-        logement: 'Mājokļa meklēšana',
-        transport: 'Transports',
-        salaire: 'Maksājuma/algas problēmas',
+        trouver: 'Atrast uzdevumus',
+        admin: 'Administratīvie dokumenti',
+        logement: 'Mājokļa nodrošinājums',
+        langue: 'Vietējā valoda',
+        paiement: 'Maksājumi / Alga',
         autre: 'Cits',
       },
     },
-    
-    // Q9 : Autre
+
+    // Q9 : Cits
     q9_autre: {
-      label: 'Norādiet savu galveno izaicinājumu',
+      label: 'Lūdzu, norādiet savu galveno izaicinājumu',
       placeholder: 'Aprakstiet savu galveno izaicinājumu...',
     },
-    
-    // Q10 : Gestion (AGENCY)
+
+    // Q10 : Pārvaldība (AGENCY)
     q10_gestion: {
-      label: 'Kā šodien pārvaldāt norīkošanas pieteikumus?',
+      ...fr.questions.q10_gestion,
+      label: 'Kā šobrīd pārvaldāt norīkojuma deklarācijas?',
       options: {
         interne: 'Iekšējā komanda',
         externe: 'Ārējais pakalpojumu sniedzējs',
-        mixte: 'Jaukta pieeja',
+        mixte: 'Kombinēta pieeja',
         manuel: 'Manuāla pārvaldība',
         logiciel: 'Specializēta programmatūra',
-        manuel: 'Manuāli (Excel, Word...)',
-        logiciel_interne: 'Iekšējā programmatūra',
-        prestataire: 'Ārējais pakalpojumu sniedzējs',
       },
     },
-    
-    // Q10 : Agences (CLIENT)
+
+    // Q10 : Aģentūras (CLIENT)
     q10_agences: {
       ...fr.questions.q10_agences,
-      label: 'Cik nodarbinātības aģentūras izmantojat?',
+      label: 'Cik pagaidu nodarbinātības aģentūras izmantojat?',
       options: {
-        '0': 'Nevienu',
+        '0': 'Neviena',
         '1': '1 aģentūru',
         '2-3': '2-3 aģentūras',
         '4-10': '4-10 aģentūras',
         '10+': 'Vairāk nekā 10',
       },
     },
-    
-    // Q10 : Processus (CLIENT)
+
+    // Q10 : Process (CLIENT)
     q10_processus: {
       ...fr.questions.q10_processus,
-      label: 'Kā nodarbināt aģentūras darbiniekus?',
+      label: 'Kā pieņemat pagaidu darbiniekus?',
       options: {
-        agence_fr: 'Franču nodarbinātības aģentūras',
-        agence_euro: 'Eiropas nodarbinātības aģentūras',
-        direct: 'Tieša nodarbināšana',
-        mixte: 'Jaukts',
+        agence_fr: 'Francijas pagaidu aģentūras',
+        agence_euro: 'Eiropas pagaidu aģentūras',
+        direct: 'Tiešā pieņemšana',
+        mixte: 'Kombinēti',
       },
     },
-    
-    // Q10 : Agence (WORKER)
+
+    // Q10 : Aģentūra (WORKER)
     q10_agence: {
       ...fr.questions.q10_agence,
-      label: 'Kā meklējat pagaidu darbu?',
+      label: 'Kā atrodat pagaidu darbu?',
       options: {
-        agence: 'Caur nodarbinātības aģentūrām',
-        bouche: 'Ieteikums',
+        agence: 'Caur pagaidu aģentūrām',
+        bouche: 'Mutiska rekomendācija',
         internet: 'Tiešsaistes darba portāli',
         direct: 'Tieša pieteikšanās',
       },
     },
-    
-    // Q10ter : Agences utilisées (WORKER)
+
+    // Q10ter : Izmantotās aģentūras (WORKER)
     q10_agences_worker: {
       label: 'Ar cik aģentūrām sadarbojaties?',
       options: {
@@ -567,25 +460,23 @@ export const lv: TranslationBundle = {
         '10+': 'Vairāk nekā 10',
       },
     },
-    
-    // Q11 : Incidents (AGENCY)
+
+    // Q11 : Incidenti (AGENCY)
     q11_incidents: {
-      label: 'Vai esat saņēmis naudas sodus vai incidentus saistībā ar norīkošanas atbilstību?',
-      description: 'Jūsu atbilde paliek anonīma',
+      ...fr.questions.q11_incidents,
+      label: 'Vai esat saskārušies ar sodiem vai incidentiem saistībā ar norīkojuma atbilstību?',
+      description: 'Jūsu atbilde paliks anonīma',
       options: {
         jamais: 'Nē, nekad',
         rarement: 'Reti (1-2 reizes)',
         parfois: 'Dažreiz (3-5 reizes)',
         souvent: 'Bieži (6+ reizes)',
-        oui_souvent: 'Jā, bieži',
-        oui_rare: 'Jā, reizēm',
-        non: 'Nē',
       },
     },
-    
-    // Q11 : Conformité (CLIENT)
+
+    // Q11 : Atbilstība (CLIENT)
     q11_conformite: {
-      label: 'Vai pārbaudāt nodarbinātības aģentūru juridisko atbilstību?',
+      label: 'Vai pārbaudāt pagaidu aģentūru juridisko atbilstību?',
       options: {
         oui_systematique: 'Jā, sistemātiski',
         oui_parfois: 'Jā, dažreiz',
@@ -593,37 +484,46 @@ export const lv: TranslationBundle = {
         ne_sait_pas: 'Nezinu',
       },
     },
-    
-    // Q11 : Problèmes (WORKER)
+
+    // Q11 : Problēmas (WORKER)
     q11_problemes: {
-      label: 'Vai esat saskāries ar problēmām pagaidu darbā ārzemēs?',
+      label: 'Vai esat piedzīvojuši problēmas ar pagaidu darbu ārzemēs?',
       options: {
         oui_graves: 'Jā, nopietnas problēmas',
-        oui_mineurs: 'Jā, mazas problēmas',
+        oui_mineurs: 'Jā, nelielas problēmas',
         non: 'Nē',
       },
     },
-    
-    // Q12 : Budget (AGENCY)
+
+    // Q12 : Budžets (AGENCY)
     q12_budget: {
-      label: 'Vai jums ir budžets ārējiem pakalpojumiem norīkošanas pārvaldībai?',
+      ...fr.questions.q12_budget,
+      label: 'Gada budžets norīkojuma administratīvai pārvaldībai',
       options: {
-        oui_important: 'Jā, būtisks',
-        oui_modere: 'Jā, mērens',
-        non: 'Nē',
-        ne_sait_pas: 'Nezinu',
+        '0-5k': '€0-5 000 / gadā',
+        '5-15k': '€5 000-15 000 / gadā',
+        '15-30k': '€15 000-30 000 / gadā',
+        '30k+': '€30 000+ / gadā',
+        inconnu: 'Nezinu',
       },
     },
-    
-    // Q12 : Critères (CLIENT)
-    q12_criteres: {
-      label: 'Kādi ir jūsu galvenie kritēriji, izvēloties nodarbinātības aģentūru?',
-      description: 'Izvēlieties vairākus variantus',
+
+    // Q12 : Budžets klientam (CLIENT)
+    q12_budget_client: {
+      ...fr.questions.q12_budget_client,
+      label: 'Gada budžets pagaidu darbam',
+      options: {
+        '0-50k': '€0 - €50 000',
+        '50-200k': '€50 000 - €200 000',
+        '200-500k': '€200 000 - €500 000',
+        '500k+': '€500 000+',
+        'inconnu': 'Nezinu',
+      },
     },
-    
-    // Q12 : Satisfaction (WORKER)
+
+    // Q12 : Apmierinātība (CLIENT)
     q12_satisfaction: {
-      label: 'Cik apmierināts esat ar saviem pašreizējiem darba apstākļiem?',
+      label: 'Apmierinātība ar pašreizējām pagaidu aģentūrām',
       options: {
         tres_satisfait: 'Ļoti apmierināts',
         satisfait: 'Apmierināts',
@@ -631,299 +531,305 @@ export const lv: TranslationBundle = {
         insatisfait: 'Neapmierināts',
       },
     },
-    
-    // Q13 : Durée (AGENCY)
-    q13_duree: {
-      label: 'Vidējais jūsu norīkošanas uzdevumu ilgums',
+
+    // Q12 : Alga (WORKER)
+    q12_salaire: {
+      ...fr.questions.q12_salaire,
+      label: 'Vai esat apmierināts ar pagaidu darba algu?',
       options: {
-        '<1mois': 'Mazāk par 1 mēnesi',
-        '1-3mois': '1-3 mēneši',
-        '3-6mois': '3-6 mēneši',
-        '6-12mois': '6-12 mēneši',
-        '12+mois': 'Vairāk nekā 12 mēneši',
+        '<1500': 'Mazāk nekā €1 500',
+        '1500-2500': '€1 500 - €2 500',
+        '2500-3500': '€2 500 - €3 500',
+        '3500+': '€3 500+',
       },
     },
-    
-    // Q12 : Budget client (CLIENT)
-    q12_budget_client: {
-      label: 'Gada budžets pagaidu darbam',
+
+    // Q13 : Zaudētie ieņēmumi (AGENCY)
+    q13_manque_gagner: {
+      ...fr.questions.q13_manque_gagner,
+      label: 'Kāda ieņēmumu daļa zaudēta administratīva sarežģītuma dēļ?',
       options: {
-        '0-50k': '0-50 000 €',
-        '50-200k': '50 000-200 000 €',
-        '200-500k': '200 000-500 000 €',
-        '500k+': '500 000+ €',
-        'inconnu': 'Nezinu',
+        'non': 'Nē, ne īsti',
+        'faible': 'Jā, neliela (< 5% ieņēmumu)',
+        'moyen': 'Jā, vidēja (5-15% ieņēmumu)',
+        'important': 'Jā, ievērojama (> 15% ieņēmumu)',
       },
     },
-    
-    // Q13 : Durée worker (WORKER)
-    q13_duree_worker: {
-      label: 'Jūsu vēlamais uzdevuma ilgums',
-      options: {
-        court: 'Īss (< 3 mēneši)',
-        moyen: 'Vidējs (3-6 mēneši)',
-        long: 'Garš (> 6 mēneši)',
-        indifferent: 'Man ir vienalga',
-      },
-    },
-    
-    // Q13 : Satisfaction (CLIENT)
+
+    // Q13 : Apmierinātība (CLIENT)
     q13_satisfaction: {
       ...fr.questions.q13_satisfaction,
-      label: 'Apmierinātība ar pašreizējām aģentūrām',
+      label: 'Apmierinātība ar jūsu pašreizējām pagaidu aģentūrām',
       options: {
         'tres_satisfait': 'Ļoti apmierināts',
         'satisfait': 'Apmierināts',
         'neutre': 'Neitrāls',
-        'insatisfait': 'Nedaudz apmierināts',
+        'insatisfait': 'Neapmierināts',
         'tres_insatisfait': 'Ļoti neapmierināts',
       },
     },
-    
-    // Q13 : Satisfaction worker (WORKER)
+
+    // Q13 : Apmierinātība darbiniekam (WORKER)
     q13_satisfaction_worker: {
       ...fr.questions.q13_satisfaction_worker,
-      label: 'Apmierinātība ar pašreizējām aģentūrām',
+      label: 'Apmierinātība ar jūsu pašreizējām pagaidu aģentūrām',
       options: {
         'tres_satisfait': 'Ļoti apmierināts',
         'satisfait': 'Apmierināts',
         'neutre': 'Neitrāls',
-        'insatisfait': 'Nedaudz apmierināts',
+        'insatisfait': 'Neapmierināts',
         'tres_insatisfait': 'Ļoti neapmierināts',
       },
     },
-    
-    // Q14 : Risques (AGENCY)
+
+    // Q14 : Riska faktori (AGENCY)
     q14_risques: {
       ...fr.questions.q14_risques,
-      label: 'Jūsu galvenās bažas',
-      description: 'Izvēlieties visus atbilstošos variantus',
+      label: 'Galvenās bažas',
+      description: 'Izvēlieties visas piemērojamās opcijas',
       options: {
-        amendes: 'Naudas sodi un sankcijas',
-        reputation: 'Reputācija / Tēls',
+        amendes: 'Sodi un sankcijas',
+        reputation: 'Reputācija / Imidžs',
         penal: 'Kriminālatbildība',
         delais: 'Uzdevumu kavējumi',
-        clients: 'Klientu zaudēšana',
-        aucun: 'Nav būtisku risku',
-        sanctions: 'Sodi/sankcijas',
-        conformite: 'Atbilstība vairākās valstīs',
-        cout: 'Administratīvās izmaksas',
-        documentation: 'Dokumentu pārvaldība',
-        responsabilite: 'Kriminālatbildība',
-        perte_clients: 'Klientu zaudēšana',
+        clients: 'Klientu zudums',
+        aucun: 'Nav būtiska riska',
       },
     },
-    
-    // Q14 : Risques client (CLIENT)
+
+    // Q14 : Vajadzības (CLIENT)
+    q14_besoins_client: {
+      ...fr.questions.q14_besoins_client,
+      label: 'Galvenās vajadzības',
+      description: 'Izvēlieties visas piemērojamās opcijas',
+      options: {
+        fiabilite: 'Atrast uzticamas aģentūras',
+        conformite: 'Juridiskā atbilstība',
+        qualite: 'Kvalitāte/prasmes',
+        cout: 'Izmaksas',
+        disponibilite: 'Kandidātu pieejamība',
+        aucun: 'Nav būtiskas vajadzības',
+      },
+    },
+
+    // Q14 : Cerības (WORKER)
+    q14_attentes: {
+      ...fr.questions.q14_attentes,
+      label: 'Cerības par pagaidu darbu ārzemēs',
+      description: 'Izvēlieties visas piemērojamās opcijas',
+      options: {
+        salaire: 'Labāka alga',
+        conditions: 'Labāki darba apstākļi',
+        stabilite: 'Stabilitāte',
+        experience: 'Starptautiskā pieredze',
+        logement: 'Palīdzība ar mājokli',
+        aucun: 'Nav īpašu cerību',
+      },
+    },
+
+    // Q14_risques_client
     q14_risques_client: {
       ...fr.questions.q14_risques_client,
-      label: 'Kādi riski jūs visvairāk uztrauc?',
-      description: 'Izvēlieties visus atbilstošos variantus',
+      label: 'Galvenās bažas',
+      description: 'Izvēlieties visas piemērojamās opcijas',
       options: {
-        conformite: 'Noteikumu neievērošana',
-        qualite: 'Nepietiekama kvalitāte',
+        conformite: 'Juridiskā atbilstība',
+        qualite: 'Kvalitāte/prasmes',
         communication: 'Komunikācija/Valodas',
-        cout: 'Negaidītas izmaksas',
+        cout: 'Neparedzētas izmaksas',
         disponibilite: 'Kandidātu pieejamība',
         aucun: 'Nav būtisku bažu',
-        fiabilite: 'Aģentūru uzticamība',
       },
     },
-    
-    // Q14 : Risques worker (WORKER)
+
+    // Q14_risques_worker
     q14_risques_worker: {
       ...fr.questions.q14_risques_worker,
       label: 'Ar kādām problēmām visbiežāk saskaraties?',
-      description: 'Izvēlieties visus atbilstošos variantus',
+      description: 'Izvēlieties visas piemērojamās opcijas',
       options: {
-        paiement: 'Algas kavēšanās',
+        paiement: 'Maksājumu kavējumi',
         conditions: 'Slikti apstākļi',
-        contrat: 'Līguma neievērošana',
-        logement: 'Neadekvāts mājoklis',
+        contrat: 'Netiek ievēroti līgumi',
+        logement: 'Nepiemērots mājoklis',
         communication: 'Komunikācijas problēmas',
-        aucun: 'Nav lielu problēmu',
+        aucun: 'Nav būtisku problēmu',
       },
     },
-    
-    // Q15 : Problème (AGENCY)
+
+    // Q15 : Problēma
     q15_probleme: {
       ...fr.questions.q15_probleme,
-      label: 'Kādu problēmu vēlētos atrisināt kā pirmo?',
+      label: 'Kuru problēmu vēlētos atrisināt vispirms?',
       placeholder: 'Aprakstiet savu prioritāro problēmu...',
     },
-    
-    // Q15 : Besoins client (CLIENT)
+
+    // Q15 : Vajadzības klientam (CLIENT)
     q15_besoins_client: {
       ...fr.questions.q15_besoins_client,
       label: 'Kādas ir jūsu prioritārās vajadzības?',
-      placeholder: 'Piemēram: Ātri atrast, labāka kvalitāte, cenas...',
+      placeholder: 'Piem.: Atrast ātri, labāka kvalitāte, cenas...',
     },
-    
-    // Q15 : Améliorations (WORKER)
+
+    // Q15 : Uzlabojumi (WORKER)
     q15_ameliorations: {
       ...fr.questions.q15_ameliorations,
       label: 'Ko vēlētos uzlabot savos uzdevumos?',
-      placeholder: 'Piemēram: Alga, mājoklis, atbalsts, stabilitāte...',
+      placeholder: 'Piem.: Alga, mājoklis, atbalsts, stabilitāte...',
     },
-    
+
     // Q16 : ERP (AGENCY)
     q16_erp: {
+      ...fr.questions.q16_erp,
       label: 'Vai izmantojat ERP/pārvaldības programmatūru?',
       options: {
         sage: 'Sage',
         sap: 'SAP',
         cegid: 'Cegid',
         bullhorn: 'Bullhorn / ATS',
-        autre: 'Cits',
-        aucun: 'Bez ERP',
-        oui: 'Jā',
-        non: 'Nē',
+        autre: 'Cita',
+        aucun: 'Nav ERP',
       },
     },
-    
-    // Q16 : Nom ERP
+
+    // Q16 : ERP nosaukums
     q16_nom_erp: {
-      label: 'Kāda programmatūra/ERP?',
-      placeholder: 'Piemēram: SAP, Odoo, pašu izveidota...',
+      label: 'Kuru programmatūru/ERP izmantojat?',
+      placeholder: 'Piem.: SAP, Odoo, individuāla...',
     },
-    
-    // Q16 : Critères (CLIENT)
+
+    // Q16 : Kritēriji (CLIENT)
     q16_criteres: {
-      label: 'Jūsu galvenie kritēriji nodarbinātības aģentūru izvēlē',
-      description: 'Izvēlieties top 3',
+      label: 'Galvenie atlases kritēriji pagaidu aģentūrām',
+      description: 'Izvēlieties savus top 3',
     },
-    
-    // Q16 : Amélioration (WORKER)
+
+    // Q16 : Uzlabojumi (WORKER)
     q16_amelioration: {
       label: 'Kas uzlabotu jūsu pagaidu darba pieredzi?',
-      description: 'Izvēlieties visus atbilstošos variantus',
+      description: 'Izvēlieties visas piemērojamās opcijas',
     },
-    
-    // Q17 : Migration (AGENCY)
+
+    // Q17 : Migrācija (AGENCY)
     q17_migration: {
-      label: 'Vai esat gatavs mainīt savus darba rīkus?',
+      ...fr.questions.q17_migration,
+      label: 'Vai esat gatavi mainīt savus darba rīkus?',
       options: {
         oui: 'Jā, bez problēmām',
-        conditions: 'Jā, noteiktos apstākļos',
-        difficile: 'Grūti, bet atvērts',
-        non: 'Nē, neiedomājams',
-        oui_rapidement: 'Jā, nekavējoties',
-        oui_progressivement: 'Jā, pakāpeniski',
-        non_satisfait: 'Nē, esmu apmierināts ar pašreizējiem rīkiem',
-        non_peur: 'Nē, baidos no pārmaiņām',
+        conditions: 'Jā, ar nosacījumiem',
+        difficile: 'Grūti, bet atvērti',
+        non: 'Nē, nav iespējams',
       },
     },
-    
-    // Q17 : Budget (CLIENT)
+
+    // Q17 : Budžets (CLIENT)
     q17_budget: {
-      label: 'Mēneša budžets nodarbinātības platformai',
+      label: 'Mēneša budžets pagaidu darbinieku atlases platformai',
       options: {
-        '0': 'Neesmu gatavs maksāt',
-        '1-100': '1-100 €/mēnesī',
-        '100-500': '100-500 €/mēnesī',
-        '500-1000': '500-1 000 €/mēnesī',
-        '1000+': 'Vairāk nekā 1 000 €/mēnesī',
+        '0': 'Neplānoju maksāt',
+        '1-100': '€1 - €100/mēn',
+        '100-500': '€100 - €500/mēn',
+        '500-1000': '€500 - €1 000/mēn',
+        '1000+': 'Vairāk nekā €1 000/mēn',
       },
     },
-    
-    // Q17 : Plateforme (WORKER)
+
+    // Q17 : Platforma (WORKER)
     q17_plateforme: {
-      label: 'Vai izmantotu platformu pagaidu darba meklēšanai ārzemēs?',
+      label: 'Vai izmantotu platformu pagaidu darba atrašanai ārzemēs?',
       options: {
         oui_certainement: 'Jā, noteikti',
-        oui_probablement: 'Jā, ticams',
+        oui_probablement: 'Jā, iespējams',
         peut_etre: 'Varbūt',
         non: 'Nē',
       },
     },
-    
-    // Section 4 - Intérêt YoJob
-    
-    // Q18 : Score
+
+    // Q18 : Vērtējums
     q18_score: {
       ...fr.questions.q18_score,
-      label: 'Interese par Eiropas norīkošanas tirgu (0-10)',
-      description: 'Vērtējums no 1 (neinteresē) līdz 10 (liela interese)',
+      label: 'Cik ļoti interesē Eiropas norīkojumu tirgus?',
+      description: 'Novērtējiet no 1 (neinteresē) līdz 10 (ļoti interesē)',
     },
-    
-    // Q19 : Features (AGENCY)
+
+    // Q19 : Funkcijas (AGENCY)
     q19_features: {
       ...fr.questions.q19_features,
-      label: 'Visinteresantākās funkcijas',
-      description: 'Izvēlieties savus top 3 prioritātes',
+      label: 'Interesantākās funkcijas',
+      description: 'Izvēlieties savas top 3 prioritātes',
       options: {
-        sipsi: 'Automātiska SIPSI deklarēšana',
-        a1: 'A1 sertifikāta pārvaldība',
-        conformite: 'Atbilstības vadības panelis',
-        alertes: 'Brīdinājumi un atjaunojumi',
+        sipsi: 'Automātiska SIPSI deklarācija',
+        a1: 'A1 sertifikātu pārvaldība',
+        conformite: 'Atbilstības panelis',
+        alertes: 'Paziņojumi un atjaunošana',
         documents: 'Dokumentu centralizācija',
         marketplace: 'Aģentūru tirgus',
-        support: 'Daudzvalodu eksperta atbalsts',
+        support: 'Daugiem valodām atbalsts',
         api: 'API integrācija (ERP)',
       },
     },
-    
-    // Q19 : Features CLIENT
+
+    // Q19 : Funkcijas (CLIENT)
     q19_features_client: {
       ...fr.questions.q19_features_client,
-      label: 'Visinteresantākās funkcijas',
-      description: 'Izvēlieties visas, kas jūs interesē',
+      label: 'Interesantākās funkcijas',
+      description: 'Izvēlieties visas, kas interesē',
       options: {
         recherche: 'Uzticamu aģentūru meklēšana',
-        comparaison: 'Cenas/kvalitātes salīdzinājums',
+        comparaison: 'Cena/kvalitāte salīdzinājums',
         avis: 'Pārbaudītas atsauksmes',
         conformite: 'Atbilstības garantija',
-        support: 'Īpašs atbalsts',
-        facturation: 'Centralizēta rēķinu izrakstīšana',
-        suivi: 'Reāllaika izsekošana',
+        support: 'Dedikēts atbalsts',
+        facturation: 'Centralizēta norēķinu sistēma',
+        suivi: 'Izsekošana reāllaikā',
       },
     },
-    
-    // Q19 : Features WORKER
+
+    // Q19 : Funkcijas (WORKER)
     q19_features_worker: {
       ...fr.questions.q19_features_worker,
-      label: 'Visinteresantākās funkcijas',
-      description: 'Izvēlieties visas, kas jūs interesē',
+      label: 'Interesantākās funkcijas',
+      description: 'Izvēlieties visas, kas interesē',
       options: {
         recherche: 'Darba meklēšana',
-        avis: 'Aģentūru vērtējumi',
+        avis: 'Aģentūru atsauksmes',
         logement: 'Palīdzība ar mājokli',
         paiement: 'Droši maksājumi',
         support: 'Atbalsts manā valodā',
-        documents: 'Palīdzība ar administratīvajiem dokumentiem',
+        documents: 'Palīdzība ar dokumentiem',
         formation: 'Apmācību programmas',
       },
     },
-    
-    // Q20 : Prix
+
+    // Q20 : Cena
     q20_prix: {
       ...fr.questions.q20_prix,
       label: 'Vēlamais cenu modelis',
       options: {
         mensuel: 'Fiksēts mēneša abonements',
-        usage: 'Maksājums par lietojumu',
+        usage: 'Maksāt pēc patēriņa',
         annuel: 'Gada plāns (atlaide)',
         gratuit: 'Bezmaksas darbiniekiem',
       },
     },
-    
-    // Q21 : Budget mensuel
+
+    // Q21 : Mēneša budžets
     q21_budget_mensuel: {
       ...fr.questions.q21_budget_mensuel,
-      label: 'Mēneša budžets pilnīgam SaaS risinājumam',
+      label: 'Mēneša budžets pilnam SaaS risinājumam',
       options: {
-        '0-100': '0-100 €/mēnesī',
-        '100-300': '100-300 €/mēnesī',
-        '300-500': '300-500 €/mēnesī',
-        '500-1000': '500-1 000 €/mēnesī',
-        '1000+': 'Vairāk nekā 1 000 €/mēnesī',
+        '0-100': '€0 - €100/mēn',
+        '100-300': '€100 - €300/mēn',
+        '300-500': '€300 - €500/mēn',
+        '500-1000': '€500 - €1 000/mēn',
+        '1000+': 'Vairāk nekā €1 000/mēn',
       },
     },
-    
+
     // Q22 : MVP
     q22_mvp: {
       ...fr.questions.q22_mvp,
-      label: 'Vai vēlētos testēt agrīnu versiju (MVP)?',
+      label: 'Vai vēlaties testēt agrīnu versiju (MVP)?',
       options: {
         oui_gratuit: 'Jā, bez maksas',
         oui_reduc: 'Jā, ar atlaidi',
@@ -931,191 +837,82 @@ export const lv: TranslationBundle = {
         non: 'Nē, neinteresē',
       },
     },
-    
-    // Section 5 - Vision Future
-    
-    // Q23 : Rôle
+
+    // Q23 : Loma
     q23_role: {
       label: 'Kā redzat savu lomu Eiropas tirgū?',
       options: {
-        decideur: 'Galīgais lēmuma pieņēmējs',
-        influenceur: 'Ietekmētājs / Ieteikums',
+        decideur: 'Gala lēmuma pieņēmējs',
+        influenceur: 'Ietekmētājs / Ieteicējs',
         utilisateur: 'Gala lietotājs',
         autre: 'Cits',
       },
     },
-    
-    // Q20 : Croissance (AGENCY)
-    q20_croissance: {
-      label: 'Kā redzat savu norīkošanas darbību nākamajos 3 gados?',
-      options: {
-        forte_croissance: 'Strauja izaugsme',
-        croissance: 'Mērena izaugsme',
-        stable: 'Stabils',
-        decroissance: 'Samazinājums',
-      },
-    },
-    
-    // Q20 : Évolution (CLIENT)
-    q20_evolution: {
-      label: 'Kā redzat savu pagaidu darba vajadzību attīstību?',
-      options: {
-        hausse: 'Pieaugums',
-        stable: 'Stabils',
-        baisse: 'Samazinājums',
-      },
-    },
-    
-    // Q20 : Projets (WORKER)
-    q20_projets: {
-      label: 'Kādi ir jūsu projekti nākamajos mēnešos?',
-      options: {
-        meme_secteur: 'Turpināt tajā pašā sektorā',
-        changer_secteur: 'Mainīt sektoru',
-        se_former: 'Mācīties',
-        entrepreneur: 'Kļūt par uzņēmēju',
-      },
-    },
-    
-    // Q21 : Budget évolution (AGENCY)
-    q21_budget_evolution: {
-      label: 'Vai plānojat palielināt savu budžetu ārējiem pakalpojumiem?',
-      options: {
-        oui_beaucoup: 'Jā, ievērojami',
-        oui_peu: 'Jā, nedaudz',
-        non: 'Nē',
-        ne_sait_pas: 'Nezinu',
-      },
-    },
-    
-    // Q21 : Budget évolution client (CLIENT)
-    q21_budget_evolution_client: {
-      label: 'Vai plānojat palielināt savu nodarbinātības budžetu?',
-      options: {
-        oui_beaucoup: 'Jā, ievērojami',
-        oui_peu: 'Jā, nedaudz',
-        non: 'Nē',
-      },
-    },
-    
-    // Q21 : Mobilité (WORKER)
-    q21_mobilite: {
-      label: 'Vai esat gatavs pārcelties darba dēļ?',
-      options: {
-        oui_europe: 'Jā, jebkur Eiropā',
-        oui_proche: 'Jā, kaimiņvalstīs',
-        non: 'Nē, tikai manā valstī',
-      },
-    },
-    
-    // Section 5 - Contact
-    
-    // Q24 : Commentaires
-    q24_commentaires: {
-      label: 'Papildu komentāri vai ierosinājumi',
-      placeholder: 'Dalieties ar savām idejām, cerībām vai īpašajām vajadzībām...',
-    },
-    
-    // Q24 : Vision du marché dans les 3 prochaines années (ALL)
+
+    // Q24 : Attīstība
     q24_evolution: {
-      label: 'Tirgus vīzija nākamajos 3 gados',
-      placeholder: 'Dalieties ar savu vīziju...',
+      label: 'Jūsu starptautiskās paplašināšanās plāni',
+      options: {
+        oui_rapide: 'Jā, 6 mēnešu laikā',
+        oui_lent: 'Jā, 1-2 gadu laikā',
+        maintien: 'Saglabāt pašreizējās valstis',
+        reduction: 'Samazināt starptautisko apjomu',
+      },
     },
-    
-    // Q25 : Autres besoins ou suggestions (ALL)
+
+    // Q24bis : Profesionālās ambīcijas (WORKER)
+    q24_aspirations: {
+      label: 'Jūsu nākotnes profesionālās ambīcijas',
+      placeholder: 'Piem.: pastāvīgs darbs, atgriešanās valstī, apmācība...',
+    },
+
+    // Q25 : Citi vajadzības vai komentāri
     q25_besoins: {
-      label: 'Citas vajadzības vai ierosinājumi',
-      placeholder: 'Jūsu ierosinājumi mūs interesē...',
+      label: 'Citas vajadzības vai komentāri',
+      placeholder: 'Dalieties ar citu atgriezenisko saiti vai vajadzībām...',
     },
-    
-    // SECTION 6 : CONTACT
-    
-    // Q26 : Téléphone professionnel (AGENCY & CLIENT)
+
+    // Kontakti
     q26_phone: {
-      label: 'Darba tālrunis',
-      placeholder: '+371 1234 5678',
+      label: 'Profesionālais tālrunis',
+      placeholder: '+371 20 123 456',
     },
-    
-    // Q27 : Prénom (ALL)
+
     q27_firstname: {
       label: 'Vārds',
       placeholder: 'Jūsu vārds',
     },
-    
-    // Q28 : Nom (ALL)
+
     q28_lastname: {
       label: 'Uzvārds',
       placeholder: 'Jūsu uzvārds',
     },
-    
-    // Q29 : SIRET/SIREN (AGENCY & CLIENT - optionnel)
+
     q29_siret: {
-      label: 'Reģistrācijas numurs (neobligāts)',
-      placeholder: '12345678901',
-      description: 'Bagātināšanai caur Uzņēmumu reģistru',
+      label: 'Uzņēmuma reģistrācijas nr. (neobligāti)',
+      placeholder: '12345678',
+      description: 'Datu bagātināšanai caur reģistru',
     },
-    
-    // Q30 : Email professionnel (ALL)
+
     email: {
-      label: 'E-pasts',
+      label: 'Jūsu e-pasts',
       placeholder: 'jusu.epasts@piemers.lv',
     },
-    
-    // Q31 : Autorisation contact (ALL)
+
     autorise_contact: {
-      label: 'Es piekrītu, ka ar mani atkal sazināsieties',
+      label: 'Piekrītu, ka ar mani sazinās vēlreiz',
     },
-    
-    // Q32 : Rapport d'étude (ALL)
+
     souhaite_rapport: {
-      label: 'Es vēlētos saņemt pētījuma ziņojumu',
+      label: 'Vēlos saņemt pētījuma ziņojumu',
     },
-    
-    // Questions additionnelles spécifiques
-    
-    // Critères de sélection (CLIENT)
-    critere_prix: {
-      label: 'Cena',
-    },
-    critere_qualite: {
-      label: 'Profilu kvalitāte',
-    },
-    critere_rapidite: {
-      label: 'Atbildes ātrums',
-    },
-    critere_conformite: {
-      label: 'Juridiskā atbilstība',
-    },
-    critere_flexibilite: {
-      label: 'Elastība',
-    },
-    
-    // Services valorisés (CLIENT)
-    service_accompagnement: {
-      label: 'Personīgais atbalsts',
-    },
-    service_garantie: {
-      label: 'Nomaiņas garantija',
-    },
-    service_formation: {
-      label: 'Iepriekšēja apmācība',
-    },
-    service_gestion: {
-      label: 'Administratīvā pārvaldība',
-    },
-    
-    // Services worker
-    service_formation_worker: {
-      label: 'Apmācības un sertifikāti',
-    },
-    service_logement: {
-      label: 'Palīdzība ar mājokli',
-    },
-    service_transport: {
-      label: 'Transporta atbalsts',
-    },
-    service_administratif: {
-      label: 'Administratīvais atbalsts',
-    },
+  },
+
+  _meta: {
+    _lastUpdated: '2024-12-12T10:00:00.000Z',
+    _origin: 'manual',
+    _translatedBy: 'YoJob Team - Latvian (LV) Complete Translation',
+    _locale: 'lv-LV',
+    _completeness: 100,
   },
 };

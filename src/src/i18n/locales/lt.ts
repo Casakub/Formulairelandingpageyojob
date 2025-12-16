@@ -1,9 +1,9 @@
 /**
- * 🇱🇹 TRADUCTIONS LITUANIENNES (LT)
- * 
- * Traductions complètes pour le lituanien
- * Base: translations-complete.ts
- * 
+ * 🇱🇹 LIETUVIŲ VERTIMAI (LT)
+ *
+ * Pilnas lietuviškas vertimas
+ * Bazė: en.ts (tokia pati struktūra)
+ *
  * @version 2.0.0
  * @created 2024-12-12T10:00:00.000Z
  */
@@ -12,10 +12,10 @@ import type { TranslationBundle } from '../types';
 import { fr } from './fr.generated';
 
 export const lt: TranslationBundle = {
-  // Hérite de FR pour les clés manquantes
+  // Paveldi trūkstamus raktus iš FR
   ...fr,
-  
-  // Navigation
+
+  // Navigacija
   nav: {
     section1: 'Profilis',
     section2: 'Patirtis',
@@ -26,7 +26,7 @@ export const lt: TranslationBundle = {
     dashboard: 'Valdymo skydas',
     back_to_site: 'Grįžti į svetainę',
   },
-  
+
   dashboard: {
     title: 'YoJob',
     subtitle: 'Valdymo skydas',
@@ -36,8 +36,8 @@ export const lt: TranslationBundle = {
       questions: 'Klausimai',
       translations: 'Vertimai',
       export: 'Eksportas',
-      integrations: 'Integracija',
-      cms: 'CMS forma',
+      integrations: 'Integracijos',
+      cms: 'Formos CMS',
       settings: 'Nustatymai',
       prospects: 'Potencialūs klientai',
     },
@@ -56,15 +56,15 @@ export const lt: TranslationBundle = {
       logged_in_as: 'Prisijungęs kaip',
     },
   },
-  
-  // Sections
+
+  // Skyriai
   section: {
     1: {
-      title: 'Profilis',
+      title: 'Agentūros profilis',
       description: '4 klausimai • 2 min',
     },
     2: {
-      title: 'Patirtis',
+      title: 'Komandiravimas',
       description: '7 klausimai • 3 min',
     },
     3: {
@@ -72,7 +72,7 @@ export const lt: TranslationBundle = {
       description: '6 klausimai • 2 min',
     },
     4: {
-      title: 'Susidomėjimas YoJob',
+      title: 'YoJob interesas',
       description: '6 klausimai • 3 min',
     },
     5: {
@@ -84,106 +84,19 @@ export const lt: TranslationBundle = {
       description: '1 klausimas • 1 min',
     },
   },
-  
-  // Sections adaptées par profil
-  sectionContent: {
-    1: {
-      agency: {
-        title: '📋 Jūsų verslo profilis',
-        description: 'Papasakokite mums apie savo agentūrą ir kompetenciją',
-      },
-      client: {
-        title: '📋 Jūsų verslo profilis',
-        description: 'Papasakokite mums apie savo įmonę ir įdarbinimo poreikius',
-      },
-      worker: {
-        title: '📋 Jūsų profilis',
-        description: 'Papasakokite mums apie savo profesinę patirtį',
-      },
-    },
-    2: {
-      agency: {
-        title: '💼 Komandiravimo veikla',
-        description: 'Jūsų patirtis komandiruojant darbuotojus',
-      },
-      client: {
-        title: '💼 Jūsų įdarbinimo patirtis',
-        description: 'Jūsų dabartinis įdarbinimas ir laikinas darbas',
-      },
-      worker: {
-        title: '💼 Jūsų laikino darbo patirtis',
-        description: 'Jūsų kelias kaip agentūros darbuotojo',
-      },
-    },
-    3: {
-      agency: {
-        title: '🎯 Poreikiai ir įrankiai',
-        description: 'Jūsų iššūkiai ir dabartiniai sprendimai',
-      },
-      client: {
-        title: '🎯 Jūsų dabartiniai poreikiai',
-        description: 'Iššūkiai ir lūkesčiai įdarbinant',
-      },
-      worker: {
-        title: '🎯 Jūsų lūkesčiai',
-        description: 'Kas jums svarbu užduotyje',
-      },
-    },
-    4: {
-      agency: {
-        title: '⭐ Susidomėjimas Europos platforma',
-        description: 'Atraskite mūsų inovatyvios rinkos viziją',
-      },
-      client: {
-        title: '⭐ Susidomėjimas Europos platforma',
-        description: 'Inovatyvus sprendimas jūsų poreikiams',
-      },
-      worker: {
-        title: '⭐ Jūsų susidomėjimas platforma',
-        description: 'Platforma lengvam užduočių paieškai',
-      },
-    },
-    5: {
-      agency: {
-        title: '🔮 Ateities vizija',
-        description: 'Biudžetas ir plėtros perspektyvos',
-      },
-      client: {
-        title: '🔮 Jūsų būsimi prioritetai',
-        description: 'Biudžetas ir įdarbinimo strategija',
-      },
-      worker: {
-        title: '🔮 Jūsų tikslai',
-        description: 'Jūsų artimiausi profesiniai projektai',
-      },
-    },
-    6: {
-      agency: {
-        title: '📧 Pasilikite kontakte',
-        description: 'Gaukite tyrimo rezultatus ir būkite informuoti',
-      },
-      client: {
-        title: '📧 Pasilikite kontakte',
-        description: 'Gaukite rezultatus ir mūsų rekomenacijas',
-      },
-      worker: {
-        title: '📧 Pasilikite kontakte',
-        description: 'Gaukite rezultatus ir galimybes',
-      },
-    },
-  },
-  
-  // Header
+
+  // Antraštė
   header: {
     title: 'YoJob',
     subtitle: 'Rinkos tyrimas',
   },
-  
+
   // Hero
   hero: {
     title: 'Rinkos apklausa',
     subtitle: 'Padėkite mums geriau suprasti jūsų poreikius',
-    description: 'Ši apklausa trunka maždaug 10-15 minučių. Jūsų atsakymai padės mums sukurti sprendimą, pritaikytą jūsų pramonės šakai.',
+    description:
+      'Apklausa trunka apie 10–15 minučių. Jūsų atsakymai padės mums sukurti sprendimą, pritaikytą jūsų sektoriui.',
     cta_start: 'Pradėti apklausą',
     cta_dashboard: 'Atidaryti valdymo skydą',
     badge: 'Europos rinkos tyrimas',
@@ -191,96 +104,98 @@ export const lt: TranslationBundle = {
       countries: '27 Europos šalys',
       questions: 'klausimai',
       benchmark: 'Gaukite 2025 m. etaloną',
-      insights: 'Ekskluzyvūs rinkos įžvalgos',
-      opportunities: 'Prioritetinė prieiga prie darbų',
+      insights: 'Išskirtinės rinkos įžvalgos',
+      opportunities: 'Prioritetinė prieiga prie darbo pasiūlymų',
     },
     footer: {
-      info: 'klausimai • Anonimiškai • Atitinka BDAR',
-      anonymous: 'Anonimiškai',
-      gdpr: 'Atitinka BDAR',
+      info: 'klausimai • Anonimiška • BDAR atitiktis',
+      anonymous: 'Anonimiška',
+      gdpr: 'BDAR atitiktis',
     },
   },
-  
-  // Respondent Type
+
+  // Respondentų tipas
   respondent_type: {
     title: 'Kas esate?',
-    subtitle: 'Pasirinkite savo profilį klausimams pritaikyti',
-    agency: 'Įdarbinimo agentūra',
-    agency_description: 'Esate laikino įdarbinimo ar komandiravimo agentūra',
+    subtitle: 'Pasirinkite profilį, kad pritaikytume klausimus',
+    agency: 'Laikinojo įdarbinimo agentūra',
+    agency_description: 'Esate laikinojo įdarbinimo ar komandiravimo agentūra',
     client: 'Klientas',
-    client_description: 'Esate įmonė, įdarbinanti agentūros darbuotojus',
+    client_description: 'Esate įmonė, kuri samdo agentūros darbuotojus',
     worker: 'Agentūros darbuotojas',
     worker_description: 'Esate agentūros ar komandiruotas darbuotojas',
   },
-  
-  // Respondent Selector
+
+  // Respondentų pasirinkimas
   selector: {
-    badge: '🌍 Europos rinkos tyrimas - Įdarbinimas ir Laikinas darbas',
+    badge: '🌍 Europos rinkos tyrimas – Įdarbinimas ir laikinas darbas',
     title: 'Pasidalinkite savo patirtimi Europos rinkoje',
-    subtitle: 'Pasirinkite savo profilį apklausai pradėti',
+    subtitle: 'Pasirinkite profilį ir pradėkite apklausą',
     cta: 'Spustelėkite pradėti →',
     trust: {
       secure: 'Saugūs duomenys',
       languages: '{count} prieinamos kalbos',
       languages_suffix: 'prieinamos kalbos',
-      anonymous: 'Anonimiškai ir konfidencialiai',
+      anonymous: 'Anonimiška ir konfidencialu',
     },
   },
-  
-  // Respondent profiles for cards
+
+  // Kortelių profiliai
   respondent: {
     agency: {
-      label: 'Įdarbinimo agentūra',
-      description: 'Esate Europos laikino įdarbinimo agentūra. Pasidalinkite savo komandiravimo patirtimi.',
+      label: 'Laikinojo įdarbinimo agentūra',
+      description:
+        'Esate Europos laikinojo įdarbinimo agentūra. Pasidalinkite komandiravimo patirtimi.',
       estimatedTime: '15 min',
     },
     client: {
       label: 'Klientas',
-      description: 'Įdarbinate agentūros darbuotojus. Pasidalinkite savo poreikiais ir lūkesčiais.',
+      description: 'Samdote agentūros darbuotojus. Pasidalinkite poreikiais ir lūkesčiais.',
       estimatedTime: '10 min',
     },
     worker: {
       label: 'Agentūros darbuotojas',
-      description: 'Dirbate kaip agentūros darbuotojas. Pasidalinkite savo patirtimi iš lauko.',
+      description: 'Dirbate kaip agentūros darbuotojas. Pasidalinkite praktine patirtimi.',
       estimatedTime: '10 min',
     },
   },
-  
-  // Buttons
+
+  // Mygtukai
   button: {
     previous: 'Ankstesnis',
     next: 'Kitas',
-    submit: 'Siųsti atsakymus',
+    submit: 'Pateikti atsakymus',
     submitting: 'Siunčiama...',
     back: 'Atgal',
     start: 'Pradėti',
   },
-  
-  // Confirmation
+
+  // Patvirtinimas
   confirmation: {
-    title: 'Dėkojame už dalyvavimą!',
+    title: 'Ačiū už dalyvavimą!',
     subtitle: 'Jūsų atsakymai sėkmingai išsaugoti',
-    message: 'Šiuo metu analizuojame visus atsakymus, kad sukurtume sprendimą, puikiai pritaikytą jūsų poreikiams.',
-    cta_back: 'Grįžti į pagrindinį puslapį',
-    cta_dashboard: 'Rodyti valdymo skydą',
+    message:
+      'Šiuo metu analizuojame visus atsakymus, kad sukurtume sprendimą, puikiai atitinkantį jūsų poreikius.',
+    cta_back: 'Grįžti į pradžios puslapį',
+    cta_dashboard: 'Peržiūrėti valdymo skydą',
   },
-  
-  // Progress
+
+  // Progresas
   progress: {
     section: 'Skyrius',
     question: 'Klausimas',
-    section_completed: 'Skyrius baigtas',
+    section_completed: 'Skyrius užbaigtas',
     questions_remaining: '{count} likusių klausimų',
-    time_remaining: 'Maždaug {time} liko',
+    time_remaining: 'Apie {time} liko',
   },
-  
-  // Common translations
+
+  // Bendri vertimai
   common: {
     oui: 'Taip',
     non: 'Ne',
     autre: 'Kita',
-    loading: 'Įkeliama...',
-    submit: 'Siųsti',
+    loading: 'Kraunama...',
+    submit: 'Pateikti',
     next: 'Kitas',
     previous: 'Ankstesnis',
     skip: 'Praleisti',
@@ -290,18 +205,18 @@ export const lt: TranslationBundle = {
     required: 'Privaloma',
     optional: 'Neprivaloma',
     error: 'Klaida',
-    success: 'Sėkmė',
+    success: 'Sėkmingai',
     completed: 'Baigta',
     inProgress: 'Vykdoma',
     notStarted: 'Nepradėta',
-    profileAgency: 'Įdarbinimo agentūra',
+    profileAgency: 'Laikinojo įdarbinimo agentūra',
     profileClient: 'Klientas',
     profileWorker: 'Agentūros darbuotojas',
     score_not_interested: 'Nedomina',
     score_very_interested: 'Labai domina',
   },
-  
-  // Sectors
+
+  // Sektoriai
   sectors: {
     btp: 'Statyba',
     industrie: 'Pramonė',
@@ -309,58 +224,58 @@ export const lt: TranslationBundle = {
     hotellerie: 'Svetingumas',
     sante: 'Sveikatos priežiūra',
     agriculture: 'Žemės ūkis',
-    tech: 'Tech/IT',
+    tech: 'Technologijos/IT',
     autres: 'Kita',
   },
-  
-  // Questions - hérite de FR puis surcharge avec traductions LT
+
+  // Klausimai – paveldi iš FR ir perrašo vertimais LT
   questions: {
     ...fr.questions,
-    
-    // Q1 : Nom
+
+    // Q1 : Pavadinimas
     q1_nom: {
       ...fr.questions.q1_nom,
       label: 'Pavadinimas',
       placeholder: 'Organizacijos pavadinimas arba jūsų vardas ir pavardė',
     },
-    
-    // Q2 : Année création (AGENCY)
+
+    // Q2 : Įkūrimo metai (AGENCY)
     q2_annee: {
       ...fr.questions.q2_annee,
       label: 'Įkūrimo metai',
       placeholder: '2015',
     },
-    
-    // Q2 : Année création (CLIENT)
+
+    // Q2 : Įkūrimo metai (CLIENT)
     q2_annee_client: {
       ...fr.questions.q2_annee_client,
       label: 'Jūsų įmonės įkūrimo metai',
       placeholder: '2010',
     },
-    
-    // Q2 : Nationalité (WORKER)
+
+    // Q2 : Pilietybė (WORKER)
     q2_nationalite: {
       ...fr.questions.q2_nationalite,
       label: 'Jūsų pilietybė',
-      placeholder: 'pvz.: lenkiška, rumunų...',
+      placeholder: 'Pvz.: lenkų, rumunų...',
     },
-    
-    // Q3 : Taille (AGENCY/CLIENT)
+
+    // Q3 : Dydis (AGENCY/CLIENT)
     q3_taille: {
       ...fr.questions.q3_taille,
       label: 'Organizacijos dydis',
       options: {
-        '1-9': '1-9 darbuotojai',
-        '10-49': '10-49 darbuotojai',
-        '50-249': '50-249 darbuotojai',
-        '250+': '250+ darbuotojai',
+        '1-9': '1-9 darbuotojų',
+        '10-49': '10-49 darbuotojų',
+        '50-249': '50-249 darbuotojų',
+        '250+': '250+ darbuotojų',
       },
     },
-    
-    // Q3 : Expérience (WORKER)
+
+    // Q3 : Patirtis (WORKER)
     q3_experience: {
       ...fr.questions.q3_experience,
-      label: 'Laikino darbo patirties metai',
+      label: 'Laikino darbo patirtis (metai)',
       options: {
         '<1': 'Mažiau nei 1 metai',
         '1-3': '1-3 metai',
@@ -369,57 +284,57 @@ export const lt: TranslationBundle = {
         '10+': 'Daugiau nei 10 metų',
       },
     },
-    
-    // Q4 : Secteurs
+
+    // Q4 : Sektoriai
     q4_secteurs: {
       ...fr.questions.q4_secteurs,
-      label: 'Pagrindiniai sektoriai',
-      description: 'Pasirinkite visus tinkamus sektorius',
+      label: 'Pagrindiniai veiklos sektoriai',
+      description: 'Pasirinkite visus aktualius sektorius',
     },
-    
-    // Q4 : Métiers (WORKER)
+
+    // Q4 : Profesijos (WORKER)
     q4_metiers: {
       ...fr.questions.q4_metiers,
       label: 'Jūsų profesijos',
       description: 'Pasirinkite visas savo profesijas',
     },
-    
-    // Q5 : Pays (AGENCY)
+
+    // Q5 : Šalis (AGENCY)
     q5_pays: {
       ...fr.questions.q5_pays,
       label: 'Jūsų agentūros šalis',
-      placeholder: 'pvz.: Lenkija',
+      placeholder: 'Pvz.: Lenkija',
     },
-    
-    // Q5 : Localisation (CLIENT)
+
+    // Q5 : Lokacija (CLIENT)
     q5_localisation: {
       ...fr.questions.q5_localisation,
       label: 'Šalis, kurioje veikia jūsų įmonė',
-      placeholder: 'pvz.: Prancūzija',
+      placeholder: 'Pvz.: Prancūzija',
     },
-    
-    // Q5 : Pays travail (WORKER)
+
+    // Q5 : Darbo šalys (WORKER)
     q5_pays_travail: {
       ...fr.questions.q5_pays_travail,
       label: 'Šalys, kuriose dirbote kaip agentūros darbuotojas',
-      placeholder: 'pvz.: Prancūzija, Vokietija, Belgija...',
+      placeholder: 'Pvz.: Prancūzija, Vokietija, Belgija...',
     },
-    
-    // Q6 : Volume (AGENCY)
+
+    // Q6 : Apimtis (AGENCY)
     q6_volume: {
-      label: 'Metinis komandiruotų darbuotojų apimtis',
+      label: 'Metinis komandiruotų darbuotojų skaičius',
       options: {
-        '0': 'Dar nė vieno',
+        '0': 'Dar nėra',
         '1-50': '1-50 darbuotojų',
         '51-200': '51-200 darbuotojų',
         '201-500': '201-500 darbuotojų',
         '500+': 'Daugiau nei 500',
       },
     },
-    
-    // Q6 : Volume client (CLIENT)
+
+    // Q6 : Apimtis klientui (CLIENT)
     q6_volume_client: {
-      label: 'Kiek agentūros darbuotojų įdarbinate per metus?',
+      label: 'Kiek agentūros darbuotojų įdarbinat per metus?',
       options: {
         '0': 'Šiuo metu nė vieno',
         '1-10': '1-10 žmonių',
@@ -428,56 +343,56 @@ export const lt: TranslationBundle = {
         '200+': '200+ žmonių',
       },
     },
-    
-    // Q6 : Fréquence (WORKER)
+
+    // Q6 : Dažnis (WORKER)
     q6_frequence: {
-      label: 'Kaip dažnai dirbate kaip agentūros darbuotojas?',
+      label: 'Kaip dažnai dirbate kaip laikinas darbuotojas?',
       options: {
         permanent: 'Reguliariai (visus metus)',
         saisonnier: 'Sezoniškai (tam tikrais mėnesiais)',
-        occasionnel: 'Retkarčiais',
+        occasionnel: 'Kartais',
         jamais: 'Dar niekada (ieškau)',
       },
     },
-    
-    // Section 2 - Détachement/Experience
-    
-    // Q7 : Origine (AGENCY)
+
+    // 2 skyrius – Komandiravimas / Patirtis
+
+    // Q7 : Kilmė (AGENCY)
     q7_origine: {
       label: 'Iš kur atvyksta jūsų komandiruoti darbuotojai?',
-      placeholder: 'pvz.: Lenkija, Rumunija, Bulgarija...',
+      placeholder: 'Pvz.: Lenkija, Rumunija, Bulgarija...',
     },
-    
-    // Q8 : Destinations (AGENCY)
+
+    // Q8 : Paskirties šalys (AGENCY)
     q8_destinations: {
       label: 'Paskirties šalys',
       description: 'Šalys, į kurias komandiruojate darbuotojus',
-      placeholder: 'pvz.: Prancūzija, Vokietija, Belgija, Nyderlandai...',
+      placeholder: 'Pvz.: Prancūzija, Vokietija, Belgija, Nyderlandai...',
     },
-    
-    // Q8 : Nationalités (CLIENT)
+
+    // Q8 : Pilietybės (CLIENT)
     q8_nationalites: {
-      label: 'Agentūros darbuotojų, kuriuos įdarbinate, pilietybės',
-      placeholder: 'pvz.: lenkiška, rumunų, bulgariška...',
+      label: 'Agentūros darbuotojų, kuriuos įdarbinat, pilietybės',
+      placeholder: 'Pvz.: lenkų, rumunų, bulgarų...',
     },
-    
-    // Q9 : Défi (AGENCY)
+
+    // Q9 : Iššūkis (AGENCY)
     q9_defi: {
-      label: 'Jūsų pagrindinis iššūkis su tarptautiniu komandirovimu',
+      label: 'Pagrindinis iššūkis su tarptautiniu komandiravimu',
       options: {
         admin: 'Administracinis sudėtingumas (A1, SIPSI...)',
-        conformite: 'Atitiktis taisyklėms keliose šalyse',
+        conformite: 'Teisinė atitiktis kelioms šalims',
         cout: 'Valdymo kaštai ir laikas',
         langues: 'Kalbos barjerai',
         autre: 'Kita',
       },
     },
-    
-    // Q9 : Défi client (CLIENT)
+
+    // Q9 : Iššūkis klientui (CLIENT)
     q9_defi_client: {
-      label: 'Jūsų pagrindinis iššūkis su Europos agentūros darbuotojais',
+      label: 'Pagrindinis iššūkis su Europos laikinais darbuotojais',
       options: {
-        trouver: 'Patikimų agentūrų paieška',
+        trouver: 'Rasti patikimas agentūras',
         conformite: 'Teisinė atitiktis',
         qualite: 'Kokybė/įgūdžiai',
         cout: 'Per dideli kaštai',
@@ -485,45 +400,43 @@ export const lt: TranslationBundle = {
         autre: 'Kita',
       },
     },
-    
-    // Q9 : Défi worker (WORKER)
+
+    // Q9 : Iššūkis darbuotojui (WORKER)
     q9_defi_worker: {
-      label: 'Jūsų pagrindinis iššūkis su laikinu darbu užsienyje',
+      label: 'Pagrindinis iššūkis jūsų užduotyse',
       options: {
+        trouver: 'Rasti užduotis',
         admin: 'Administracinė dokumentacija',
-        langue: 'Kalbos barjeras',
-        logement: 'Būsto paieška',
-        transport: 'Transportas',
-        salaire: 'Problemos su apmokėjimu/atlyginimu',
+        logement: 'Būstas / Apgyvendinimas',
+        langue: 'Vietos kalba',
+        paiement: 'Mokėjimai / Atlyginimas',
         autre: 'Kita',
       },
     },
-    
-    // Q9 : Autre
+
+    // Q9 : Kita
     q9_autre: {
-      label: 'Nurodykite savo pagrindinį iššūkį',
-      placeholder: 'Apibūdinkite savo pagrindinį iššūkį...',
+      label: 'Nurodykite pagrindinį iššūkį',
+      placeholder: 'Apibūdinkite pagrindinį iššūkį...',
     },
-    
-    // Q10 : Gestion (AGENCY)
+
+    // Q10 : Valdymas (AGENCY)
     q10_gestion: {
-      label: 'Kaip šiandien valdote komandiravimo paraiškas?',
+      ...fr.questions.q10_gestion,
+      label: 'Kaip šiandien valdote komandiravimo deklaracijas?',
       options: {
         interne: 'Vidinė komanda',
-        externe: 'Išorės paslaugų teikėjas',
-        mixte: 'Mišrus požiūris',
+        externe: 'Išorinis paslaugų teikėjas',
+        mixte: 'Mišrus būdas',
         manuel: 'Rankinis valdymas',
         logiciel: 'Specializuota programinė įranga',
-        manuel: 'Rankiniu būdu (Excel, Word...)',
-        logiciel_interne: 'Vidinė programinė įranga',
-        prestataire: 'Išorės paslaugų teikėjas',
       },
     },
-    
-    // Q10 : Agences (CLIENT)
+
+    // Q10 : Agentūros (CLIENT)
     q10_agences: {
       ...fr.questions.q10_agences,
-      label: 'Kiek įdarbinimo agentūrų naudojate?',
+      label: 'Kiek laikinojo įdarbinimo agentūrų naudojate?',
       options: {
         '0': 'Nė vienos',
         '1': '1 agentūrą',
@@ -532,34 +445,34 @@ export const lt: TranslationBundle = {
         '10+': 'Daugiau nei 10',
       },
     },
-    
-    // Q10 : Processus (CLIENT)
+
+    // Q10 : Procesas (CLIENT)
     q10_processus: {
       ...fr.questions.q10_processus,
-      label: 'Kaip įdarbinate agentūros darbuotojus?',
+      label: 'Kaip įdarbinat agentūros darbuotojus?',
       options: {
-        agence_fr: 'Prancūzų įdarbinimo agentūros',
-        agence_euro: 'Europos įdarbinimo agentūros',
+        agence_fr: 'Prancūzijos laikinojo įdarbinimo agentūros',
+        agence_euro: 'Europos laikinojo įdarbinimo agentūros',
         direct: 'Tiesioginis įdarbinimas',
         mixte: 'Mišrus',
       },
     },
-    
-    // Q10 : Agence (WORKER)
+
+    // Q10 : Agentūra (WORKER)
     q10_agence: {
       ...fr.questions.q10_agence,
-      label: 'Kaip ieškote laikino darbo?',
+      label: 'Kaip randate laikino darbo?',
       options: {
-        agence: 'Per įdarbinimo agentūras',
-        bouche: 'Rekomendacija',
+        agence: 'Per laikinojo įdarbinimo agentūras',
+        bouche: 'Rekomendacijos',
         internet: 'Internetiniai darbo portalai',
         direct: 'Tiesioginė paraiška',
       },
     },
-    
-    // Q10ter : Agences utilisées (WORKER)
+
+    // Q10ter : Naudotos agentūros (WORKER)
     q10_agences_worker: {
-      label: 'Su kiek agentūrų bendradarbiaujate?',
+      label: 'Su kiek agentūrų dirbate?',
       options: {
         '1': 'Tik 1 agentūra',
         '2-3': '2-3 agentūros',
@@ -567,25 +480,23 @@ export const lt: TranslationBundle = {
         '10+': 'Daugiau nei 10',
       },
     },
-    
-    // Q11 : Incidents (AGENCY)
+
+    // Q11 : Incidentai (AGENCY)
     q11_incidents: {
-      label: 'Ar turėjote baudų ar incidentų, susijusių su komandiravimo atitikties taisyklėmis?',
-      description: 'Jūsų atsakymas lieka anonimiškas',
+      ...fr.questions.q11_incidents,
+      label: 'Ar patyrėte baudų ar incidentų dėl komandiravimo atitikties?',
+      description: 'Atsakymas lieka anonimiškas',
       options: {
         jamais: 'Ne, niekada',
         rarement: 'Retai (1-2 kartus)',
         parfois: 'Kartais (3-5 kartus)',
-        souvent: 'Dažnai (6+ kartus)',
-        oui_souvent: 'Taip, dažnai',
-        oui_rare: 'Taip, retkarčiais',
-        non: 'Ne',
+        souvent: 'Dažnai (6+ kartų)',
       },
     },
-    
-    // Q11 : Conformité (CLIENT)
+
+    // Q11 : Atitiktis (CLIENT)
     q11_conformite: {
-      label: 'Ar tikrinate įdarbinimo agentūrų teisinę atitiktį?',
+      label: 'Ar tikrinate laikinojo įdarbinimo agentūrų teisinę atitiktį?',
       options: {
         oui_systematique: 'Taip, sistemingai',
         oui_parfois: 'Taip, kartais',
@@ -593,8 +504,8 @@ export const lt: TranslationBundle = {
         ne_sait_pas: 'Nežinau',
       },
     },
-    
-    // Q11 : Problèmes (WORKER)
+
+    // Q11 : Problemų (WORKER)
     q11_problemes: {
       label: 'Ar turėjote problemų su laikinu darbu užsienyje?',
       options: {
@@ -603,27 +514,24 @@ export const lt: TranslationBundle = {
         non: 'Ne',
       },
     },
-    
-    // Q12 : Budget (AGENCY)
+
+    // Q12 : Biudžetas (AGENCY)
     q12_budget: {
-      label: 'Ar turite biudžetą išorės paslaugoms komandiravimo valdymui?',
+      ...fr.questions.q12_budget,
+      label: 'Metinis biudžetas komandiravimo administravimui',
       options: {
-        oui_important: 'Taip, reikšmingą',
-        oui_modere: 'Taip, vidutinį',
-        non: 'Ne',
-        ne_sait_pas: 'Nežinau',
+        '0-5k': '€0-5 000 / metus',
+        '5-15k': '€5 000-15 000 / metus',
+        '15-30k': '€15 000-30 000 / metus',
+        '30k+': '€30 000+ / metus',
+        inconnu: 'Nežinau',
       },
     },
-    
-    // Q12 : Critères (CLIENT)
-    q12_criteres: {
-      label: 'Kokie yra pagrindiniai kriterijai renkantis įdarbinimo agentūrą?',
-      description: 'Pasirinkite kelis variantus',
-    },
-    
-    // Q12 : Budget client (CLIENT)
+
+    // Q12 : Biudžetas klientui (CLIENT)
     q12_budget_client: {
-      label: 'Metinis biudžetas laikinajam darbui',
+      ...fr.questions.q12_budget_client,
+      label: 'Metinis biudžetas laikinam darbui',
       options: {
         '0-50k': '€0 - €50 000',
         '50-200k': '€50 000 - €200 000',
@@ -632,10 +540,10 @@ export const lt: TranslationBundle = {
         'inconnu': 'Nežinau',
       },
     },
-    
-    // Q12 : Satisfaction (WORKER)
+
+    // Q12 : Pasitenkinimas (CLIENT)
     q12_satisfaction: {
-      label: 'Kaip patenkinti esate savo dabartinėmis darbo sąlygomis?',
+      label: 'Pasitenkinimas dabartinėmis agentūromis',
       options: {
         tres_satisfait: 'Labai patenkintas',
         satisfait: 'Patenkintas',
@@ -643,10 +551,11 @@ export const lt: TranslationBundle = {
         insatisfait: 'Nepatenkintas',
       },
     },
-    
-    // Q12 : Salaire (WORKER)
+
+    // Q12 : Atlyginimas (WORKER)
     q12_salaire: {
-      label: 'Ar esate patenkintas savo laikino darbo atlyginimu?',
+      ...fr.questions.q12_salaire,
+      label: 'Ar esate patenkintas atlyginimu iš laikino darbo?',
       options: {
         '<1500': 'Mažiau nei €1 500',
         '1500-2500': '€1 500 - €2 500',
@@ -654,22 +563,11 @@ export const lt: TranslationBundle = {
         '3500+': '€3 500+',
       },
     },
-    
-    // Q13 : Durée (AGENCY)
-    q13_duree: {
-      label: 'Vidutinė jūsų komandiravimo užduočių trukmė',
-      options: {
-        '<1mois': 'Mažiau nei 1 mėnuo',
-        '1-3mois': '1-3 mėnesiai',
-        '3-6mois': '3-6 mėnesiai',
-        '6-12mois': '6-12 mėnesių',
-        '12+mois': 'Daugiau nei 12 mėnesių',
-      },
-    },
-    
-    // Q13 : Manque à gagner (AGENCY)
+
+    // Q13 : Pajamų praradimas (AGENCY)
     q13_manque_gagner: {
-      label: 'Koks pajamų procentas prarandamas dėl administracinės sudėtingumo?',
+      ...fr.questions.q13_manque_gagner,
+      label: 'Koks pajamų procentas prarandamas dėl administracinio sudėtingumo?',
       options: {
         'non': 'Ne, ne iš tikrųjų',
         'faible': 'Taip, mažas (< 5% pajamų)',
@@ -677,10 +575,11 @@ export const lt: TranslationBundle = {
         'important': 'Taip, reikšmingas (> 15% pajamų)',
       },
     },
-    
-    // Q13 : Satisfaction (CLIENT)
+
+    // Q13 : Pasitenkinimas (CLIENT)
     q13_satisfaction: {
-      label: 'Pasitenkinimas dabartinėmis laikino darbo agentūromis',
+      ...fr.questions.q13_satisfaction,
+      label: 'Pasitenkinimas dabartinėmis laikinojo darbo agentūromis',
       options: {
         'tres_satisfait': 'Labai patenkintas',
         'satisfait': 'Patenkintas',
@@ -689,22 +588,11 @@ export const lt: TranslationBundle = {
         'tres_insatisfait': 'Labai nepatenkintas',
       },
     },
-    
-    // Q13 : Budget client (CLIENT)
-    q13_budget_client: {
-      label: 'Koks yra jūsų metinis biudžetas laikinajam darbui?',
-      options: {
-        '<50k': 'Mažiau nei €50k',
-        '50-200k': '€50k - €200k',
-        '200-500k': '€200k - €500k',
-        '500k-1M': '€500k - €1M',
-        '1M+': 'Daugiau nei €1M',
-      },
-    },
-    
-    // Q13 : Satisfaction worker (WORKER)
+
+    // Q13 : Pasitenkinimas darbuotojo (WORKER)
     q13_satisfaction_worker: {
-      label: 'Pasitenkinimas dabartinėmis laikino darbo agentūromis',
+      ...fr.questions.q13_satisfaction_worker,
+      label: 'Pasitenkinimas dabartinėmis agentūromis',
       options: {
         'tres_satisfait': 'Labai patenkintas',
         'satisfait': 'Patenkintas',
@@ -713,116 +601,108 @@ export const lt: TranslationBundle = {
         'tres_insatisfait': 'Labai nepatenkintas',
       },
     },
-    
-    // Q13 : Durée worker (WORKER)
-    q13_duree_worker: {
-      label: 'Jūsų pageidaujama užduoties trukmė',
-      options: {
-        court: 'Trumpa (< 3 mėnesiai)',
-        moyen: 'Vidutinė (3-6 mėnesiai)',
-        long: 'Ilga (> 6 mėnesiai)',
-        indifferent: 'Man nesvarbu',
-      },
-    },
-    
-    // Section 3 - Besoins/Potrebe
-    
-    // Q14 : Risques (AGENCY)
+
+    // 3 skyrius – Poreikiai
+
+    // Q14 : Rizikos (AGENCY)
     q14_risques: {
-      label: 'Jūsų pagrindinės baimės',
-      description: 'Pasirinkite visus tinkamus',
+      ...fr.questions.q14_risques,
+      label: 'Pagrindinės rizikos',
+      description: 'Pasirinkite visas, kurios tinka',
       options: {
-        amendes: 'Baudos ir nuobaudos',
+        amendes: 'Baudos ir sankcijos',
         reputation: 'Reputacija / Įvaizdis',
         penal: 'Baudžiamoji atsakomybė',
         delais: 'Užduočių vėlavimai',
         clients: 'Klientų praradimas',
-        aucun: 'Jokių reikšmingų rizikų',
-        sanctions: 'Nuobaudos/sankcijos',
-        conformite: 'Atitiktis taisyklėms keliose šalyse',
-        cout: 'Administraciniai kaštai',
-        documentation: 'Dokumentų valdymas',
-        responsabilite: 'Baudžiamoji atsakomybė',
-        perte_clients: 'Klientų praradimas',
+        aucun: 'Nėra didelės rizikos',
       },
     },
-    
-    // Q14 : Besoins (CLIENT)
+
+    // Q14 : Poreikiai (CLIENT)
     q14_besoins_client: {
-      label: 'Jūsų pagrindiniai poreikiai',
-      description: 'Pasirinkite visus tinkamus',
+      ...fr.questions.q14_besoins_client,
+      label: 'Pagrindiniai poreikiai',
+      description: 'Pasirinkite visas, kurios tinka',
       options: {
-        fiabilite: 'Patikimų agentūrų paieška',
+        fiabilite: 'Rasti patikimas agentūras',
         conformite: 'Teisinė atitiktis',
         qualite: 'Kokybė/įgūdžiai',
         cout: 'Kaštai',
         disponibilite: 'Kandidatų prieinamumas',
-        aucun: 'Jokių reikšmingų poreikių',
+        aucun: 'Nėra didelio poreikio',
       },
     },
-    
-    // Q14 : Attentes (WORKER)
+
+    // Q14 : Lūkesčiai (WORKER)
     q14_attentes: {
-      label: 'Jūsų lūkesčiai laikiniam darbui užsienyje',
-      description: 'Pasirinkite visus tinkamus',
+      ...fr.questions.q14_attentes,
+      label: 'Lūkesčiai dėl laikino darbo užsienyje',
+      description: 'Pasirinkite visas, kurios tinka',
       options: {
         salaire: 'Geresnis atlyginimas',
         conditions: 'Geresnės darbo sąlygos',
         stabilite: 'Stabilumas',
         experience: 'Tarptautinė patirtis',
         logement: 'Pagalba su būstu',
-        aucun: 'Jokių specialių lūkesčių',
+        aucun: 'Jokių ypatingų lūkesčių',
       },
     },
-    
-    // Q14_risques_client options
+
+    // Q14_risques_client
     q14_risques_client: {
-      label: 'Jūsų pagrindinės baimės',
-      description: 'Pasirinkite visus tinkamus',
+      ...fr.questions.q14_risques_client,
+      label: 'Pagrindinės rizikos',
+      description: 'Pasirinkite visas, kurios tinka',
       options: {
         conformite: 'Teisinė atitiktis',
         qualite: 'Kokybė/įgūdžiai',
         communication: 'Komunikacija/Kalbos',
         cout: 'Netikėti kaštai',
         disponibilite: 'Kandidatų prieinamumas',
-        aucun: 'Jokių reikšmingų baimių',
+        aucun: 'Nėra didelių rizikų',
       },
     },
-    
-    // Q14_risques_worker options
+
+    // Q14_risques_worker
     q14_risques_worker: {
-      label: 'Kokias problemas dažniausiai sutinkate?',
-      description: 'Pasirinkite visus tinkamus',
+      ...fr.questions.q14_risques_worker,
+      label: 'Dažniausiai pasitaikančios problemos',
+      description: 'Pasirinkite visas, kurios tinka',
       options: {
         paiement: 'Mokėjimo vėlavimai',
         conditions: 'Prastos sąlygos',
-        contrat: 'Sutartys negerbiamos',
+        contrat: 'Nesilaikoma sutarčių',
         logement: 'Netinkamas būstas',
         communication: 'Komunikacijos problemos',
-        aucun: 'Jokių reikšmingų problemų',
+        aucun: 'Nėra didelių problemų',
       },
     },
-    
-    // Q15 : Problème (AGENCY)
+
+    // Q15 : Problema
     q15_probleme: {
+      ...fr.questions.q15_probleme,
       label: 'Kokią problemą norėtumėte išspręsti pirmiausia?',
-      placeholder: 'Apibūdinkite savo prioritetinę problemą...',
+      placeholder: 'Apibūdinkite prioritetinę problemą...',
     },
-    
-    // Q15 : Besoins client (CLIENT)
+
+    // Q15 : Poreikiai klientui (CLIENT)
     q15_besoins_client: {
-      label: 'Kokie yra jūsų prioritetiniai poreikiai?',
-      placeholder: 'Pvz.: Rasti greitai, geresnę kokybę, kainas...',
+      ...fr.questions.q15_besoins_client,
+      label: 'Kokie jūsų prioritetiniai poreikiai?',
+      placeholder: 'Pvz.: Rasti greitai, geresnė kokybė, kainos...',
     },
-    
-    // Q15 : Améliorations (WORKER)
+
+    // Q15 : Patobulinimai (WORKER)
     q15_ameliorations: {
+      ...fr.questions.q15_ameliorations,
       label: 'Ką norėtumėte pagerinti savo užduotyse?',
       placeholder: 'Pvz.: Atlyginimas, būstas, pagalba, stabilumas...',
     },
-    
+
     // Q16 : ERP (AGENCY)
     q16_erp: {
+      ...fr.questions.q16_erp,
       label: 'Ar naudojate ERP/valdymo programinę įrangą?',
       options: {
         sage: 'Sage',
@@ -830,60 +710,55 @@ export const lt: TranslationBundle = {
         cegid: 'Cegid',
         bullhorn: 'Bullhorn / ATS',
         autre: 'Kita',
-        aucun: 'Jokios ERP',
-        oui: 'Taip',
-        non: 'Ne',
+        aucun: 'Nėra ERP',
       },
     },
-    
-    // Q16 : Nom ERP
+
+    // Q16 : ERP pavadinimas
     q16_nom_erp: {
       label: 'Kokia programinė įranga/ERP?',
-      placeholder: 'Pvz.: SAP, Odoo, pasirinktinė...',
+      placeholder: 'Pvz.: SAP, Odoo, individuali...',
     },
-    
-    // Q16 : Critères (CLIENT)
+
+    // Q16 : Kriterijai (CLIENT)
     q16_criteres: {
-      label: 'Jūsų pagrindiniai atrankos kriterijai laikino darbo agentūroms',
-      description: 'Pasirinkite savo 3 prioritetus',
+      label: 'Pagrindiniai kriterijai renkantis agentūras',
+      description: 'Pasirinkite 3 prioritetus',
     },
-    
-    // Q16 : Amélioration (WORKER)
+
+    // Q16 : Patobulinimai (WORKER)
     q16_amelioration: {
       label: 'Kas pagerintų jūsų laikino darbo patirtį?',
-      description: 'Pasirinkite visus tinkamus',
+      description: 'Pasirinkite visas, kurios tinka',
     },
-    
-    // Q17 : Migration (AGENCY)
+
+    // Q17 : Migracija (AGENCY)
     q17_migration: {
-      label: 'Ar pasiruošę pakeisti savo darbo įrankius?',
+      ...fr.questions.q17_migration,
+      label: 'Ar pasiruošę keisti savo darbo įrankius?',
       options: {
         oui: 'Taip, jokių problemų',
         conditions: 'Taip, su sąlygomis',
-        difficile: 'Sunku, bet atviras',
+        difficile: 'Sunku, bet atvira',
         non: 'Ne, neįmanoma',
-        oui_rapidement: 'Taip, nedelsiant',
-        oui_progressivement: 'Taip, palaipsniui',
-        non_satisfait: 'Ne, patenkintas dabartiniais įrankiais',
-        non_peur: 'Ne, bijau pokyčių',
       },
     },
-    
-    // Q17 : Budget (CLIENT)
+
+    // Q17 : Biudžetas (CLIENT)
     q17_budget: {
-      label: 'Mėnesinis biudžetas laikino darbo įdarbinimo platformai',
+      label: 'Mėnesinis biudžetas laikinojo įdarbinimo platformai',
       options: {
-        '0': 'Nenoriu mokėti',
-        '1-100': '€1 - €100/mėnesį',
-        '100-500': '€100 - €500/mėnesį',
-        '500-1000': '€500 - €1 000/mėnesį',
-        '1000+': 'Daugiau nei €1 000/mėnesį',
+        '0': 'Nesu pasiruošęs mokėti',
+        '1-100': '€1 - €100/mėn',
+        '100-500': '€100 - €500/mėn',
+        '500-1000': '€500 - €1 000/mėn',
+        '1000+': 'Daugiau nei €1 000/mėn',
       },
     },
-    
-    // Q17 : Plateforme (WORKER)
+
+    // Q17 : Platforma (WORKER)
     q17_plateforme: {
-      label: 'Ar naudotumėte platformą laikino darbo paieškai užsienyje?',
+      label: 'Ar naudotumėte platformą rasti laikino darbo užsienyje?',
       options: {
         oui_certainement: 'Taip, tikrai',
         oui_probablement: 'Taip, tikriausiai',
@@ -891,86 +766,93 @@ export const lt: TranslationBundle = {
         non: 'Ne',
       },
     },
-    
-    // Section 4 - Intérêt YoJob
-    
-    // Q18 : Score
+
+    // 4 skyrius – YoJob susidomėjimas
+
+    // Q18 : Įvertinimas
     q18_score: {
-      label: 'Kaip jus domina Europos komandiravimo rinka?',
+      ...fr.questions.q18_score,
+      label: 'Kiek jus domina Europos komandiravimo rinka?',
       description: 'Įvertinkite nuo 1 (nedomina) iki 10 (labai domina)',
     },
-    
-    // Q19 : Features (AGENCY)
+
+    // Q19 : Funkcijos (AGENCY)
     q19_features: {
+      ...fr.questions.q19_features,
       label: 'Įdomiausios funkcijos',
-      description: 'Pasirinkite savo 3 prioritetus',
+      description: 'Pasirinkite 3 prioritetus',
       options: {
         sipsi: 'Automatinė SIPSI deklaracija',
         a1: 'A1 sertifikato valdymas',
         conformite: 'Atitikties valdymo skydelis',
-        alertes: 'Įspėjimai ir atnaujinimai',
+        alertes: 'Priminimai ir atnaujinimai',
         documents: 'Dokumentų centralizavimas',
         marketplace: 'Agentūrų rinka',
         support: 'Daugiakalbė ekspertų pagalba',
         api: 'API integracija (ERP)',
       },
     },
-    
-    // Q19 : Features CLIENT
+
+    // Q19 : Funkcijos (CLIENT)
     q19_features_client: {
+      ...fr.questions.q19_features_client,
       label: 'Įdomiausios funkcijos',
-      description: 'Pasirinkite visas, kurios jus domina',
+      description: 'Pasirinkite visas, kurios domina',
       options: {
         recherche: 'Patikimų agentūrų paieška',
         comparaison: 'Kainos/kokybės palyginimas',
-        avis: 'Patikrinti atsiliepimai',
+        avis: 'Patikrintos apžvalgos',
         conformite: 'Atitikties garantija',
-        support: 'Paskirta pagalba',
+        support: 'Dedikuota pagalba',
         facturation: 'Centralizuota apskaita',
-        suivi: 'Realaus laiko stebėjimas',
+        suivi: 'Stebėjimas realiu laiku',
       },
     },
-    
-    // Q19 : Features WORKER
+
+    // Q19 : Funkcijos (WORKER)
     q19_features_worker: {
+      ...fr.questions.q19_features_worker,
       label: 'Įdomiausios funkcijos',
-      description: 'Pasirinkite visas, kurios jus domina',
+      description: 'Pasirinkite visas, kurios domina',
       options: {
-        recherche: 'Darbų paieška',
+        recherche: 'Darbo paieška',
         avis: 'Agentūrų vertinimai',
         logement: 'Pagalba su būstu',
         paiement: 'Saugus mokėjimas',
         support: 'Pagalba mano kalba',
-        documents: 'Pagalba su administraciniais dokumentais',
+        documents: 'Pagalba su dokumentais',
         formation: 'Mokymo programos',
       },
     },
-    
-    // Q20 : Prix
+
+    // Q20 : Kaina
     q20_prix: {
-      label: 'Pageidaujamas kainų modelis',
+      ...fr.questions.q20_prix,
+      label: 'Pageidaujamas kainodaros modelis',
       options: {
-        mensuel: 'Fiksuota mėnesinė prenumerata',
-        usage: 'Mokėti už naudojimą',
+        mensuel: 'Fiksuotas mėnesinis abonementas',
+        usage: 'Mokėti pagal naudojimą',
         annuel: 'Metinis planas (nuolaida)',
-        gratuit: 'Nemokama darbuotojams',
+        gratuit: 'Nemokamai darbuotojams',
       },
     },
-    
-    // Q21 : Budget mensuel
+
+    // Q21 : Mėnesinis biudžetas
     q21_budget_mensuel: {
+      ...fr.questions.q21_budget_mensuel,
       label: 'Mėnesinis biudžetas pilnam SaaS sprendimui',
       options: {
-        '0-100': '€0 - €100/mėnesį',
-        '100-300': '€100 - €300/mėnesį',
-        '300-500': '€300 - €500/mėnesį',
-        '500-1000': '€500 - €1 000/mėnesį',
-        '1000+': 'Daugiau nei €1 000/mėnesį',
+        '0-100': '€0 - €100/mėn',
+        '100-300': '€100 - €300/mėn',
+        '300-500': '€300 - €500/mėn',
+        '500-1000': '€500 - €1 000/mėn',
+        '1000+': 'Daugiau nei €1 000/mėn',
       },
     },
-    
+
     // Q22 : MVP
     q22_mvp: {
+      ...fr.questions.q22_mvp,
       label: 'Ar norėtumėte išbandyti ankstyvą versiją (MVP)?',
       options: {
         oui_gratuit: 'Taip, nemokamai',
@@ -979,225 +861,92 @@ export const lt: TranslationBundle = {
         non: 'Ne, nedomina',
       },
     },
-    
-    // Section 5 - Vision Future
-    
-    // Q23 : Rôle
+
+    // 5 skyrius – Ateities vizija
+
+    // Q23 : Vaidmuo
     q23_role: {
       label: 'Kaip matote savo vaidmenį Europos rinkoje?',
       options: {
-        decideur: 'Galutinis sprendimus priimantis asmuo',
-        influenceur: 'Įtakos darytėjas / Rekomendacija',
-        utilisateur: 'Galutinis vartotojas',
+        decideur: 'Galutinis sprendimų priėmėjas',
+        influenceur: 'Patarėjas / Rekomendacijos',
+        utilisateur: 'Galinysis naudotojas',
         autre: 'Kita',
       },
     },
-    
-    // Q20 : Croissance (AGENCY)
-    q20_croissance: {
-      label: 'Kaip matote savo komandiravimo veiklą per ateinančius 3 metus?',
-      options: {
-        forte_croissance: 'Spartus augimas',
-        croissance: 'Vidutinis augimas',
-        stable: 'Stabilu',
-        decroissance: 'Mažėjimas',
-      },
-    },
-    
-    // Q20 : Évolution (CLIENT)
-    q20_evolution: {
-      label: 'Kaip matote savo laikino darbo poreikių raidą?',
-      options: {
-        hausse: 'Padidėjimas',
-        stable: 'Stabilu',
-        baisse: 'Sumažėjimas',
-      },
-    },
-    
-    // Q20 : Projets (WORKER)
-    q20_projets: {
-      label: 'Kokie yra jūsų projektai artimiausius mėnesius?',
-      options: {
-        meme_secteur: 'Tęsti tame pačiame sektoriuje',
-        changer_secteur: 'Pakeisti sektorių',
-        se_former: 'Mokytis',
-        entrepreneur: 'Tapti verslininkui',
-      },
-    },
-    
-    // Q21 : Budget évolution (AGENCY)
-    q21_budget_evolution: {
-      label: 'Ar planuojate padidinti savo biudžetą išorės paslaugoms?',
-      options: {
-        oui_beaucoup: 'Taip, žymiai',
-        oui_peu: 'Taip, šiek tiek',
-        non: 'Ne',
-        ne_sait_pas: 'Nežinau',
-      },
-    },
-    
-    // Q21 : Budget évolution client (CLIENT)
-    q21_budget_evolution_client: {
-      label: 'Ar planuojate padidinti savo įdarbinimo biudžetą?',
-      options: {
-        oui_beaucoup: 'Taip, žymiai',
-        oui_peu: 'Taip, šiek tiek',
-        non: 'Ne',
-      },
-    },
-    
-    // Q21 : Mobilité (WORKER)
-    q21_mobilite: {
-      label: 'Ar pasiruošę persikraustyti dėl darbo?',
-      options: {
-        oui_europe: 'Taip, bet kur Europoje',
-        oui_proche: 'Taip, kaimyninės šalys',
-        non: 'Ne, tik mano šalyje',
-      },
-    },
-    
-    // Section 5 - Contact
-    
-    // Q22 : Email
-    q22_email: {
-      label: 'El. paštas (neprivaloma)',
-      placeholder: 'jusu@email.lt',
-      description: 'Rezultatams ir informacijai apie projektą gauti',
-    },
-    
-    // Q22 : Email AGENCY
-    q22_email_agency: {
-      label: 'Verslo el. paštas (neprivaloma)',
-      placeholder: 'kontaktai@jusųagentūra.lt',
-      description: 'Rezultatams ir ekskluzyviai prieigai prie platformos gauti',
-    },
-    
-    // Q22 : Email CLIENT
-    q22_email_client: {
-      label: 'Verslo el. paštas (neprivaloma)',
-      placeholder: 'kontaktai@jusu-imonė.lt',
-      description: 'Rekomendacijoms, pritaikytoms jūsų poreikiams, gauti',
-    },
-    
-    // Q22 : Email WORKER
-    q22_email_worker: {
-      label: 'El. paštas (neprivaloma)',
-      placeholder: 'jusu@email.lt',
-      description: 'Galimybėms, atitinkančioms jūsų profilį, gauti',
-    },
-    
-    // Q23 : Téléphone (optionnel)
-    q23_telephone: {
-      label: 'Telefonas (neprivaloma)',
-      placeholder: '+370 123 45678',
-    },
-    
-    // Q24 : Commentaires
-    q24_commentaires: {
-      label: 'Papildomi komentarai ar pasiūlymai',
-      placeholder: 'Pasidalykite savo idėjomis, lūkesčiais ar konkrečiais poreikiais...',
-    },
-    
-    // Q24 : Vision du marché dans les 3 prochaines années (ALL)
+
+    // Q24 : Plėtra
     q24_evolution: {
-      label: 'Rinkos vizija per ateinančius 3 metus',
-      placeholder: 'Pasidalykite savo vizija...',
+      label: 'Jūsų tarptautinės plėtros planai',
+      options: {
+        oui_rapide: 'Taip, per 6 mėnesius',
+        oui_lent: 'Taip, per 1-2 metus',
+        maintien: 'Išlaikyti dabartines šalis',
+        reduction: 'Sumažinti tarptautinę apimtį',
+      },
     },
-    
-    // Q25 : Autres besoins ou suggestions (ALL)
+
+    // Q24bis : Ambicijos (WORKER)
+    q24_aspirations: {
+      label: 'Jūsų būsimos profesinės ambicijos',
+      placeholder: 'Pvz.: nuolatinė sutartis, grįžimas į šalį, mokymai...',
+    },
+
+    // Q25 : Poreikiai
     q25_besoins: {
-      label: 'Kiti poreikiai ar pasiūlymai',
-      placeholder: 'Jūsų pasiūlymai mums įdomūs...',
+      label: 'Kiti poreikiai ar komentarai',
+      placeholder: 'Pasidalykite kita atsiliepimu ar poreikiais...',
     },
-    
-    // SECTION 6 : CONTACT
-    
-    // Q26 : Téléphone professionnel (AGENCY & CLIENT)
+
+    // 6 skyrius – Kontaktas
+
+    // Q26 : Profesinis telefonas
     q26_phone: {
-      label: 'Darbo telefonas',
-      placeholder: '+370 1234 5678',
+      label: 'Profesinis telefono numeris',
+      placeholder: '+370 612 34567',
     },
-    
-    // Q27 : Prénom (ALL)
+
+    // Q27 : Vardas
     q27_firstname: {
       label: 'Vardas',
       placeholder: 'Jūsų vardas',
     },
-    
-    // Q28 : Nom (ALL)
+
+    // Q28 : Pavardė
     q28_lastname: {
       label: 'Pavardė',
       placeholder: 'Jūsų pavardė',
     },
-    
-    // Q29 : SIRET/SIREN (AGENCY & CLIENT - optionnel)
+
+    // Q29 : SIRET/SIREN
     q29_siret: {
-      label: 'Įmonės kodas (neprivaloma)',
+      label: 'Įmonės kodas (pasirinktinai)',
       placeholder: '123456789',
-      description: 'Praturtinimui per VĮ Registrų centrą',
+      description: 'Duomenų praturtinimui per registrus',
     },
-    
-    // Q30 : Email professionnel (ALL)
+
+    // Q30 : El. paštas
     email: {
-      label: 'El. paštas',
-      placeholder: 'jusu.pastas@pavyzdys.lt',
+      label: 'Jūsų el. paštas',
+      placeholder: 'jusu.el.pastas@pavyzdys.lt',
     },
-    
-    // Q31 : Autorisation contact (ALL)
+
+    // Q31 : Sutikimas dėl kontakto
     autorise_contact: {
-      label: 'Sutinku, kad vėl susisiektumėte',
+      label: 'Sutinku, kad su manimi būtų susisiekta dar kartą',
     },
-    
-    // Q32 : Rapport d'étude (ALL)
+
+    // Q32 : Ataskaita
     souhaite_rapport: {
-      label: 'Norėčiau gauti tyrimo ataskaitą',
+      label: 'Noriu gauti tyrimo ataskaitą',
     },
-    
-    // Questions additionnelles spécifiques
-    
-    // Critères de sélection (CLIENT)
-    critere_prix: {
-      label: 'Kaina',
-    },
-    critere_qualite: {
-      label: 'Profilių kokybė',
-    },
-    critere_rapidite: {
-      label: 'Atsakymo greitis',
-    },
-    critere_conformite: {
-      label: 'Teisinė atitiktis',
-    },
-    critere_flexibilite: {
-      label: 'Lankstumas',
-    },
-    
-    // Services valorisés (CLIENT)
-    service_accompagnement: {
-      label: 'Asmeninė pagalba',
-    },
-    service_garantie: {
-      label: 'Pakeitimo garantija',
-    },
-    service_formation: {
-      label: 'Išankstinis mokymas',
-    },
-    service_gestion: {
-      label: 'Administracinis valdymas',
-    },
-    
-    // Services worker
-    service_formation_worker: {
-      label: 'Mokymai ir sertifikatai',
-    },
-    service_logement: {
-      label: 'Pagalba dėl būsto',
-    },
-    service_transport: {
-      label: 'Transporto pagalba',
-    },
-    service_administratif: {
-      label: 'Administracinė pagalba',
-    },
+  },
+
+  _meta: {
+    _lastUpdated: '2024-12-12T10:00:00.000Z',
+    _origin: 'manual',
+    _translatedBy: 'YoJob Team - Lithuanian (LT) Translation',
+    _locale: 'lt-LT',
+    _completeness: 100,
   },
 };
