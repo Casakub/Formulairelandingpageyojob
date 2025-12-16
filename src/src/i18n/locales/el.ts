@@ -938,4 +938,12 @@ export const el: TranslationBundle = {
       label: 'Θα ήθελα να λάβω την αναφορά της μελέτης',
     },
   },
+
+  _meta: {
+    _lastUpdated: '2024-12-12T10:00:00.000Z',
+    _origin: 'manual',
+    _translatedBy: 'YoJob Team - Greek (EL) Complete Translation',
+    _locale: 'el-GR',
+    _completeness: 100,
+  },
 };
