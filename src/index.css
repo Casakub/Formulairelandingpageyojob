@@ -727,10 +727,6 @@
     right: calc(var(--spacing) * 10);
   }
 
-  .-bottom-3 {
-    bottom: calc(var(--spacing) * -3);
-  }
-
   .-bottom-20 {
     bottom: calc(var(--spacing) * -20);
   }
@@ -895,10 +891,6 @@
 
   .-mx-1 {
     margin-inline: calc(var(--spacing) * -1);
-  }
-
-  .mx-1 {
-    margin-inline: calc(var(--spacing) * 1);
   }
 
   .mx-auto {
@@ -2836,16 +2828,6 @@
   @supports (color: color-mix(in lab, red, red)) {
     .bg-cyan-400\/20 {
       background-color: color-mix(in oklab, var(--color-cyan-400) 20%, transparent);
-    }
-  }
-
-  .bg-cyan-400\/30 {
-    background-color: color-mix(in srgb, oklch(.789 .154 211.53) 30%, transparent);
-  }
-
-  @supports (color: color-mix(in lab, red, red)) {
-    .bg-cyan-400\/30 {
-      background-color: color-mix(in oklab, var(--color-cyan-400) 30%, transparent);
     }
   }
 

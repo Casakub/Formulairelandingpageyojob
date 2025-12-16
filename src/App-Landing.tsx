@@ -1254,13 +1254,12 @@ export default function AppLanding() {
                       </form>
 
                       <p className="text-xs text-gray-500 text-center mt-4 flex items-center justify-center gap-1">
-                        🔒 <span>{content.network?.waitlist?.securityNote || 'Vos données sont sécurisées et ne seront jamais partagées'}</span>
+                        <span>{content.network?.waitlist?.securityNote || 'Vos données sont sécurisées et ne seront jamais partagées'}</span>
                       </p>
                     </div>
 
                     {/* Decorative elements - Cohérent avec la palette */}
                     <div className="absolute -top-3 -right-3 w-32 h-32 bg-violet-500/30 rounded-full blur-3xl animate-pulse" />
-                    <div className="absolute -bottom-3 -left-3 w-32 h-32 bg-cyan-400/30 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '1s' }} />
                   </motion.div>
                 </div>
               </div>
@@ -1823,21 +1822,6 @@ export default function AppLanding() {
           >
             <div className="flex flex-col sm:flex-row items-center justify-center gap-2 text-sm text-white/80">
               <p>{content.footer?.bottom?.copyright || '© 2024 YOJOB. Tous droits réservés.'}</p>
-              <Badge className="bg-white/10 backdrop-blur-md border-white/20 text-white px-3 py-1 shadow-lg">
-                {content.footer?.bottom?.madeWith ? (
-                  content.footer.bottom.madeWith.split('❤️').map((part, i, arr) => (
-                    i < arr.length - 1 ? (
-                      <span key={i}>
-                        {part}<span className="text-red-400 mx-1 animate-pulse">❤️</span>
-                      </span>
-                    ) : part
-                  ))
-                ) : (
-                  <>
-                    Fait avec <span className="text-red-400 mx-1 animate-pulse">❤️</span> pour faciliter le recrutement européen
-                  </>
-                )}
-              </Badge>
               {/* Badge Supabase Live */}
               <Badge className="bg-green-500/20 backdrop-blur-md border-green-400/30 text-green-300 px-3 py-1 shadow-lg flex items-center gap-1.5">
                 <span className="w-2 h-2 bg-green-400 rounded-full animate-pulse" />

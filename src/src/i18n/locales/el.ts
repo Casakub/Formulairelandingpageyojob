@@ -85,94 +85,6 @@ export const el: TranslationBundle = {
     },
   },
   
-  // Sections adaptées par profil
-  sectionContent: {
-    1: {
-      agency: {
-        title: '📋 Το προφίλ της εταιρείας σας',
-        description: 'Πείτε μας για το γραφείο σας και την εξειδίκευσή του',
-      },
-      client: {
-        title: '📋 Το προφίλ της εταιρείας σας',
-        description: 'Πείτε μας για την εταιρεία σας και τις ανάγκες πρόσληψης',
-      },
-      worker: {
-        title: '📋 Το προφίλ σας',
-        description: 'Πείτε μας για το επαγγελματικό σας υπόβαθρο',
-      },
-    },
-    2: {
-      agency: {
-        title: '💼 Δραστηριότητα απόσπασης',
-        description: 'Η εμπειρία σας στην απόσπαση εργαζομένων',
-      },
-      client: {
-        title: '💼 Η εμπειρία πρόσληψής σας',
-        description: 'Η τρέχουσα πρόσληψη και προσωρινή εργασία σας',
-      },
-      worker: {
-        title: '💼 Η εμπειρία σας στην προσωρινή εργασία',
-        description: 'Η πορεία σας ως εργαζόμενος γραφείου',
-      },
-    },
-    3: {
-      agency: {
-        title: '🎯 Ανάγκες και εργαλεία',
-        description: 'Οι προκλήσεις και οι τρέχουσες λύσεις σας',
-      },
-      client: {
-        title: '🎯 Οι τρέχουσες ανάγκες σας',
-        description: 'Προκλήσεις και προσδοκίες στην πρόσληψη',
-      },
-      worker: {
-        title: '🎯 Οι προσδοκίες σας',
-        description: 'Τι είναι σημαντικό για εσάς σε μια αποστολή',
-      },
-    },
-    4: {
-      agency: {
-        title: '⭐ Ενδιαφέρον για την ευρωπαϊκή πλατφόρμα',
-        description: 'Ανακαλύψτε το καινοτόμο όραμα της αγοράς μας',
-      },
-      client: {
-        title: '⭐ Ενδιαφέρον για την ευρωπαϊκή πλατφόρμα',
-        description: 'Μια καινοτόμος λύση για τις ανάγκες σας',
-      },
-      worker: {
-        title: '⭐ Το ενδιαφέρον σας για την πλατφόρμα',
-        description: 'Πλατφόρμα για ευκολότερη αναζήτηση αποστολών',
-      },
-    },
-    5: {
-      agency: {
-        title: '🔮 Μελλοντικό όραμα',
-        description: 'Προϋπολογισμός και προοπτικές ανάπτυξης',
-      },
-      client: {
-        title: '🔮 Οι μελλοντικές προτεραιότητές σας',
-        description: 'Προϋπολογισμός και στρατηγική πρόσληψης',
-      },
-      worker: {
-        title: '🔮 Οι στόχοι σας',
-        description: 'Οι επερχόμενες επαγγελματικές προοπτικές σας',
-      },
-    },
-    6: {
-      agency: {
-        title: '📧 Παραμείνετε σε επαφή',
-        description: 'Λάβετε τα αποτελέσματα της έρευνας και μείνετε ενημερωμένοι',
-      },
-      client: {
-        title: '📧 Παραμείνετε σε επαφή',
-        description: 'Λάβετε τα αποτελέσματα και τις συστάσεις μας',
-      },
-      worker: {
-        title: '📧 Παραμείνετε σε επαφή',
-        description: 'Λάβετε τα αποτελέσματα και ευκαιρίες',
-      },
-    },
-  },
-  
   // Header
   header: {
     title: 'YoJob',
@@ -297,6 +209,8 @@ export const el: TranslationBundle = {
     profileAgency: 'Γραφείο απασχόλησης',
     profileClient: 'Πελάτης',
     profileWorker: 'Εργαζόμενος γραφείου',
+    score_not_interested: 'Δεν ενδιαφέρομαι',
+    score_very_interested: 'Πολύ ενδιαφέρομαι',
   },
   
   // Sectors
@@ -505,16 +419,14 @@ export const el: TranslationBundle = {
     
     // Q10 : Gestion (AGENCY)
     q10_gestion: {
-      label: 'Πώς διαχειρίζεστε σήμερα τα αιτήματα απόσπασης;',
+      ...fr.questions.q10_gestion,
+      label: 'Πώς διαχειρίζεστε σήμερα τις δηλώσεις απόσπασης;',
       options: {
         interne: 'Εσωτερική ομάδα',
-        externe: 'Εξωτερικός πάροχος υπηρεσιών',
+        externe: 'Εξωτερικός πάροχος',
         mixte: 'Μικτή προσέγγιση',
         manuel: 'Χειροκίνητη διαχείριση',
         logiciel: 'Εξειδικευμένο λογισμικό',
-        manuel: 'Χειροκίνητα (Excel, Word...)',
-        logiciel_interne: 'Εσωτερικό λογισμικό',
-        prestataire: 'Εξωτερικός πάροχος υπηρεσιών',
       },
     },
     
@@ -568,16 +480,14 @@ export const el: TranslationBundle = {
     
     // Q11 : Incidents (AGENCY)
     q11_incidents: {
-      label: 'Έχετε λάβει πρόστιμα ή συμβάντα σχετικά με τη συμμόρφωση απόσπασης;',
+      ...fr.questions.q11_incidents,
+      label: 'Έχετε αντιμετωπίσει πρόστιμα ή περιστατικά σχετικά με τη συμμόρφωση απόσπασης;',
       description: 'Η απάντησή σας παραμένει ανώνυμη',
       options: {
         jamais: 'Όχι, ποτέ',
         rarement: 'Σπάνια (1-2 φορές)',
         parfois: 'Μερικές φορές (3-5 φορές)',
         souvent: 'Συχνά (6+ φορές)',
-        oui_souvent: 'Ναι, συχνά',
-        oui_rare: 'Ναι, περιστασιακά',
-        non: 'Όχι',
       },
     },
     
@@ -604,24 +514,33 @@ export const el: TranslationBundle = {
     
     // Q12 : Budget (AGENCY)
     q12_budget: {
-      label: 'Έχετε προϋπολογισμό για εξωτερικές υπηρεσίες διαχείρισης απόσπασης;',
+      ...fr.questions.q12_budget,
+      label: 'Ετήσιος προϋπολογισμός για διοικητική διαχείριση απόσπασης',
       options: {
-        oui_important: 'Ναι, σημαντικός',
-        oui_modere: 'Ναι, μέτριος',
-        non: 'Όχι',
-        ne_sait_pas: 'Δεν ξέρω',
+        '0-5k': '0-5 000 € / έτος',
+        '5-15k': '5 000-15 000 € / έτος',
+        '15-30k': '15 000-30 000 € / έτος',
+        '30k+': '30 000+ € / έτος',
+        inconnu: 'Δεν ξέρω',
       },
     },
     
-    // Q12 : Critères (CLIENT)
-    q12_criteres: {
-      label: 'Ποια είναι τα κύρια κριτήριά σας για την επιλογή γραφείου απασχόλησης;',
-      description: 'Επιλέξτε πολλαπλές επιλογές',
+    // Q12 : Budget client (CLIENT)
+    q12_budget_client: {
+      ...fr.questions.q12_budget_client,
+      label: 'Ετήσιος προϋπολογισμός για προσωρινή εργασία',
+      options: {
+        '0-50k': '0 - 50 000 €',
+        '50-200k': '50 000 - 200 000 €',
+        '200-500k': '200 000 - 500 000 €',
+        '500k+': '500 000+ €',
+        'inconnu': 'Δεν ξέρω',
+      },
     },
     
-    // Q12 : Satisfaction (WORKER)
+    // Q12 : Satisfaction (CLIENT)
     q12_satisfaction: {
-      label: 'Πόσο ικανοποιημένοι είστε με τις τρέχουσες συνθήκες εργασίας σας;',
+      label: 'Ικανοποίηση από τα τρέχοντα γραφεία απασχόλησης',
       options: {
         tres_satisfait: 'Πολύ ικανοποιημένος',
         satisfait: 'Ικανοποιημένος',
@@ -630,449 +549,393 @@ export const el: TranslationBundle = {
       },
     },
     
-    // Q13 : Durée (AGENCY)
-    q13_duree: {
-      label: 'Μέση διάρκεια των αποστολών απόσπασής σας',
+    // Q12 : Salaire (WORKER)
+    q12_salaire: {
+      ...fr.questions.q12_salaire,
+      label: 'Είστε ικανοποιημένοι με τον μισθό σας στην προσωρινή εργασία;',
       options: {
-        '<1mois': 'Λιγότερο από 1 μήνα',
-        '1-3mois': '1-3 μήνες',
-        '3-6mois': '3-6 μήνες',
-        '6-12mois': '6-12 μήνες',
-        '12+mois': 'Πάνω από 12 μήνες',
+        '<1500': 'Λιγότερο από €1 500',
+        '1500-2500': '€1 500 - €2 500',
+        '2500-3500': '€2 500 - €3 500',
+        '3500+': '€3 500+',
       },
     },
     
-    // Q13 : Budget client (CLIENT)
-    q13_budget_client: {
-      label: 'Ποιος είναι ο ετήσιος προϋπολογισμός σας για προσωρινή εργασία;',
+    // Q13 : Manque à gagner (AGENCY)
+    q13_manque_gagner: {
+      ...fr.questions.q13_manque_gagner,
+      label: 'Ποιο ποσοστό εσόδων χάνεται λόγω διοικητικής πολυπλοκότητας;',
       options: {
-        '<50k': 'Λιγότερο από €50k',
-        '50-200k': '€50k - €200k',
-        '200-500k': '€200k - €500k',
-        '500k-1M': '€500k - €1M',
-        '1M+': 'Πάνω από €1M',
+        'non': 'Όχι, όχι πραγματικά',
+        'faible': 'Ναι, χαμηλό (< 5% έσοδα)',
+        'moyen': 'Ναι, μεσαίο (5-15% έσοδα)',
+        'important': 'Ναι, σημαντικό (> 15% έσοδα)',
       },
     },
     
-    // Q13 : Durée worker (WORKER)
-    q13_duree_worker: {
-      label: 'Η προτιμώμενη διάρκεια αποστολής σας',
+    // Q13 : Satisfaction (CLIENT)
+    q13_satisfaction: {
+      ...fr.questions.q13_satisfaction,
+      label: 'Ικανοποίηση από τα τρέχοντα γραφεία σας',
       options: {
-        court: 'Σύντομη (< 3 μήνες)',
-        moyen: 'Μέτρια (3-6 μήνες)',
-        long: 'Μακρά (> 6 μήνες)',
-        indifferent: 'Αδιάφορος',
+        'tres_satisfait': 'Πολύ ικανοποιημένος',
+        'satisfait': 'Ικανοποιημένος',
+        'neutre': 'Ουδέτερος',
+        'insatisfait': 'Δυσαρεστημένος',
+        'tres_insatisfait': 'Πολύ δυσαρεστημένος',
       },
     },
     
-    // Section 3 - Besoins/Potrebe
-    
-    // Q14 : Intérêt marketplace (AGENCY)
-    q14_interet: {
-      label: 'Θα σας ενδιέφερε μια ευρωπαϊκή πλατφόρμα για την προσφορά των υπηρεσιών σας;',
-      description: 'Μια αγορά για την αύξηση της ορατότητάς σας',
+    // Q13 : Satisfaction worker (WORKER)
+    q13_satisfaction_worker: {
+      ...fr.questions.q13_satisfaction_worker,
+      label: 'Ικανοποίηση από τα τρέχοντα γραφεία σας',
       options: {
-        tres_interesse: 'Πολύ ενδιαφερόμενος',
-        interesse: 'Ενδιαφερόμενος',
-        neutre: 'Ουδέτερος',
-        pas_interesse: 'Δεν ενδιαφέρομαι',
+        'tres_satisfait': 'Πολύ ικανοποιημένος',
+        'satisfait': 'Ικανοποιημένος',
+        'neutre': 'Ουδέτερος',
+        'insatisfait': 'Δυσαρεστημένος',
+        'tres_insatisfait': 'Πολύ δυσαρεστημένος',
       },
     },
     
-    // Q14 : Intérêt plateforme (CLIENT)
-    q14_interet_client: {
-      label: 'Θα σας ενδιέφερε μια πλατφόρμα για εύκολη εύρεση ευρωπαϊκών γραφείων;',
+    // Section 3 - Besoins
+    
+    // Q14 : Risques (AGENCY)
+    q14_risques: {
+      ...fr.questions.q14_risques,
+      label: 'Κύριες ανησυχίες σας',
+      description: 'Επιλέξτε όλα όσα ισχύουν',
       options: {
-        tres_interesse: 'Πολύ ενδιαφερόμενος',
-        interesse: 'Ενδιαφερόμενος',
-        neutre: 'Ουδέτερος',
-        pas_interesse: 'Δεν ενδιαφέρομαι',
+        amendes: 'Πρόστιμα και κυρώσεις',
+        reputation: 'Φήμη / Εικόνα',
+        penal: 'Ποινική ευθύνη',
+        delais: 'Καθυστερήσεις στις αποστολές',
+        clients: 'Απώλεια πελατών',
+        aucun: 'Δεν υπάρχει σημαντικός κίνδυνος',
       },
     },
     
-    // Q14 : Intérêt worker (WORKER)
-    q14_interet_worker: {
-      label: 'Θα σας ενδιέφερε μια πλατφόρμα για αναζήτηση αποστολών;',
+    // Q14 : Besoins (CLIENT)
+    q14_besoins_client: {
+      ...fr.questions.q14_besoins_client,
+      label: 'Κύριες ανάγκες σας',
+      description: 'Επιλέξτε όλα όσα ισχύουν',
       options: {
-        tres_interesse: 'Πολύ ενδιαφερόμενος',
-        interesse: 'Ενδιαφερόμενος',
-        neutre: 'Ουδέτερος',
-        pas_interesse: 'Δεν ενδιαφέρομαι',
+        fiabilite: 'Εύρεση αξιόπιστων γραφείων',
+        conformite: 'Νομική συμμόρφωση',
+        qualite: 'Ποιότητα/δεξιότητες',
+        cout: 'Κόστη',
+        disponibilite: 'Διαθεσιμότητα υποψηφίων',
+        aucun: 'Καμία σημαντική ανάγκη',
       },
     },
     
-    // Q15 : Fonctionnalités (AGENCY)
-    q15_fonctionnalites: {
-      label: 'Ποιες λειτουργίες θα ήταν πιο χρήσιμες;',
-      description: 'Επιλέξτε πολλαπλές επιλογές',
+    // Q14 : Attentes (WORKER)
+    q14_attentes: {
+      ...fr.questions.q14_attentes,
+      label: 'Οι προσδοκίες σας για προσωρινή εργασία στο εξωτερικό',
+      description: 'Επιλέξτε όλα όσα ισχύουν',
       options: {
-        marketplace: 'Αγορά υπηρεσιών',
-        admin: 'Αυτοματοποιημένη διαχείριση',
-        conformite: 'Έλεγχοι συμμόρφωσης',
-        payment: 'Ενσωματωμένες πληρωμές',
-        support: 'Πολυγλωσσική υποστήριξη',
+        salaire: 'Καλύτερος μισθός',
+        conditions: 'Καλύτερες συνθήκες εργασίας',
+        stabilite: 'Σταθερότητα',
+        experience: 'Διεθνής εμπειρία',
+        logement: 'Βοήθεια στέγασης',
+        aucun: 'Καμία ιδιαίτερη προσδοκία',
+      },
+    },
+    
+    // Q14_risques_client options
+    q14_risques_client: {
+      ...fr.questions.q14_risques_client,
+      label: 'Κύριες ανησυχίες σας',
+      description: 'Επιλέξτε όλα όσα ισχύουν',
+      options: {
+        conformite: 'Νομική συμμόρφωση',
+        qualite: 'Ποιότητα/δεξιότητες',
+        communication: 'Επικοινωνία/Γλώσσες',
+        cout: 'Απρόβλεπτα κόστη',
+        disponibilite: 'Διαθεσιμότητα υποψηφίων',
+        aucun: 'Δεν υπάρχουν σημαντικές ανησυχίες',
+      },
+    },
+    
+    // Q14_risques_worker options
+    q14_risques_worker: {
+      ...fr.questions.q14_risques_worker,
+      label: 'Με ποια προβλήματα συναντάστε πιο συχνά;',
+      description: 'Επιλέξτε όλα όσα ισχύουν',
+      options: {
+        paiement: 'Καθυστερήσεις πληρωμών',
+        conditions: 'Κακές συνθήκες',
+        contrat: 'Μη τήρηση συμβολαίων',
+        logement: 'Ανεπαρκής στέγαση',
+        communication: 'Προβλήματα επικοινωνίας',
+        aucun: 'Δεν υπάρχουν σημαντικά προβλήματα',
+      },
+    },
+    
+    // Q15 : Problème
+    q15_probleme: {
+      ...fr.questions.q15_probleme,
+      label: 'Ποιο πρόβλημα θα θέλατε να λύσετε πρώτο;',
+      placeholder: 'Περιγράψτε το κύριο πρόβλημά σας...',
+    },
+    
+    // Q15 : Besoins client (CLIENT)
+    q15_besoins_client: {
+      ...fr.questions.q15_besoins_client,
+      label: 'Ποιες είναι οι προτεραιότητές σας;',
+      placeholder: 'π.χ.: γρήγορη εύρεση, καλύτερη ποιότητα, τιμές...',
+    },
+    
+    // Q15 : Améliorations (WORKER)
+    q15_ameliorations: {
+      ...fr.questions.q15_ameliorations,
+      label: 'Τι θα θέλατε να βελτιώσετε στις αποστολές σας;',
+      placeholder: 'π.χ.: μισθός, στέγαση, υποστήριξη, σταθερότητα...',
+    },
+    
+    // Q16 : ERP (AGENCY)
+    q16_erp: {
+      ...fr.questions.q16_erp,
+      label: 'Χρησιμοποιείτε ERP/λογισμικό διαχείρισης;',
+      options: {
+        sage: 'Sage',
+        sap: 'SAP',
+        cegid: 'Cegid',
+        bullhorn: 'Bullhorn / ATS',
         autre: 'Άλλο',
+        aucun: 'Κανένα ERP',
       },
     },
     
-    // Q15 : Fonctionnalités client (CLIENT)
-    q15_fonctionnalites_client: {
-      label: 'Ποιες λειτουργίες θα ήταν πιο χρήσιμες;',
-      description: 'Επιλέξτε πολλαπλές επιλογές',
+    // Q16 : Nom ERP
+    q16_nom_erp: {
+      label: 'Ποιο λογισμικό/ERP;',
+      placeholder: 'π.χ.: SAP, Odoo, προσαρμοσμένο...',
+    },
+    
+    // Q16 : Critères (CLIENT)
+    q16_criteres: {
+      label: 'Κύρια κριτήριά σας για επιλογή γραφείων',
+      description: 'Επιλέξτε τα 3 σημαντικότερα',
+    },
+    
+    // Q16 : Amélioration (WORKER)
+    q16_amelioration: {
+      label: 'Τι θα βελτίωνε την εμπειρία προσωρινής εργασίας σας;',
+      description: 'Επιλέξτε όλα όσα ισχύουν',
+    },
+    
+    // Q17 : Migration (AGENCY)
+    q17_migration: {
+      ...fr.questions.q17_migration,
+      label: 'Είστε έτοιμοι να αλλάξετε εργαλεία;',
       options: {
-        comparaison: 'Σύγκριση γραφείων',
+        oui: 'Ναι, χωρίς πρόβλημα',
+        conditions: 'Ναι, υπό προϋποθέσεις',
+        difficile: 'Δύσκολο, αλλά ανοιχτό',
+        non: 'Όχι, δεν είναι εφικτό',
+      },
+    },
+    
+    // Q17 : Budget (CLIENT)
+    q17_budget: {
+      label: 'Μηνιαίο budget για πλατφόρμα πρόσληψης προσωρινής εργασίας',
+      options: {
+        '0': 'Δεν προτίθεμαι να πληρώσω',
+        '1-100': '€1 - €100/μήνα',
+        '100-500': '€100 - €500/μήνα',
+        '500-1000': '€500 - €1 000/μήνα',
+        '1000+': 'Πάνω από €1 000/μήνα',
+      },
+    },
+    
+    // Q17 : Plateforme (WORKER)
+    q17_plateforme: {
+      label: 'Θα χρησιμοποιούσατε πλατφόρμα για να βρείτε προσωρινή εργασία στο εξωτερικό;',
+      options: {
+        oui_certainement: 'Ναι, σίγουρα',
+        oui_probablement: 'Ναι, πιθανώς',
+        peut_etre: 'Ίσως',
+        non: 'Όχι',
+      },
+    },
+    
+    // Section 4 - Intérêt YoJob
+    
+    // Q18 : Score
+    q18_score: {
+      ...fr.questions.q18_score,
+      label: 'Πόσο σας ενδιαφέρει μια ευρωπαϊκή πλατφόρμα απόσπασης;',
+      description: 'Βαθμολογήστε από 1 (καθόλου) έως 10 (πολύ)',
+    },
+    
+    // Q19 : Features (AGENCY)
+    q19_features: {
+      ...fr.questions.q19_features,
+      label: 'Οι πιο ενδιαφέρουσες λειτουργίες',
+      description: 'Επιλέξτε τις 3 κύριες προτεραιότητές σας',
+      options: {
+        sipsi: 'Αυτόματη δήλωση SIPSI',
+        a1: 'Διαχείριση πιστοποιητικού A1',
+        conformite: 'Πίνακας συμμόρφωσης',
+        alertes: 'Ειδοποιήσεις & ανανεώσεις',
+        documents: 'Κεντρικοποίηση εγγράφων',
+        marketplace: 'Αγορά γραφείων',
+        support: 'Πολυγλωσσική εξειδικευμένη υποστήριξη',
+        api: 'API ενσωμάτωση (ERP)',
+      },
+    },
+    
+    // Q19 : Features CLIENT
+    q19_features_client: {
+      ...fr.questions.q19_features_client,
+      label: 'Οι πιο ενδιαφέρουσες λειτουργίες',
+      description: 'Επιλέξτε όλες όσες σας ενδιαφέρουν',
+      options: {
+        recherche: 'Αναζήτηση αξιόπιστων γραφείων',
+        comparaison: 'Σύγκριση τιμής/ποιότητας',
         avis: 'Επαληθευμένες κριτικές',
-        suivi: 'Παρακολούθηση αποστολών',
-        documentation: 'Κεντρική τεκμηρίωση',
-        facturation: 'Διαχείριση τιμολογίων',
-        autre: 'Άλλο',
+        conformite: 'Εγγύηση συμμόρφωσης',
+        support: 'Αφιερωμένη υποστήριξη',
+        facturation: 'Κεντρική τιμολόγηση',
+        suivi: 'Παρακολούθηση σε πραγματικό χρόνο',
       },
     },
     
-    // Q15 : Fonctionnalités worker (WORKER)
-    q15_fonctionnalites_worker: {
-      label: 'Ποιες λειτουργίες θα ήταν πιο χρήσιμες;',
-      description: 'Επιλέξτε πολλαπλές επιλογές',
+    // Q19 : Features WORKER
+    q19_features_worker: {
+      ...fr.questions.q19_features_worker,
+      label: 'Οι πιο ενδιαφέρουσες λειτουργίες',
+      description: 'Επιλέξτε όλες όσες σας ενδιαφέρουν',
       options: {
-        recherche: 'Προηγμένη αναζήτηση αποστολών',
-        alertes: 'Ειδοποιήσεις για νέες αποστολές',
-        documents: 'Διαχείριση εγγράφων',
+        recherche: 'Αναζήτηση εργασίας',
         avis: 'Αξιολογήσεις γραφείων',
-        support: 'Πολυγλωσσική υποστήριξη',
+        logement: 'Βοήθεια στέγασης',
+        paiement: 'Ασφαλής πληρωμή',
+        support: 'Υποστήριξη στη γλώσσα μου',
+        documents: 'Βοήθεια με διοικητικά έγγραφα',
+        formation: 'Προγράμματα κατάρτισης',
+      },
+    },
+    
+    // Q20 : Prix
+    q20_prix: {
+      ...fr.questions.q20_prix,
+      label: 'Προτιμώμενο μοντέλο τιμολόγησης',
+      options: {
+        mensuel: 'Σταθερή μηνιαία συνδρομή',
+        usage: 'Pay-as-you-go (χρήση)',
+        annuel: 'Ετήσιο πλάνο (έκπτωση)',
+        gratuit: 'Δωρεάν για εργαζόμενους',
+      },
+    },
+    
+    // Q21 : Budget mensuel
+    q21_budget_mensuel: {
+      ...fr.questions.q21_budget_mensuel,
+      label: 'Μηνιαίο budget για πλήρη SaaS λύση',
+      options: {
+        '0-100': '€0 - €100/μήνα',
+        '100-300': '€100 - €300/μήνα',
+        '300-500': '€300 - €500/μήνα',
+        '500-1000': '€500 - €1 000/μήνα',
+        '1000+': 'Πάνω από €1 000/μήνα',
+      },
+    },
+    
+    // Q22 : MVP
+    q22_mvp: {
+      ...fr.questions.q22_mvp,
+      label: 'Θα θέλατε να δοκιμάσετε μια πρώιμη έκδοση (MVP);',
+      options: {
+        oui_gratuit: 'Ναι, δωρεάν',
+        oui_reduc: 'Ναι, με έκπτωση',
+        peut_etre: 'Ίσως, εξαρτάται από τις λειτουργίες',
+        non: 'Όχι, δεν ενδιαφέρομαι',
+      },
+    },
+    
+    // Section 5 - Vision Future
+    
+    // Q23 : Rôle
+    q23_role: {
+      label: 'Πώς βλέπετε τον ρόλο σας στην ευρωπαϊκή αγορά;',
+      options: {
+        decideur: 'Τελικός αποφασιστής',
+        influenceur: 'Επηρεάζων / Σύσταση',
+        utilisateur: 'Τελικός χρήστης',
         autre: 'Άλλο',
       },
     },
     
-    // Q16 : Frein (AGENCY)
-    q16_frein: {
-      label: 'Ποιο θα ήταν το μεγαλύτερο εμπόδιό σας στη χρήση τέτοιας πλατφόρμας;',
-      options: {
-        cout: 'Κόστος',
-        complexite: 'Πολύ περίπλοκο',
-        confiance: 'Έλλειψη εμπιστοσύνης',
-        changement: 'Δεν θέλω να αλλάξω',
-        aucun: 'Κανένα εμπόδιο',
-        autre: 'Άλλο',
-      },
-    },
-    
-    // Q16 : Frein client (CLIENT)
-    q16_frein_client: {
-      label: 'Ποιο θα ήταν το μεγαλύτερο εμπόδιό σας;',
-      options: {
-        cout: 'Κόστος',
-        confiance: 'Εμπιστοσύνη σε γραφεία',
-        complexite: 'Πολύ περίπλοκο',
-        aucun: 'Κανένα εμπόδιο',
-        autre: 'Άλλο',
-      },
-    },
-    
-    // Q16 : Frein worker (WORKER)
-    q16_frein_worker: {
-      label: 'Ποιο θα ήταν το μεγαλύτερο εμπόδιό σας;',
-      options: {
-        complexite: 'Πολύ περίπλοκο',
-        confiance: 'Εμπιστοσύνη στην πλατφόρμα',
-        acces: 'Πρόσβαση σε τεχνολογία',
-        aucun: 'Κανένα εμπόδιο',
-        autre: 'Άλλο',
-      },
-    },
-    
-    // Q17 : Prix (AGENCY)
-    q17_prix: {
-      label: 'Ποιο μοντέλο τιμολόγησης σας φαίνεται πιο κατάλληλο;',
-      options: {
-        commission: 'Προμήθεια ανά αποστολή',
-        abonnement: 'Μηνιαία συνδρομή',
-        freemium: 'Δωρεάν + premium λειτουργίες',
-        autre: 'Άλλο',
-      },
-    },
-    
-    // Q17 : Services (CLIENT)
-    q17_services: {
-      label: 'Ποιες υπηρεσίες θα εκτιμούσατε περισσότερο;',
-      description: 'Επιλέξτε πολλαπλές επιλογές',
-    },
-    
-    // Q17 : Services worker (WORKER)
-    q17_services_worker: {
-      label: 'Ποιες υπηρεσίες θα εκτιμούσατε περισσότερο;',
-      description: 'Επιλέξτε πολλαπλές επιλογές',
-    },
-    
-    // Q18 : Recommandation (AGENCY)
-    q18_recommandation: {
-      label: 'Θα συστήνατε τέτοια πλατφόρμα σε συναδέλφους;',
-      options: {
-        certainement: 'Σίγουρα',
-        probablement: 'Πιθανώς',
-        peut_etre: 'Ίσως',
-        probablement_pas: 'Πιθανώς όχι',
-      },
-    },
-    
-    // Q18 : Recommandation client (CLIENT)
-    q18_recommandation_client: {
-      label: 'Θα συστήνατε τέτοια λύση;',
-      options: {
-        certainement: 'Σίγουρα',
-        probablement: 'Πιθανώς',
-        peut_etre: 'Ίσως',
-        probablement_pas: 'Πιθανώς όχι',
-      },
-    },
-    
-    // Q18 : Recommandation worker (WORKER)
-    q18_recommandation_worker: {
-      label: 'Θα συστήνατε τέτοια πλατφόρμα;',
-      options: {
-        certainement: 'Σίγουρα',
-        probablement: 'Πιθανώς',
-        peut_etre: 'Ίσως',
-        probablement_pas: 'Πιθανώς όχι',
-      },
-    },
-    
-    // Q19 : Test (AGENCY)
-    q19_test: {
-      label: 'Θα θέλατε να συμμετάσχετε στη beta φάση;',
-      options: {
-        oui_immediat: 'Ναι, αμέσως',
-        oui_plus_tard: 'Ναι, αλλά αργότερα',
-        non: 'Όχι',
-      },
-    },
-    
-    // Q19 : Test client (CLIENT)
-    q19_test_client: {
-      label: 'Θα θέλατε να συμμετάσχετε στη δοκιμή;',
-      options: {
-        oui_immediat: 'Ναι, αμέσως',
-        oui_plus_tard: 'Ναι, αλλά αργότερα',
-        non: 'Όχι',
-      },
-    },
-    
-    // Q19 : Test worker (WORKER)
-    q19_test_worker: {
-      label: 'Θα θέλατε να συμμετάσχετε στη δοκιμή;',
-      options: {
-        oui_immediat: 'Ναι, αμέσως',
-        oui_plus_tard: 'Ναι, αλλά αργότερα',
-        non: 'Όχι',
-      },
-    },
-    
-    // Section 4 - Vision Future
-    
-    // Q20 : Croissance (AGENCY)
-    q20_croissance: {
-      label: 'Πώς βλέπετε τη δραστηριότητα απόσπασής σας τα επόμενα 3 χρόνια;',
-      options: {
-        forte_croissance: 'Ισχυρή ανάπτυξη',
-        croissance: 'Μέτρια ανάπτυξη',
-        stable: 'Σταθερό',
-        decroissance: 'Μείωση',
-      },
-    },
-    
-    // Q20 : Évolution (CLIENT)
-    q20_evolution: {
-      label: 'Πώς βλέπετε την εξέλιξη των αναγκών σας για προσωρινή εργασία;',
-      options: {
-        hausse: 'Αύξηση',
-        stable: 'Σταθερό',
-        baisse: 'Μείωση',
-      },
-    },
-    
-    // Q20 : Projets (WORKER)
-    q20_projets: {
-      label: 'Ποια είναι τα σχέδιά σας τους επόμενους μήνες;',
-      options: {
-        meme_secteur: 'Συνέχεια στον ίδιο τομέα',
-        changer_secteur: 'Αλλαγή τομέα',
-        se_former: 'Εκπαίδευση',
-        entrepreneur: 'Γίνω επιχειρηματίας',
-      },
-    },
-    
-    // Q21 : Budget évolution (AGENCY)
-    q21_budget_evolution: {
-      label: 'Σχεδιάζετε να αυξήσετε τον προϋπολογισμό σας για εξωτερικές υπηρεσίες;',
-      options: {
-        oui_beaucoup: 'Ναι, σημαντικά',
-        oui_peu: 'Ναι, λίγο',
-        non: 'Όχι',
-        ne_sait_pas: 'Δεν ξέρω',
-      },
-    },
-    
-    // Q21 : Budget évolution client (CLIENT)
-    q21_budget_evolution_client: {
-      label: 'Σχεδιάζετε να αυξήσετε τον προϋπολογισμό πρόσληψης σας;',
-      options: {
-        oui_beaucoup: 'Ναι, σημαντικά',
-        oui_peu: 'Ναι, λίγο',
-        non: 'Όχι',
-      },
-    },
-    
-    // Q21 : Mobilité (WORKER)
-    q21_mobilite: {
-      label: 'Είστε πρόθυμοι να μετακινηθείτε για δουλειά;',
-      options: {
-        oui_europe: 'Ναι, οπουδήποτε στην Ευρώπη',
-        oui_proche: 'Ναι, σε γειτονικές χώρες',
-        non: 'Όχι, μόνο στη χώρα μου',
-      },
-    },
-    
-    // Section 5 - Contact
-    
-    // Q22 : Email
-    q22_email: {
-      label: 'Email (προαιρετικό)',
-      placeholder: 'to@email.gr',
-      description: 'Για να λάβετε τα αποτελέσματα και πληροφορίες για το έργο',
-    },
-    
-    // Q22 : Email AGENCY
-    q22_email_agency: {
-      label: 'Επαγγελματικό email (προαιρετικό)',
-      placeholder: 'contact@youroffice.gr',
-      description: 'Για να λάβετε τα αποτελέσματα και αποκλειστική πρόσβαση στην πλατφόρμα',
-    },
-    
-    // Q22 : Email CLIENT
-    q22_email_client: {
-      label: 'Επαγγελματικό email (προαιρετικό)',
-      placeholder: 'contact@your-company.gr',
-      description: 'Για να λάβετε συστάσεις προσαρμοσμένες στις ανάγκες σας',
-    },
-    
-    // Q22 : Email WORKER
-    q22_email_worker: {
-      label: 'Email (προαιρετικό)',
-      placeholder: 'to@email.gr',
-      description: 'Για να λάβετε ευκαιρίες που ταιριάζουν στο προφίλ σας',
-    },
-    
-    // Q23 : Téléphone (optionnel)
-    q23_telephone: {
-      label: 'Τηλέφωνο (προαιρετικό)',
-      placeholder: '+30 210 1234567',
-    },
-    
-    // Q24 : Commentaires
-    q24_commentaires: {
-      label: 'Πρόσθετα σχόλια ή προτάσεις',
-      placeholder: 'Μοιραστείτε τις ιδέες, προσδοκίες ή ειδικές ανάγκες σας...',
-    },
-    
-    // Q24 : Vision du marché dans les 3 prochaines années (ALL)
+    // Q24 : Évolution
     q24_evolution: {
-      label: 'Όραμα της αγοράς τα επόμενα 3 χρόνια',
-      placeholder: 'Μοιραστείτε το όραμά σας...',
+      label: 'Τα διεθνή σχέδια επέκτασής σας',
+      options: {
+        oui_rapide: 'Ναι, μέσα σε 6 μήνες',
+        oui_lent: 'Ναι, μέσα σε 1-2 χρόνια',
+        maintien: 'Διατήρηση των τωρινών χωρών',
+        reduction: 'Μείωση διεθνούς εύρους',
+      },
     },
     
-    // Q25 : Autres besoins ou suggestions (ALL)
+    // Q24bis : Aspirations (WORKER)
+    q24_aspirations: {
+      label: 'Οι μελλοντικές επαγγελματικές φιλοδοξίες σας',
+      placeholder: 'π.χ.: μόνιμη σύμβαση, επιστροφή στη χώρα, εκπαίδευση...',
+    },
+    
+    // Q25 : Besoins
     q25_besoins: {
-      label: 'Άλλες ανάγκες ή προτάσεις',
-      placeholder: 'Οι προτάσεις σας μας ενδιαφέρουν...',
+      label: 'Άλλες ανάγκες ή σχόλια',
+      placeholder: 'Μοιραστείτε οποιαδήποτε άλλη ανατροφοδότηση ή ανάγκη...',
     },
     
-    // SECTION 6 : CONTACT
+    // Section 6 - Contact
     
-    // Q26 : Téléphone professionnel (AGENCY & CLIENT)
+    // Q26 : Téléphone professionnel
     q26_phone: {
       label: 'Επαγγελματικό τηλέφωνο',
       placeholder: '+30 210 1234567',
     },
     
-    // Q27 : Prénom (ALL)
+    // Q27 : Prénom
     q27_firstname: {
       label: 'Όνομα',
       placeholder: 'Το όνομά σας',
     },
     
-    // Q28 : Nom (ALL)
+    // Q28 : Nom
     q28_lastname: {
       label: 'Επώνυμο',
       placeholder: 'Το επώνυμό σας',
     },
     
-    // Q29 : SIRET/SIREN (AGENCY & CLIENT - optionnel)
+    // Q29 : SIRET/SIREN
     q29_siret: {
       label: 'ΑΦΜ (προαιρετικό)',
       placeholder: '123456789',
       description: 'Για εμπλουτισμό μέσω ΓΕΜΗ',
     },
     
-    // Q30 : Email professionnel (ALL)
+    // Q30 : Email
     email: {
-      label: 'Email',
+      label: 'Το email σας',
       placeholder: 'to.email@paradeigma.gr',
     },
     
-    // Q31 : Autorisation contact (ALL)
+    // Q31 : Autorisation contact
     autorise_contact: {
-      label: 'Αποδέχομαι να επικοινωνήσετε ξανά μαζί μου',
+      label: 'Συμφωνώ να επικοινωνήσετε ξανά μαζί μου',
     },
     
-    // Q32 : Rapport d'étude (ALL)
+    // Q32 : Rapport d'étude
     souhaite_rapport: {
       label: 'Θα ήθελα να λάβω την αναφορά της μελέτης',
-    },
-    
-    // Questions additionnelles spécifiques
-    
-    // Critères de sélection (CLIENT)
-    critere_prix: {
-      label: 'Τιμή',
-    },
-    critere_qualite: {
-      label: 'Ποιότητα προφίλ',
-    },
-    critere_rapidite: {
-      label: 'Ταχύτητα απόκρισης',
-    },
-    critere_conformite: {
-      label: 'Νομική συμμόρφωση',
-    },
-    critere_flexibilite: {
-      label: 'Ευελιξία',
-    },
-    
-    // Services valorisés (CLIENT)
-    service_accompagnement: {
-      label: 'Προσωπική υποστήριξη',
-    },
-    service_garantie: {
-      label: 'Εγγύηση αντικατάστασης',
-    },
-    service_formation: {
-      label: 'Προηγούμενη εκπαίδευση',
-    },
-    service_gestion: {
-      label: 'Διοικητική διαχείριση',
-    },
-    
-    // Services worker
-    service_formation_worker: {
-      label: 'Εκπαιδεύσεις και πιστοποιητικά',
-    },
-    service_logement: {
-      label: 'Βοήθεια για στέγαση',
-    },
-    service_transport: {
-      label: 'Υποστήριξη μεταφορών',
-    },
-    service_administratif: {
-      label: 'Διοικητική υποστήριξη',
     },
   },
 };
