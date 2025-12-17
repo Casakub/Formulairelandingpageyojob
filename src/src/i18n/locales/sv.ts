@@ -153,11 +153,30 @@ export const sv: TranslationBundle = {
 
   // Bekräftelse
   confirmation: {
-    title: 'Tack för ditt deltagande!',
+    title: 'Tack för ditt deltagande! 🙏',
     subtitle: 'Dina svar har sparats',
     message: 'Vi analyserar alla svar för att skapa en lösning som passar dina behov perfekt.',
     cta_back: 'Tillbaka till startsidan',
     cta_dashboard: 'Visa dashboard',
+    description: 'Din åsikt är värdefull och hjälper till att forma YoJobs framtid.',
+    cta: 'Tillbaka till YoJobs webbplats',
+    
+    reward: {
+      report: {
+        title: 'Rapport "Trender 2025"',
+        description: 'Skickad inom 3 veckor'
+      },
+      earlyaccess: {
+        title: 'Tidig tillgång till YoJob',
+        description: 'Topp 100 deltagare'
+      }
+    },
+    
+    thanks: {
+      title: '🎁 Som tack för ditt deltagande:',
+      item1: '• Exklusiv rapport "Utstationeringtrender 2025"',
+      item2: '• Topp 100 deltagare = 3 månaders gratis tillgång till YoJob (värde 500€)'
+    }
   },
 
   // Framsteg

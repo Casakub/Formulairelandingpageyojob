@@ -170,11 +170,30 @@ export const en: TranslationBundle = {
   
   // Confirmation
   confirmation: {
-    title: 'Thank you for your participation!',
+    title: 'Thank you for your participation! 🙏',
     subtitle: 'Your answers have been successfully saved',
     message: 'We are currently analyzing all responses to create a solution perfectly tailored to your needs.',
     cta_back: 'Back to homepage',
     cta_dashboard: 'View Dashboard',
+    description: 'Your feedback is valuable and helps shape the future of YoJob.',
+    cta: 'Back to YoJob website',
+    
+    reward: {
+      report: {
+        title: 'Report "Trends 2025"',
+        description: 'Sent within 3 weeks'
+      },
+      earlyaccess: {
+        title: 'YoJob Early Access',
+        description: 'Top 100 respondents'
+      }
+    },
+    
+    thanks: {
+      title: '🎁 As a thank you for your participation:',
+      item1: '• Exclusive report "Posting Trends 2025"',
+      item2: '• Top 100 respondents = 3 months free access to YoJob (worth €500)'
+    }
   },
   
   // Progress

@@ -172,12 +172,30 @@ export const lt: TranslationBundle = {
 
   // Patvirtinimas
   confirmation: {
-    title: 'Ačiū už dalyvavimą!',
+    title: 'Ačiū už dalyvavimą! 🙏',
     subtitle: 'Jūsų atsakymai sėkmingai išsaugoti',
-    message:
-      'Šiuo metu analizuojame visus atsakymus, kad sukurtume sprendimą, puikiai atitinkantį jūsų poreikius.',
-    cta_back: 'Grįžti į pradžios puslapį',
-    cta_dashboard: 'Peržiūrėti valdymo skydą',
+    message: 'Šiuo metu analizuojame visus atsakymus, kad sukurtume sprendimą, puikiai pritaikytą jūsų poreikiams.',
+    cta_back: 'Grįžti į pagrindinį puslapį',
+    cta_dashboard: 'Žiūrėti valdymo skydą',
+    description: 'Jūsų nuomonė yra vertinga ir padeda formuoti YoJob ateitį.',
+    cta: 'Grįžti į YoJob svetainę',
+    
+    reward: {
+      report: {
+        title: 'Ataskaita "Tendencijos 2025"',
+        description: 'Išsiųsta per 3 savaites'
+      },
+      earlyaccess: {
+        title: 'Ankstyvoji prieiga prie YoJob',
+        description: 'Top 100 dalyvių'
+      }
+    },
+    
+    thanks: {
+      title: '🎁 Kaip padėka už dalyvavimą:',
+      item1: '• Ekskliatyvi ataskaita "Komandiruočių tendencijos 2025"',
+      item2: '• Top 100 dalyvių = 3 mėnesiai nemokamos prieigos prie YoJob (vertė 500€)'
+    }
   },
 
   // Progresas

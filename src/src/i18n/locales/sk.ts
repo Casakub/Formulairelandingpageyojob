@@ -153,11 +153,30 @@ export const sk: TranslationBundle = {
 
   // Potvrdenie
   confirmation: {
-    title: 'Ďakujeme za účasť!',
+    title: 'Ďakujeme za účasť! 🙏',
     subtitle: 'Vaše odpovede boli úspešne uložené',
     message: 'Analyzujeme všetky odpovede, aby sme vytvorili riešenie presne pre vaše potreby.',
     cta_back: 'Späť na hlavnú stránku',
     cta_dashboard: 'Zobraziť Dashboard',
+    description: 'Váš názor je cenný a pomáha formovať budúcnosť YoJob.',
+    cta: 'Späť na web YoJob',
+    
+    reward: {
+      report: {
+        title: 'Správa "Trendy 2025"',
+        description: 'Odoslaná do 3 týždňov'
+      },
+      earlyaccess: {
+        title: 'Predčasný prístup YoJob',
+        description: 'Top 100 účastníkov'
+      }
+    },
+    
+    thanks: {
+      title: '🎁 Ako poďakovanie za vašu účasť:',
+      item1: '• Exkluzívna správa "Trendy vysielania 2025"',
+      item2: '• Top 100 účastníkov = 3 mesiace bezplatný prístup k YoJob (hodnota 500€)'
+    }
   },
 
   // Progres

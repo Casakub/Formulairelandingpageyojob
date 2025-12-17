@@ -170,11 +170,30 @@ export const da: TranslationBundle = {
 
   // Confirmation
   confirmation: {
-    title: 'Tak for din deltagelse!',
+    title: 'Tak for din deltagelse! 🙏',
     subtitle: 'Dine svar er blevet gemt',
     message: 'Vi analyserer i øjeblikket alle svar for at skabe en løsning perfekt tilpasset dine behov.',
     cta_back: 'Tilbage til forsiden',
-    cta_dashboard: 'Vis Dashboard',
+    cta_dashboard: 'Se dashboard',
+    description: 'Din mening er værdifuld og hjælper med at forme YoJobs fremtid.',
+    cta: 'Tilbage til YoJobs websted',
+    
+    reward: {
+      report: {
+        title: 'Rapport "Tendenser 2025"',
+        description: 'Sendt inden for 3 uger'
+      },
+      earlyaccess: {
+        title: 'Tidlig adgang til YoJob',
+        description: 'Top 100 deltagere'
+      }
+    },
+    
+    thanks: {
+      title: '🎁 Som tak for din deltagelse:',
+      item1: '• Eksklusiv rapport "Udstationeringstendenser 2025"',
+      item2: '• Top 100 deltagere = 3 måneders gratis adgang til YoJob (værdi 500€)'
+    }
   },
 
   // Progress

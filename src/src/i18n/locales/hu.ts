@@ -165,11 +165,30 @@ export const hu: TranslationBundle = {
   
   // Megerősítés
   confirmation: {
-    title: 'Köszönjük a részvételt!',
+    title: 'Köszönjük a részvételt! 🙏',
     subtitle: 'Az Ön válaszait sikeresen rögzítettük',
     message: 'Jelenleg minden választ elemzünk, hogy az Ön igényeihez tökéletesen igazított megoldást hozzunk létre.',
     cta_back: 'Vissza a kezdőlapra',
     cta_dashboard: 'Irányítópult megtekintése',
+    description: 'Az Ön véleménye értékes, és segít formálni a YoJob jövőjét.',
+    cta: 'Vissza a YoJob weboldalra',
+    
+    reward: {
+      report: {
+        title: 'Jelentés "Trendek 2025"',
+        description: '3 héten belül elküldve'
+      },
+      earlyaccess: {
+        title: 'Korai hozzáférés YoJob',
+        description: 'Top 100 résztvevő'
+      }
+    },
+    
+    thanks: {
+      title: '🎁 Részvételéért köszönetként:',
+      item1: '• Exkluzív jelentés "Kiküldetési trendek 2025"',
+      item2: '• Top 100 résztvevő = 3 hónap ingyenes hozzáférés a YoJobhoz (500€ érték)'
+    }
   },
   
   // Haladás

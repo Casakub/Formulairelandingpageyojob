@@ -120,6 +120,69 @@ const SECTIONS = [
   { id: 6, labelKey: 'section.6.title', labelFallback: 'Contact', icon: '📧', questions: 1, time: '1 min' }
 ];
 
+/**
+ * 🌍 MAP LANGUE → PAYS
+ * Détermine le pays basé sur la langue sélectionnée dans le formulaire
+ */
+function getCountryFromLanguage(langCode: string): string {
+  const languageToCountry: Record<string, string> = {
+    'fr': 'France',
+    'en': 'United Kingdom',
+    'de': 'Allemagne',
+    'es': 'Espagne',
+    'it': 'Italie',
+    'pl': 'Pologne',
+    'ro': 'Roumanie',
+    'bg': 'Bulgarie',
+    'hr': 'Croatie',
+    'cz': 'République Tchèque',
+    'da': 'Danemark',
+    'ee': 'Estonie',
+    'el': 'Grèce',
+    'fi': 'Finlande',
+    'hu': 'Hongrie',
+    'lt': 'Lituanie',
+    'lv': 'Lettonie',
+    'nl': 'Pays-Bas',
+    'pt': 'Portugal',
+    'sk': 'Slovaquie',
+    'sl': 'Slovénie',
+    'sv': 'Suède',
+  };
+  return languageToCountry[langCode] || 'Non spécifié';
+}
+
+/**
+ * 🏳️ MAP LANGUE → CODE PAYS (ISO 3166-1 alpha-2)
+ */
+function getCountryCodeFromLanguage(langCode: string): string {
+  const languageToCountryCode: Record<string, string> = {
+    'fr': 'FR',
+    'en': 'GB',
+    'de': 'DE',
+    'es': 'ES',
+    'it': 'IT',
+    'pl': 'PL',
+    'ro': 'RO',
+    'bg': 'BG',
+    'hr': 'HR',
+    'cz': 'CZ',
+    'da': 'DK',
+    'ee': 'EE',
+    'el': 'GR',
+    'fi': 'FI',
+    'hu': 'HU',
+    'lt': 'LT',
+    'lv': 'LV',
+    'nl': 'NL',
+    'pt': 'PT',
+    'sk': 'SK',
+    'sl': 'SI',
+    'sv': 'SE',
+  };
+  return languageToCountryCode[langCode] || 'XX';
+}
+
 export default function AppSurveyOriginal() {
   const [viewMode, setViewMode] = useState<'survey' | 'dashboard' | 'login'>('survey'); // Toggle between survey, dashboard and login
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -274,7 +337,9 @@ export default function AppSurveyOriginal() {
       const responseId = `YJ-2025-${Math.floor(Math.random() * 1000000).toString().padStart(6, '0')}`;
       
       // Enriched metadata
-      const country = extractCountry(formData.q5_pays || formData.q5_localisation || formData.q5_pays_travail);
+      // 🌍 Pays basé sur la LANGUE sélectionnée (pas sur la réponse q5_pays)
+      const country = getCountryFromLanguage(currentLangRef.current);
+      const countryCode = getCountryCodeFromLanguage(currentLangRef.current);
       const sector = respondentType === 'worker'
         ? (formData.q4_metiers[0] || 'Non spécifié')
         : (formData.q4_secteurs[0] || 'Non spécifié');
@@ -304,9 +369,60 @@ export default function AppSurveyOriginal() {
       const responseData = {
         response_id: responseId,
         respondent_type: respondentType || 'agency', // ✅ Include respondent type
-        language_code: currentLangRef.current, // ✅ Include language code from user's selection
-        ...formData,
+        language_code: currentLangRef.current, // ✅ RÉACTIVÉ - Langue utilisée lors du remplissage
+        
+        // 🔹 CORE FIELDS (communs à tous les types)
+        q1_nom: formData.q1_nom || '',
+        q2_annee: formData.q2_annee || '',
+        q3_taille: formData.q3_taille || '',
+        q4_secteurs: formData.q4_secteurs || [],
+        
+        // 🔹 FIELDS ADAPTABLES (utiliser les champs génériques ou les mettre dans additional_data)
+        // Pour les questions qui existent dans la table, on les remplit directement
+        q5_pays: formData.q5_pays || '',
+        q6_volume: formData.q6_volume || '',
+        q7_origine: formData.q7_origine || '',
+        q8_destinations: formData.q8_destinations || '',
+        q9_defi: formData.q9_defi || '',
+        q9_autre: formData.q9_autre || '',
+        q10_gestion: formData.q10_gestion || '', // ✅ TOUS les profils utilisent ce fieldName
+        q11_incidents: formData.q11_incidents || '',
+        
+        q12_budget: formData.q12_budget || '',
+        q13_manque_gagner: formData.q13_manque_gagner || '',
+        q14_risques: formData.q14_risques || '',
+        q15_probleme: formData.q15_probleme || '',
+        q16_erp: formData.q16_erp || '',
+        q16_autre: formData.q16_autre || '',
+        q17_migration: formData.q17_migration || '',
+        
+        q18_score: formData.q18_score || 0,
+        q19_features: formData.q19_features || [],
+        q20_prix: formData.q20_prix || '',
+        q21_budget_mensuel: formData.q21_budget_mensuel || '',
+        q22_mvp: formData.q22_mvp || '',
+        q23_role: formData.q23_role || '',
+        
+        q24_evolution: formData.q24_evolution || '',
+        q25_besoins: formData.q25_besoins || '',
+        
+        q26_phone: formData.q26_phone || '',
+        q27_firstname: formData.q27_firstname || '',
+        q28_lastname: formData.q28_lastname || '',
+        q29_siret: formData.q29_siret || '',
+        email: formData.email || '',
+        autorise_contact: formData.autorise_contact || false,
+        souhaite_rapport: formData.souhaite_rapport || false,
+        
+        // 🔹 ADDITIONAL DATA (questions spécifiques au type de répondant)
+        additional_data: {
+          // ✅ Backup complet pour référence et debugging
+          raw_form_data: formData
+        },
+        
+        // Metadata enrichie
         country,
+        countryCode,
         sector,
         company_size: companySize,
         detachment_experience: detachmentExperience,

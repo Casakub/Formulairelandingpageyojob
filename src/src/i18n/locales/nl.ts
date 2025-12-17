@@ -152,11 +152,30 @@ export const nl: TranslationBundle = {
   
   // Confirmation
   confirmation: {
-    title: 'Dank u voor uw deelname!',
+    title: 'Dank u voor uw deelname! 🙏',
     subtitle: 'Uw antwoorden zijn succesvol opgeslagen',
     message: 'We analyseren momenteel alle antwoorden om een oplossing te creëren die perfect is afgestemd op uw behoeften.',
     cta_back: 'Terug naar homepage',
     cta_dashboard: 'Dashboard Bekijken',
+    description: 'Uw mening is waardevol en helpt de toekomst van YoJob vorm te geven.',
+    cta: 'Terug naar YoJob website',
+    
+    reward: {
+      report: {
+        title: 'Rapport "Trends 2025"',
+        description: 'Verstuurd binnen 3 weken'
+      },
+      earlyaccess: {
+        title: 'Vroege Toegang YoJob',
+        description: 'Top 100 deelnemers'
+      }
+    },
+    
+    thanks: {
+      title: '🎁 Als dank voor uw deelname:',
+      item1: '• Exclusief rapport "Detacheringstendensen 2025"',
+      item2: '• Top 100 deelnemers = 3 maanden gratis toegang tot YoJob (waarde €500)'
+    }
   },
   
   // Progress

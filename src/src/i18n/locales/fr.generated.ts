@@ -209,6 +209,25 @@ function generateFrenchBundle(): TranslationBundle {
       message: 'Nous analysons actuellement toutes les réponses pour créer une solution parfaitement adaptée à vos besoins.',
       cta_back: 'Retour à l\'accueil',
       cta_dashboard: 'Voir le Dashboard',
+      description: 'Votre avis est précieux et contribue à façonner l\'avenir de YoJob.',
+      cta: 'Retour au site YoJob',
+      
+      reward: {
+        report: {
+          title: 'Rapport "Tendances 2025"',
+          description: 'Envoyé sous 3 semaines'
+        },
+        earlyaccess: {
+          title: 'Early Access YoJob',
+          description: 'Top 100 répondants'
+        }
+      },
+      
+      thanks: {
+        title: '🎁 En remerciement de votre participation :',
+        item1: '• Rapport exclusif "Tendances du détachement 2025"',
+        item2: '• Top 100 répondants = 3 mois d\'accès gratuit à YoJob (valeur 500€)'
+      }
     },
     
     progress: {

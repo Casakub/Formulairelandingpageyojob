@@ -165,11 +165,30 @@ export const it: TranslationBundle = {
   
   // Conferma
   confirmation: {
-    title: 'Grazie per la sua partecipazione!',
+    title: 'Grazie per la sua partecipazione! 🙏',
     subtitle: 'Le sue risposte sono state registrate con successo',
     message: 'Stiamo attualmente analizzando tutte le risposte per creare una soluzione perfettamente adattata alle sue esigenze.',
     cta_back: 'Torna all\'inizio',
     cta_dashboard: 'Vedi il Dashboard',
+    description: 'La sua opinione è preziosa e contribuisce a plasmare il futuro di YoJob.',
+    cta: 'Torna al sito YoJob',
+    
+    reward: {
+      report: {
+        title: 'Rapporto "Tendenze 2025"',
+        description: 'Inviato entro 3 settimane'
+      },
+      earlyaccess: {
+        title: 'Accesso Anticipato YoJob',
+        description: 'Top 100 partecipanti'
+      }
+    },
+    
+    thanks: {
+      title: '🎁 In ringraziamento per la sua partecipazione:',
+      item1: '• Rapporto esclusivo "Tendenze del distacco 2025"',
+      item2: '• Top 100 partecipanti = 3 mesi di accesso gratuito a YoJob (valore 500€)'
+    }
   },
   
   // Progresso

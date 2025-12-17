@@ -170,11 +170,30 @@ export const fi: TranslationBundle = {
   
   // Confirmation
   confirmation: {
-    title: 'Kiitos osallistumisestasi!',
+    title: 'Kiitos osallistumisestasi! 🙏',
     subtitle: 'Vastauksesi on tallennettu onnistuneesti',
     message: 'Analysoimme parhaillaan kaikkia vastauksia luodaksemme ratkaisun, joka on täysin räätälöity tarpeisiisi.',
     cta_back: 'Takaisin etusivulle',
-    cta_dashboard: 'Näytä hallintapaneeli',
+    cta_dashboard: 'Katso kojelautaa',
+    description: 'Mielipiteesi on arvokas ja auttaa muovaamaan YoJobin tulevaisuutta.',
+    cta: 'Takaisin YoJobin verkkosivuille',
+    
+    reward: {
+      report: {
+        title: 'Raportti "Trendit 2025"',
+        description: 'Lähetetty 3 viikon kuluessa'
+      },
+      earlyaccess: {
+        title: 'Varhainen pääsy YoJobiin',
+        description: 'Top 100 osallistujaa'
+      }
+    },
+    
+    thanks: {
+      title: '🎁 Kiitoksena osallistumisestasi:',
+      item1: '• Eksklusiivinen raportti "Lähetettyjen työntekijöiden trendit 2025"',
+      item2: '• Top 100 osallistujaa = 3 kuukautta ilmaista pääsyä YoJobiin (arvo 500€)'
+    }
   },
   
   // Progress

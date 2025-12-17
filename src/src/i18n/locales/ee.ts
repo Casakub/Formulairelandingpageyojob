@@ -170,11 +170,30 @@ export const ee: TranslationBundle = {
   
   // Confirmation
   confirmation: {
-    title: 'Täname osalemise eest!',
+    title: 'Täname osalemise eest! 🙏',
     subtitle: 'Teie vastused on edukalt salvestatud',
     message: 'Praegu analüüsime kõiki vastuseid, et luua lahendus, mis on täielikult kohandatud teie vajadustele.',
     cta_back: 'Tagasi avalehele',
     cta_dashboard: 'Kuva juhtpaneel',
+    description: 'Teie arvamus on väärtuslik ja aitab kujundada YoJob tulevikku.',
+    cta: 'Tagasi YoJob veebisaidile',
+    
+    reward: {
+      report: {
+        title: 'Aruanne "Trendid 2025"',
+        description: 'Saadetud 3 nädala jooksul'
+      },
+      earlyaccess: {
+        title: 'Varajane juurdepääs YoJob',
+        description: 'Top 100 osalejat'
+      }
+    },
+    
+    thanks: {
+      title: '🎁 Tänuks osalemise eest:',
+      item1: '• Eksklusiivne aruanne "Lähetamise trendid 2025"',
+      item2: '• Top 100 osalejat = 3 kuud tasuta juurdepääsu YoJobile (väärtus 500€)'
+    }
   },
   
   // Progress

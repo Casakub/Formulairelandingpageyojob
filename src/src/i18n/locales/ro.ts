@@ -153,11 +153,30 @@ export const ro: TranslationBundle = {
 
   // Confirmare
   confirmation: {
-    title: 'Vă mulțumim pentru participare!',
+    title: 'Vă mulțumim pentru participare! 🙏',
     subtitle: 'Răspunsurile au fost salvate cu succes',
     message: 'Analizăm toate răspunsurile pentru a crea o soluție perfect adaptată nevoilor dvs.',
     cta_back: 'Înapoi la pagina principală',
     cta_dashboard: 'Vezi dashboard-ul',
+    description: 'Părerea dvs. este prețioasă și contribuie la modelarea viitorului YoJob.',
+    cta: 'Înapoi la site-ul YoJob',
+    
+    reward: {
+      report: {
+        title: 'Raport "Tendințe 2025"',
+        description: 'Trimis în 3 săptămâni'
+      },
+      earlyaccess: {
+        title: 'Acces Anticipat YoJob',
+        description: 'Top 100 participanți'
+      }
+    },
+    
+    thanks: {
+      title: '🎁 Ca mulțumire pentru participare:',
+      item1: '• Raport exclusiv "Tendințe ale detașării 2025"',
+      item2: '• Top 100 participanți = 3 luni acces gratuit la YoJob (valoare 500€)'
+    }
   },
 
   // Progres

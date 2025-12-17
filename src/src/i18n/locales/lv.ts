@@ -154,12 +154,31 @@ export const lv: TranslationBundle = {
 
   // Apstiprinājums
   confirmation: {
-    title: 'Paldies par dalību!',
+    title: 'Paldies par dalību! 🙏',
     subtitle: 'Jūsu atbildes ir saglabātas',
     message:
       'Mēs analizējam visus atbildes, lai izveidotu risinājumu, kas perfekti atbilst jūsu vajadzībām.',
     cta_back: 'Atpakaļ uz sākumlapu',
     cta_dashboard: 'Skatīt vadības paneli',
+    description: 'Jūsu viedoklis ir vērtīgs un palīdz veidot YoJob nākotni.',
+    cta: 'Atpakaļ uz YoJob tīmekļa vietni',
+    
+    reward: {
+      report: {
+        title: 'Ziņojums "Tendences 2025"',
+        description: 'Nosūtīts 3 nedēļu laikā'
+      },
+      earlyaccess: {
+        title: 'Agrīna piekļuve YoJob',
+        description: 'Top 100 dalībnieki'
+      }
+    },
+    
+    thanks: {
+      title: '🎁 Kā pateicība par dalību:',
+      item1: '• Ekskluzīvs ziņojums "Norīkošanas tendences 2025"',
+      item2: '• Top 100 dalībnieki = 3 mēneši bezmaksas piekļuves YoJob (vērtība 500€)'
+    }
   },
 
   // Progress

@@ -170,11 +170,30 @@ export const hr: TranslationBundle = {
   
   // Confirmation
   confirmation: {
-    title: 'Hvala vam na sudjelovanju!',
+    title: 'Hvala vam na sudjelovanju! 🙏',
     subtitle: 'Vaši odgovori uspješno su spremljeni',
     message: 'Trenutno analiziramo sve odgovore kako bismo stvorili rješenje savršeno prilagođeno vašim potrebama.',
     cta_back: 'Natrag na početnu stranicu',
-    cta_dashboard: 'Prikaži nadzornu ploču',
+    cta_dashboard: 'Pogledaj Dashboard',
+    description: 'Vaše mišljenje je vrijedno i pomaže oblikovati budućnost YoJob.',
+    cta: 'Natrag na YoJob web',
+    
+    reward: {
+      report: {
+        title: 'Izvješće "Trendovi 2025"',
+        description: 'Poslano za 3 tjedna'
+      },
+      earlyaccess: {
+        title: 'Rani pristup YoJob',
+        description: 'Top 100 sudionika'
+      }
+    },
+    
+    thanks: {
+      title: '🎁 Kao zahvalu za sudjelovanje:',
+      item1: '• Ekskluzivno izvješće "Trendovi delegiranja 2025"',
+      item2: '• Top 100 sudionika = 3 mjeseca besplatnog pristupa YoJobu (vrijednost 500€)'
+    }
   },
   
   // Progress

@@ -17,9 +17,17 @@ if (credentialsConfigured) {
   console.warn('📖 See SETUP_DATABASE.md for instructions');
 }
 
-// SINGLETON: Create only ONE Supabase client instance
+// ⚠️ NE PLUS CRÉER D'INSTANCE ICI POUR ÉVITER "Multiple GoTrueClient"
+// L'instance est maintenant créée dans /lib/supabase-public.ts
+// Ce fichier est conservé pour la compatibilité avec les helpers
+
+// SINGLETON: Create only ONE Supabase client instance (lazy initialization)
 let supabaseInstance: SupabaseClient | null = null;
 
+/**
+ * ⚠️ DEPRECATED: Utilisez getSupabasePublicClient() de /lib/supabase-public.ts à la place
+ * Cette fonction est conservée pour la compatibilité avec le code existant
+ */
 function getSupabaseClient(): SupabaseClient | null {
   if (!credentialsConfigured) {
     return null;
@@ -30,7 +38,8 @@ function getSupabaseClient(): SupabaseClient | null {
     return supabaseInstance;
   }
   
-  // Create new instance only if it doesn't exist
+  // Create new instance only if it doesn't exist (LAZY)
+  console.log('📦 Création instance Supabase (Dashboard)');
   supabaseInstance = createClient(supabaseUrl, supabaseAnonKey, {
     auth: {
       persistSession: false, // Pas de session pour formulaire public
@@ -48,19 +57,28 @@ function getSupabaseClient(): SupabaseClient | null {
     }
   });
   
-  // FORCE: Supprimer toute session au chargement
-  supabaseInstance.auth.getSession().then(({ data }) => {
-    if (data.session) {
-      console.warn('⚠️ Session détectée sur formulaire public - Suppression...');
-      supabaseInstance?.auth.signOut();
-    }
-  });
-  
   return supabaseInstance;
 }
 
-// Export the singleton instance
-export const supabase = getSupabaseClient();
+// ⚠️ Export de la fonction pour usage externe (lazy loading)
+export { getSupabaseClient };
+
+// ⚠️ Export du client comme getter pour compatibilité avec le code existant
+export const supabase = (() => {
+  // Retourne un proxy qui crée l'instance seulement quand utilisé
+  let _instance: SupabaseClient | null = null;
+  return new Proxy({} as SupabaseClient, {
+    get(target, prop) {
+      if (!_instance) {
+        _instance = getSupabaseClient();
+      }
+      if (!_instance) {
+        throw new Error('Supabase not configured');
+      }
+      return (_instance as any)[prop];
+    }
+  });
+})();
 
 // Database types
 export interface MarketResearchResponse {
@@ -68,6 +86,7 @@ export interface MarketResearchResponse {
   created_at?: string;
   response_id: string;
   respondent_type?: string; // ✅ 'agency' | 'client' | 'worker'
+  language_code?: string; // ✅ Code ISO 639-1 de la langue (fr, en, de, pl, ro, etc.)
   
   // Section 1: Profil
   q1_nom: string;
@@ -88,7 +107,7 @@ export interface MarketResearchResponse {
   // Section 3: Besoins
   q12_budget: string;
   q13_manque_gagner: string;
-  q14_risques: string;
+  q14_risques: string | string[]; // ✅ Peut être string ou array
   q15_probleme: string;
   q16_erp: string;
   q16_autre: string;
@@ -115,8 +134,22 @@ export interface MarketResearchResponse {
   autorise_contact: boolean;
   souhaite_rapport: boolean;
   
+  // 🔹 ADDITIONAL DATA (questions spécifiques au type de répondant)
+  additional_data?: {
+    // Client specific
+    q10_agences?: string;
+    q10_processus?: string;
+    // Worker specific
+    q10_agence?: string;
+    q10_agences_worker?: string;
+    // Raw form data pour référence complète
+    raw_form_data?: any;
+    [key: string]: any; // Permet d'ajouter n'importe quelle clé dynamiquement
+  };
+  
   // Metadata enrichie
   country?: string;
+  country_code?: string; // ✅ Code pays ISO 3166-1 alpha-2 (FR, DE, PL, RO, etc.) basé sur la langue
   sector?: string;
   company_size?: number;
   detachment_experience?: string;
@@ -131,13 +164,14 @@ export interface MarketResearchResponse {
 
 // Helper functions
 export async function saveResponse(data: MarketResearchResponse) {
-  if (!supabase) {
+  const client = getSupabaseClient();
+  if (!client) {
     console.error('Supabase not configured. Cannot save response.');
     return { success: false, error: new Error('Supabase not configured') };
   }
   
   try {
-    const { data: response, error } = await supabase
+    const { data: response, error } = await client
       .from('market_research_responses')
       .insert([data])
       .select()
@@ -152,13 +186,14 @@ export async function saveResponse(data: MarketResearchResponse) {
 }
 
 export async function getAllResponses() {
-  if (!supabase) {
+  const client = getSupabaseClient();
+  if (!client) {
     console.warn('Supabase not configured. Using mock data.');
     return { success: false, data: null, error: new Error('Supabase not configured') };
   }
   
   try {
-    const { data, error } = await supabase
+    const { data, error } = await client
       .from('market_research_responses')
       .select('*')
       .order('created_at', { ascending: false });
@@ -172,12 +207,13 @@ export async function getAllResponses() {
 }
 
 export async function getResponseById(id: string) {
-  if (!supabase) {
+  const client = getSupabaseClient();
+  if (!client) {
     return { success: false, error: new Error('Supabase not configured') };
   }
   
   try {
-    const { data, error } = await supabase
+    const { data, error } = await client
       .from('market_research_responses')
       .select('*')
       .eq('id', id)
@@ -192,12 +228,13 @@ export async function getResponseById(id: string) {
 }
 
 export async function getResponsesCount() {
-  if (!supabase) {
+  const client = getSupabaseClient();
+  if (!client) {
     return { success: false, count: 0 };
   }
   
   try {
-    const { count, error } = await supabase
+    const { count, error } = await client
       .from('market_research_responses')
       .select('*', { count: 'exact', head: true });
     
@@ -210,12 +247,13 @@ export async function getResponsesCount() {
 }
 
 export async function getResponsesByCountry(country: string) {
-  if (!supabase) {
+  const client = getSupabaseClient();
+  if (!client) {
     return { success: false, error: new Error('Supabase not configured'), data: [] };
   }
   
   try {
-    const { data, error } = await supabase
+    const { data, error } = await client
       .from('market_research_responses')
       .select('*')
       .eq('country', country)
@@ -230,12 +268,13 @@ export async function getResponsesByCountry(country: string) {
 }
 
 export async function getResponsesBySector(sector: string) {
-  if (!supabase) {
+  const client = getSupabaseClient();
+  if (!client) {
     return { success: false, error: new Error('Supabase not configured'), data: [] };
   }
   
   try {
-    const { data, error } = await supabase
+    const { data, error } = await client
       .from('market_research_responses')
       .select('*')
       .eq('sector', sector)
@@ -250,12 +289,13 @@ export async function getResponsesBySector(sector: string) {
 }
 
 export async function deleteResponse(id: string) {
-  if (!supabase) {
+  const client = getSupabaseClient();
+  if (!client) {
     return { success: false, error: new Error('Supabase not configured') };
   }
   
   try {
-    const { error } = await supabase
+    const { error } = await client
       .from('market_research_responses')
       .delete()
       .eq('id', id);
