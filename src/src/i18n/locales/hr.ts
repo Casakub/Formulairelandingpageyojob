@@ -644,6 +644,12 @@ export const hr: TranslationBundle = {
       label: 'Koji softver/ERP?',
       placeholder: 'Npr.: SAP, Odoo, vlastiti...',
     },
+
+    // Q16 : Autre ERP (précision)
+    q16_autre: {
+      label: 'Navedite svoj ERP',
+      placeholder: 'Naziv softvera...',
+    },
     
     // Q17 : Migration (AGENCY)
     q17_migration: {

@@ -732,10 +732,10 @@ export const lt: TranslationBundle = {
       },
     },
 
-    // Q16 : ERP pavadinimas
-    q16_nom_erp: {
-      label: 'Kokia programinė įranga/ERP?',
-      placeholder: 'Pvz.: SAP, Odoo, individuali...',
+    // Q16 : Kita ERP (patikslinimas)
+    q16_autre: {
+      label: 'Nurodykite savo ERP',
+      placeholder: 'Programinės įrangos pavadinimas...',
     },
 
     // Q16 : Kriterijai (CLIENT)

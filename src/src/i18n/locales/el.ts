@@ -748,6 +748,12 @@ export const el: TranslationBundle = {
       description: 'Επιλέξτε όλα όσα ισχύουν',
     },
     
+    // Q16 : Autre ERP (précision)
+    q16_autre: {
+      label: 'Διευκρινίστε το ERP σας',
+      placeholder: 'Όνομα λογισμικού...',
+    },
+    
     // Q17 : Migration (AGENCY)
     q17_migration: {
       ...fr.questions.q17_migration,

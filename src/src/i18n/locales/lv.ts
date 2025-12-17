@@ -729,6 +729,12 @@ export const lv: TranslationBundle = {
       description: 'Izvēlieties visas piemērojamās opcijas',
     },
 
+    // Q16 : Cits ERP (precizējums)
+    q16_autre: {
+      label: 'Norādiet savu ERP',
+      placeholder: 'Programmatūras nosaukums...',
+    },
+
     // Q17 : Migrācija (AGENCY)
     q17_migration: {
       ...fr.questions.q17_migration,

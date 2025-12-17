@@ -748,6 +748,12 @@ export const fi: TranslationBundle = {
       description: 'Valitse kaikki sopivat',
     },
     
+    // Q16 : Autre ERP (précision)
+    q16_autre: {
+      label: 'Tarkenna ERP-järjestelmäsi',
+      placeholder: 'Ohjelmiston nimi...',
+    },
+    
     // Q17 : Migration (AGENCY)
     q17_migration: {
       ...fr.questions.q17_migration,

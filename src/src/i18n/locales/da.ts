@@ -748,6 +748,12 @@ export const da: TranslationBundle = {
       description: 'Vælg alle der gælder',
     },
 
+    // Q16 : Autre ERP (précision)
+    q16_autre: {
+      label: 'Angiv dit ERP',
+      placeholder: 'Softwarenavn...',
+    },
+
     // Q17 : Migration (AGENCY)
     q17_migration: {
       ...fr.questions.q17_migration,

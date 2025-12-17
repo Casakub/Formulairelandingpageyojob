@@ -718,6 +718,12 @@ export const ro: TranslationBundle = {
       label: 'Ce software/ERP?',
       placeholder: 'Ex.: SAP, Odoo, personalizat...',
     },
+    
+    // Q16 : Alte ERP (précision)
+    q16_autre: {
+      label: 'Specificați ERP-ul dvs.',
+      placeholder: 'Nume software...',
+    },
 
     // Q16 : Criterii (CLIENT)
     q16_criteres: {

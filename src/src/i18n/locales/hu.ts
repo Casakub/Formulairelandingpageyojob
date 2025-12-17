@@ -933,6 +933,12 @@ export const hu: TranslationBundle = {
       label: 'Elfogadom, hogy újra kapcsolatba lépjenek velem',
     },
     
+    // Q16 : Autre ERP (précision)
+    q16_autre: {
+      label: 'Adja meg az ERP-jét',
+      placeholder: 'Szoftver neve...',
+    },
+    
     // Q32: Felmérési jelentés
     souhaite_rapport: {
       label: 'Szeretném megkapni a felmérési jelentést',

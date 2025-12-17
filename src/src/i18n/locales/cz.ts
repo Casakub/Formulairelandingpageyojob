@@ -748,6 +748,12 @@ export const cz: TranslationBundle = {
       description: 'Vyberte všechny relevantní možnosti',
     },
 
+    // Q16 : Autre ERP (précision)
+    q16_autre: {
+      label: 'Upřesněte svůj ERP',
+      placeholder: 'Název softwaru...',
+    },
+
     // Q17 : Migration (AGENCY)
     q17_migration: {
       ...fr.questions.q17_migration,

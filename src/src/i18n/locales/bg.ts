@@ -724,6 +724,12 @@ export const bg: TranslationBundle = {
       placeholder: 'Напр.: SAP, Odoo, персонализиран...',
     },
     
+    // Q16: Друг ERP (уточнение)
+    q16_autre: {
+      label: 'Уточнете вашия ERP',
+      placeholder: 'Име на софтуера...',
+    },
+    
     // Q16: Критерии (CLIENT)
     q16_criteres: {
       label: 'Вашите основни критерии за избор на агенции за временна работа',

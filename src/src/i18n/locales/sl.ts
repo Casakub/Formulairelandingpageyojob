@@ -731,6 +731,12 @@ export const sl: TranslationBundle = {
       description: 'Izberite vse ustrezne možnosti',
     },
 
+    // Q16 : Autre ERP (précision)
+    q16_autre: {
+      label: 'Navedite svoj ERP',
+      placeholder: 'Ime programske opreme...',
+    },
+
     // Q17 : Migracija (AGENCY)
     q17_migration: {
       ...fr.questions.q17_migration,

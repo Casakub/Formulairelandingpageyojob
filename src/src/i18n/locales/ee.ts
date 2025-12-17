@@ -748,6 +748,12 @@ export const ee: TranslationBundle = {
       description: 'Valige kõik, mis sobivad',
     },
     
+    // Q16 : Muu ERP (täpsustus)
+    q16_autre: {
+      label: 'Täpsustage oma ERP',
+      placeholder: 'Tarkvara nimi...',
+    },
+    
     // Q17 : Migration (AGENCY)
     q17_migration: {
       ...fr.questions.q17_migration,

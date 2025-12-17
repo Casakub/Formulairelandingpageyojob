@@ -706,6 +706,12 @@ export const nl: TranslationBundle = {
       placeholder: 'Bijv.: SAP, Odoo, eigen...',
     },
 
+    // Q16 : Andere ERP (precisering)
+    q16_autre: {
+      label: 'Specificeer uw ERP',
+      placeholder: 'Softwarenaam...',
+    },
+
     // Q16 : Critères (CLIENT)
     q16_criteres: {
       label: 'Uw belangrijkste selectiecriteria voor uitzendbureaus',

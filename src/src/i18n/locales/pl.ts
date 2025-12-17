@@ -718,6 +718,12 @@ export const pl: TranslationBundle = {
       placeholder: 'Np.: SAP, Odoo, własne...',
     },
 
+    // Q16 : Inne ERP (precyzja)
+    q16_autre: {
+      label: 'Podaj swój ERP',
+      placeholder: 'Nazwa oprogramowania...',
+    },
+
     // Q16 : Kryteria (CLIENT)
     q16_criteres: {
       label: 'Twoje główne kryteria wyboru agencji',

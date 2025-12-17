@@ -751,6 +751,12 @@ export const es: TranslationBundle = {
       placeholder: 'Ej: SAP, Odoo, personalizado...',
     },
     
+    // Q16 : Otro ERP (precisión)
+    q16_autre: {
+      label: 'Especifique su ERP',
+      placeholder: 'Nombre del software...',
+    },
+    
     // Q16 : Criterios (CLIENT)
     q16_criteres: {
       label: 'Sus principales criterios de selección para agencias de trabajo temporal',

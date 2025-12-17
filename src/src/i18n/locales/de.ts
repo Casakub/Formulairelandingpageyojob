@@ -735,6 +735,12 @@ export const de: TranslationBundle = {
       placeholder: 'Z.B.: SAP, Odoo, individuell...',
     },
     
+    // Q16 : Autre ERP (précision)
+    q16_autre: {
+      label: 'Geben Sie Ihr ERP an',
+      placeholder: 'Name der Software...',
+    },
+    
     // Q16 : Critères (CLIENT)
     q16_criteres: {
       label: 'Ihre Hauptauswahlkriterien für Zeitarbeitsfirmen',

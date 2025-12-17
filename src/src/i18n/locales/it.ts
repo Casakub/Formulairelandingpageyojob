@@ -750,6 +750,12 @@ export const it: TranslationBundle = {
       placeholder: 'Es: SAP, Odoo, personalizzato...',
     },
     
+    // Q16 : Altro ERP (precisazione)
+    q16_autre: {
+      label: 'Specificare il proprio ERP',
+      placeholder: 'Nome del software...',
+    },
+    
     // Q16 : Criteri (CLIENT)
     q16_criteres: {
       label: 'I suoi principali criteri di selezione per le agenzie di lavoro interinale',

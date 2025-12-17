@@ -731,6 +731,12 @@ export const sv: TranslationBundle = {
       description: 'Välj alla som gäller',
     },
 
+    // Q16 : Autre ERP (précision)
+    q16_autre: {
+      label: 'Ange ditt ERP',
+      placeholder: 'Programvarunamn...',
+    },
+
     // Q17 : Migration (AGENCY)
     q17_migration: {
       ...fr.questions.q17_migration,
