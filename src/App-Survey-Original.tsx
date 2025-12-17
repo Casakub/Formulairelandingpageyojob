@@ -1,5 +1,5 @@
-import { useState, useEffect } from 'react';
-import { AnimatePresence, motion } from 'motion/react';
+import { useState, useEffect, useRef } from 'react';
+import { motion, AnimatePresence } from 'motion/react';
 import { ArrowRight, ChevronLeft, CheckCircle } from 'lucide-react';
 import { Button } from './components/ui/button';
 import { toast } from 'sonner@2.0.3';
@@ -199,6 +199,9 @@ export default function AppSurveyOriginal() {
   const [completedSections, setCompletedSections] = useState<number[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [startTime] = useState(Date.now());
+  
+  // 🌍 Ref pour stocker la langue courante (accessible dans handleSubmit)
+  const currentLangRef = useRef('fr');
 
   // Check authentication on mount & URL params for admin access
   useEffect(() => {
@@ -301,6 +304,7 @@ export default function AppSurveyOriginal() {
       const responseData = {
         response_id: responseId,
         respondent_type: respondentType || 'agency', // ✅ Include respondent type
+        language_code: currentLangRef.current, // ✅ Include language code from user's selection
         ...formData,
         country,
         sector,
@@ -313,6 +317,7 @@ export default function AppSurveyOriginal() {
       };
       
       console.log('📤 Envoi de la réponse avec type:', respondentType);
+      console.log('🌍 Langue utilisée:', currentLangRef.current);
       
       // Save to Supabase using PUBLIC client (no session possible)
       const result = await saveResponsePublic(responseData);
@@ -403,6 +408,7 @@ export default function AppSurveyOriginal() {
             handleNextSection={handleNextSection}
             handleSubmit={handleSubmit}
             isSubmitting={isSubmitting}
+            currentLangRef={currentLangRef}
           />
         )}
       </QuestionsProvider>
@@ -425,6 +431,7 @@ interface AppContentProps {
   handleNextSection: () => void;
   handleSubmit: () => void;
   isSubmitting: boolean;
+  currentLangRef: React.MutableRefObject<string>;
 }
 
 function AppContent({
@@ -441,7 +448,8 @@ function AppContent({
   handlePrevSection,
   handleNextSection,
   handleSubmit,
-  isSubmitting
+  isSubmitting,
+  currentLangRef
 }: AppContentProps) {
   const { t, currentLang } = useI18n();
   
@@ -449,6 +457,9 @@ function AppContent({
   const translatedLanguages = SUPPORTED_LANGUAGES.filter(lang => 
     TRANSLATED_LANGUAGE_CODES.includes(lang.code)
   );
+  
+  // 🌍 Mettre à jour la ref de la langue courante
+  currentLangRef.current = currentLang;
   
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-900 via-violet-900 to-cyan-900 relative overflow-hidden">

@@ -206,10 +206,10 @@ app.post("/push", async (c) => {
 });
 
 /**
- * GET /push/status
+ * GET /push/status -> /status
  * Get current translation status in database
  */
-app.get("/push/status", async (c) => {
+app.get("/status", async (c) => {
   try {
     const supabase = getSupabaseClient();
 

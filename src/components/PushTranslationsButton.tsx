@@ -14,7 +14,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from './ui/
 import { TRANSLATIONS, SUPPORTED_LANGUAGES } from '../src/i18n';
 import { projectId, publicAnonKey } from '../utils/supabase/info';
 
-const API_URL = `https://${projectId}.supabase.co/functions/v1/make-server-10092a63/push-translations`;
+const API_BASE_URL = `https://${projectId}.supabase.co/functions/v1/make-server-10092a63/push-translations`;
 
 interface PushResult {
   success: boolean;
@@ -49,7 +49,7 @@ export function PushTranslationsButton() {
     try {
       console.log('🚀 Pushing translations to Supabase...');
 
-      const response = await fetch(`${API_URL}/push`, {
+      const response = await fetch(`${API_BASE_URL}/push`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -88,11 +88,23 @@ export function PushTranslationsButton() {
     setIsLoadingStatus(true);
 
     try {
-      const response = await fetch(`${API_URL}/status`, {
+      const response = await fetch(`${API_BASE_URL}/status`, {
         headers: {
           'Authorization': `Bearer ${publicAnonKey}`,
         },
       });
+
+      if (!response.ok) {
+        console.warn('⚠️ Status endpoint returned non-OK status:', response.status);
+        return;
+      }
+
+      // Vérifier le content-type avant de parser en JSON
+      const contentType = response.headers.get('content-type');
+      if (!contentType || !contentType.includes('application/json')) {
+        console.warn('⚠️ Status endpoint did not return JSON:', contentType);
+        return;
+      }
 
       const data: StatusResult = await response.json();
       setStatus(data);

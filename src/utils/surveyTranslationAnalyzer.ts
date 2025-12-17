@@ -291,35 +291,60 @@ export async function analyzeLanguage(
 export async function analyzeAllLanguages(
   bundles: Record<SupportedLanguage, TranslationBundle>
 ): Promise<GlobalAnalysis> {
-  const expectedKeys = extractExpectedKeys();
-  const languages: LanguageAnalysis[] = [];
+  try {
+    console.log('🔍 [analyzeAllLanguages] Starting analysis...');
+    console.log('📦 [analyzeAllLanguages] Bundles received:', Object.keys(bundles));
+    
+    const expectedKeys = extractExpectedKeys();
+    console.log('🔑 [analyzeAllLanguages] Expected keys extracted:', expectedKeys.length);
+    
+    const languages: LanguageAnalysis[] = [];
 
-  for (const langCode of SUPPORTED_LANGUAGES.map(l => l.code)) {
-    const bundle = bundles[langCode];
-    if (bundle) {
-      const analysis = await analyzeLanguage(langCode, bundle);
-      languages.push(analysis);
+    for (const langCode of SUPPORTED_LANGUAGES.map(l => l.code)) {
+      try {
+        const bundle = bundles[langCode];
+        if (bundle) {
+          console.log(`📋 [analyzeAllLanguages] Analyzing ${langCode}...`);
+          const analysis = await analyzeLanguage(langCode, bundle);
+          languages.push(analysis);
+          console.log(`✅ [analyzeAllLanguages] ${langCode} analyzed: ${analysis.completeness}%`);
+        } else {
+          console.warn(`⚠️ [analyzeAllLanguages] No bundle found for ${langCode}`);
+        }
+      } catch (error) {
+        console.error(`❌ [analyzeAllLanguages] Error analyzing ${langCode}:`, error);
+        // Continue with other languages instead of failing completely
+      }
     }
+
+    console.log('✅ [analyzeAllLanguages] All languages analyzed:', languages.length);
+
+    // Calculer moyenne
+    const averageCompleteness = languages.length > 0
+      ? Math.round(languages.reduce((sum, l) => sum + l.completeness, 0) / languages.length)
+      : 0;
+
+    // Meilleure et pire langue
+    const sorted = [...languages].sort((a, b) => b.completeness - a.completeness);
+    const bestLanguage = sorted[0]?.language || null;
+    const worstLanguage = sorted[sorted.length - 1]?.language || null;
+
+    const result = {
+      totalQuestions: SURVEY_QUESTIONS.length,
+      totalKeys: expectedKeys.length,
+      languages,
+      averageCompleteness,
+      bestLanguage,
+      worstLanguage,
+    };
+    
+    console.log('🎉 [analyzeAllLanguages] Analysis complete:', result);
+    return result;
+  } catch (error) {
+    console.error('❌ [analyzeAllLanguages] Critical error:', error);
+    console.error('📋 [analyzeAllLanguages] Error stack:', error instanceof Error ? error.stack : 'No stack');
+    throw error;
   }
-
-  // Calculer moyenne
-  const averageCompleteness = languages.length > 0
-    ? Math.round(languages.reduce((sum, l) => sum + l.completeness, 0) / languages.length)
-    : 0;
-
-  // Meilleure et pire langue
-  const sorted = [...languages].sort((a, b) => b.completeness - a.completeness);
-  const bestLanguage = sorted[0]?.language || null;
-  const worstLanguage = sorted[sorted.length - 1]?.language || null;
-
-  return {
-    totalQuestions: SURVEY_QUESTIONS.length,
-    totalKeys: expectedKeys.length,
-    languages,
-    averageCompleteness,
-    bestLanguage,
-    worstLanguage,
-  };
 }
 
 /**

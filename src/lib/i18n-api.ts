@@ -51,14 +51,29 @@ export async function fetchQuestionTranslations(): Promise<QuestionTranslationDa
     const response = await fetch(`${BASE_URL}/questions`, { headers });
     
     if (!response.ok) {
-      throw new Error(`Failed to fetch question translations: ${response.statusText}`);
+      const errorText = await response.text();
+      console.error('❌ fetchQuestionTranslations failed:', {
+        status: response.status,
+        statusText: response.statusText,
+        errorText,
+        url: `${BASE_URL}/questions`
+      });
+      throw new Error(`Failed to fetch question translations: ${response.statusText} - ${errorText}`);
+    }
+    
+    // Vérifier le content-type
+    const contentType = response.headers.get('content-type');
+    if (!contentType || !contentType.includes('application/json')) {
+      console.error('❌ fetchQuestionTranslations: Response is not JSON', contentType);
+      return [];
     }
     
     const data = await response.json();
+    console.log('✅ fetchQuestionTranslations response:', { success: data.success, count: data.translations?.length });
     return data.success ? data.translations : [];
   } catch (error) {
-    console.error('Error fetching question translations:', error);
-    return [];
+    console.error('❌ Error fetching question translations:', error);
+    throw error; // Re-throw to see the full error
   }
 }
 
@@ -121,17 +136,33 @@ export async function bulkSaveQuestionTranslations(
 
 export async function fetchUITextTranslations(): Promise<UITextTranslationData[]> {
   try {
+    console.log('🔍 [fetchUITextTranslations] Fetching from:', `${BASE_URL}/ui-texts`);
     const response = await fetch(`${BASE_URL}/ui-texts`, { headers });
     
     if (!response.ok) {
-      throw new Error(`Failed to fetch UI text translations: ${response.statusText}`);
+      const errorText = await response.text();
+      console.error('❌ fetchUITextTranslations failed:', {
+        status: response.status,
+        statusText: response.statusText,
+        errorText,
+        url: `${BASE_URL}/ui-texts`
+      });
+      throw new Error(`Failed to fetch UI text translations: ${response.statusText} - ${errorText}`);
+    }
+    
+    // Vérifier le content-type
+    const contentType = response.headers.get('content-type');
+    if (!contentType || !contentType.includes('application/json')) {
+      console.error('❌ fetchUITextTranslations: Response is not JSON', contentType);
+      return [];
     }
     
     const data = await response.json();
+    console.log('✅ fetchUITextTranslations response:', { success: data.success, count: data.translations?.length });
     return data.success ? data.translations : [];
   } catch (error) {
-    console.error('Error fetching UI text translations:', error);
-    return [];
+    console.error('❌ Error fetching UI text translations:', error);
+    throw error; // Re-throw to see the full error
   }
 }
 
@@ -210,17 +241,33 @@ export async function bulkSaveUITextTranslations(
 
 export async function fetchCountryLanguageMappings(): Promise<CountryLanguageMapping[]> {
   try {
+    console.log('🔍 [fetchCountryLanguageMappings] Fetching from:', `${BASE_URL}/country-languages`);
     const response = await fetch(`${BASE_URL}/country-languages`, { headers });
     
     if (!response.ok) {
-      throw new Error(`Failed to fetch country-language mappings: ${response.statusText}`);
+      const errorText = await response.text();
+      console.error('❌ fetchCountryLanguageMappings failed:', {
+        status: response.status,
+        statusText: response.statusText,
+        errorText,
+        url: `${BASE_URL}/country-languages`
+      });
+      throw new Error(`Failed to fetch country-language mappings: ${response.statusText} - ${errorText}`);
+    }
+    
+    // Vérifier le content-type
+    const contentType = response.headers.get('content-type');
+    if (!contentType || !contentType.includes('application/json')) {
+      console.error('❌ fetchCountryLanguageMappings: Response is not JSON', contentType);
+      return [];
     }
     
     const data = await response.json();
+    console.log('✅ fetchCountryLanguageMappings response:', { success: data.success, count: data.mappings?.length });
     return data.success ? data.mappings : [];
   } catch (error) {
-    console.error('Error fetching country-language mappings:', error);
-    return [];
+    console.error('❌ Error fetching country-language mappings:', error);
+    throw error; // Re-throw to see the full error
   }
 }
 

@@ -64,33 +64,53 @@ export function SurveyTranslationDashboard({ onTranslationUpdate }: SurveyTransl
       try {
         console.log('🔍 [SurveyTranslationDashboard] Chargement des bundles de traduction...');
         
-        // Créer le mapping des bundles
-        const bundles: Record<SupportedLanguage, any> = {
-          fr: translationBundles.fr,
-          en: translationBundles.en,
-          de: translationBundles.de,
-          es: translationBundles.es,
-          it: translationBundles.it,
-          pt: translationBundles.pt,
-          nl: translationBundles.nl,
-          pl: translationBundles.pl,
-          ro: translationBundles.ro,
-          bg: translationBundles.bg,
-          hu: translationBundles.hu,
-          cz: translationBundles.cz,
-          sk: translationBundles.sk,
-          hr: translationBundles.hr,
-          sl: translationBundles.sl,
-          lt: translationBundles.lt,
-          lv: translationBundles.lv,
-          ee: translationBundles.ee,
-          el: translationBundles.el,
-          sv: translationBundles.sv,
-          da: translationBundles.da,
-          fi: translationBundles.fi,
-        };
+        // Créer le mapping des bundles avec gestion d'erreur par bundle
+        const bundles: Record<SupportedLanguage, any> = {} as any;
+        
+        const languagesToLoad: Array<{ code: SupportedLanguage; bundle: any }> = [
+          { code: 'fr', bundle: translationBundles.fr },
+          { code: 'en', bundle: translationBundles.en },
+          { code: 'de', bundle: translationBundles.de },
+          { code: 'es', bundle: translationBundles.es },
+          { code: 'it', bundle: translationBundles.it },
+          { code: 'pt', bundle: translationBundles.pt },
+          { code: 'nl', bundle: translationBundles.nl },
+          { code: 'pl', bundle: translationBundles.pl },
+          { code: 'ro', bundle: translationBundles.ro },
+          { code: 'bg', bundle: translationBundles.bg },
+          { code: 'hu', bundle: translationBundles.hu },
+          { code: 'cz', bundle: translationBundles.cz },
+          { code: 'sk', bundle: translationBundles.sk },
+          { code: 'hr', bundle: translationBundles.hr },
+          { code: 'sl', bundle: translationBundles.sl },
+          { code: 'lt', bundle: translationBundles.lt },
+          { code: 'lv', bundle: translationBundles.lv },
+          { code: 'ee', bundle: translationBundles.ee },
+          { code: 'el', bundle: translationBundles.el },
+          { code: 'sv', bundle: translationBundles.sv },
+          { code: 'da', bundle: translationBundles.da },
+          { code: 'fi', bundle: translationBundles.fi },
+        ];
+        
+        // Charger chaque bundle avec vérification
+        for (const { code, bundle } of languagesToLoad) {
+          try {
+            if (!bundle) {
+              console.error(`❌ [SurveyTranslationDashboard] Bundle ${code} est undefined/null`);
+              continue;
+            }
+            bundles[code] = bundle;
+            console.log(`✅ [SurveyTranslationDashboard] Bundle ${code} chargé:`, Object.keys(bundle));
+          } catch (error) {
+            console.error(`❌ [SurveyTranslationDashboard] Erreur lors du chargement du bundle ${code}:`, error);
+          }
+        }
 
-        console.log('📦 [SurveyTranslationDashboard] Bundles chargés:', Object.keys(bundles));
+        console.log('📦 [SurveyTranslationDashboard] Bundles chargés avec succès:', Object.keys(bundles));
+        
+        if (Object.keys(bundles).length === 0) {
+          throw new Error('Aucun bundle de traduction n\'a pu être chargé');
+        }
         
         const analysis = await analyzeAllLanguages(bundles);
         console.log('✅ [SurveyTranslationDashboard] Analyse terminée:', {
@@ -102,7 +122,13 @@ export function SurveyTranslationDashboard({ onTranslationUpdate }: SurveyTransl
         
         setGlobalAnalysis(analysis);
       } catch (error) {
-        console.error('❌ [SurveyTranslationDashboard] Erreur lors de l\'analyse des traductions:', error);
+        console.error('❌ ❌ Error loading translations:', error instanceof Error ? error : new Error(String(error)));
+        console.error('📋 Error details:', {
+          message: error instanceof Error ? error.message : String(error),
+          stack: error instanceof Error ? error.stack : 'No stack trace',
+          name: error instanceof Error ? error.name : typeof error,
+          error: error
+        });
       } finally {
         setIsLoading(false);
       }

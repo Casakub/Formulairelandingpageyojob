@@ -1,12 +1,19 @@
 import { useState } from 'react';
 import { motion } from 'motion/react';
-import { Database, RefreshCw, CheckCircle, XCircle, AlertCircle, Loader2 } from 'lucide-react';
+import { Database, RefreshCw, CheckCircle, XCircle, AlertCircle, Loader2, Terminal, X } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '../ui/card';
 import { Button } from '../ui/button';
 import { Badge } from '../ui/badge';
 import { Alert, AlertDescription } from '../ui/alert';
 import { fetchQuestionTranslations, fetchUITextTranslations, fetchCountryLanguageMappings } from '../../lib/i18n-api';
 import { CountryLanguageGenerator } from './CountryLanguageGenerator';
+
+interface LogEntry {
+  timestamp: string;
+  type: 'info' | 'success' | 'error' | 'warning';
+  message: string;
+  details?: any;
+}
 
 export function TranslationDiagnostic() {
   const [loading, setLoading] = useState(false);
@@ -15,27 +22,58 @@ export function TranslationDiagnostic() {
     uiTexts: any[];
     countries: any[];
   } | null>(null);
+  const [logs, setLogs] = useState<LogEntry[]>([]);
+  const [showLogs, setShowLogs] = useState(true);
+
+  const addLog = (type: LogEntry['type'], message: string, details?: any) => {
+    const timestamp = new Date().toLocaleTimeString('fr-FR');
+    setLogs(prev => [...prev, { timestamp, type, message, details }]);
+    
+    // Log dans la vraie console aussi
+    const logMethod = type === 'error' ? console.error : type === 'warning' ? console.warn : console.log;
+    const emoji = type === 'error' ? '❌' : type === 'success' ? '✅' : type === 'warning' ? '⚠️' : '🔍';
+    logMethod(`${emoji} [${timestamp}] ${message}`, details || '');
+  };
+
+  const clearLogs = () => {
+    setLogs([]);
+  };
 
   const runDiagnostic = async () => {
     setLoading(true);
+    clearLogs();
+    
     try {
-      console.log('🔍 Running diagnostic...');
+      addLog('info', 'Démarrage du diagnostic des traductions...');
       
-      const [questions, uiTexts, countries] = await Promise.all([
-        fetchQuestionTranslations(),
-        fetchUITextTranslations(),
-        fetchCountryLanguageMappings()
-      ]);
+      addLog('info', 'Récupération des questions depuis Supabase...');
+      const questions = await fetchQuestionTranslations();
+      addLog('success', `Questions récupérées : ${questions.length}`, { count: questions.length });
+      
+      addLog('info', 'Récupération des textes UI depuis Supabase...');
+      const uiTexts = await fetchUITextTranslations();
+      addLog('success', `Textes UI récupérés : ${uiTexts.length}`, { count: uiTexts.length });
+      
+      addLog('info', 'Récupération des mappings pays-langues depuis Supabase...');
+      const countries = await fetchCountryLanguageMappings();
+      addLog('success', `Mappings pays récupérés : ${countries.length}`, { count: countries.length });
 
-      console.log('✅ Translations loaded from Supabase:', {
+      addLog('success', 'Diagnostic terminé avec succès !', {
         questions: questions.length,
         uiTexts: uiTexts.length,
         countries: countries.length
       });
 
       setData({ questions, uiTexts, countries });
-    } catch (error) {
-      console.error('❌ Error loading translations:', error);
+    } catch (error: any) {
+      addLog('error', 'Erreur lors du chargement des traductions', {
+        message: error.message,
+        name: error.name,
+        stack: error.stack?.split('\n').slice(0, 3).join('\n')
+      });
+      
+      // Set empty data to avoid undefined state
+      setData({ questions: [], uiTexts: [], countries: [] });
     } finally {
       setLoading(false);
     }
@@ -282,6 +320,47 @@ export function TranslationDiagnostic() {
               Cliquez sur <strong>"Lancer le diagnostic"</strong> pour vérifier l'état des traductions dans la base de données.
             </AlertDescription>
           </Alert>
+        </CardContent>
+      )}
+
+      {/* Logs Section */}
+      {logs.length > 0 && (
+        <CardContent className="space-y-4">
+          <div className="flex items-center justify-between">
+            <CardTitle className="text-sm">Logs du diagnostic</CardTitle>
+            <Button
+              onClick={() => setShowLogs(!showLogs)}
+              size="sm"
+              className="gap-2"
+            >
+              {showLogs ? (
+                <><X className="w-4 h-4" /> Masquer les logs</>
+              ) : (
+                <><Terminal className="w-4 h-4" /> Afficher les logs</>
+              )}
+            </Button>
+          </div>
+          {showLogs && (
+            <div className="max-h-64 overflow-y-auto space-y-2">
+              {logs.map((log, idx) => (
+                <div key={idx} className={`p-2 rounded-lg ${log.type === 'error' ? 'bg-red-50' : log.type === 'warning' ? 'bg-orange-50' : 'bg-green-50'}`}>
+                  <div className="flex items-center gap-2">
+                    <Badge variant={log.type === 'error' ? 'outline' : log.type === 'warning' ? 'outline' : 'outline'} className={`text-${log.type === 'error' ? 'red-500' : log.type === 'warning' ? 'orange-500' : 'green-500'}`}>
+                      {log.timestamp}
+                    </Badge>
+                    <span className={`text-sm ${log.type === 'error' ? 'text-red-500' : log.type === 'warning' ? 'text-orange-500' : 'text-green-500'}`}>
+                      {log.message}
+                    </span>
+                  </div>
+                  {log.details && (
+                    <div className="mt-1 text-xs text-slate-600">
+                      {log.details}
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
+          )}
         </CardContent>
       )}
     </Card>
