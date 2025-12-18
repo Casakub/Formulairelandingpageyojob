@@ -136,6 +136,7 @@ export default function AppLanding() {
   const [successMessage, setSuccessMessage] = useState('');
   const [showDuplicateModal, setShowDuplicateModal] = useState(false);
   const [duplicateEmail, setDuplicateEmail] = useState('');
+  const [revealedEmail, setRevealedEmail] = useState(false);
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -228,6 +229,18 @@ export default function AppLanding() {
     window.addEventListener('landing-translations-updated', handleTranslationsUpdate);
     return () => window.removeEventListener('landing-translations-updated', handleTranslationsUpdate);
   }, [refresh]);
+
+  // 🛡️ Protection anti-bot pour l'email
+  const handleEmailReveal = (e: React.MouseEvent) => {
+    e.preventDefault();
+    if (!revealedEmail) {
+      setRevealedEmail(true);
+      // Reconstruction dynamique de l'email
+      const parts = ['contact', 'yojob', 'fr'];
+      const email = `${parts[0]}@${parts[1]}.${parts[2]}`;
+      window.location.href = `mailto:${email}`;
+    }
+  };
 
   const handleWaitlistSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -1891,21 +1904,32 @@ export default function AppLanding() {
                   whileHover={{ x: 3 }}
                 >
                   <MapPin className="w-5 h-5 text-cyan-400 flex-shrink-0 drop-shadow-[0_0_8px_rgba(6,182,212,0.6)]" />
-                  <span className="text-white/90">{content.footer?.contact?.address || 'Paris, France'}</span>
+                  <span className="text-white/90">{content.footer?.contact?.address || 'Bordeaux, France'}</span>
                 </motion.li>
                 <motion.li 
                   className="flex items-center gap-3 p-2 rounded-lg bg-white/5 backdrop-blur-sm hover:bg-white/10 transition-all duration-300"
                   whileHover={{ x: 3 }}
                 >
                   <Phone className="w-5 h-5 text-violet-400 drop-shadow-[0_0_8px_rgba(124,58,237,0.6)]" />
-                  <span className="text-white/90">{content.footer?.contact?.phone || '+33 1 23 45 67 89'}</span>
+                  <a href="tel:+33650622524" className="text-white/90 hover:text-cyan-400 transition-colors">
+                    {content.footer?.contact?.phone || '+33 6 50 62 25 24'}
+                  </a>
                 </motion.li>
                 <motion.li 
                   className="flex items-center gap-3 p-2 rounded-lg bg-white/5 backdrop-blur-sm hover:bg-white/10 transition-all duration-300"
                   whileHover={{ x: 3 }}
                 >
                   <Mail className="w-5 h-5 text-cyan-400 drop-shadow-[0_0_8px_rgba(6,182,212,0.6)]" />
-                  <span className="text-white/90">{content.footer?.contact?.email || 'contact@yojob.eu'}</span>
+                  <button
+                    onClick={handleEmailReveal}
+                    className="text-white/90 hover:text-cyan-400 transition-colors cursor-pointer bg-transparent border-0 p-0"
+                    aria-label="Envoyer un email"
+                  >
+                    {revealedEmail 
+                      ? (content.footer?.contact?.email || 'contact@yojob.fr')
+                      : (content.footer?.contact?.email || 'contact')+String.fromCharCode(64)+(content.footer?.contact?.email?.split('@')[1] || 'yojob.fr')
+                    }
+                  </button>
                 </motion.li>
               </ul>
             </motion.div>
