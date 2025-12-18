@@ -11,6 +11,7 @@ import {
 } from '../ui/tooltip';
 import { useI18n, SUPPORTED_LANGUAGES } from '../../src/i18n';
 import { TRANSLATED_LANGUAGE_CODES } from '../../src/i18n/constants';
+import { LogoSvg } from '../../imports/YojobLogoComplete';
 
 interface HeaderProps {
   currentSection: number;
@@ -69,8 +70,12 @@ export function Header({ currentSection, progress, onDashboardClick }: HeaderPro
       <div className="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between">
         {/* Logo */}
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-600 to-cyan-500 flex items-center justify-center shadow-lg shadow-blue-500/30">
-            <span className="text-white text-xl">Y</span>
+          <div className="w-14 h-14 sm:w-16 sm:h-16">
+            <LogoSvg 
+              className="w-full h-full" 
+              effects={true}
+              aria-label="YOJOB"
+            />
           </div>
           <div>
             <h1 className={`transition-colors ${isScrolled ? 'text-gray-900' : 'text-white'}`}>
