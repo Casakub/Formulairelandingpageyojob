@@ -50,6 +50,8 @@ import { useLandingTranslations } from './hooks/useLandingTranslations';
 import { SEOHead } from './components/SEOHead';
 import { getAllLanguageCodes } from './lib/languages';
 import { projectId, publicAnonKey } from './utils/supabase/info';
+import YojobLogo from './imports/Frame-2121-1190';
+import HeaderLogo from './imports/Frame-2124-2200';
 
 // 🎨 Mapping des icônes : string → Composant React
 const ICON_MAP: Record<string, any> = {
@@ -436,11 +438,11 @@ export default function AppLanding() {
         <div className="container mx-auto px-4">
           <div className="flex items-center justify-between">
             {/* Logo */}
-            <div className="flex items-center gap-2">
-              <div className="bg-gradient-to-r from-blue-600 to-cyan-500 text-white px-4 py-2 rounded-lg">
-                YOJOB
+            <a href="#home" className="inline-block hover:opacity-90 transition-opacity">
+              <div className="w-16 h-16 sm:w-20 sm:h-20 md:w-24 md:h-24 lg:w-28 lg:h-28">
+                <HeaderLogo className="w-full h-full" />
               </div>
-            </div>
+            </a>
 
             {/* Desktop Navigation */}
             <nav className="hidden lg:flex items-center gap-8">
@@ -1704,11 +1706,11 @@ export default function AppLanding() {
               transition={{ duration: 0.6 }}
             >
               <motion.div 
-                className="bg-gradient-to-r from-violet-600 to-cyan-500 text-white px-5 py-2.5 rounded-xl inline-block mb-4 shadow-xl shadow-violet-500/30 backdrop-blur-sm border border-white/20"
+                className="w-32 h-32 inline-block mb-6"
                 whileHover={{ scale: 1.05, y: -2 }}
                 transition={{ duration: 0.3 }}
               >
-                <span className="font-extrabold tracking-tight text-lg">YOJOB</span>
+                <YojobLogo />
               </motion.div>
               <p className="text-sm text-white/90 mb-5 leading-relaxed">
                 {content.footer?.logo?.tagline || 'Votre partenaire de confiance pour le recrutement de talents européens.'}
