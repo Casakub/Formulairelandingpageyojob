@@ -1269,10 +1269,10 @@ export default function AppLanding() {
                             {content.network?.waitlist?.badge || '✨ Nouveauté 2026'}
                           </Badge>
                         </motion.div>
-                        <h3 className="text-white mb-3 text-center lg:text-left px-0">
+                        <h3 className="text-white mb-3 text-center lg:text-left px-0 text-[24px]">
                           {content.network?.waitlist?.title || 'Votre plateforme tout-en-un du détachement européen'}
                         </h3>
-                        <p className="text-cyan-100 text-lg leading-relaxed text-center lg:text-left px-0">
+                        <p className="text-cyan-100 leading-relaxed text-center lg:text-left px-0 text-[14px]">
                           {content.network?.waitlist?.subtitle || 'Centralisez tous vos documents et données de détachement dans un espace sécurisé. Réalisez vos démarches administratives directement en ligne et gérez vos offres d\'emploi depuis une interface unique. Simplifiez votre conformité et gagnez un temps précieux.'}
                         </p>
                       </div>
