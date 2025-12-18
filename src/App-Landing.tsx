@@ -438,13 +438,35 @@ export default function AppLanding() {
           <div className="flex items-center justify-between">
             {/* Logo */}
             <a href="#home" className="inline-block hover:opacity-90 transition-opacity">
-              <div className="w-16 h-16 sm:w-20 sm:h-20 md:w-24 md:h-24 lg:w-28 lg:h-28">
+              {isScrolled ? (
                 <LogoSvg 
-                  className="w-full h-full" 
+                  className="w-14 h-14 sm:w-16 sm:h-16 md:w-20 md:h-20 lg:w-24 lg:h-24"
                   effects={true}
                   aria-label="YOJOB - Leader du recrutement européen"
                 />
-              </div>
+              ) : (
+                <motion.div 
+                  className="w-14 h-14 sm:w-16 sm:h-16 md:w-20 md:h-20 lg:w-24 lg:h-24 rounded-2xl bg-white/25 backdrop-blur-md border-2 border-white/40 p-1 shadow-[0_0_30px_rgba(6,182,212,0.8),0_0_60px_rgba(6,182,212,0.5),0_0_90px_rgba(124,58,237,0.4)] hover:shadow-[0_0_40px_rgba(6,182,212,1),0_0_80px_rgba(6,182,212,0.8),0_0_120px_rgba(124,58,237,0.6)] hover:border-cyan-300/60 hover:bg-white/35 transition-all duration-300"
+                  animate={{ 
+                    boxShadow: [
+                      '0 0 30px rgba(6,182,212,0.8), 0 0 60px rgba(6,182,212,0.5), 0 0 90px rgba(124,58,237,0.4)',
+                      '0 0 40px rgba(6,182,212,1), 0 0 80px rgba(6,182,212,0.7), 0 0 120px rgba(124,58,237,0.6)',
+                      '0 0 30px rgba(6,182,212,0.8), 0 0 60px rgba(6,182,212,0.5), 0 0 90px rgba(124,58,237,0.4)'
+                    ]
+                  }}
+                  transition={{ 
+                    duration: 2.5, 
+                    repeat: Infinity, 
+                    ease: "easeInOut" 
+                  }}
+                >
+                  <LogoSvg 
+                    className="w-full h-full brightness-110 contrast-110 drop-shadow-[0_0_10px_rgba(255,255,255,0.8)]"
+                    effects={true}
+                    aria-label="YOJOB - Leader du recrutement européen"
+                  />
+                </motion.div>
+              )}
             </a>
 
             {/* Desktop Navigation */}
