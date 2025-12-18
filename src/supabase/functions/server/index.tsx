@@ -17,6 +17,7 @@ import { uploadAvatar, deleteAvatar, refreshSignedUrl } from "./storage.tsx";
 import landingRoutes from "./landing.tsx";
 import prospectsRoutes from "./prospects.tsx";
 import tasksRoutes from "./tasks.tsx";
+import eventsRoutes from "./events.tsx";
 import { syncSurveyToProspect, batchSyncSurveysToProspects } from "./survey-to-prospect.tsx";
 import questionsRoutes from "./questions.tsx";
 import migrateTranslationsRoutes from "./migrate-translations.tsx";
@@ -173,6 +174,9 @@ app.route("/make-server-10092a63/prospects", prospectsRoutes);
 
 // Tasks endpoints
 app.route("/make-server-10092a63/tasks", tasksRoutes);
+
+// Events endpoints
+app.route("/make-server-10092a63/events", eventsRoutes);
 
 // Survey to Prospect sync endpoints
 app.post("/make-server-10092a63/survey/sync-to-prospect", async (c) => {

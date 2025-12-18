@@ -29,6 +29,7 @@ import { Card, CardContent } from '../ui/card';
 import { Textarea } from '../ui/textarea';
 import { Badge } from '../ui/badge';
 import { TasksSection } from './TasksSection';
+import { EventsSection } from './EventsSection';
 import { projectId, publicAnonKey } from '../../utils/supabase/info';
 
 interface ProspectSheetProps {
@@ -915,6 +916,9 @@ export function ProspectSheet({ prospect, open, onClose, onUpdate }: ProspectShe
 
               {/* Section Tâches (commune à tous) */}
               <TasksSection prospectId={prospect.id} onUpdate={onUpdate} />
+
+              {/* Section Événements (commune à tous) */}
+              <EventsSection prospectId={prospect.id} onUpdate={onUpdate} />
             </div>
 
             {/* Footer */}

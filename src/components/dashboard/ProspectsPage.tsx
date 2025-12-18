@@ -378,6 +378,7 @@ export function ProspectsPage() {
                         return (
                           <tr
                             key={prospect.id}
+                            data-prospect-id={prospect.id}
                             onClick={() => setSelectedProspect(prospect)}
                             className="border-b border-slate-100 hover:bg-slate-50 transition-colors cursor-pointer"
                           >

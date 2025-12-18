@@ -16,7 +16,8 @@ import {
   X,
   ArrowLeft,
   ChevronLeft,
-  ChevronRight
+  ChevronRight,
+  Calendar
 } from 'lucide-react';
 import { Button } from './components/ui/button';
 import { TranslationProvider } from './contexts/TranslationContext';
@@ -28,10 +29,11 @@ import { ExportImportManager } from './components/dashboard/ExportImportManager'
 import { IntegrationManager } from './components/dashboard/IntegrationManager';
 import { SettingsPanel } from './components/dashboard/SettingsPanel';
 import { ProspectsPage } from './components/dashboard/ProspectsPage';
+import { AgendaPage } from './components/dashboard/AgendaPage';
 import { useAuth } from './hooks/useAuth';
 import { Badge } from './components/ui/badge';
 
-type TabType = 'overview' | 'questions' | 'results' | 'integrations' | 'translations' | 'settings' | 'export' | 'prospects';
+type TabType = 'overview' | 'agenda' | 'questions' | 'results' | 'integrations' | 'translations' | 'settings' | 'export' | 'prospects';
 
 interface DashboardAppProps {
   onBackToSurvey?: () => void;
@@ -45,13 +47,14 @@ export default function DashboardApp({ onBackToSurvey }: DashboardAppProps = {})
 
   const tabs = [
     { id: 'overview' as TabType, label: 'Vue d\'ensemble', icon: LayoutDashboard, color: 'from-blue-500 to-cyan-500' },
+    { id: 'agenda' as TabType, label: 'Agenda', icon: Calendar, color: 'from-violet-500 to-pink-500' },
     { id: 'results' as TabType, label: 'Résultats', icon: BarChart3, color: 'from-cyan-500 to-teal-500' },
-    { id: 'questions' as TabType, label: 'Questions', icon: FileEdit, color: 'from-violet-500 to-purple-500' },
+    { id: 'questions' as TabType, label: 'Questions', icon: FileEdit, color: 'from-purple-500 to-violet-500' },
     { id: 'translations' as TabType, label: 'Traductions', icon: Languages, color: 'from-indigo-500 to-blue-500', badge: '⭐ Hub' },
     { id: 'export' as TabType, label: 'Export', icon: Download, color: 'from-green-500 to-emerald-500' },
     { id: 'integrations' as TabType, label: 'Intégrations', icon: Plug, color: 'from-orange-500 to-amber-500' },
     { id: 'settings' as TabType, label: 'Paramètres', icon: Settings, color: 'from-slate-500 to-gray-500' },
-    { id: 'prospects' as TabType, label: 'Prospects', icon: Users, color: 'from-green-500 to-emerald-500' }
+    { id: 'prospects' as TabType, label: 'Prospects', icon: Users, color: 'from-emerald-500 to-teal-500' }
   ];
 
   return (
@@ -198,6 +201,7 @@ export default function DashboardApp({ onBackToSurvey }: DashboardAppProps = {})
           {tabs.map((tab, index) => (
             <motion.button
               key={tab.id}
+              data-tab={tab.id}
               onClick={() => setActiveTab(tab.id)}
               className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all group relative ${
                 activeTab === tab.id
@@ -326,6 +330,9 @@ export default function DashboardApp({ onBackToSurvey }: DashboardAppProps = {})
             )}
             {activeTab === 'prospects' && (
               <ProspectsPage key="prospects" />
+            )}
+            {activeTab === 'agenda' && (
+              <AgendaPage key="agenda" />
             )}
           </AnimatePresence>
         </div>
