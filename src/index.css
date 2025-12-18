@@ -628,50 +628,6 @@
     inset: calc(var(--spacing) * 0);
   }
 
-  .inset-\[-1\.25\%\] {
-    inset: -1.25%;
-  }
-
-  .inset-\[-2\.91\%\] {
-    inset: -2.91%;
-  }
-
-  .inset-\[1\.47\%_1\.46\%\] {
-    inset: 1.47% 1.46%;
-  }
-
-  .inset-\[1\.53\%_1\.78\%_1\.62\%_1\.52\%\] {
-    inset: 1.53% 1.78% 1.62% 1.52%;
-  }
-
-  .inset-\[26\.78\%_26\.77\%_26\.8\%_26\.99\%\] {
-    inset: 26.78% 26.77% 26.8% 26.99%;
-  }
-
-  .inset-\[28\.29\%_28\.27\%_28\.31\%_28\.49\%\] {
-    inset: 28.29% 28.27% 28.31% 28.49%;
-  }
-
-  .inset-\[28\.35\%_28\.37\%_28\.47\%_28\.56\%\] {
-    inset: 28.35% 28.37% 28.47% 28.56%;
-  }
-
-  .inset-\[63\.27\%_62\.76\%_26\.54\%_27\.09\%\] {
-    inset: 63.27% 62.76% 26.54% 27.09%;
-  }
-
-  .inset-\[64\.84\%_64\.6\%_28\.41\%_28\.66\%\] {
-    inset: 64.84% 64.6% 28.41% 28.66%;
-  }
-
-  .inset-\[80\.15\%_80\.61\%_1\.54\%_1\.14\%\] {
-    inset: 80.15% 80.61% 1.54% 1.14%;
-  }
-
-  .inset-\[81\.67\%_82\.18\%_3\.12\%_2\.67\%\] {
-    inset: 81.67% 82.18% 3.12% 2.67%;
-  }
-
   .-top-1 {
     top: calc(var(--spacing) * -1);
   }
@@ -818,6 +774,10 @@
 
   .left-full {
     left: 100%;
+  }
+
+  .isolate {
+    isolation: isolate;
   }
 
   .-z-10 {
@@ -1089,10 +1049,6 @@
     display: block;
   }
 
-  .contents {
-    display: contents;
-  }
-
   .flex {
     display: flex;
   }
@@ -1152,11 +1108,6 @@
   .size-9 {
     width: calc(var(--spacing) * 9);
     height: calc(var(--spacing) * 9);
-  }
-
-  .size-full {
-    width: 100%;
-    height: 100%;
   }
 
   .h-1 {
@@ -4450,50 +4401,6 @@
     background-clip: text;
   }
 
-  .mask-intersect {
-    mask-composite: intersect;
-  }
-
-  .mask-alpha {
-    mask-mode: alpha;
-  }
-
-  .mask-size-\[8\.604px_8\.589px\] {
-    mask-size: 8.604px 8.589px;
-  }
-
-  .mask-size-\[19\.928px_19\.922px\] {
-    mask-size: 19.928px 19.922px;
-  }
-
-  .mask-size-\[55px_54\.921px\] {
-    mask-size: 55px 54.921px;
-  }
-
-  .mask-size-\[127\.18px_126\.923px\] {
-    mask-size: 127.18px 126.923px;
-  }
-
-  .mask-no-clip {
-    mask-clip: no-clip;
-  }
-
-  .mask-position-\[0\.08px\] {
-    mask-position: .08px;
-  }
-
-  .mask-position-\[0\.081px_0\.08px\] {
-    mask-position: .081px .08px;
-  }
-
-  .mask-position-\[2px\] {
-    mask-position: 2px;
-  }
-
-  .mask-no-repeat {
-    mask-repeat: no-repeat;
-  }
-
   .fill-primary {
     fill: var(--primary);
   }
@@ -5428,32 +5335,8 @@
     opacity: .75;
   }
 
-  .opacity-80 {
-    opacity: .8;
-  }
-
   .opacity-90 {
     opacity: .9;
-  }
-
-  .opacity-\[0\.019\] {
-    opacity: .019;
-  }
-
-  .opacity-\[0\.024\] {
-    opacity: .024;
-  }
-
-  .opacity-\[0\.64\] {
-    opacity: .64;
-  }
-
-  .opacity-\[0\.76\] {
-    opacity: .76;
-  }
-
-  .mix-blend-screen {
-    mix-blend-mode: screen;
   }
 
   .shadow {

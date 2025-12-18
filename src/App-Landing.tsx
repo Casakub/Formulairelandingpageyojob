@@ -50,8 +50,7 @@ import { useLandingTranslations } from './hooks/useLandingTranslations';
 import { SEOHead } from './components/SEOHead';
 import { getAllLanguageCodes } from './lib/languages';
 import { projectId, publicAnonKey } from './utils/supabase/info';
-import YojobLogo from './imports/Frame-2121-1190';
-import HeaderLogo from './imports/Frame-2124-2200';
+import { LogoSvg } from './imports/YojobLogoComplete';
 
 // 🎨 Mapping des icônes : string → Composant React
 const ICON_MAP: Record<string, any> = {
@@ -440,7 +439,11 @@ export default function AppLanding() {
             {/* Logo */}
             <a href="#home" className="inline-block hover:opacity-90 transition-opacity">
               <div className="w-16 h-16 sm:w-20 sm:h-20 md:w-24 md:h-24 lg:w-28 lg:h-28">
-                <HeaderLogo className="w-full h-full" />
+                <LogoSvg 
+                  className="w-full h-full" 
+                  effects={true}
+                  aria-label="YOJOB - Leader du recrutement européen"
+                />
               </div>
             </a>
 
@@ -1710,7 +1713,11 @@ export default function AppLanding() {
                 whileHover={{ scale: 1.05, y: -2 }}
                 transition={{ duration: 0.3 }}
               >
-                <YojobLogo />
+                <LogoSvg 
+                  className="w-full h-full" 
+                  effects={true}
+                  aria-label="YOJOB"
+                />
               </motion.div>
               <p className="text-sm text-white/90 mb-5 leading-relaxed">
                 {content.footer?.logo?.tagline || 'Votre partenaire de confiance pour le recrutement de talents européens.'}
