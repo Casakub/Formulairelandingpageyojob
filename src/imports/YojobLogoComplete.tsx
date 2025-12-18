@@ -1,11 +1,12 @@
 /**
  * YojobLogoComplete - Logo YOJOB complet avec tous les effets visuels
- * 
+ *
  * Ce composant contient le SVG original du logo YOJOB avec:
  * - Effets de glassmorphism et blend modes
  * - Masques et filtres SVG
  * - Textures et gradients
- * 
+ * - Logo complet avec texte "YOJOB"
+ *
  * @param className - Classes Tailwind pour le styling (taille, couleurs, etc.)
  */
 
@@ -15,10 +16,10 @@ interface YojobLogoCompleteProps {
 
 export default function YojobLogoComplete({ className = "" }: YojobLogoCompleteProps) {
   return (
-    <svg 
-      xmlns="http://www.w3.org/2000/svg" 
-      xmlnsXlink="http://www.w3.org/1999/xlink" 
-      viewBox="0 0 127.68 127.2"
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      xmlnsXlink="http://www.w3.org/1999/xlink"
+      viewBox="0 0 406.2287 178.9262"
       className={className}
     >
       <defs>
