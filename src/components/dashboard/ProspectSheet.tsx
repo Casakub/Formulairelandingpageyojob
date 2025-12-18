@@ -20,11 +20,15 @@ import {
   Loader2,
   MessageSquare,
   Rocket,
+  Trash2,
+  RefreshCw,
+  Edit,
 } from 'lucide-react';
 import { Button } from '../ui/button';
 import { Card, CardContent } from '../ui/card';
 import { Textarea } from '../ui/textarea';
 import { Badge } from '../ui/badge';
+import { TasksSection } from './TasksSection';
 import { projectId, publicAnonKey } from '../../utils/supabase/info';
 
 interface ProspectSheetProps {
@@ -51,6 +55,7 @@ interface ProspectSheetProps {
   } | null;
   open: boolean;
   onClose: () => void;
+  onUpdate?: () => void; // Callback pour notifier les changements
 }
 
 interface SurveyData {
@@ -117,10 +122,32 @@ const SOURCE_LABELS: Record<string, string> = {
   manual: 'Ajout Manuel',
 };
 
-export function ProspectSheet({ prospect, open, onClose }: ProspectSheetProps) {
+export function ProspectSheet({ prospect, open, onClose, onUpdate }: ProspectSheetProps) {
   const [surveyData, setSurveyData] = useState<SurveyData | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [newNote, setNewNote] = useState('');
+  const [notes, setNotes] = useState<Array<{
+    id: string;
+    content: string;
+    author_name: string;
+    created_at: string;
+  }>>([]);
+  const [isSavingNote, setIsSavingNote] = useState(false);
+  const [showStatusModal, setShowStatusModal] = useState(false);
+  const [isUpdatingStatus, setIsUpdatingStatus] = useState(false);
+  const [currentStatus, setCurrentStatus] = useState(prospect?.status || 'new');
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [isUpdatingInfo, setIsUpdatingInfo] = useState(false);
+  const [editForm, setEditForm] = useState({
+    name: '',
+    email: '',
+    phone: '',
+    company: '',
+    country_code: '',
+    sector: '',
+    need_type: '',
+    message: '',
+  });
 
   // Charger les données complètes de l'enquête (si source = survey_*)
   useEffect(() => {
@@ -158,6 +185,215 @@ export function ProspectSheet({ prospect, open, onClose }: ProspectSheetProps) {
 
     loadSurveyData();
   }, [prospect?.id, open]);
+
+  // Charger les notes existantes
+  useEffect(() => {
+    if (!prospect || !open) return;
+
+    const loadNotes = async () => {
+      try {
+        const response = await fetch(
+          `https://${projectId}.supabase.co/functions/v1/make-server-10092a63/prospects/${prospect.id}/notes`,
+          {
+            headers: {
+              'Authorization': `Bearer ${publicAnonKey}`,
+              'Content-Type': 'application/json',
+            },
+          }
+        );
+
+        const data = await response.json();
+        if (data.success && data.notes) {
+          setNotes(data.notes);
+        }
+      } catch (error) {
+        console.error('Erreur chargement notes:', error);
+      }
+    };
+
+    loadNotes();
+  }, [prospect?.id, open]);
+
+  // Réinitialiser le statut actuel quand le prospect change
+  useEffect(() => {
+    if (prospect) {
+      setCurrentStatus(prospect.status);
+    }
+  }, [prospect?.id, prospect?.status]);
+
+  // Ouvrir la modal d'édition et initialiser le formulaire
+  const handleOpenEditModal = () => {
+    if (!prospect) return;
+    setEditForm({
+      name: prospect.name || '',
+      email: prospect.email || '',
+      phone: prospect.phone || '',
+      company: prospect.company || '',
+      country_code: prospect.country_code || '',
+      sector: prospect.sector || '',
+      need_type: prospect.need_type || '',
+      message: prospect.message || '',
+    });
+    setShowEditModal(true);
+  };
+
+  // Mettre à jour les informations du prospect
+  const handleUpdateInfo = async () => {
+    if (!prospect) return;
+
+    setIsUpdatingInfo(true);
+    try {
+      const response = await fetch(
+        `https://${projectId}.supabase.co/functions/v1/make-server-10092a63/prospects/${prospect.id}`,
+        {
+          method: 'PATCH',
+          headers: {
+            'Authorization': `Bearer ${publicAnonKey}`,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(editForm),
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+      }
+
+      const data = await response.json();
+      if (data.success) {
+        // Mettre à jour les données localement
+        Object.assign(prospect, editForm);
+        setShowEditModal(false);
+        console.log('✅ Informations mises à jour avec succès');
+        
+        // Appeler le callback pour rafraîchir la liste
+        if (onUpdate) {
+          onUpdate();
+        }
+      } else {
+        console.error('❌ Erreur mise à jour infos:', data.error);
+        alert(`Erreur: ${data.error || 'Erreur inconnue'}`);
+      }
+    } catch (error: any) {
+      console.error('❌ Erreur mise à jour infos:', error);
+      alert(`Erreur lors de la mise à jour: ${error.message}\n\nVérifiez que le serveur backend est démarré.`);
+    } finally {
+      setIsUpdatingInfo(false);
+    }
+  };
+
+  // Sauvegarder une nouvelle note
+  const handleSaveNote = async () => {
+    if (!newNote.trim() || !prospect) return;
+
+    setIsSavingNote(true);
+    try {
+      const response = await fetch(
+        `https://${projectId}.supabase.co/functions/v1/make-server-10092a63/prospects/${prospect.id}/notes`,
+        {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${publicAnonKey}`,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            content: newNote.trim(),
+            authorName: 'Admin',
+          }),
+        }
+      );
+
+      const data = await response.json();
+      if (data.success && data.note) {
+        // Ajouter la nouvelle note en tête de liste
+        setNotes([data.note, ...notes]);
+        setNewNote('');
+        console.log('✅ Note sauvegardée avec succès');
+      } else {
+        console.error('❌ Erreur sauvegarde note:', data.error);
+      }
+    } catch (error) {
+      console.error('❌ Erreur sauvegarde note:', error);
+    } finally {
+      setIsSavingNote(false);
+    }
+  };
+
+  // Supprimer une note
+  const handleDeleteNote = async (noteId: string) => {
+    if (!prospect || !confirm('Voulez-vous vraiment supprimer cette note ?')) return;
+
+    try {
+      const response = await fetch(
+        `https://${projectId}.supabase.co/functions/v1/make-server-10092a63/prospects/${prospect.id}/notes/${noteId}`,
+        {
+          method: 'DELETE',
+          headers: {
+            'Authorization': `Bearer ${publicAnonKey}`,
+            'Content-Type': 'application/json',
+          },
+        }
+      );
+
+      const data = await response.json();
+      if (data.success) {
+        // Retirer la note de la liste
+        setNotes(notes.filter(note => note.id !== noteId));
+        console.log('✅ Note supprimée avec succès');
+      } else {
+        console.error('❌ Erreur suppression note:', data.error);
+      }
+    } catch (error) {
+      console.error('❌ Erreur suppression note:', error);
+    }
+  };
+
+  // Mettre à jour le statut du prospect
+  const handleUpdateStatus = async () => {
+    if (!prospect || !currentStatus) return;
+
+    setIsUpdatingStatus(true);
+    try {
+      const response = await fetch(
+        `https://${projectId}.supabase.co/functions/v1/make-server-10092a63/prospects/${prospect.id}/status`,
+        {
+          method: 'PATCH',
+          headers: {
+            'Authorization': `Bearer ${publicAnonKey}`,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            status: currentStatus,
+          }),
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+      }
+
+      const data = await response.json();
+      if (data.success) {
+        // Mettre à jour le statut localement
+        prospect.status = currentStatus;
+        setShowStatusModal(false);
+        console.log('✅ Statut mis à jour avec succès');
+        
+        // Appeler le callback pour rafraîchir la liste
+        if (onUpdate) {
+          onUpdate();
+        }
+      } else {
+        console.error('❌ Erreur mise à jour statut:', data.error);
+        alert(`Erreur: ${data.error || 'Erreur inconnue'}`);
+      }
+    } catch (error: any) {
+      console.error('❌ Erreur mise à jour statut:', error);
+      alert(`Erreur lors de la mise à jour du statut: ${error.message}\n\nVérifiez que le serveur backend est démarré.`);
+    } finally {
+      setIsUpdatingStatus(false);
+    }
+  };
 
   if (!prospect) return null;
 
@@ -619,6 +855,40 @@ export function ProspectSheet({ prospect, open, onClose }: ProspectSheetProps) {
               {/* Section Notes (commune à tous) */}
               <div>
                 <h3 className="text-slate-900 mb-3">📝 Notes internes</h3>
+                
+                {/* Liste des notes existantes */}
+                {notes.length > 0 && (
+                  <div className="space-y-3 mb-4">
+                    {notes.map(note => (
+                      <div key={note.id} className="p-3 bg-slate-50 rounded-lg border border-slate-200 relative group">
+                        <div className="flex items-start justify-between gap-3">
+                          <p className="text-sm text-slate-700 flex-1">{note.content}</p>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            className="h-7 w-7 p-0 text-slate-400 hover:text-red-500 hover:bg-red-50 opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0"
+                            onClick={() => handleDeleteNote(note.id)}
+                            title="Supprimer cette note"
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </Button>
+                        </div>
+                        <p className="text-xs text-slate-500 mt-2">
+                          Par {note.author_name} • {formatDate(note.created_at)}
+                        </p>
+                      </div>
+                    ))}
+                  </div>
+                )}
+
+                {/* Message si aucune note */}
+                {notes.length === 0 && (
+                  <div className="p-3 bg-blue-50 rounded-lg border border-blue-200 mb-4">
+                    <p className="text-sm text-blue-700">Aucune note pour le moment. Ajoutez-en une ci-dessous !</p>
+                  </div>
+                )}
+
+                {/* Formulaire nouvelle note */}
                 <Textarea
                   placeholder="Ajouter une note sur ce prospect…"
                   value={newNote}
@@ -629,32 +899,338 @@ export function ProspectSheet({ prospect, open, onClose }: ProspectSheetProps) {
                   variant="outline"
                   size="sm"
                   className="mt-2"
-                  disabled={!newNote.trim()}
-                  onClick={() => {
-                    console.log('Note sauvegardée:', newNote);
-                    setNewNote('');
-                  }}
+                  disabled={!newNote.trim() || isSavingNote}
+                  onClick={handleSaveNote}
                 >
-                  Enregistrer la note
+                  {isSavingNote ? (
+                    <>
+                      <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                      Enregistrement...
+                    </>
+                  ) : (
+                    'Enregistrer la note'
+                  )}
                 </Button>
               </div>
+
+              {/* Section Tâches (commune à tous) */}
+              <TasksSection prospectId={prospect.id} onUpdate={onUpdate} />
             </div>
 
             {/* Footer */}
             <div className="px-6 py-4 border-t border-slate-200 bg-slate-50">
-              <div className="flex gap-3">
-                <Button variant="outline" className="flex-1">
-                  Modifier le statut
+              <div className="grid grid-cols-3 gap-2">
+                <Button
+                  variant="outline"
+                  className="flex items-center justify-center gap-2"
+                  onClick={handleOpenEditModal}
+                >
+                  <Edit className="w-4 h-4" />
+                  Éditer
                 </Button>
                 <Button
-                  className="flex-1 bg-gradient-to-r from-blue-500 to-cyan-500 hover:from-blue-600 hover:to-cyan-600 text-white shadow-md"
+                  variant="outline"
+                  className="flex items-center justify-center gap-2"
+                  onClick={() => setShowStatusModal(true)}
+                >
+                  <RefreshCw className="w-4 h-4" />
+                  Statut
+                </Button>
+                <Button
+                  className="bg-gradient-to-r from-blue-500 to-cyan-500 hover:from-blue-600 hover:to-cyan-600 text-white shadow-md flex items-center justify-center gap-2"
                   onClick={() => window.open(`mailto:${prospect.email}`)}
                 >
-                  Envoyer un email
+                  <Mail className="w-4 h-4" />
+                  Email
                 </Button>
               </div>
             </div>
           </motion.div>
+
+          {/* Modale de modification du statut */}
+          {showStatusModal && (
+            <>
+              {/* Overlay modale */}
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                onClick={() => setShowStatusModal(false)}
+                className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[60]"
+              />
+
+              {/* Modale */}
+              <motion.div
+                initial={{ opacity: 0, scale: 0.95, y: 20 }}
+                animate={{ opacity: 1, scale: 1, y: 0 }}
+                exit={{ opacity: 0, scale: 0.95, y: 20 }}
+                className="fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-md bg-white rounded-2xl shadow-2xl z-[70] p-6"
+              >
+                <div className="mb-4">
+                  <h3 className="text-slate-900 mb-1 flex items-center gap-2">
+                    <RefreshCw className="w-5 h-5 text-blue-600" />
+                    Modifier le statut
+                  </h3>
+                  <p className="text-sm text-slate-600">
+                    Sélectionnez le nouveau statut pour ce prospect
+                  </p>
+                </div>
+
+                {/* Options de statut */}
+                <div className="space-y-2 mb-6">
+                  {[
+                    { value: 'new', label: 'Nouveau', color: 'bg-blue-100 text-blue-800 border-blue-200' },
+                    { value: 'qualified', label: 'Qualifié', color: 'bg-purple-100 text-purple-800 border-purple-200' },
+                    { value: 'follow-up', label: 'Suivi en cours', color: 'bg-cyan-100 text-cyan-800 border-cyan-200' },
+                    { value: 'proposal', label: 'Proposition envoyée', color: 'bg-orange-100 text-orange-800 border-orange-200' },
+                    { value: 'won', label: 'Gagné', color: 'bg-green-100 text-green-800 border-green-200' },
+                    { value: 'lost', label: 'Perdu', color: 'bg-red-100 text-red-800 border-red-200' },
+                  ].map((status) => (
+                    <button
+                      key={status.value}
+                      onClick={() => setCurrentStatus(status.value)}
+                      className={`w-full p-3 rounded-lg border-2 transition-all text-left ${
+                        currentStatus === status.value
+                          ? `${status.color} border-opacity-100 shadow-md scale-[1.02]`
+                          : 'bg-slate-50 text-slate-700 border-slate-200 hover:border-slate-300 hover:bg-slate-100'
+                      }`}
+                    >
+                      <div className="flex items-center justify-between">
+                        <span className="text-sm">{status.label}</span>
+                        {currentStatus === status.value && (
+                          <CheckCircle className="w-5 h-5" />
+                        )}
+                      </div>
+                    </button>
+                  ))}
+                </div>
+
+                {/* Boutons d'action */}
+                <div className="flex gap-3">
+                  <Button
+                    variant="outline"
+                    className="flex-1"
+                    onClick={() => setShowStatusModal(false)}
+                    disabled={isUpdatingStatus}
+                  >
+                    Annuler
+                  </Button>
+                  <Button
+                    className="flex-1 bg-gradient-to-r from-blue-500 to-cyan-500 hover:from-blue-600 hover:to-cyan-600 text-white shadow-md"
+                    onClick={handleUpdateStatus}
+                    disabled={isUpdatingStatus || currentStatus === prospect.status}
+                  >
+                    {isUpdatingStatus ? (
+                      <>
+                        <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                        Mise à jour...
+                      </>
+                    ) : (
+                      'Confirmer'
+                    )}
+                  </Button>
+                </div>
+              </motion.div>
+            </>
+          )}
+
+          {/* Modale d'édition des informations */}
+          {showEditModal && (
+            <>
+              {/* Overlay modale */}
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                onClick={() => setShowEditModal(false)}
+                className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[60]"
+              />
+
+              {/* Modale */}
+              <motion.div
+                initial={{ opacity: 0, scale: 0.95, y: 20 }}
+                animate={{ opacity: 1, scale: 1, y: 0 }}
+                exit={{ opacity: 0, scale: 0.95, y: 20 }}
+                className="fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-2xl max-h-[90vh] bg-white rounded-2xl shadow-2xl z-[70] flex flex-col"
+              >
+                {/* Header fixe */}
+                <div className="p-6 border-b border-slate-200 flex-shrink-0">
+                  <h3 className="text-slate-900 mb-1 flex items-center gap-2">
+                    <Edit className="w-5 h-5 text-blue-600" />
+                    Modifier les informations
+                  </h3>
+                  <p className="text-sm text-slate-600">
+                    Mettez à jour les informations du prospect
+                  </p>
+                </div>
+
+                {/* Contenu scrollable */}
+                <div className="flex-1 overflow-y-auto p-6">
+                  <div className="space-y-6">
+                    {/* Section Identité */}
+                    <div>
+                      <h4 className="text-sm text-slate-900 mb-3 flex items-center gap-2">
+                        <Users className="w-4 h-4 text-blue-600" />
+                        Identité
+                      </h4>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                          <label className="text-xs text-slate-600 mb-1.5 block">Nom complet</label>
+                          <div className="relative">
+                            <Users className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+                            <input
+                              type="text"
+                              placeholder="Jean Dupont"
+                              value={editForm.name}
+                              onChange={(e) => setEditForm({ ...editForm, name: e.target.value })}
+                              className="w-full pl-10 pr-3 py-2.5 bg-slate-50 rounded-lg border border-slate-200 focus:border-cyan-500 focus:ring-2 focus:ring-cyan-200 transition-all text-sm"
+                            />
+                          </div>
+                        </div>
+                        <div>
+                          <label className="text-xs text-slate-600 mb-1.5 block">Email *</label>
+                          <div className="relative">
+                            <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+                            <input
+                              type="email"
+                              placeholder="email@exemple.com"
+                              value={editForm.email}
+                              onChange={(e) => setEditForm({ ...editForm, email: e.target.value })}
+                              className="w-full pl-10 pr-3 py-2.5 bg-slate-50 rounded-lg border border-slate-200 focus:border-cyan-500 focus:ring-2 focus:ring-cyan-200 transition-all text-sm"
+                            />
+                          </div>
+                        </div>
+                        <div>
+                          <label className="text-xs text-slate-600 mb-1.5 block">Téléphone</label>
+                          <div className="relative">
+                            <Phone className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+                            <input
+                              type="tel"
+                              placeholder="+33 6 12 34 56 78"
+                              value={editForm.phone}
+                              onChange={(e) => setEditForm({ ...editForm, phone: e.target.value })}
+                              className="w-full pl-10 pr-3 py-2.5 bg-slate-50 rounded-lg border border-slate-200 focus:border-cyan-500 focus:ring-2 focus:ring-cyan-200 transition-all text-sm"
+                            />
+                          </div>
+                        </div>
+                        <div>
+                          <label className="text-xs text-slate-600 mb-1.5 block">Code pays</label>
+                          <div className="relative">
+                            <GlobeIcon className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+                            <input
+                              type="text"
+                              placeholder="FR"
+                              maxLength={2}
+                              value={editForm.country_code}
+                              onChange={(e) => setEditForm({ ...editForm, country_code: e.target.value.toUpperCase() })}
+                              className="w-full pl-10 pr-3 py-2.5 bg-slate-50 rounded-lg border border-slate-200 focus:border-cyan-500 focus:ring-2 focus:ring-cyan-200 transition-all text-sm uppercase"
+                            />
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Section Entreprise */}
+                    <div>
+                      <h4 className="text-sm text-slate-900 mb-3 flex items-center gap-2">
+                        <Building2 className="w-4 h-4 text-violet-600" />
+                        Entreprise
+                      </h4>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                          <label className="text-xs text-slate-600 mb-1.5 block">Nom de l'entreprise</label>
+                          <div className="relative">
+                            <Building2 className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+                            <input
+                              type="text"
+                              placeholder="ACME Corp"
+                              value={editForm.company}
+                              onChange={(e) => setEditForm({ ...editForm, company: e.target.value })}
+                              className="w-full pl-10 pr-3 py-2.5 bg-slate-50 rounded-lg border border-slate-200 focus:border-cyan-500 focus:ring-2 focus:ring-cyan-200 transition-all text-sm"
+                            />
+                          </div>
+                        </div>
+                        <div>
+                          <label className="text-xs text-slate-600 mb-1.5 block">Secteur d'activité</label>
+                          <div className="relative">
+                            <Briefcase className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+                            <input
+                              type="text"
+                              placeholder="BTP, Industrie, Services..."
+                              value={editForm.sector}
+                              onChange={(e) => setEditForm({ ...editForm, sector: e.target.value })}
+                              className="w-full pl-10 pr-3 py-2.5 bg-slate-50 rounded-lg border border-slate-200 focus:border-cyan-500 focus:ring-2 focus:ring-cyan-200 transition-all text-sm"
+                            />
+                          </div>
+                        </div>
+                        <div className="md:col-span-2">
+                          <label className="text-xs text-slate-600 mb-1.5 block">Type de besoin</label>
+                          <div className="relative">
+                            <Target className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+                            <input
+                              type="text"
+                              placeholder="Recrutement, Intérim, Formation..."
+                              value={editForm.need_type}
+                              onChange={(e) => setEditForm({ ...editForm, need_type: e.target.value })}
+                              className="w-full pl-10 pr-3 py-2.5 bg-slate-50 rounded-lg border border-slate-200 focus:border-cyan-500 focus:ring-2 focus:ring-cyan-200 transition-all text-sm"
+                            />
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Section Message */}
+                    <div>
+                      <h4 className="text-sm text-slate-900 mb-3 flex items-center gap-2">
+                        <MessageSquare className="w-4 h-4 text-cyan-600" />
+                        Message
+                      </h4>
+                      <div className="relative">
+                        <MessageSquare className="absolute left-3 top-3 w-4 h-4 text-slate-400" />
+                        <Textarea
+                          placeholder="Contexte, demande spécifique, informations complémentaires..."
+                          value={editForm.message}
+                          onChange={(e) => setEditForm({ ...editForm, message: e.target.value })}
+                          className="w-full pl-10 pr-3 py-2.5 bg-slate-50 rounded-lg border border-slate-200 focus:border-cyan-500 focus:ring-2 focus:ring-cyan-200 transition-all text-sm min-h-[100px]"
+                        />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Footer fixe */}
+                <div className="p-6 border-t border-slate-200 bg-slate-50 flex-shrink-0">
+                  <div className="flex gap-3">
+                    <Button
+                      variant="outline"
+                      className="flex-1"
+                      onClick={() => setShowEditModal(false)}
+                      disabled={isUpdatingInfo}
+                    >
+                      Annuler
+                    </Button>
+                    <Button
+                      className="flex-1 bg-gradient-to-r from-blue-500 to-cyan-500 hover:from-blue-600 hover:to-cyan-600 text-white shadow-md"
+                      onClick={handleUpdateInfo}
+                      disabled={isUpdatingInfo || !editForm.email}
+                    >
+                      {isUpdatingInfo ? (
+                        <>
+                          <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                          Mise à jour...
+                        </>
+                      ) : (
+                        <>
+                          <CheckCircle className="w-4 h-4 mr-2" />
+                          Enregistrer
+                        </>
+                      )}
+                    </Button>
+                  </div>
+                </div>
+              </motion.div>
+            </>
+          )}
         </>
       )}
     </AnimatePresence>

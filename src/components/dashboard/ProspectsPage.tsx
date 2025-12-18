@@ -460,6 +460,10 @@ export function ProspectsPage() {
         prospect={selectedProspect}
         open={!!selectedProspect}
         onClose={() => setSelectedProspect(null)}
+        onUpdate={() => {
+          loadStats();
+          loadProspects();
+        }}
       />
 
       {/* New Prospect Dialog */}

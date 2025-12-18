@@ -334,38 +334,154 @@ app.get("/details/:id", async (c) => {
 });
 
 /**
+ * PATCH /:id/status
+ * Mettre à jour le statut d'un prospect
+ */
+app.patch("/:id/status", async (c) => {
+  try {
+    const id = c.req.param("id");
+    const body = await c.req.json();
+    const { status } = body;
+
+    // Validation des statuts autorisés
+    const validStatuses = ['new', 'qualified', 'follow-up', 'proposal', 'won', 'lost'];
+    if (!status || !validStatuses.includes(status)) {
+      return c.json({ 
+        success: false, 
+        error: `Invalid status. Must be one of: ${validStatuses.join(', ')}` 
+      }, 400);
+    }
+
+    const supabase = getSupabaseClient();
+
+    // Vérifier que le prospect existe
+    const { data: prospect, error: prospectError } = await supabase
+      .from("prospects")
+      .select("id, status")
+      .eq("id", id)
+      .single();
+
+    if (prospectError || !prospect) {
+      return c.json({ success: false, error: "Prospect not found" }, 404);
+    }
+
+    // Mettre à jour le statut
+    const { data: updatedProspect, error: updateError } = await supabase
+      .from("prospects")
+      .update({ status })
+      .eq("id", id)
+      .select()
+      .single();
+
+    if (updateError) {
+      console.error("Error updating status:", updateError);
+      return c.json({ success: false, error: updateError.message }, 500);
+    }
+
+    // Créer une action dans l'historique
+    await supabase
+      .from("prospect_actions")
+      .insert([{
+        prospect_id: id,
+        action_type: 'status_change',
+        action_label: `Statut changé : ${prospect.status} → ${status}`,
+        action_description: `Le statut du prospect a été modifié de "${prospect.status}" à "${status}"`,
+        user_name: 'Admin',
+      }]);
+
+    return c.json({
+      success: true,
+      prospect: updatedProspect,
+      message: "Status updated successfully",
+    });
+  } catch (error: any) {
+    console.error("Error in PATCH /:id/status:", error);
+    return c.json({ error: error.message }, 500);
+  }
+});
+
+/**
  * PATCH /:id
- * Mettre à jour un prospect
+ * Mettre à jour les informations d'un prospect
  */
 app.patch("/:id", async (c) => {
   try {
     const id = c.req.param("id");
     const body = await c.req.json();
+    const {
+      name,
+      email,
+      phone,
+      company,
+      country_code,
+      language_code,
+      sector,
+      need_type,
+      message,
+      responsible_name,
+      next_action_date,
+      next_action_type,
+      next_action_label,
+    } = body;
+
     const supabase = getSupabaseClient();
 
-    const { data, error } = await supabase
+    // Vérifier que le prospect existe
+    const { data: prospect, error: prospectError } = await supabase
       .from("prospects")
-      .update(body)
+      .select("*")
+      .eq("id", id)
+      .single();
+
+    if (prospectError || !prospect) {
+      return c.json({ success: false, error: "Prospect not found" }, 404);
+    }
+
+    // Construire l'objet de mise à jour (uniquement les champs fournis)
+    const updateData: any = {};
+    if (name !== undefined) updateData.name = name;
+    if (email !== undefined) updateData.email = email;
+    if (phone !== undefined) updateData.phone = phone;
+    if (company !== undefined) updateData.company = company;
+    if (country_code !== undefined) updateData.country_code = country_code;
+    if (language_code !== undefined) updateData.language_code = language_code;
+    if (sector !== undefined) updateData.sector = sector;
+    if (need_type !== undefined) updateData.need_type = need_type;
+    if (message !== undefined) updateData.message = message;
+    if (responsible_name !== undefined) updateData.responsible_name = responsible_name;
+    if (next_action_date !== undefined) updateData.next_action_date = next_action_date;
+    if (next_action_type !== undefined) updateData.next_action_type = next_action_type;
+    if (next_action_label !== undefined) updateData.next_action_label = next_action_label;
+
+    // Mettre à jour le prospect
+    const { data: updatedProspect, error: updateError } = await supabase
+      .from("prospects")
+      .update(updateData)
       .eq("id", id)
       .select()
       .single();
 
-    if (error) {
-      console.error("Error updating prospect:", error);
-      return c.json({ error: error.message }, 500);
+    if (updateError) {
+      console.error("Error updating prospect:", updateError);
+      return c.json({ success: false, error: updateError.message }, 500);
     }
 
-    // Enregistrer l'action
-    await supabase.from("prospect_actions").insert({
-      prospect_id: id,
-      action_type: "update",
-      action_label: "Mise à jour des informations",
-      user_name: "Admin",
-    });
+    // Créer une action dans l'historique
+    const changedFields = Object.keys(updateData).join(', ');
+    await supabase
+      .from("prospect_actions")
+      .insert([{
+        prospect_id: id,
+        action_type: 'info_update',
+        action_label: 'Informations mises à jour',
+        action_description: `Champs modifiés : ${changedFields}`,
+        user_name: 'Admin',
+      }]);
 
     return c.json({
       success: true,
-      prospect: data,
+      prospect: updatedProspect,
+      message: "Prospect updated successfully",
     });
   } catch (error: any) {
     console.error("Error in PATCH /:id:", error);
@@ -537,6 +653,120 @@ app.post("/:id/integrations", async (c) => {
     });
   } catch (error: any) {
     console.error("Error in POST /:id/integrations:", error);
+    return c.json({ error: error.message }, 500);
+  }
+});
+
+/**
+ * POST /:id/notes
+ * Ajouter une note interne à un prospect
+ */
+app.post("/:id/notes", async (c) => {
+  try {
+    const id = c.req.param("id");
+    const body = await c.req.json();
+    const { content, authorName } = body;
+
+    if (!content || !content.trim()) {
+      return c.json({ success: false, error: "Note content is required" }, 400);
+    }
+
+    const supabase = getSupabaseClient();
+
+    // Vérifier que le prospect existe
+    const { data: prospect, error: prospectError } = await supabase
+      .from("prospects")
+      .select("id")
+      .eq("id", id)
+      .single();
+
+    if (prospectError || !prospect) {
+      return c.json({ success: false, error: "Prospect not found" }, 404);
+    }
+
+    // Créer la note
+    const { data: note, error: noteError } = await supabase
+      .from("prospect_notes")
+      .insert([{
+        prospect_id: id,
+        content: content.trim(),
+        author_name: authorName || "Admin",
+      }])
+      .select()
+      .single();
+
+    if (noteError) {
+      console.error("Error creating note:", noteError);
+      return c.json({ success: false, error: noteError.message }, 500);
+    }
+
+    return c.json({
+      success: true,
+      note,
+    });
+  } catch (error: any) {
+    console.error("Error in POST /:id/notes:", error);
+    return c.json({ error: error.message }, 500);
+  }
+});
+
+/**
+ * GET /:id/notes
+ * Récupérer toutes les notes d'un prospect
+ */
+app.get("/:id/notes", async (c) => {
+  try {
+    const id = c.req.param("id");
+    const supabase = getSupabaseClient();
+
+    const { data: notes, error } = await supabase
+      .from("prospect_notes")
+      .select("*")
+      .eq("prospect_id", id)
+      .order("created_at", { ascending: false });
+
+    if (error) {
+      console.error("Error fetching notes:", error);
+      return c.json({ error: error.message }, 500);
+    }
+
+    return c.json({
+      success: true,
+      notes: notes || [],
+    });
+  } catch (error: any) {
+    console.error("Error in GET /:id/notes:", error);
+    return c.json({ error: error.message }, 500);
+  }
+});
+
+/**
+ * DELETE /:id/notes/:noteId
+ * Supprimer une note
+ */
+app.delete("/:id/notes/:noteId", async (c) => {
+  try {
+    const id = c.req.param("id");
+    const noteId = c.req.param("noteId");
+    const supabase = getSupabaseClient();
+
+    const { error } = await supabase
+      .from("prospect_notes")
+      .delete()
+      .eq("id", noteId)
+      .eq("prospect_id", id);
+
+    if (error) {
+      console.error("Error deleting note:", error);
+      return c.json({ error: error.message }, 500);
+    }
+
+    return c.json({
+      success: true,
+      message: "Note deleted successfully",
+    });
+  } catch (error: any) {
+    console.error("Error in DELETE /:id/notes/:noteId:", error);
     return c.json({ error: error.message }, 500);
   }
 });

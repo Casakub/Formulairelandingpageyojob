@@ -16,6 +16,7 @@ import { seedFromSurveyConfig } from "./seed-from-survey-config.tsx";
 import { uploadAvatar, deleteAvatar, refreshSignedUrl } from "./storage.tsx";
 import landingRoutes from "./landing.tsx";
 import prospectsRoutes from "./prospects.tsx";
+import tasksRoutes from "./tasks.tsx";
 import { syncSurveyToProspect, batchSyncSurveysToProspects } from "./survey-to-prospect.tsx";
 import questionsRoutes from "./questions.tsx";
 import migrateTranslationsRoutes from "./migrate-translations.tsx";
@@ -75,7 +76,7 @@ app.use(
   cors({
     origin: "*",
     allowHeaders: ["Content-Type", "Authorization"],
-    allowMethods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    allowMethods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
     exposeHeaders: ["Content-Length"],
     maxAge: 600,
   }),
@@ -169,6 +170,9 @@ app.post("/make-server-10092a63/storage/refresh-url", refreshSignedUrl);
 
 // Prospects endpoints
 app.route("/make-server-10092a63/prospects", prospectsRoutes);
+
+// Tasks endpoints
+app.route("/make-server-10092a63/tasks", tasksRoutes);
 
 // Survey to Prospect sync endpoints
 app.post("/make-server-10092a63/survey/sync-to-prospect", async (c) => {
