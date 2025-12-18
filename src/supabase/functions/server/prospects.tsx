@@ -149,6 +149,7 @@ app.get("/list", async (c) => {
     const country = searchParams.get("country");
     const sector = searchParams.get("sector");
     const search = searchParams.get("search");
+    const showArchived = searchParams.get("archived") === "true";
     const page = parseInt(searchParams.get("page") || "1");
     const limit = parseInt(searchParams.get("limit") || "50");
     const offset = (page - 1) * limit;
@@ -159,14 +160,18 @@ app.get("/list", async (c) => {
     let query = supabase
       .from("prospects")
       .select("*", { count: "exact" })
-      .eq("is_archived", false)
       .order("created_at", { ascending: false });
+
+    // Filtre archivé : si showArchived est false, on exclut les archivés
+    if (!showArchived) {
+      query = query.eq("is_archived", false);
+    }
 
     // Filtres
     if (type && type !== "all") {
       query = query.eq("type", type);
     }
-    if (status) {
+    if (status && status !== "all") {
       query = query.eq("status", status);
     }
     if (country) {

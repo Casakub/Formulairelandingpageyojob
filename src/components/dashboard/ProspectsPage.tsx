@@ -406,6 +406,7 @@ export function ProspectsPage() {
     { id: 'qualified', label: 'Qualifié', icon: CheckSquare },
     { id: 'converted', label: 'Converti', icon: UserCheck },
     { id: 'lost', label: 'Perdu', icon: XCircle },
+    { id: 'archived', label: 'Archivés', icon: Archive },
   ];
 
   return (
@@ -493,7 +494,17 @@ export function ProspectsPage() {
             return (
               <button
                 key={chip.id}
-                onClick={() => setActiveStatusFilter(chip.id)}
+                onClick={() => {
+                  setActiveStatusFilter(chip.id);
+                  // Si on clique sur "Archivés", activer showArchived automatiquement
+                  if (chip.id === 'archived') {
+                    setShowArchived(true);
+                  }
+                  // Si on clique sur un autre statut, désactiver showArchived
+                  if (chip.id !== 'archived' && chip.id !== 'all') {
+                    setShowArchived(false);
+                  }
+                }}
                 className={`px-3 py-1.5 rounded-lg text-sm flex items-center gap-1.5 transition-all ${
                   activeStatusFilter === chip.id
                     ? 'bg-blue-500 text-white shadow-md'
@@ -518,17 +529,6 @@ export function ProspectsPage() {
               className="pl-10 bg-white border-slate-200"
             />
           </div>
-          
-          {/* Toggle Archivés */}
-          <Button
-            variant="outline"
-            size="default"
-            onClick={() => setShowArchived(!showArchived)}
-            className={`gap-2 ${showArchived ? 'bg-slate-200 border-slate-400' : ''}`}
-          >
-            {showArchived ? <ArchiveX className="w-4 h-4" /> : <Archive className="w-4 h-4" />}
-            {showArchived ? 'Masquer archivés' : 'Afficher archivés'}
-          </Button>
 
           <Button className="bg-gradient-to-r from-blue-500 to-cyan-500 hover:from-blue-600 hover:to-cyan-600 text-white shadow-md gap-2" onClick={() => setNewProspectDialogOpen(true)}>
             <Plus className="w-4 h-4" />
