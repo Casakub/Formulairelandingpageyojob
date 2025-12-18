@@ -132,6 +132,10 @@ export default function AppLanding() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
   const [waitlistEmail, setWaitlistEmail] = useState('');
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
+  const [successMessage, setSuccessMessage] = useState('');
+  const [showDuplicateModal, setShowDuplicateModal] = useState(false);
+  const [duplicateEmail, setDuplicateEmail] = useState('');
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -258,15 +262,39 @@ export default function AppLanding() {
       if (data.success) {
         const successMsg = content.network?.waitlist?.successMessage || 
                            (currentLanguage === 'fr' ? 'Merci ! Vous êtes inscrit à la liste d\'attente.' : 'Thank you! You are now on the waitlist.');
-        alert(successMsg);
+        setSuccessMessage(successMsg);
+        setShowSuccessModal(true);
         setWaitlistEmail('');
         console.log('✅ Prospect waitlist créé:', data.prospectId);
       } else {
-        throw new Error(data.error || 'Erreur lors de l\'inscription');
+        // Vérifier si c'est une erreur de duplication
+        if (data.isDuplicate || data.errorCode === '23505') {
+          setDuplicateEmail(waitlistEmail);
+          setShowDuplicateModal(true);
+          setWaitlistEmail('');
+          console.log('⚠️ Email déjà inscrit:', waitlistEmail);
+        } else {
+          throw new Error(data.error || 'Erreur lors de l\'inscription');
+        }
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error('❌ Erreur waitlist submit:', error);
-      alert(currentLanguage === 'fr' ? 'Erreur lors de l\'inscription. Veuillez réessayer.' : 'Error during registration. Please try again.');
+      
+      // Détecter l'erreur de duplication dans le message d'erreur
+      const errorMessage = error?.message || '';
+      const isDuplicate = errorMessage.includes('23505') || 
+                         errorMessage.includes('duplicate key') || 
+                         errorMessage.includes('already exists');
+      
+      if (isDuplicate) {
+        // Afficher la modale "Déjà inscrit"
+        setDuplicateEmail(waitlistEmail);
+        setShowDuplicateModal(true);
+        setWaitlistEmail('');
+      } else {
+        // Autre erreur
+        alert(currentLanguage === 'fr' ? 'Erreur lors de l\'inscription. Veuillez réessayer.' : 'Error during registration. Please try again.');
+      }
     }
   };
 
@@ -307,7 +335,8 @@ export default function AppLanding() {
       const data = await response.json();
 
       if (data.success) {
-        alert(content.ctaForm.form.successMessage);
+        setSuccessMessage(content.ctaForm.form.successMessage);
+        setShowSuccessModal(true);
         setFormData({
           name: '',
           email: '',
@@ -319,11 +348,50 @@ export default function AppLanding() {
         });
         console.log('✅ Prospect contact créé:', data.prospectId);
       } else {
-        throw new Error(data.error || 'Erreur lors de l\'envoi');
+        // Vérifier si c'est une erreur de duplication
+        if (data.isDuplicate || data.errorCode === '23505') {
+          setDuplicateEmail(formData.email);
+          setShowDuplicateModal(true);
+          setFormData({
+            name: '',
+            email: '',
+            phone: '',
+            company: '',
+            contactType: '',
+            needType: '',
+            message: '',
+          });
+          console.log('⚠️ Email déjà inscrit:', formData.email);
+        } else {
+          throw new Error(data.error || 'Erreur lors de l\'envoi');
+        }
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error('❌ Erreur contact submit:', error);
-      alert(currentLanguage === 'fr' ? 'Erreur lors de l\'envoi. Veuillez réessayer.' : 'Error sending form. Please try again.');
+      
+      // Détecter l'erreur de duplication dans le message d'erreur
+      const errorMessage = error?.message || '';
+      const isDuplicate = errorMessage.includes('23505') || 
+                         errorMessage.includes('duplicate key') || 
+                         errorMessage.includes('already exists');
+      
+      if (isDuplicate) {
+        // Afficher la modale "Déjà inscrit"
+        setDuplicateEmail(formData.email);
+        setShowDuplicateModal(true);
+        setFormData({
+          name: '',
+          email: '',
+          phone: '',
+          company: '',
+          contactType: '',
+          needType: '',
+          message: '',
+        });
+      } else {
+        // Autre erreur
+        alert(currentLanguage === 'fr' ? 'Erreur lors de l\'envoi. Veuillez réessayer.' : 'Error sending form. Please try again.');
+      }
     }
   };
 
@@ -1076,7 +1144,7 @@ export default function AppLanding() {
                       <p className="text-gray-300 text-center text-sm leading-relaxed mb-4">
                         {service.description}
                       </p>
-                      <a href="#contact" className={`text-${colors.border}-400 hover:text-${colors.border}-300 flex items-center justify-center gap-2 group/link`}>
+                      <a href="#contact" className="text-cyan-400 hover:text-cyan-300 flex items-center justify-center gap-2 group/link">
                         {service.linkLabel || 'Learn more'}
                         <ArrowRight className="w-4 h-4 group-hover/link:translate-x-1 transition-transform" />
                       </a>
@@ -1869,6 +1937,264 @@ export default function AppLanding() {
           </motion.div>
         </div>
       </footer>
+
+      {/* 🎉 MODALE DE SUCCÈS PREMIUM avec Logo YOJOB */}
+      {showSuccessModal && (
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-black/60 backdrop-blur-md"
+          onClick={() => setShowSuccessModal(false)}
+        >
+          <motion.div
+            initial={{ scale: 0.8, opacity: 0, y: 20 }}
+            animate={{ scale: 1, opacity: 1, y: 0 }}
+            exit={{ scale: 0.8, opacity: 0, y: 20 }}
+            transition={{ type: "spring", duration: 0.5, bounce: 0.3 }}
+            className="relative max-w-md w-full bg-gradient-to-br from-violet-50 via-white to-cyan-50 rounded-3xl shadow-2xl border border-violet-200/50 overflow-hidden"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Gradient decorative top */}
+            <div className="absolute inset-x-0 top-0 h-2 bg-gradient-to-r from-violet-600 via-purple-600 to-cyan-600" />
+            
+            {/* Blob decoratif */}
+            <div className="absolute top-0 right-0 w-64 h-64 bg-gradient-to-br from-cyan-400/20 to-violet-600/20 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2" />
+            <div className="absolute bottom-0 left-0 w-48 h-48 bg-gradient-to-tr from-violet-400/20 to-purple-600/20 rounded-full blur-3xl translate-y-1/2 -translate-x-1/2" />
+
+            <div className="relative p-8 flex flex-col items-center text-center">
+              {/* Logo YOJOB avec effets glassmorphism */}
+              <motion.div
+                initial={{ scale: 0, rotate: -180 }}
+                animate={{ scale: 1, rotate: 0 }}
+                transition={{ delay: 0.2, type: "spring", stiffness: 200 }}
+                className="mb-6 relative"
+              >
+                <div className="relative w-24 h-24 rounded-2xl bg-gradient-to-br from-white/80 to-white/40 backdrop-blur-xl border border-white/60 shadow-2xl flex items-center justify-center overflow-hidden group">
+                  {/* Gradient background animé */}
+                  <div className="absolute inset-0 bg-gradient-to-br from-violet-500/10 via-purple-500/10 to-cyan-500/10" />
+                  
+                  {/* Scintillement néon */}
+                  <motion.div
+                    className="absolute inset-0 bg-gradient-to-tr from-cyan-400/0 via-cyan-400/30 to-violet-500/0"
+                    animate={{
+                      opacity: [0.3, 0.8, 0.3],
+                      scale: [1, 1.05, 1],
+                    }}
+                    transition={{
+                      duration: 2,
+                      repeat: Infinity,
+                      ease: "easeInOut",
+                    }}
+                  />
+                  
+                  {/* Logo SVG */}
+                  <div className="relative z-10 w-16 h-16 drop-shadow-[0_0_15px_rgba(6,182,212,0.4)]">
+                    <LogoSvg />
+                  </div>
+                </div>
+
+                {/* Anneaux de succès */}
+                <motion.div
+                  className="absolute inset-0 rounded-2xl border-2 border-cyan-400/50"
+                  initial={{ scale: 1, opacity: 0.8 }}
+                  animate={{ scale: 1.3, opacity: 0 }}
+                  transition={{ duration: 1.5, repeat: Infinity }}
+                />
+                <motion.div
+                  className="absolute inset-0 rounded-2xl border-2 border-violet-400/50"
+                  initial={{ scale: 1, opacity: 0.8 }}
+                  animate={{ scale: 1.5, opacity: 0 }}
+                  transition={{ duration: 1.5, delay: 0.3, repeat: Infinity }}
+                />
+              </motion.div>
+
+              {/* Message de succès */}
+              <motion.h3
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.3 }}
+                className="text-gray-900 mb-3"
+              >
+                {successMessage}
+              </motion.h3>
+
+              <motion.p
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 0.4 }}
+                className="text-gray-600 mb-6 text-sm"
+              >
+                {currentLanguage === 'fr' 
+                  ? 'Nous vous recontacterons très bientôt.' 
+                  : 'We will contact you very soon.'}
+              </motion.p>
+
+              {/* Bouton OK avec shimmer effect */}
+              <motion.div
+                initial={{ opacity: 0, scale: 0.9 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ delay: 0.5 }}
+                className="w-full"
+              >
+                <Button
+                  onClick={() => setShowSuccessModal(false)}
+                  className="relative overflow-hidden group w-full h-12 bg-gradient-to-r from-violet-600 via-purple-600 to-cyan-600 hover:from-violet-700 hover:via-purple-700 hover:to-cyan-700 text-white rounded-xl shadow-lg shadow-violet-500/30 hover:shadow-xl hover:shadow-violet-500/40 transition-all duration-300"
+                >
+                  <span className="relative z-10 flex items-center justify-center gap-2">
+                    {currentLanguage === 'fr' ? 'Fermer' : 'Close'}
+                    <CheckCircle className="w-5 h-5" />
+                  </span>
+                  {/* Shimmer effect */}
+                  <div className="absolute inset-0 -translate-x-full group-hover:translate-x-full transition-transform duration-700 bg-gradient-to-r from-transparent via-white/30 to-transparent" />
+                </Button>
+              </motion.div>
+            </div>
+          </motion.div>
+        </motion.div>
+      )}
+
+      {/* 🔶 MODALE "DÉJÀ INSCRIT" avec Logo YOJOB */}
+      {showDuplicateModal && (
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-black/60 backdrop-blur-md"
+          onClick={() => setShowDuplicateModal(false)}
+        >
+          <motion.div
+            initial={{ scale: 0.8, opacity: 0, y: 20 }}
+            animate={{ scale: 1, opacity: 1, y: 0 }}
+            exit={{ scale: 0.8, opacity: 0, y: 20 }}
+            transition={{ type: "spring", duration: 0.5, bounce: 0.3 }}
+            className="relative max-w-md w-full bg-gradient-to-br from-orange-50 via-white to-amber-50 rounded-3xl shadow-2xl border border-orange-200/50 overflow-hidden"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Gradient decorative top - Orange/Amber pour avertissement */}
+            <div className="absolute inset-x-0 top-0 h-2 bg-gradient-to-r from-orange-500 via-amber-500 to-yellow-500" />
+            
+            {/* Blob decoratif orange/amber */}
+            <div className="absolute top-0 right-0 w-64 h-64 bg-gradient-to-br from-orange-400/20 to-amber-600/20 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2" />
+            <div className="absolute bottom-0 left-0 w-48 h-48 bg-gradient-to-tr from-amber-400/20 to-orange-600/20 rounded-full blur-3xl translate-y-1/2 -translate-x-1/2" />
+
+            <div className="relative p-8 flex flex-col items-center text-center">
+              {/* Logo YOJOB avec effets orange/amber */}
+              <motion.div
+                initial={{ scale: 0, rotate: -180 }}
+                animate={{ scale: 1, rotate: 0 }}
+                transition={{ delay: 0.2, type: "spring", stiffness: 200 }}
+                className="mb-6 relative"
+              >
+                <div className="relative w-24 h-24 rounded-2xl bg-gradient-to-br from-white/80 to-white/40 backdrop-blur-xl border border-white/60 shadow-2xl flex items-center justify-center overflow-hidden group">
+                  {/* Gradient background orange */}
+                  <div className="absolute inset-0 bg-gradient-to-br from-orange-500/10 via-amber-500/10 to-yellow-500/10" />
+                  
+                  {/* Scintillement orange/amber */}
+                  <motion.div
+                    className="absolute inset-0 bg-gradient-to-tr from-orange-400/0 via-orange-400/30 to-amber-500/0"
+                    animate={{
+                      opacity: [0.3, 0.8, 0.3],
+                      scale: [1, 1.05, 1],
+                    }}
+                    transition={{
+                      duration: 2,
+                      repeat: Infinity,
+                      ease: "easeInOut",
+                    }}
+                  />
+                  
+                  {/* Logo SVG */}
+                  <div className="relative z-10 w-16 h-16 drop-shadow-[0_0_15px_rgba(251,146,60,0.4)]">
+                    <LogoSvg />
+                  </div>
+                </div>
+
+                {/* Anneaux d'alerte orange */}
+                <motion.div
+                  className="absolute inset-0 rounded-2xl border-2 border-orange-400/50"
+                  initial={{ scale: 1, opacity: 0.8 }}
+                  animate={{ scale: 1.3, opacity: 0 }}
+                  transition={{ duration: 1.5, repeat: Infinity }}
+                />
+                <motion.div
+                  className="absolute inset-0 rounded-2xl border-2 border-amber-400/50"
+                  initial={{ scale: 1, opacity: 0.8 }}
+                  animate={{ scale: 1.5, opacity: 0 }}
+                  transition={{ duration: 1.5, delay: 0.3, repeat: Infinity }}
+                />
+              </motion.div>
+
+              {/* Icône d'alerte */}
+              <motion.div
+                initial={{ scale: 0 }}
+                animate={{ scale: 1 }}
+                transition={{ delay: 0.4, type: "spring", stiffness: 300 }}
+                className="mb-4"
+              >
+                <div className="w-16 h-16 rounded-full bg-gradient-to-br from-orange-100 to-amber-100 flex items-center justify-center">
+                  <Mail className="w-8 h-8 text-orange-600" />
+                </div>
+              </motion.div>
+
+              {/* Message principal */}
+              <motion.h3
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.3 }}
+                className="text-gray-900 mb-2"
+              >
+                {currentLanguage === 'fr' 
+                  ? 'Déjà inscrit !' 
+                  : 'Already registered!'}
+              </motion.h3>
+
+              {/* Email concerné */}
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 0.4 }}
+                className="mb-4 px-4 py-2 bg-orange-100/50 rounded-lg border border-orange-200"
+              >
+                <p className="text-sm text-orange-800 break-all">
+                  <strong>{duplicateEmail}</strong>
+                </p>
+              </motion.div>
+
+              <motion.p
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 0.5 }}
+                className="text-gray-600 mb-6 text-sm"
+              >
+                {currentLanguage === 'fr' 
+                  ? 'Cet email est déjà inscrit à notre liste d\'attente. Nous vous contacterons bientôt !' 
+                  : 'This email is already on our waitlist. We will contact you soon!'}
+              </motion.p>
+
+              {/* Bouton OK orange */}
+              <motion.div
+                initial={{ opacity: 0, scale: 0.9 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ delay: 0.6 }}
+                className="w-full"
+              >
+                <Button
+                  onClick={() => setShowDuplicateModal(false)}
+                  className="relative overflow-hidden group w-full h-12 bg-gradient-to-r from-orange-500 via-amber-500 to-yellow-500 hover:from-orange-600 hover:via-amber-600 hover:to-yellow-600 text-white rounded-xl shadow-lg shadow-orange-500/30 hover:shadow-xl hover:shadow-orange-500/40 transition-all duration-300"
+                >
+                  <span className="relative z-10 flex items-center justify-center gap-2">
+                    {currentLanguage === 'fr' ? 'Compris' : 'Got it'}
+                    <Mail className="w-5 h-5" />
+                  </span>
+                  {/* Shimmer effect */}
+                  <div className="absolute inset-0 -translate-x-full group-hover:translate-x-full transition-transform duration-700 bg-gradient-to-r from-transparent via-white/30 to-transparent" />
+                </Button>
+              </motion.div>
+            </div>
+          </motion.div>
+        </motion.div>
+      )}
       </div>
     </HelmetProvider>
   );

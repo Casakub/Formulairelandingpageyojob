@@ -99,6 +99,17 @@ app.post("/submit", async (c) => {
         }, 503);
       }
       
+      // Erreur de duplication (email déjà inscrit)
+      if (error.code === '23505' || error.message?.includes('duplicate key') || error.message?.includes('already exists')) {
+        return c.json({ 
+          success: false, 
+          error: `duplicate key value violates unique constraint "uq_prospects_email"`,
+          errorCode: '23505',
+          isDuplicate: true,
+          email
+        }, 409); // 409 Conflict
+      }
+      
       return c.json({ success: false, error: error.message }, 500);
     }
 
