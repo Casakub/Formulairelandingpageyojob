@@ -295,19 +295,34 @@ export function EventDetailsModal({ event, onClose, onUpdate, onDelete }: EventD
         // Attendre que l'onglet se charge, puis trouver et cliquer sur le prospect
         setTimeout(() => {
           // Chercher la ligne du prospect par son ID
-          const prospectRow = document.querySelector(`[data-prospect-id="${event.prospect_id}"]`) as HTMLElement;
+          let prospectRow = document.querySelector(`[data-prospect-id="${event.prospect_id}"]`) as HTMLElement;
           
           if (prospectRow) {
             console.log('✅ Prospect trouvé dans la liste, ouverture de la fiche...');
             prospectRow.click();
             prospectRow.scrollIntoView({ behavior: 'smooth', block: 'center' });
           } else {
-            console.warn('⚠️ Prospect non trouvé dans la liste. ID recherché:', event.prospect_id);
-            // Fallback : essayer de trouver par d'autres moyens
-            const allRows = document.querySelectorAll('[data-prospect-id]');
-            console.log('📋 Prospects disponibles:', Array.from(allRows).map(r => r.getAttribute('data-prospect-id')));
+            console.warn('⚠️ Prospect non trouvé dans la liste (peut-être sur une autre page ou filtré).');
+            console.log('📋 Recherche dans toute la page...');
+            
+            // Fallback : réessayer après un délai supplémentaire au cas où le chargement prend du temps
+            setTimeout(() => {
+              prospectRow = document.querySelector(`[data-prospect-id="${event.prospect_id}"]`) as HTMLElement;
+              
+              if (prospectRow) {
+                console.log('✅ Prospect trouvé après rechargement, ouverture...');
+                prospectRow.click();
+                prospectRow.scrollIntoView({ behavior: 'smooth', block: 'center' });
+              } else {
+                console.error('❌ Prospect introuvable. Il peut être sur une autre page, filtré, ou archivé.');
+                console.log('💡 Astuce : Vérifiez les filtres actifs dans l\'onglet Prospects.');
+                
+                // Afficher un message utilisateur amical
+                alert(`Le prospect lié à cet événement n'est pas visible dans la liste actuelle. Il peut être filtré, archivé, ou sur une autre page. Essayez de modifier les filtres ou la recherche.`);
+              }
+            }, 1000); // Deuxième tentative après 1s
           }
-        }, 800); // Augmenté à 800ms pour laisser le temps au tableau de se charger
+        }, 800); // Premier essai après 800ms
       } else {
         console.error('❌ Onglet Prospects introuvable');
       }

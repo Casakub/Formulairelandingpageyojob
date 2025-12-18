@@ -335,7 +335,7 @@ app.get("/details/:id", async (c) => {
 
 /**
  * PATCH /:id/status
- * Mettre à jour le statut d'un prospect
+ * Mettre à jour le statut d'un prospect (archiver, désarchiver, etc.)
  */
 app.patch("/:id/status", async (c) => {
   try {
@@ -343,9 +343,12 @@ app.patch("/:id/status", async (c) => {
     const body = await c.req.json();
     const { status } = body;
 
-    // Validation des statuts autorisés
-    const validStatuses = ['new', 'qualified', 'follow-up', 'proposal', 'won', 'lost'];
-    if (!status || !validStatuses.includes(status)) {
+    if (!status) {
+      return c.json({ success: false, error: "Status is required" }, 400);
+    }
+
+    const validStatuses = ['new', 'contacted', 'qualified', 'converted', 'lost', 'archived'];
+    if (!validStatuses.includes(status)) {
       return c.json({ 
         success: false, 
         error: `Invalid status. Must be one of: ${validStatuses.join(', ')}` 
@@ -357,7 +360,7 @@ app.patch("/:id/status", async (c) => {
     // Vérifier que le prospect existe
     const { data: prospect, error: prospectError } = await supabase
       .from("prospects")
-      .select("id, status")
+      .select("*")
       .eq("id", id)
       .single();
 
@@ -374,25 +377,32 @@ app.patch("/:id/status", async (c) => {
       .single();
 
     if (updateError) {
-      console.error("Error updating status:", updateError);
+      console.error("Error updating prospect status:", updateError);
       return c.json({ success: false, error: updateError.message }, 500);
     }
 
     // Créer une action dans l'historique
+    let actionLabel = "Statut modifié";
+    if (status === "archived") {
+      actionLabel = "Prospect archivé";
+    } else if (prospect.status === "archived") {
+      actionLabel = "Prospect désarchivé";
+    }
+
     await supabase
       .from("prospect_actions")
       .insert([{
         prospect_id: id,
         action_type: 'status_change',
-        action_label: `Statut changé : ${prospect.status} → ${status}`,
-        action_description: `Le statut du prospect a été modifié de "${prospect.status}" à "${status}"`,
+        action_label: actionLabel,
+        action_description: `Statut changé de "${prospect.status}" vers "${status}"`,
         user_name: 'Admin',
       }]);
 
     return c.json({
       success: true,
       prospect: updatedProspect,
-      message: "Status updated successfully",
+      message: "Prospect status updated successfully",
     });
   } catch (error: any) {
     console.error("Error in PATCH /:id/status:", error);
@@ -571,29 +581,144 @@ app.post("/:id/note", async (c) => {
 
 /**
  * DELETE /:id
- * Archiver un prospect (soft delete)
+ * Supprimer définitivement un prospect
  */
 app.delete("/:id", async (c) => {
   try {
     const id = c.req.param("id");
     const supabase = getSupabaseClient();
 
-    const { error } = await supabase
+    // Vérifier que le prospect existe
+    const { data: prospect, error: prospectError } = await supabase
       .from("prospects")
-      .update({ is_archived: true })
+      .select("email, name")
+      .eq("id", id)
+      .single();
+
+    if (prospectError || !prospect) {
+      return c.json({ success: false, error: "Prospect not found" }, 404);
+    }
+
+    // Supprimer les données liées (cascade devrait fonctionner mais on force pour être sûr)
+    await supabase.from("prospect_notes").delete().eq("prospect_id", id);
+    await supabase.from("prospect_actions").delete().eq("prospect_id", id);
+    await supabase.from("prospect_tasks").delete().eq("prospect_id", id);
+    await supabase.from("prospect_events").delete().eq("prospect_id", id);
+
+    // Supprimer le prospect
+    const { error: deleteError } = await supabase
+      .from("prospects")
+      .delete()
       .eq("id", id);
 
-    if (error) {
-      console.error("Error archiving prospect:", error);
-      return c.json({ error: error.message }, 500);
+    if (deleteError) {
+      console.error("Error deleting prospect:", deleteError);
+      return c.json({ success: false, error: deleteError.message }, 500);
     }
+
+    console.log(`✅ Prospect supprimé : ${prospect.name || prospect.email} (${id})`);
 
     return c.json({
       success: true,
-      message: "Prospect archived successfully",
+      message: "Prospect deleted successfully",
     });
   } catch (error: any) {
     console.error("Error in DELETE /:id:", error);
+    return c.json({ error: error.message }, 500);
+  }
+});
+
+/**
+ * POST /bulk-delete
+ * Supprimer plusieurs prospects en batch
+ */
+app.post("/bulk-delete", async (c) => {
+  try {
+    const body = await c.req.json();
+    const { ids } = body;
+
+    if (!ids || !Array.isArray(ids) || ids.length === 0) {
+      return c.json({ success: false, error: "Array of prospect IDs is required" }, 400);
+    }
+
+    const supabase = getSupabaseClient();
+
+    // Supprimer les données liées pour tous les prospects
+    await supabase.from("prospect_notes").delete().in("prospect_id", ids);
+    await supabase.from("prospect_actions").delete().in("prospect_id", ids);
+    await supabase.from("prospect_tasks").delete().in("prospect_id", ids);
+    await supabase.from("prospect_events").delete().in("prospect_id", ids);
+
+    // Supprimer les prospects
+    const { error: deleteError } = await supabase
+      .from("prospects")
+      .delete()
+      .in("id", ids);
+
+    if (deleteError) {
+      console.error("Error bulk deleting prospects:", deleteError);
+      return c.json({ success: false, error: deleteError.message }, 500);
+    }
+
+    console.log(`✅ ${ids.length} prospects supprimés`);
+
+    return c.json({
+      success: true,
+      count: ids.length,
+      message: `${ids.length} prospect(s) deleted successfully`,
+    });
+  } catch (error: any) {
+    console.error("Error in POST /bulk-delete:", error);
+    return c.json({ error: error.message }, 500);
+  }
+});
+
+/**
+ * POST /bulk-archive
+ * Archiver plusieurs prospects en batch
+ */
+app.post("/bulk-archive", async (c) => {
+  try {
+    const body = await c.req.json();
+    const { ids } = body;
+
+    if (!ids || !Array.isArray(ids) || ids.length === 0) {
+      return c.json({ success: false, error: "Array of prospect IDs is required" }, 400);
+    }
+
+    const supabase = getSupabaseClient();
+
+    // Mettre à jour le statut en "archived"
+    const { error: updateError } = await supabase
+      .from("prospects")
+      .update({ status: "archived" })
+      .in("id", ids);
+
+    if (updateError) {
+      console.error("Error bulk archiving prospects:", updateError);
+      return c.json({ success: false, error: updateError.message }, 500);
+    }
+
+    // Créer des actions dans l'historique pour chaque prospect
+    const actions = ids.map(id => ({
+      prospect_id: id,
+      action_type: 'status_change',
+      action_label: 'Prospect archivé',
+      action_description: 'Archivé en batch',
+      user_name: 'Admin',
+    }));
+
+    await supabase.from("prospect_actions").insert(actions);
+
+    console.log(`✅ ${ids.length} prospects archivés`);
+
+    return c.json({
+      success: true,
+      count: ids.length,
+      message: `${ids.length} prospect(s) archived successfully`,
+    });
+  } catch (error: any) {
+    console.error("Error in POST /bulk-archive:", error);
     return c.json({ error: error.message }, 500);
   }
 });

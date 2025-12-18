@@ -4,7 +4,7 @@ import { ProspectsExport } from './ProspectsExport';
 import { ProspectsSetupBanner } from './ProspectsSetupBanner';
 import { projectId, publicAnonKey } from '../../utils/supabase/info';
 import { useState, useEffect } from 'react';
-import { motion } from 'motion/react';
+import { motion, AnimatePresence } from 'motion/react';
 import { 
   Users, 
   Building2, 
@@ -14,14 +14,24 @@ import {
   Plus, 
   RefreshCw, 
   ClipboardList,
-  Rocket
+  Rocket,
+  Trash2,
+  Archive,
+  ArchiveX,
+  MoreVertical,
+  CheckSquare,
+  Square,
+  AlertCircle,
+  Phone,
+  XCircle,
 } from 'lucide-react';
 import { Card, CardContent, CardHeader } from '../ui/card';
 import { Button } from '../ui/button';
 import { Input } from '../ui/input';
+import { Badge } from '../ui/badge';
 
 type ProspectType = 'all' | 'client' | 'agency' | 'interim' | 'waitlist' | 'contact';
-type ProspectStatus = 'new' | 'qualified' | 'follow-up' | 'proposal' | 'won' | 'lost';
+type ProspectStatus = 'new' | 'contacted' | 'qualified' | 'converted' | 'lost' | 'archived';
 
 interface Prospect {
   id: string;
@@ -67,11 +77,15 @@ const TYPE_BADGES = {
 
 const STATUS_BADGES = {
   new: { bg: '#dbeafe', text: '#1d4ed8', label: 'Nouveau' },
+  contacted: { bg: '#ffedd5', text: '#c2410c', label: 'Contacté' },
   qualified: { bg: '#dcfce7', text: '#15803d', label: 'Qualifié' },
-  'follow-up': { bg: '#fef3c7', text: '#b45309', label: 'Relance planifiée' },
-  proposal: { bg: '#ede9fe', text: '#6d28d9', label: 'Proposition envoyée' },
-  won: { bg: '#d1fae5', text: '#047857', label: 'Gagné' },
+  converted: { bg: '#d1fae5', text: '#047857', label: 'Converti' },
   lost: { bg: '#fee2e2', text: '#b91c1c', label: 'Perdu' },
+  archived: { bg: '#f3f4f6', text: '#6b7280', label: 'Archivé' },
+  // Anciens statuts pour compatibilité
+  'follow-up': { bg: '#fef3c7', text: '#b45309', label: 'Relance planifiée' },
+  'proposal': { bg: '#ede9fe', text: '#6d28d9', label: 'Proposition envoyée' },
+  'won': { bg: '#d1fae5', text: '#047857', label: 'Gagné' },
 };
 
 const COUNTRY_FLAGS: Record<string, string> = {
@@ -92,6 +106,9 @@ const AVATAR_COLORS = [
 
 export function ProspectsPage() {
   const [activeFilter, setActiveFilter] = useState<ProspectType>('all');
+  const [activeStatusFilter, setActiveStatusFilter] = useState<string>('all');
+  const [showArchived, setShowArchived] = useState(false);
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedProspect, setSelectedProspect] = useState<Prospect | null>(null);
   const [prospects, setProspects] = useState<Prospect[]>([]);
@@ -102,6 +119,7 @@ export function ProspectsPage() {
   const [newProspectDialogOpen, setNewProspectDialogOpen] = useState(false);
   const [isScoringBatch, setIsScoringBatch] = useState(false);
   const [needsSetup, setNeedsSetup] = useState(false);
+  const [isPerformingBulkAction, setIsPerformingBulkAction] = useState(false);
 
   // Charger les statistiques
   const loadStats = async () => {
@@ -141,6 +159,12 @@ export function ProspectsPage() {
       if (activeFilter !== 'all') {
         params.append('type', activeFilter);
       }
+      if (activeStatusFilter !== 'all') {
+        params.append('status', activeStatusFilter);
+      }
+      if (showArchived) {
+        params.append('archived', 'true');
+      }
       if (searchQuery) {
         params.append('search', searchQuery);
       }
@@ -174,11 +198,162 @@ export function ProspectsPage() {
 
   useEffect(() => {
     loadProspects();
-  }, [activeFilter, searchQuery, currentPage]);
+  }, [activeFilter, activeStatusFilter, showArchived, searchQuery, currentPage]);
 
   const handleRefresh = () => {
     loadStats();
     loadProspects();
+  };
+
+  // Actions groupées
+  const handleBulkArchive = async () => {
+    if (selectedIds.size === 0) return;
+    if (!confirm(`Archiver ${selectedIds.size} prospect(s) ?`)) return;
+
+    setIsPerformingBulkAction(true);
+    try {
+      const response = await fetch(
+        `https://${projectId}.supabase.co/functions/v1/make-server-10092a63/prospects/bulk-archive`,
+        {
+          method: 'POST',
+          headers: {
+            Authorization: `Bearer ${publicAnonKey}`,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ ids: Array.from(selectedIds) }),
+        }
+      );
+
+      const data = await response.json();
+      if (data.success) {
+        setSelectedIds(new Set());
+        handleRefresh();
+      }
+    } catch (error) {
+      console.error('Erreur archivage groupé:', error);
+    } finally {
+      setIsPerformingBulkAction(false);
+    }
+  };
+
+  const handleBulkDelete = async () => {
+    if (selectedIds.size === 0) return;
+    if (!confirm(`⚠️ ATTENTION : Supprimer définitivement ${selectedIds.size} prospect(s) ?\n\nCette action est IRRÉVERSIBLE.`)) return;
+
+    setIsPerformingBulkAction(true);
+    try {
+      const response = await fetch(
+        `https://${projectId}.supabase.co/functions/v1/make-server-10092a63/prospects/bulk-delete`,
+        {
+          method: 'POST',
+          headers: {
+            Authorization: `Bearer ${publicAnonKey}`,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ ids: Array.from(selectedIds) }),
+        }
+      );
+
+      const data = await response.json();
+      if (data.success) {
+        setSelectedIds(new Set());
+        handleRefresh();
+      }
+    } catch (error) {
+      console.error('Erreur suppression groupée:', error);
+    } finally {
+      setIsPerformingBulkAction(false);
+    }
+  };
+
+  // Actions individuelles
+  const handleArchiveProspect = async (prospectId: string) => {
+    try {
+      const response = await fetch(
+        `https://${projectId}.supabase.co/functions/v1/make-server-10092a63/prospects/${prospectId}/status`,
+        {
+          method: 'PATCH',
+          headers: {
+            Authorization: `Bearer ${publicAnonKey}`,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ status: 'archived' }),
+        }
+      );
+
+      const data = await response.json();
+      if (data.success) {
+        handleRefresh();
+      }
+    } catch (error) {
+      console.error('Erreur archivage:', error);
+    }
+  };
+
+  const handleUnarchiveProspect = async (prospectId: string) => {
+    try {
+      const response = await fetch(
+        `https://${projectId}.supabase.co/functions/v1/make-server-10092a63/prospects/${prospectId}/status`,
+        {
+          method: 'PATCH',
+          headers: {
+            Authorization: `Bearer ${publicAnonKey}`,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ status: 'new' }),
+        }
+      );
+
+      const data = await response.json();
+      if (data.success) {
+        handleRefresh();
+      }
+    } catch (error) {
+      console.error('Erreur désarchivage:', error);
+    }
+  };
+
+  const handleDeleteProspect = async (prospectId: string) => {
+    if (!confirm('⚠️ Supprimer définitivement ce prospect ?\n\nCette action est IRRÉVERSIBLE.')) return;
+
+    try {
+      const response = await fetch(
+        `https://${projectId}.supabase.co/functions/v1/make-server-10092a63/prospects/${prospectId}`,
+        {
+          method: 'DELETE',
+          headers: {
+            Authorization: `Bearer ${publicAnonKey}`,
+            'Content-Type': 'application/json',
+          },
+        }
+      );
+
+      const data = await response.json();
+      if (data.success) {
+        handleRefresh();
+      }
+    } catch (error) {
+      console.error('Erreur suppression:', error);
+    }
+  };
+
+  // Sélection multiple
+  const toggleSelectAll = () => {
+    if (selectedIds.size === prospects.length) {
+      setSelectedIds(new Set());
+    } else {
+      setSelectedIds(new Set(prospects.map(p => p.id)));
+    }
+  };
+
+  const toggleSelectProspect = (prospectId: string) => {
+    const newSelectedIds = new Set(selectedIds);
+    if (newSelectedIds.has(prospectId)) {
+      newSelectedIds.delete(prospectId);
+    } else {
+      newSelectedIds.add(prospectId);
+    }
+    setSelectedIds(newSelectedIds);
   };
 
   const KPI_CARDS = [
@@ -224,8 +399,17 @@ export function ProspectsPage() {
     { id: 'waitlist' as ProspectType, label: 'Waitlist', count: stats?.total_waitlist || 0 },
   ];
 
+  const STATUS_CHIPS = [
+    { id: 'all', label: 'Tous les statuts', icon: ClipboardList },
+    { id: 'new', label: 'Nouveau', icon: AlertCircle },
+    { id: 'contacted', label: 'Contacté', icon: Phone },
+    { id: 'qualified', label: 'Qualifié', icon: CheckSquare },
+    { id: 'converted', label: 'Converti', icon: UserCheck },
+    { id: 'lost', label: 'Perdu', icon: XCircle },
+  ];
+
   return (
-    <div className="space-y-8">
+    <div className="space-y-6">
       {/* Setup Banner (if tables don't exist) */}
       {needsSetup && <ProspectsSetupBanner />}
 
@@ -234,48 +418,43 @@ export function ProspectsPage() {
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.4 }}
-        className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4"
       >
-        <div>
-          <h1 className="text-slate-900">Prospects & relances</h1>
-          <p className="text-slate-600 text-sm mt-1">
-            Gérez vos prospects collectés depuis la landing page (waitlist + contact) et autres sources.
-          </p>
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-slate-900">Prospects & relances</h1>
+            <p className="text-slate-600 text-sm mt-1">
+              Gérez vos prospects collectés depuis la landing page (waitlist + contact) et autres sources.
+            </p>
+          </div>
+          <Button variant="outline" size="sm" className="gap-2" onClick={handleRefresh}>
+            <RefreshCw className="w-4 h-4" />
+            Actualiser
+          </Button>
         </div>
-        <Button variant="outline" size="sm" className="gap-2" onClick={handleRefresh}>
-          <RefreshCw className="w-4 h-4" />
-          <span className="hidden sm:inline">Actualiser</span>
-        </Button>
       </motion.div>
 
-      {/* KPI Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+      {/* KPI Cards - Compact version */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         {KPI_CARDS.map((kpi, index) => (
           <motion.div
             key={index}
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: index * 0.1, duration: 0.4 }}
+            transition={{ delay: index * 0.05, duration: 0.3 }}
           >
-            <Card className="border-slate-200 shadow-md hover:shadow-lg transition-shadow">
-              <CardContent className="p-6">
-                <div className="flex items-start justify-between mb-4">
-                  <div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${kpi.gradient} flex items-center justify-center shadow-lg`}>
-                    <kpi.icon className="w-6 h-6 text-white" />
-                  </div>
+            <Card className="border-slate-200 bg-white hover:shadow-md transition-shadow">
+              <CardContent className="p-5">
+                <div className={`w-12 h-12 rounded-2xl bg-gradient-to-br ${kpi.gradient} flex items-center justify-center mb-4`}>
+                  <kpi.icon className="w-6 h-6 text-white" />
                 </div>
-                <div className="space-y-2">
-                  <div className="text-slate-900 text-2xl">{kpi.value}</div>
-                  <div className="text-slate-600 text-sm">{kpi.label}</div>
-                  <div className="text-cyan-600 text-xs">{kpi.sublabel}</div>
-                  <div className="mt-3">
-                    <div className="h-2 bg-slate-100 rounded-full overflow-hidden">
-                      <div
-                        className={`h-full bg-gradient-to-r ${kpi.gradient} rounded-full transition-all duration-500`}
-                        style={{ width: `${Math.min(kpi.progress, 100)}%` }}
-                      />
-                    </div>
-                  </div>
+                <div className="text-slate-900 text-3xl mb-1">{kpi.value}</div>
+                <div className="text-slate-600 text-sm mb-1">{kpi.label}</div>
+                <div className="text-cyan-600 text-xs mb-3">{kpi.sublabel}</div>
+                <div className="h-1.5 bg-slate-100 rounded-full overflow-hidden">
+                  <div
+                    className={`h-full bg-gradient-to-r ${kpi.gradient} rounded-full transition-all duration-500`}
+                    style={{ width: `${Math.min(kpi.progress, 100)}%` }}
+                  />
                 </div>
               </CardContent>
             </Card>
@@ -287,24 +466,45 @@ export function ProspectsPage() {
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
-        transition={{ delay: 0.4, duration: 0.4 }}
-        className="space-y-4"
+        transition={{ delay: 0.2, duration: 0.3 }}
+        className="space-y-3"
       >
         {/* Type filters */}
-        <div className="flex flex-wrap items-center gap-3">
+        <div className="flex flex-wrap items-center gap-2">
           {TYPE_CHIPS.map((chip) => (
             <button
               key={chip.id}
               onClick={() => setActiveFilter(chip.id)}
-              className={`px-4 py-2 rounded-full text-sm transition-all ${
+              className={`px-3 py-1.5 rounded-lg text-sm transition-all ${
                 activeFilter === chip.id
-                  ? 'bg-gradient-to-r from-blue-500 to-cyan-500 text-white shadow-lg'
-                  : 'bg-slate-100 text-slate-600 hover:bg-slate-200 border border-slate-200'
+                  ? 'bg-blue-500 text-white shadow-md'
+                  : 'bg-white text-slate-700 hover:bg-slate-50 border border-slate-200'
               }`}
             >
               {chip.label} ({chip.count})
             </button>
           ))}
+        </div>
+
+        {/* Status filters */}
+        <div className="flex flex-wrap items-center gap-2">
+          {STATUS_CHIPS.map((chip) => {
+            const Icon = chip.icon;
+            return (
+              <button
+                key={chip.id}
+                onClick={() => setActiveStatusFilter(chip.id)}
+                className={`px-3 py-1.5 rounded-lg text-sm flex items-center gap-1.5 transition-all ${
+                  activeStatusFilter === chip.id
+                    ? 'bg-blue-500 text-white shadow-md'
+                    : 'bg-white text-slate-700 hover:bg-slate-50 border border-slate-200'
+                }`}
+              >
+                <Icon className="w-3.5 h-3.5" />
+                {chip.label}
+              </button>
+            );
+          })}
         </div>
 
         {/* Search & New */}
@@ -318,6 +518,18 @@ export function ProspectsPage() {
               className="pl-10 bg-white border-slate-200"
             />
           </div>
+          
+          {/* Toggle Archivés */}
+          <Button
+            variant="outline"
+            size="default"
+            onClick={() => setShowArchived(!showArchived)}
+            className={`gap-2 ${showArchived ? 'bg-slate-200 border-slate-400' : ''}`}
+          >
+            {showArchived ? <ArchiveX className="w-4 h-4" /> : <Archive className="w-4 h-4" />}
+            {showArchived ? 'Masquer archivés' : 'Afficher archivés'}
+          </Button>
+
           <Button className="bg-gradient-to-r from-blue-500 to-cyan-500 hover:from-blue-600 hover:to-cyan-600 text-white shadow-md gap-2" onClick={() => setNewProspectDialogOpen(true)}>
             <Plus className="w-4 h-4" />
             Nouveau prospect
@@ -358,6 +570,21 @@ export function ProspectsPage() {
                   <table className="w-full">
                     <thead>
                       <tr className="bg-slate-50 border-b border-slate-200">
+                        <th className="px-4 py-3 text-left w-12">
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              toggleSelectAll();
+                            }}
+                            className="w-5 h-5 flex items-center justify-center rounded border-2 border-slate-300 hover:border-cyan-500 transition-colors"
+                          >
+                            {selectedIds.size === prospects.length && prospects.length > 0 ? (
+                              <CheckSquare className="w-4 h-4 text-cyan-600" />
+                            ) : (
+                              <Square className="w-4 h-4 text-slate-400" />
+                            )}
+                          </button>
+                        </th>
                         <th className="px-4 py-3 text-left text-sm text-slate-600 w-32">Type/Source</th>
                         <th className="px-4 py-3 text-left text-sm text-slate-600 min-w-[200px]">Contact</th>
                         <th className="px-4 py-3 text-left text-sm text-slate-600 w-32">Entreprise</th>
@@ -365,25 +592,43 @@ export function ProspectsPage() {
                         <th className="px-4 py-3 text-left text-sm text-slate-600 w-32">Besoin</th>
                         <th className="px-4 py-3 text-left text-sm text-slate-600 w-32">Statut</th>
                         <th className="px-4 py-3 text-left text-sm text-slate-600 w-32">Date</th>
+                        <th className="px-4 py-3 text-left text-sm text-slate-600 w-20">Actions</th>
                       </tr>
                     </thead>
                     <tbody>
                       {prospects.map((prospect, idx) => {
                         const typeBadge = TYPE_BADGES[prospect.type as keyof typeof TYPE_BADGES] || TYPE_BADGES.contact;
-                        const statusBadge = STATUS_BADGES[prospect.status];
+                        const statusBadge = STATUS_BADGES[prospect.status as keyof typeof STATUS_BADGES] || { bg: '#e5e7eb', text: '#374151', label: prospect.status };
                         const TypeIcon = typeBadge.icon;
                         const countryFlag = COUNTRY_FLAGS[prospect.country_code || ''] || '🌍';
                         const avatarColor = AVATAR_COLORS[idx % AVATAR_COLORS.length];
+                        const isSelected = selectedIds.has(prospect.id);
 
                         return (
                           <tr
                             key={prospect.id}
                             data-prospect-id={prospect.id}
-                            onClick={() => setSelectedProspect(prospect)}
-                            className="border-b border-slate-100 hover:bg-slate-50 transition-colors cursor-pointer"
+                            className={`border-b border-slate-100 hover:bg-slate-50 transition-colors ${
+                              isSelected ? 'bg-cyan-50/50' : ''
+                            }`}
                           >
                             <td className="px-4 py-4">
-                              <div className="space-y-1">
+                              <button
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  toggleSelectProspect(prospect.id);
+                                }}
+                                className="w-5 h-5 flex items-center justify-center rounded border-2 border-slate-300 hover:border-cyan-500 transition-colors"
+                              >
+                                {isSelected ? (
+                                  <CheckSquare className="w-4 h-4 text-cyan-600" />
+                                ) : (
+                                  <Square className="w-4 h-4 text-slate-400" />
+                                )}
+                              </button>
+                            </td>
+                            <td className="px-4 py-4" onClick={() => setSelectedProspect(prospect)}>
+                              <div className="space-y-1 cursor-pointer">
                                 <span
                                   className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs"
                                   style={{ backgroundColor: typeBadge.bg, color: typeBadge.text }}
@@ -394,21 +639,21 @@ export function ProspectsPage() {
                                 <p className="text-xs text-slate-500">{prospect.source}</p>
                               </div>
                             </td>
-                            <td className="px-4 py-4">
+                            <td className="px-4 py-4 cursor-pointer" onClick={() => setSelectedProspect(prospect)}>
                               <div>
                                 <p className="text-sm text-slate-900">{prospect.name || prospect.email}</p>
                                 <p className="text-xs text-slate-500">{prospect.email}</p>
                               </div>
                             </td>
-                            <td className="px-4 py-4 text-sm text-slate-600">{prospect.company || '—'}</td>
-                            <td className="px-4 py-4 text-sm text-slate-900">
+                            <td className="px-4 py-4 text-sm text-slate-600 cursor-pointer" onClick={() => setSelectedProspect(prospect)}>{prospect.company || '—'}</td>
+                            <td className="px-4 py-4 text-sm text-slate-900 cursor-pointer" onClick={() => setSelectedProspect(prospect)}>
                               <span className="flex items-center gap-1.5">
                                 <span className="text-base">{countryFlag}</span>
                                 {prospect.country_code || '—'}
                               </span>
                             </td>
-                            <td className="px-4 py-4 text-xs text-slate-600">{prospect.need_type || prospect.sector || '—'}</td>
-                            <td className="px-4 py-4">
+                            <td className="px-4 py-4 text-xs text-slate-600 cursor-pointer" onClick={() => setSelectedProspect(prospect)}>{prospect.need_type || prospect.sector || '—'}</td>
+                            <td className="px-4 py-4 cursor-pointer" onClick={() => setSelectedProspect(prospect)}>
                               <span
                                 className="inline-block px-2.5 py-1 rounded-md text-xs"
                                 style={{ backgroundColor: statusBadge.bg, color: statusBadge.text }}
@@ -416,8 +661,57 @@ export function ProspectsPage() {
                                 {statusBadge.label}
                               </span>
                             </td>
-                            <td className="px-4 py-4 text-xs text-slate-600">
+                            <td className="px-4 py-4 text-xs text-slate-600 cursor-pointer" onClick={() => setSelectedProspect(prospect)}>
                               {new Date(prospect.created_at).toLocaleDateString('fr-FR')}
+                            </td>
+                            <td className="px-4 py-4">
+                              <div className="relative group">
+                                <Button
+                                  variant="ghost"
+                                  size="sm"
+                                  className="w-8 h-8 p-0"
+                                  onClick={(e) => e.stopPropagation()}
+                                >
+                                  <MoreVertical className="w-4 h-4 text-slate-400" />
+                                </Button>
+                                
+                                {/* Menu déroulant */}
+                                <div className="absolute right-0 top-full mt-1 w-48 bg-white border border-slate-200 rounded-lg shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-50">
+                                  {prospect.status === 'archived' ? (
+                                    <button
+                                      onClick={(e) => {
+                                        e.stopPropagation();
+                                        handleUnarchiveProspect(prospect.id);
+                                      }}
+                                      className="w-full flex items-center gap-2 px-4 py-2.5 text-sm text-left hover:bg-slate-50 transition-colors text-green-600"
+                                    >
+                                      <ArchiveX className="w-4 h-4" />
+                                      Désarchiver
+                                    </button>
+                                  ) : (
+                                    <button
+                                      onClick={(e) => {
+                                        e.stopPropagation();
+                                        handleArchiveProspect(prospect.id);
+                                      }}
+                                      className="w-full flex items-center gap-2 px-4 py-2.5 text-sm text-left hover:bg-slate-50 transition-colors text-slate-700"
+                                    >
+                                      <Archive className="w-4 h-4" />
+                                      Archiver
+                                    </button>
+                                  )}
+                                  <button
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      handleDeleteProspect(prospect.id);
+                                    }}
+                                    className="w-full flex items-center gap-2 px-4 py-2.5 text-sm text-left hover:bg-red-50 transition-colors text-red-600 border-t border-slate-100"
+                                  >
+                                    <Trash2 className="w-4 h-4" />
+                                    Supprimer définitivement
+                                  </button>
+                                </div>
+                              </div>
                             </td>
                           </tr>
                         );
@@ -476,6 +770,65 @@ export function ProspectsPage() {
           setNewProspectDialogOpen(false);
         }}
       />
+
+      {/* Barre d'actions groupées flottante */}
+      <AnimatePresence>
+        {selectedIds.size > 0 && (
+          <motion.div
+            initial={{ opacity: 0, y: 100 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: 100 }}
+            transition={{ type: 'spring', damping: 25, stiffness: 300 }}
+            className="fixed bottom-8 left-1/2 -translate-x-1/2 z-50"
+          >
+            <div className="bg-gradient-to-r from-blue-600 to-cyan-600 text-white px-8 py-4 rounded-2xl shadow-2xl border border-white/20 backdrop-blur-lg">
+              <div className="flex items-center gap-6">
+                <div className="flex items-center gap-2">
+                  <CheckSquare className="w-5 h-5" />
+                  <span className="text-sm">{selectedIds.size} prospect{selectedIds.size > 1 ? 's' : ''} sélectionné{selectedIds.size > 1 ? 's' : ''}</span>
+                </div>
+                
+                <div className="w-px h-8 bg-white/30" />
+                
+                <div className="flex items-center gap-3">
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={handleBulkArchive}
+                    disabled={isPerformingBulkAction}
+                    className="text-white hover:bg-white/20 backdrop-blur-sm gap-2"
+                  >
+                    <Archive className="w-4 h-4" />
+                    Archiver
+                  </Button>
+                  
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={handleBulkDelete}
+                    disabled={isPerformingBulkAction}
+                    className="text-white hover:bg-red-500/50 backdrop-blur-sm gap-2"
+                  >
+                    <Trash2 className="w-4 h-4" />
+                    Supprimer
+                  </Button>
+                  
+                  <div className="w-px h-8 bg-white/30" />
+                  
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => setSelectedIds(new Set())}
+                    className="text-white hover:bg-white/20 backdrop-blur-sm"
+                  >
+                    <XCircle className="w-4 h-4" />
+                  </Button>
+                </div>
+              </div>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }
