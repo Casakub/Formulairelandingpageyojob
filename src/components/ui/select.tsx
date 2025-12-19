@@ -204,7 +204,7 @@ export function SelectContent({ children, className = '' }: SelectContentProps) 
         width: `${position.width}px`,
         zIndex: 99999
       }}
-      className={`max-h-60 overflow-auto rounded-md shadow-lg ${className}`}
+      className={`max-h-60 overflow-y-auto rounded-md shadow-lg ${className}`}
     >
       {children}
     </div>,
@@ -228,8 +228,8 @@ export function SelectItem({ value, children, className = '' }: SelectItemProps)
     <button
       type="button"
       onClick={handleClick}
-      className={`w-full text-left px-3 py-2 text-sm hover:bg-slate-100 focus:bg-slate-100 cursor-pointer ${
-        isSelected ? 'bg-slate-100 font-medium' : ''
+      className={`w-full text-left px-3 py-2 text-sm cursor-pointer ${
+        isSelected ? 'font-medium' : ''
       } ${className}`}
     >
       {children}
