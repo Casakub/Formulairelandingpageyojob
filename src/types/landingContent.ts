@@ -50,6 +50,7 @@ export interface ServiceItem {
   title: string;
   description: string;
   linkLabel: string;
+  href?: string;
 }
 
 export interface ServicesContent {

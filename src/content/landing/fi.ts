@@ -274,10 +274,10 @@ export const landingContentFI: LandingPageContent = {
       services: {
         title: 'Palvelut',
         links: [
-          { label: 'Eurooppalainen vuokratyö', href: '#interim' },
-          { label: 'Erikoistunut rekrytointi', href: '#recrutement' },
-          { label: 'Neuvonta ja noudattaminen', href: '#conseil' },
-          { label: 'Työntekijöiden lähettäminen', href: '#detachement' },
+          { label: 'Eurooppalainen vuokratyö', href: '/services/interim-europeen' },
+          { label: 'Erikoistunut rekrytointi', href: '/services/recrutement-specialise' },
+          { label: 'Neuvonta ja noudattaminen', href: '/services/conseil-conformite' },
+          { label: 'Työntekijöiden lähettäminen', href: '/services/detachement-personnel' },
         ],
       },
       company: {

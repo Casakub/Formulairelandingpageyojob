@@ -274,10 +274,10 @@ export const landingContentNL: LandingPageContent = {
       services: {
         title: 'Diensten',
         links: [
-          { label: 'Europees uitzendwerk', href: '#interim' },
-          { label: 'Gespecialiseerde werving', href: '#recrutement' },
-          { label: 'Advies & Naleving', href: '#conseil' },
-          { label: 'Detachering van werknemers', href: '#detachement' },
+          { label: 'Europees uitzendwerk', href: '/services/interim-europeen' },
+          { label: 'Gespecialiseerde werving', href: '/services/recrutement-specialise' },
+          { label: 'Advies & Naleving', href: '/services/conseil-conformite' },
+          { label: 'Detachering van personeel', href: '/services/detachement-personnel' },
         ],
       },
       company: {

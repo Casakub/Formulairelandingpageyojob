@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'motion/react';
+import { Link } from './components/Link';
 import { 
   FileText, 
   Building2, 
@@ -987,16 +988,14 @@ export default function CGV() {
                 ces Conditions Générales de Vente.
               </p>
               <div className="flex flex-wrap gap-4 justify-center">
-                <Button
-                  className="bg-gradient-to-r from-cyan-500 to-violet-500 hover:from-cyan-600 hover:to-violet-600 text-white shadow-lg shadow-cyan-500/30"
-                  onClick={() => {
-                    window.history.pushState({}, '', '/');
-                    window.dispatchEvent(new PopStateEvent('popstate'));
-                  }}
-                >
-                  <ArrowLeft className="w-4 h-4 mr-2" />
-                  Retour à l'accueil
-                </Button>
+                <Link href="/">
+                  <Button
+                    className="bg-gradient-to-r from-cyan-500 to-violet-500 hover:from-cyan-600 hover:to-violet-600 text-white shadow-lg shadow-cyan-500/30"
+                  >
+                    <ArrowLeft className="w-4 h-4 mr-2" />
+                    Retour à l'accueil
+                  </Button>
+                </Link>
                 <Button
                   className="relative overflow-hidden group rounded-full bg-gradient-to-r from-cyan-500 to-blue-600 text-white hover:from-cyan-400 hover:to-blue-500 shadow-xl hover:shadow-cyan-500/50 transition-all duration-300 border-0"
                   onClick={() => window.location.href = `mailto:${dpoEmail}`}

@@ -48,6 +48,7 @@ import { TestimonialCarousel } from './components/landing/TestimonialCarousel';
 import { LanguageSelector } from './components/landing/LanguageSelector';
 import { useLandingTranslations } from './hooks/useLandingTranslations';
 import { SEOHead } from './components/SEOHead';
+import { Link } from './components/Link';
 import { log, loggers } from './lib/logger';
 import { getAllLanguageCodes } from './lib/languages';
 import { projectId, publicAnonKey } from './utils/supabase/info';
@@ -465,11 +466,11 @@ export default function AppLanding() {
             >
               Réessayer
             </Button>
-            <a href="/admin">
+            <Link href="/admin">
               <Button className="bg-cyan-500 text-white hover:bg-cyan-600">
                 Aller au Dashboard
               </Button>
-            </a>
+            </Link>
           </div>
           <p className="text-red-300 text-xs mt-4">💡 Consultez <code>/MIGRATION_GUIDE.md</code> pour le guide complet</p>
         </div>
@@ -494,11 +495,11 @@ export default function AppLanding() {
             <p className="text-orange-200 pl-5">Cherchez la card "Migration vers Supabase"</p>
             <p className="text-orange-200 pl-5">Cliquez sur "Lancer la migration"</p>
           </div>
-          <a href="/admin">
+          <Link href="/admin">
             <Button className="bg-white text-orange-900 hover:bg-orange-50 w-full">
               Aller au Dashboard
             </Button>
-          </a>
+          </Link>
           <p className="text-orange-300 text-xs mt-4">⚡ Migration en ~1 minute</p>
         </div>
       </div>
@@ -1129,6 +1130,13 @@ export default function AppLanding() {
                 { bg: 'purple', border: 'purple', shadow: 'rgba(124,58,237,0.5)', shadowHover: 'rgba(124,58,237,0.8)' },
               ][index] || { bg: 'blue', border: 'blue', shadow: 'rgba(59,130,246,0.5)', shadowHover: 'rgba(59,130,246,0.8)' };
               
+              // 🔗 URLs fixes pour les 3 pages de services (ne changent pas selon la langue)
+              const serviceUrls = [
+                '/services/interim-europeen',
+                '/services/recrutement-specialise', 
+                '/services/conseil-conformite'
+              ];
+              
               const IconComponent = ICON_MAP[service.icon] || Users;
               
               return (
@@ -1159,10 +1167,10 @@ export default function AppLanding() {
                       <p className="text-gray-300 text-center text-sm leading-relaxed mb-4">
                         {service.description}
                       </p>
-                      <a href="#contact" className="text-cyan-400 hover:text-cyan-300 flex items-center justify-center gap-2 group/link">
+                      <Link href={serviceUrls[index] || service.href || '#contact'} className="text-cyan-400 hover:text-cyan-300 flex items-center justify-center gap-2 group/link">
                         {service.linkLabel || 'Learn more'}
                         <ArrowRight className="w-4 h-4 group-hover/link:translate-x-1 transition-transform" />
-                      </a>
+                      </Link>
                     </CardContent>
                   </Card>
                 </motion.div>

@@ -274,10 +274,10 @@ export const landingContentSK: LandingPageContent = {
       services: {
         title: 'Služby',
         links: [
-          { label: 'Európska agentúrna práca', href: '#interim' },
-          { label: 'Špecializovaný nábor', href: '#recrutement' },
-          { label: 'Poradenstvo a súlad', href: '#conseil' },
-          { label: 'Vyslanie pracovníkov', href: '#detachement' },
+          { label: 'Európska agentúrna práca', href: '/services/interim-europeen' },
+          { label: 'Špecializovaný nábor', href: '/services/recrutement-specialise' },
+          { label: 'Poradenstvo a zhoda', href: '/services/conseil-conformite' },
+          { label: 'Vysielanie pracovníkov', href: '/services/detachement-personnel' },
         ],
       },
       company: {

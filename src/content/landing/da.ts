@@ -274,10 +274,10 @@ export const landingContentDA: LandingPageContent = {
       services: {
         title: 'Tjenester',
         links: [
-          { label: 'Europæisk vikarbureauarbejde', href: '#interim' },
-          { label: 'Specialiseret rekruttering', href: '#recrutement' },
-          { label: 'Rådgivning og overholdelse', href: '#conseil' },
-          { label: 'Udstationering af medarbejdere', href: '#detachement' },
+          { label: 'Europæisk vikarbureauarbejde', href: '/services/interim-europeen' },
+          { label: 'Specialiseret rekruttering', href: '/services/recrutement-specialise' },
+          { label: 'Rådgivning og overholdelse', href: '/services/conseil-conformite' },
+          { label: 'Udstationering af medarbejdere', href: '/services/detachement-personnel' },
         ],
       },
       company: {

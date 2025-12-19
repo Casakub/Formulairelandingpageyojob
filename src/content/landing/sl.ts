@@ -274,10 +274,10 @@ export const landingContentSL: LandingPageContent = {
       services: {
         title: 'Storitve',
         links: [
-          { label: 'Evropsko začasno delo', href: '#interim' },
-          { label: 'Specializirano zaposlovanje', href: '#recrutement' },
-          { label: 'Svetovanje in skladnost', href: '#conseil' },
-          { label: 'Napotitev delavcev', href: '#detachement' },
+          { label: 'Evropsko začasno delo', href: '/services/interim-europeen' },
+          { label: 'Specializirano zaposlovanje', href: '/services/recrutement-specialise' },
+          { label: 'Svetovanje in skladnost', href: '/services/conseil-conformite' },
+          { label: 'Napotitev delavcev', href: '/services/detachement-personnel' },
         ],
       },
       company: {

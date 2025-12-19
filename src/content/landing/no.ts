@@ -274,10 +274,10 @@ export const landingContentNO: LandingPageContent = {
       services: {
         title: 'Tjenester',
         links: [
-          { label: 'Europeisk vikarbyråtjenester', href: '#interim' },
-          { label: 'Spesialisert rekruttering', href: '#recrutement' },
-          { label: 'Rådgivning og etterlevelse', href: '#conseil' },
-          { label: 'Arbeidstakerutstasjonering', href: '#detachement' },
+          { label: 'Europeisk vikarbyråtjenester', href: '/services/interim-europeen' },
+          { label: 'Spesialisert rekruttering', href: '/services/recrutement-specialise' },
+          { label: 'Rådgivning og overholdelse', href: '/services/conseil-conformite' },
+          { label: 'Utstasjonering av ansatte', href: '/services/detachement-personnel' },
         ],
       },
       company: {

@@ -274,10 +274,10 @@ export const landingContentHR: LandingPageContent = {
       services: {
         title: 'Usluge',
         links: [
-          { label: 'Europski privremeni rad', href: '#interim' },
-          { label: 'Specijalizirano zapošljavanje', href: '#recrutement' },
-          { label: 'Savjetovanje i usklađenost', href: '#conseil' },
-          { label: 'Upućivanje radnika', href: '#detachement' },
+          { label: 'Europski privremeni rad', href: '/services/interim-europeen' },
+          { label: 'Specijalizirano zapošljavanje', href: '/services/recrutement-specialise' },
+          { label: 'Savjetovanje i usklađenost', href: '/services/conseil-conformite' },
+          { label: 'Upućivanje radnika', href: '/services/detachement-personnel' },
         ],
       },
       company: {

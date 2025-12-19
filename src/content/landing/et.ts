@@ -274,10 +274,10 @@ export const landingContentET: LandingPageContent = {
       services: {
         title: 'Teenused',
         links: [
-          { label: 'Euroopa ajutine töö', href: '#interim' },
-          { label: 'Spetsialiseeritud värbamine', href: '#recrutement' },
-          { label: 'Nõustamine ja vastavus', href: '#conseil' },
-          { label: 'Töötajate lähetamine', href: '#detachement' },
+          { label: 'Euroopa ajutine töö', href: '/services/interim-europeen' },
+          { label: 'Spetsialiseeritud värbamine', href: '/services/recrutement-specialise' },
+          { label: 'Nõustamine ja vastavus', href: '/services/conseil-conformite' },
+          { label: 'Töötajate lähetamine', href: '/services/detachement-personnel' },
         ],
       },
       company: {

@@ -274,10 +274,10 @@ export const landingContentHU: LandingPageContent = {
       services: {
         title: 'Szolgáltatások',
         links: [
-          { label: 'Európai időszakos foglalkoztatás', href: '#interim' },
-          { label: 'Specializált toborzás', href: '#recrutement' },
-          { label: 'Tanácsadás és megfelelés', href: '#conseil' },
-          { label: 'Munkavállalók kiküldetése', href: '#detachement' },
+          { label: 'Európai időszakos foglalkoztatás', href: '/services/interim-europeen' },
+          { label: 'Specializált toborzás', href: '/services/recrutement-specialise' },
+          { label: 'Tanácsadás és megfelelés', href: '/services/conseil-conformite' },
+          { label: 'Munkavállalók kiküldetése', href: '/services/detachement-personnel' },
         ],
       },
       company: {

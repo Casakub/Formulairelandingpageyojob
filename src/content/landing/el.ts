@@ -274,10 +274,10 @@ export const landingContentEL: LandingPageContent = {
       services: {
         title: 'Υπηρεσίες',
         links: [
-          { label: 'Ευρωπαϊκή προσωρινή εργασία', href: '#interim' },
-          { label: 'Εξειδικευμένη πρόσληψη', href: '#recrutement' },
-          { label: 'Συμβουλευτική και συμμόρφωση', href: '#conseil' },
-          { label: 'Απόσπαση εργαζομένων', href: '#detachement' },
+          { label: 'Ευρωπαϊκή προσωρινή εργασία', href: '/services/interim-europeen' },
+          { label: 'Εξειδικευμένη πρόσληψη', href: '/services/recrutement-specialise' },
+          { label: 'Συμβουλευτική και συμμόρφωση', href: '/services/conseil-conformite' },
+          { label: 'Απόσπαση εργαζομένων', href: '/services/detachement-personnel' },
         ],
       },
       company: {

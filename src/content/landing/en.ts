@@ -107,18 +107,21 @@ export const landingContentEN: LandingPageContent = {
         title: 'European Temporary Work',
         description: 'Recruitment of temporary staff throughout Europe with complete formalities management.',
         linkLabel: 'Learn more',
+        href: '/services/interim-europeen',
       },
       {
         icon: 'Target',
         title: 'Specialized Recruitment',
         description: 'Find the talents you need thanks to our network of sector experts.',
         linkLabel: 'Learn more',
+        href: '/services/recrutement-specialise',
       },
       {
         icon: 'ShieldCheck',
         title: 'Consulting & Compliance',
         description: 'Ensure compliance with all European regulations on posting.',
         linkLabel: 'Learn more',
+        href: '/services/conseil-conformite',
       },
     ],
   },
@@ -274,10 +277,10 @@ export const landingContentEN: LandingPageContent = {
       services: {
         title: 'Services',
         links: [
-          { label: 'European Temporary Work', href: '#interim' },
-          { label: 'Specialized Recruitment', href: '#recrutement' },
-          { label: 'Consulting & Compliance', href: '#conseil' },
-          { label: 'Posted Workers', href: '#detachement' },
+          { label: 'European Temporary Work', href: '/services/interim-europeen' },
+          { label: 'Specialized Recruitment', href: '/services/recrutement-specialise' },
+          { label: 'Consulting & Compliance', href: '/services/conseil-conformite' },
+          { label: 'Posted Workers', href: '/services/detachement-personnel' },
         ],
       },
       company: {

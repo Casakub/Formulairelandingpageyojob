@@ -274,10 +274,10 @@ export const landingContentLV: LandingPageContent = {
       services: {
         title: 'Pakalpojumi',
         links: [
-          { label: 'Eiropas pagaidu darbs', href: '#interim' },
-          { label: 'Specializēta darbā pieņemšana', href: '#recrutement' },
-          { label: 'Konsultācijas un atbilstība', href: '#conseil' },
-          { label: 'Darbinieku norīkošana', href: '#detachement' },
+          { label: 'Eiropas pagaidu darbs', href: '/services/interim-europeen' },
+          { label: 'Specializēta darbā pieņemšana', href: '/services/recrutement-specialise' },
+          { label: 'Konsultācijas un atbilstība', href: '/services/conseil-conformite' },
+          { label: 'Darbinieku norīkošana', href: '/services/detachement-personnel' },
         ],
       },
       company: {

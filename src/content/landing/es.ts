@@ -107,18 +107,21 @@ export const landingContentES: LandingPageContent = {
         title: 'Trabajo temporal europeo',
         description: 'Reclutamiento de personal temporal en toda Europa con gestión completa de las formalidades.',
         linkLabel: 'Saber más',
+        href: '/services/interim-europeen',
       },
       {
         icon: 'Target',
         title: 'Reclutamiento especializado',
         description: 'Encuentre los talentos que necesita gracias a nuestra red de expertos sectoriales.',
         linkLabel: 'Saber más',
+        href: '/services/recrutement-specialise',
       },
       {
         icon: 'ShieldCheck',
         title: 'Consultoría & Conformidad',
         description: 'Asegúrese de respetar todas las regulaciones europeas en materia de desplazamiento.',
         linkLabel: 'Saber más',
+        href: '/services/conseil-conformite',
       },
     ],
   },
@@ -274,10 +277,10 @@ export const landingContentES: LandingPageContent = {
       services: {
         title: 'Servicios',
         links: [
-          { label: 'Trabajo temporal europeo', href: '#interim' },
-          { label: 'Reclutamiento especializado', href: '#recrutement' },
-          { label: 'Consultoría & Conformidad', href: '#conseil' },
-          { label: 'Desplazamiento de personal', href: '#detachement' },
+          { label: 'Trabajo temporal europeo', href: '/services/interim-europeen' },
+          { label: 'Reclutamiento especializado', href: '/services/recrutement-specialise' },
+          { label: 'Consultoría & Conformidad', href: '/services/conseil-conformite' },
+          { label: 'Desplazamiento de personal', href: '/services/detachement-personnel' },
         ],
       },
       company: {

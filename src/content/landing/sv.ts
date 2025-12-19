@@ -274,10 +274,10 @@ export const landingContentSV: LandingPageContent = {
       services: {
         title: 'Tjänster',
         links: [
-          { label: 'Europeisk bemanning', href: '#interim' },
-          { label: 'Specialiserad rekrytering', href: '#recrutement' },
-          { label: 'Rådgivning och efterlevnad', href: '#conseil' },
-          { label: 'Utstationering av arbetstagare', href: '#detachement' },
+          { label: 'Europeisk bemanning', href: '/services/interim-europeen' },
+          { label: 'Specialiserad rekrytering', href: '/services/recrutement-specialise' },
+          { label: 'Rådgivning och efterlevnad', href: '/services/conseil-conformite' },
+          { label: 'Utstationering av personal', href: '/services/detachement-personnel' },
         ],
       },
       company: {

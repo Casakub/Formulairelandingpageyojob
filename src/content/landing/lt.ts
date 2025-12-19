@@ -274,10 +274,10 @@ export const landingContentLT: LandingPageContent = {
       services: {
         title: 'Paslaugos',
         links: [
-          { label: 'Europos laikinas darbas', href: '#interim' },
-          { label: 'Specializuotas įdarbinimas', href: '#recrutement' },
-          { label: 'Konsultacijos ir atitikimas', href: '#conseil' },
-          { label: 'Darbuotojų komandiruotės', href: '#detachement' },
+          { label: 'Europos laikinas darbas', href: '/services/interim-europeen' },
+          { label: 'Specializuotas įdarbinimas', href: '/services/recrutement-specialise' },
+          { label: 'Konsultacijos ir atitikimas', href: '/services/conseil-conformite' },
+          { label: 'Darbuotojų komandiruotės', href: '/services/detachement-personnel' },
         ],
       },
       company: {

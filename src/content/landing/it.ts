@@ -274,10 +274,10 @@ export const landingContentIT: LandingPageContent = {
       services: {
         title: 'Servizi',
         links: [
-          { label: 'Lavoro temporaneo europeo', href: '#interim' },
-          { label: 'Reclutamento specializzato', href: '#recrutement' },
-          { label: 'Consulenza & Conformità', href: '#conseil' },
-          { label: 'Distacco lavoratori', href: '#detachement' },
+          { label: 'Lavoro temporaneo europeo', href: '/services/interim-europeen' },
+          { label: 'Reclutamento specializzato', href: '/services/recrutement-specialise' },
+          { label: 'Consulenza e conformità', href: '/services/conseil-conformite' },
+          { label: 'Distacco di personale', href: '/services/detachement-personnel' },
         ],
       },
       company: {

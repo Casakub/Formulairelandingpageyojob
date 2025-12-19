@@ -105,20 +105,23 @@ export const landingContentDE: LandingPageContent = {
       {
         icon: 'Users',
         title: 'Europäische Zeitarbeit',
-        description: 'Rekrutierung von Zeitpersonal überall in Europa mit vollständiger Verwaltung der Formalitäten.',
+        description: 'Rekrutierung von Zeitarbeitnehmern in ganz Europa mit vollständiger Verwaltung der Formalitäten.',
         linkLabel: 'Mehr erfahren',
+        href: '/services/interim-europeen',
       },
       {
         icon: 'Target',
-        title: 'Spezialisierte Personalbeschaffung',
-        description: 'Finden Sie die Talente, die Sie brauchen, dank unserem Netzwerk von Branchenexperten.',
+        title: 'Spezialisierte Rekrutierung',
+        description: 'Finden Sie die Talente, die Sie brauchen, dank unserem Netzwerk von Sektorexperten.',
         linkLabel: 'Mehr erfahren',
+        href: '/services/recrutement-specialise',
       },
       {
         icon: 'ShieldCheck',
         title: 'Beratung & Compliance',
         description: 'Stellen Sie sicher, dass Sie alle europäischen Vorschriften zur Entsendung einhalten.',
         linkLabel: 'Mehr erfahren',
+        href: '/services/conseil-conformite',
       },
     ],
   },
@@ -274,10 +277,10 @@ export const landingContentDE: LandingPageContent = {
       services: {
         title: 'Dienstleistungen',
         links: [
-          { label: 'Europäische Zeitarbeit', href: '#interim' },
-          { label: 'Spezialisierte Personalbeschaffung', href: '#recrutement' },
-          { label: 'Beratung & Compliance', href: '#conseil' },
-          { label: 'Arbeitnehmerentsendung', href: '#detachement' },
+          { label: 'Europäische Zeitarbeit', href: '/services/interim-europeen' },
+          { label: 'Spezialisierte Personalbeschaffung', href: '/services/recrutement-specialise' },
+          { label: 'Beratung & Compliance', href: '/services/conseil-conformite' },
+          { label: 'Arbeitnehmerentsendung', href: '/services/detachement-personnel' },
         ],
       },
       company: {

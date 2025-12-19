@@ -107,18 +107,21 @@ export const landingContentFR: LandingPageContent = {
         title: 'Intérim européen',
         description: 'Recrutement de personnel temporaire partout en Europe avec gestion complète des formalités.',
         linkLabel: 'En savoir plus',
+        href: '/services/interim-europeen',
       },
       {
         icon: 'Target',
         title: 'Recrutement spécialisé',
         description: 'Trouvez les talents dont vous avez besoin grâce à notre réseau d\'experts sectoriels.',
         linkLabel: 'En savoir plus',
+        href: '/services/recrutement-specialise',
       },
       {
         icon: 'ShieldCheck',
         title: 'Conseil & Conformité',
         description: 'Assurez-vous de respecter toutes les réglementations européennes en matière de détachement.',
         linkLabel: 'En savoir plus',
+        href: '/services/conseil-conformite',
       },
     ],
   },
@@ -274,10 +277,10 @@ export const landingContentFR: LandingPageContent = {
       services: {
         title: 'Services',
         links: [
-          { label: 'Intérim européen', href: '#interim' },
-          { label: 'Recrutement spécialisé', href: '#recrutement' },
-          { label: 'Conseil & Conformité', href: '#conseil' },
-          { label: 'Détachement de personnel', href: '#detachement' },
+          { label: 'Intérim européen', href: '/services/interim-europeen' },
+          { label: 'Recrutement spécialisé', href: '/services/recrutement-specialise' },
+          { label: 'Conseil & Conformité', href: '/services/conseil-conformite' },
+          { label: 'Détachement de personnel', href: '/services/detachement-personnel' },
         ],
       },
       company: {

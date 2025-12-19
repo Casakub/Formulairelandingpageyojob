@@ -274,10 +274,10 @@ export const landingContentBG: LandingPageContent = {
       services: {
         title: 'Услуги',
         links: [
-          { label: 'Европейска временна заетост', href: '#interim' },
-          { label: 'Специализирано набиране', href: '#recrutement' },
-          { label: 'Консултиране и съответствие', href: '#conseil' },
-          { label: 'Командироване на работници', href: '#detachement' },
+          { label: 'Европейска временна заетост', href: '/services/interim-europeen' },
+          { label: 'Специализирано набиране', href: '/services/recrutement-specialise' },
+          { label: 'Консултиране и съответствие', href: '/services/conseil-conformite' },
+          { label: 'Командироване на работници', href: '/services/detachement-personnel' },
         ],
       },
       company: {

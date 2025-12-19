@@ -274,10 +274,10 @@ export const landingContentRO: LandingPageContent = {
       services: {
         title: 'Servicii',
         links: [
-          { label: 'Muncă temporară europeană', href: '#interim' },
-          { label: 'Recrutare specializată', href: '#recrutement' },
-          { label: 'Consultanță și Conformitate', href: '#conseil' },
-          { label: 'Detașare lucrători', href: '#detachement' },
+          { label: 'Muncă temporară europeană', href: '/services/interim-europeen' },
+          { label: 'Recrutare specializată', href: '/services/recrutement-specialise' },
+          { label: 'Consultanță și conformitate', href: '/services/conseil-conformite' },
+          { label: 'Detașare de personal', href: '/services/detachement-personnel' },
         ],
       },
       company: {
