@@ -57,6 +57,14 @@ interface ComplianceSettings {
   consent_tracking: boolean;
 }
 
+interface ComplianceConfig {
+  companyName: string;
+  dpoName: string;
+  dpoEmail: string;
+  privacyPolicyUrl: string;
+  gdprCompliant: boolean;
+}
+
 export function SettingsPanel() {
   const [apiKey, setApiKey] = useState('');
   const [savedKey, setSavedKey] = useState<string | null>(null);
@@ -86,11 +94,21 @@ export function SettingsPanel() {
     consent_tracking: true,
   });
 
+  const [complianceConfig, setComplianceConfig] = useState<ComplianceConfig>({
+    companyName: '',
+    dpoName: '',
+    dpoEmail: '',
+    privacyPolicyUrl: '',
+    gdprCompliant: false,
+  });
+
   const [isSavingSMTP, setIsSavingSMTP] = useState(false);
   const [isSavingCompliance, setIsSavingCompliance] = useState(false);
   const [isTestingSMTP, setIsTestingSMTP] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [smtpTestResult, setSMTPTestResult] = useState<{ success: boolean; message: string } | null>(null);
+  const [isLoadingDiagnostic, setIsLoadingDiagnostic] = useState(false);
+  const [diagnosticResult, setDiagnosticResult] = useState<{ healthy: boolean; message: string } | null>(null);
 
   useEffect(() => {
     loadApiKey();
@@ -193,7 +211,7 @@ export function SettingsPanel() {
 
       if (result.success) {
         toast.success('✅ Connexion Claude réussie !', {
-          description: `Modèle: ${result.model || 'claude-3-5-sonnet-20241022'}`,
+          description: `Modèle: ${result.model || 'claude-3-5-sonnet-20240620'}`,
           duration: 5000
         });
       } else {
@@ -468,7 +486,7 @@ export function SettingsPanel() {
             'Content-Type': 'application/json',
             'Authorization': `Bearer ${publicAnonKey}`
           },
-          body: JSON.stringify(complianceSettings)
+          body: JSON.stringify(complianceConfig)
         }
       );
 
@@ -479,7 +497,7 @@ export function SettingsPanel() {
 
       const result = await response.json();
       
-      setComplianceSettings(result);
+      setComplianceConfig(result);
       
       toast.success('✅ Paramètres de conformité sauvegardés avec succès !');
       
@@ -488,6 +506,48 @@ export function SettingsPanel() {
       toast.error('❌ Erreur lors de la sauvegarde: ' + (error instanceof Error ? error.message : 'Erreur inconnue'));
     } finally {
       setIsSavingCompliance(false);
+    }
+  };
+
+  const runDiagnostic = async () => {
+    setIsLoadingDiagnostic(true);
+    setDiagnosticResult(null);
+    
+    try {
+      const { projectId, publicAnonKey } = await import('../../utils/supabase/info');
+      
+      const response = await fetch(
+        `https://${projectId}.supabase.co/functions/v1/make-server-10092a63/diagnostic`,
+        {
+          method: 'GET',
+          headers: {
+            'Authorization': `Bearer ${publicAnonKey}`
+          }
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error('Failed to run diagnostic');
+      }
+
+      const result = await response.json();
+      setDiagnosticResult(result);
+      
+      if (result.healthy) {
+        toast.success('✅ Diagnostic terminé - Système OK');
+      } else {
+        toast.warning('⚠️ Diagnostic terminé - Problèmes détectés');
+      }
+      
+    } catch (error) {
+      console.error('Error running diagnostic:', error);
+      setDiagnosticResult({
+        healthy: false,
+        message: 'Erreur lors de l\'exécution du diagnostic'
+      });
+      toast.error('❌ Erreur lors du diagnostic');
+    } finally {
+      setIsLoadingDiagnostic(false);
     }
   };
 
@@ -581,217 +641,13 @@ export function SettingsPanel() {
         </TabsList>
 
         {/* Tab: API Anthropic */}
-        <TabsContent value="api" className="space-y-6 mt-6">
-          {/* Diagnostic Rapide */}
+        <TabsContent value="api" className="space-y-6 mt-2">
+          
+          {/* 🔑 SECTION 1: Configuration Clé API (PRIORITAIRE - EN HAUT) */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.01 }}
-          >
-            <QuickDiagnostic />
-          </motion.div>
-
-          {/* 🐛 DEBUG OVERRIDES */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.05 }}
-            whileHover={{ y: -4 }}
-          >
-            <Card className="bg-white border-orange-200 shadow-lg hover:shadow-xl hover:border-orange-300 transition-all duration-300">
-              <CardHeader className="border-b border-orange-100 pb-4">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-orange-500 to-red-500 flex items-center justify-center">
-                      <Bug className="w-5 h-5 text-white" />
-                    </div>
-                    <div>
-                      <CardTitle className="text-slate-900">Debug Overrides</CardTitle>
-                      <CardDescription>Diagnostiquer les problèmes de traduction</CardDescription>
-                    </div>
-                  </div>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={loadOverrides}
-                    disabled={isLoadingOverrides}
-                    className="border-orange-500/30 hover:bg-orange-500/10 text-orange-600"
-                  >
-                    {isLoadingOverrides ? (
-                      <>
-                        <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                        Chargement...
-                      </>
-                    ) : (
-                      'Analyser'
-                    )}
-                  </Button>
-                </div>
-              </CardHeader>
-              <CardContent className="pt-6">
-                {!overridesDebug ? (
-                  <div className="text-center py-8">
-                    <Bug className="w-12 h-12 text-orange-400 mx-auto mb-3" />
-                    <p className="text-slate-600 mb-4">
-                      Cliquez sur "Analyser" pour vérifier les overrides en base de données
-                    </p>
-                  </div>
-                ) : (
-                  <div className="space-y-4">
-                    {/* Résumé */}
-                    <div className="grid grid-cols-2 gap-4">
-                      <div className="p-4 rounded-xl bg-blue-50 border border-blue-200">
-                        <p className="text-sm text-slate-600 mb-1">Total overrides</p>
-                        <p className="text-2xl text-blue-700">{overridesDebug.count || 0}</p>
-                      </div>
-                      <div className="p-4 rounded-xl bg-red-50 border border-red-200">
-                        <p className="text-sm text-slate-600 mb-1">Labels anglais</p>
-                        <p className="text-2xl text-red-700">{overridesDebug.problematicCount || 0}</p>
-                      </div>
-                    </div>
-
-                    {/* Liste des overrides problématiques */}
-                    {overridesDebug.problematicCount > 0 && (
-                      <div className="max-h-64 overflow-y-auto border border-red-200 rounded-xl p-4 bg-red-50/50">
-                        <p className="text-sm text-slate-700 mb-3">
-                          <strong>Overrides avec labels anglais :</strong>
-                        </p>
-                        <div className="space-y-2">
-                          {overridesDebug.problematicOverrides.map((item: any, idx: number) => (
-                            <div key={idx} className="p-3 bg-white rounded-lg border border-red-200 text-xs">
-                              <code className="text-red-700 font-mono">{item.id}</code>
-                              {item.label && (
-                                <div className="mt-1 text-slate-600">
-                                  <span className="font-semibold">Label:</span> {item.label}
-                                </div>
-                              )}
-                            </div>
-                          ))}
-                        </div>
-                      </div>
-                    )}
-
-                    {/* Actions */}
-                    <div className="flex gap-3">
-                      <Button
-                        variant="destructive"
-                        onClick={deleteOverrides}
-                        disabled={isLoadingOverrides || overridesDebug.count === 0}
-                        className="flex-1"
-                      >
-                        <Trash2 className="w-4 h-4 mr-2" />
-                        Supprimer tous les overrides
-                      </Button>
-                    </div>
-
-                    <div className="text-xs text-slate-500 p-3 bg-blue-50 rounded-lg border border-blue-200">
-                      <strong>💡 Note:</strong> La suppression des overrides ne touchera PAS les traductions. Elle réinitialisera seulement les modifications de structure faites via le dashboard Questions.
-                    </div>
-                  </div>
-                )}
-              </CardContent>
-            </Card>
-          </motion.div>
-
-          {/* 📦 IMPORT TRADUCTIONS CLIENT & WORKER */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.07 }}
-            whileHover={{ y: -4 }}
-          >
-            <Card className="bg-white border-cyan-200 shadow-lg hover:shadow-xl hover:border-cyan-300 transition-all duration-300">
-              <CardHeader className="border-b border-cyan-100 pb-4">
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-cyan-500 to-blue-500 flex items-center justify-center">
-                    <Database className="w-5 h-5 text-white" />
-                  </div>
-                  <div>
-                    <CardTitle className="text-slate-900">Maintenance Traductions</CardTitle>
-                    <CardDescription>Importer les traductions Client & Worker</CardDescription>
-                  </div>
-                </div>
-              </CardHeader>
-              <CardContent className="pt-6">
-                <div className="space-y-4">
-                  <div className="p-4 rounded-xl bg-cyan-50 border border-cyan-200">
-                    <div className="flex items-start gap-3 mb-3">
-                      <Info className="w-5 h-5 text-cyan-600 flex-shrink-0 mt-0.5" />
-                      <div>
-                        <p className="text-sm text-slate-900 mb-1">
-                          <strong>Traductions manquantes détectées</strong>
-                        </p>
-                        <p className="text-xs text-slate-600">
-                          Les questions Client et Worker de la Section 2 (Détachement) nécessitent des traductions françaises pour s'afficher correctement.
-                        </p>
-                      </div>
-                    </div>
-                    
-                    <div className="space-y-2 text-xs text-slate-700">
-                      <p className="flex items-center gap-2">
-                        <CheckCircle2 className="w-3 h-3 text-cyan-600" />
-                        q5_localisation (Pays entreprise)
-                      </p>
-                      <p className="flex items-center gap-2">
-                        <CheckCircle2 className="w-3 h-3 text-cyan-600" />
-                        q6_volume_client (Volume intérimaires)
-                      </p>
-                      <p className="flex items-center gap-2">
-                        <CheckCircle2 className="w-3 h-3 text-cyan-600" />
-                        q8_nationalites (Nationalités)
-                      </p>
-                      <p className="flex items-center gap-2">
-                        <CheckCircle2 className="w-3 h-3 text-cyan-600" />
-                        + toutes les autres questions client/worker
-                      </p>
-                    </div>
-                  </div>
-
-                  <div className="p-4 rounded-xl bg-gradient-to-r from-blue-50 to-violet-50 border border-blue-200">
-                    <div className="flex items-center gap-2 mb-2">
-                      <Download className="w-4 h-4 text-blue-600" />
-                      <span className="text-sm text-blue-900">Ce qui sera importé</span>
-                    </div>
-                    <div className="space-y-1 text-xs text-slate-700">
-                      <p>• Traductions FR + 22 langues européennes</p>
-                      <p>• Questions Client (18 items)</p>
-                      <p>• Questions Worker (15 items)</p>
-                      <p>• Options de réponses incluses</p>
-                    </div>
-                  </div>
-
-                  <Button
-                    onClick={importClientWorkerTranslations}
-                    disabled={isImportingTranslations}
-                    className="w-full bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-600 hover:to-blue-600 text-white shadow-lg shadow-cyan-500/30"
-                    size="lg"
-                  >
-                    {isImportingTranslations ? (
-                      <>
-                        <Loader2 className="w-5 h-5 mr-2 animate-spin" />
-                        Import en cours...
-                      </>
-                    ) : (
-                      <>
-                        <Download className="w-5 h-5 mr-2" />
-                        Importer les traductions
-                      </>
-                    )}
-                  </Button>
-
-                  <div className="text-xs text-slate-500 p-3 bg-green-50 rounded-lg border border-green-200">
-                    <strong>✅ Sécurisé:</strong> L'import utilise "upsert" - les traductions existantes seront mises à jour, pas de duplication.
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          </motion.div>
-
-          {/* Card principale - Configuration */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.1 }}
             whileHover={{ y: -4 }}
           >
             <Card className="bg-white border-slate-200 shadow-lg hover:shadow-xl hover:border-cyan-300 transition-all duration-300">
@@ -928,11 +784,11 @@ export function SettingsPanel() {
             </Card>
           </motion.div>
 
-          {/* Guide pas à pas */}
+          {/* 📖 SECTION 2: Guide pas à pas */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.2 }}
+            transition={{ delay: 0.05 }}
             whileHover={{ y: -4 }}
           >
             <Card className="bg-gradient-to-br from-cyan-50 to-blue-50 border-cyan-200 shadow-md hover:shadow-lg hover:border-cyan-300 transition-all duration-300">
@@ -1041,17 +897,19 @@ export function SettingsPanel() {
                       type="number"
                       placeholder="587"
                       value={smtpConfig.port}
-                      onChange={(e) => setSMTPConfig({ ...smtpConfig, port: parseInt(e.target.value) || 587 })}
+                      onChange={(e) => setSMTPConfig({ ...smtpConfig, port: parseInt(e.target.value) || 0 })}
                       className="mt-1 bg-white border-slate-200 text-slate-900 placeholder:text-slate-400 focus:border-cyan-400 focus:ring-cyan-400/20"
                     />
                   </div>
-                  
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
-                    <Label htmlFor="smtpUsername">Nom d'utilisateur *</Label>
+                    <Label htmlFor="smtpUsername">Nom d'utilisateur / Email *</Label>
                     <Input
                       id="smtpUsername"
                       type="text"
-                      placeholder="user@example.com"
+                      placeholder="votre@email.com"
                       value={smtpConfig.username}
                       onChange={(e) => setSMTPConfig({ ...smtpConfig, username: e.target.value })}
                       className="mt-1 bg-white border-slate-200 text-slate-900 placeholder:text-slate-400 focus:border-cyan-400 focus:ring-cyan-400/20"
@@ -1060,63 +918,35 @@ export function SettingsPanel() {
                   
                   <div>
                     <Label htmlFor="smtpPassword">Mot de passe *</Label>
-                    <div className="relative mt-1">
-                      <Input
-                        id="smtpPassword"
-                        type={showPassword ? "text" : "password"}
-                        placeholder="••••••••"
-                        value={smtpConfig.password}
-                        onChange={(e) => setSMTPConfig({ ...smtpConfig, password: e.target.value })}
-                        className="pr-10 bg-white border-slate-200 text-slate-900 placeholder:text-slate-400 focus:border-cyan-400 focus:ring-cyan-400/20"
-                      />
-                      <button
-                        type="button"
-                        onClick={() => setShowPassword(!showPassword)}
-                        className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"
-                      >
-                        {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-                      </button>
-                    </div>
-                  </div>
-                  
-                  <div>
-                    <Label htmlFor="smtpFromEmail">Email expéditeur *</Label>
                     <Input
-                      id="smtpFromEmail"
-                      type="email"
-                      placeholder="noreply@yojob.com"
-                      value={smtpConfig.from_email}
-                      onChange={(e) => setSMTPConfig({ ...smtpConfig, from_email: e.target.value })}
-                      className="mt-1 bg-white border-slate-200 text-slate-900 placeholder:text-slate-400 focus:border-cyan-400 focus:ring-cyan-400/20"
-                    />
-                  </div>
-                  
-                  <div>
-                    <Label htmlFor="smtpFromName">Nom expéditeur *</Label>
-                    <Input
-                      id="smtpFromName"
-                      type="text"
-                      placeholder="YOJOB"
-                      value={smtpConfig.from_name}
-                      onChange={(e) => setSMTPConfig({ ...smtpConfig, from_name: e.target.value })}
+                      id="smtpPassword"
+                      type="password"
+                      placeholder="•••••••••"
+                      value={smtpConfig.password}
+                      onChange={(e) => setSMTPConfig({ ...smtpConfig, password: e.target.value })}
                       className="mt-1 bg-white border-slate-200 text-slate-900 placeholder:text-slate-400 focus:border-cyan-400 focus:ring-cyan-400/20"
                     />
                   </div>
                 </div>
 
-                <div className="flex items-center gap-2">
-                  <Switch
-                    checked={smtpConfig.secure}
-                    onCheckedChange={(checked) => setSMTPConfig({ ...smtpConfig, secure: checked })}
+                <div>
+                  <Label htmlFor="smtpFromEmail">Email d'expédition *</Label>
+                  <Input
+                    id="smtpFromEmail"
+                    type="email"
+                    placeholder="noreply@yojob.com"
+                    value={smtpConfig.from_email}
+                    onChange={(e) => setSMTPConfig({ ...smtpConfig, from_email: e.target.value })}
+                    className="mt-1 bg-white border-slate-200 text-slate-900 placeholder:text-slate-400 focus:border-cyan-400 focus:ring-cyan-400/20"
                   />
-                  <Label>Utiliser SSL/TLS (recommandé)</Label>
+                  <p className="text-xs text-slate-500 mt-1">L'adresse email qui apparaîtra comme expéditeur</p>
                 </div>
 
-                <div className="flex items-center gap-3 pt-2">
+                <div className="flex gap-3">
                   <Button
                     onClick={saveSMTPSettings}
-                    disabled={isSavingSMTP}
-                    className="flex-1 bg-gradient-to-r from-blue-500 to-cyan-500 text-white"
+                    disabled={isSavingSMTP || !smtpConfig.host || !smtpConfig.username}
+                    className="flex-1 bg-gradient-to-r from-violet-500 to-cyan-500 hover:from-violet-600 hover:to-cyan-600 text-white shadow-lg shadow-violet-500/30"
                     size="lg"
                   >
                     {isSavingSMTP ? (
@@ -1152,29 +982,13 @@ export function SettingsPanel() {
                     )}
                   </Button>
                 </div>
+
+                <div className="text-xs text-slate-500 p-3 bg-blue-50 rounded-lg border border-blue-200">
+                  <strong>💡 Conseil:</strong> Pour Gmail, utilisez smtp.gmail.com:587 et activez "Autoriser les applications moins sécurisées" ou créez un mot de passe d'application.
+                </div>
               </CardContent>
             </Card>
           </motion.div>
-
-          {/* Info complémentaires */}
-          <Card className="border-slate-200 bg-gradient-to-br from-orange-50 to-amber-50">
-            <CardContent className="p-6">
-              <div className="flex items-start gap-3">
-                <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-orange-500 to-amber-500 flex items-center justify-center flex-shrink-0">
-                  <Settings className="w-5 h-5 text-white" />
-                </div>
-                <div>
-                  <h3 className="text-slate-900 mb-2">Configuration recommandée</h3>
-                  <ul className="text-sm text-slate-600 space-y-1">
-                    <li>• Utilisez un serveur SMTP dédié (ex: SendGrid, AWS SES, Mailgun)</li>
-                    <li>• Activez SSL/TLS pour sécuriser les connexions</li>
-                    <li>• Testez la configuration avant d'activer les workflows</li>
-                    <li>• Conservez vos identifiants en sécurité</li>
-                  </ul>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
         </TabsContent>
 
         {/* Tab: Compliance */}
@@ -1186,37 +1000,133 @@ export function SettingsPanel() {
             transition={{ delay: 0.1 }}
             whileHover={{ y: -4 }}
           >
-            <Card className="bg-white border-slate-200 shadow-lg hover:shadow-xl hover:border-cyan-300 transition-all duration-300">
+            <Card className="bg-white border-slate-200 shadow-lg hover:shadow-xl hover:border-purple-300 transition-all duration-300">
               <CardHeader className="border-b border-slate-100 pb-4">
                 <div className="flex items-center gap-3">
                   <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-violet-500 to-purple-500 flex items-center justify-center">
                     <Shield className="w-5 h-5 text-white" />
                   </div>
                   <div>
-                    <CardTitle className="text-slate-900">Conformité & RGPD</CardTitle>
-                    <CardDescription>Paramètres de conformité légale</CardDescription>
+                    <CardTitle className="text-slate-900">Conformité RGPD</CardTitle>
+                    <CardDescription>Configuration de la conformité légale</CardDescription>
                   </div>
                 </div>
               </CardHeader>
               <CardContent className="pt-6 space-y-6">
-                <div className="p-4 bg-blue-50 border border-blue-200 rounded-lg">
-                  <div className="flex items-start gap-2">
-                    <AlertCircle className="w-5 h-5 text-blue-600 mt-0.5" />
-                    <div className="text-sm text-blue-700">
-                      <p className="mb-1">
-                        Ces paramètres garantissent la conformité RGPD de vos campagnes d'emails.
-                      </p>
-                      <p className="text-xs text-blue-600">
-                        Les options activées sont fortement recommandées pour respecter les régulations européennes.
-                      </p>
-                    </div>
+                
+                <div>
+                  <Label htmlFor="companyName">Nom de l'entreprise *</Label>
+                  <Input
+                    id="companyName"
+                    type="text"
+                    placeholder="YOJOB"
+                    value={complianceConfig.companyName}
+                    onChange={(e) => setComplianceConfig({ ...complianceConfig, companyName: e.target.value })}
+                    className="mt-1 bg-white border-slate-200 text-slate-900 placeholder:text-slate-400 focus:border-purple-400 focus:ring-purple-400/20"
+                  />
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <Label htmlFor="dpoName">Nom du DPO</Label>
+                    <Input
+                      id="dpoName"
+                      type="text"
+                      placeholder="Jean Dupont"
+                      value={complianceConfig.dpoName}
+                      onChange={(e) => setComplianceConfig({ ...complianceConfig, dpoName: e.target.value })}
+                      className="mt-1 bg-white border-slate-200 text-slate-900 placeholder:text-slate-400 focus:border-purple-400 focus:ring-purple-400/20"
+                    />
+                  </div>
+                  
+                  <div>
+                    <Label htmlFor="dpoEmail">Email du DPO</Label>
+                    <Input
+                      id="dpoEmail"
+                      type="email"
+                      placeholder="dpo@yojob.com"
+                      value={complianceConfig.dpoEmail}
+                      onChange={(e) => setComplianceConfig({ ...complianceConfig, dpoEmail: e.target.value })}
+                      className="mt-1 bg-white border-slate-200 text-slate-900 placeholder:text-slate-400 focus:border-purple-400 focus:ring-purple-400/20"
+                    />
                   </div>
                 </div>
 
+                <div>
+                  <Label htmlFor="privacyPolicyUrl">URL Politique de confidentialité *</Label>
+                  <Input
+                    id="privacyPolicyUrl"
+                    type="url"
+                    placeholder="https://yojob.com/privacy"
+                    value={complianceConfig.privacyPolicyUrl}
+                    onChange={(e) => setComplianceConfig({ ...complianceConfig, privacyPolicyUrl: e.target.value })}
+                    className="mt-1 bg-white border-slate-200 text-slate-900 placeholder:text-slate-400 focus:border-purple-400 focus:ring-purple-400/20"
+                  />
+                </div>
+
+                <div className="flex items-center gap-3 p-4 bg-purple-50 rounded-xl border border-purple-200">
+                  <input
+                    type="checkbox"
+                    id="gdprCompliant"
+                    checked={complianceConfig.gdprCompliant}
+                    onChange={(e) => setComplianceConfig({ ...complianceConfig, gdprCompliant: e.target.checked })}
+                    className="w-4 h-4 text-purple-600 border-purple-300 rounded focus:ring-purple-500"
+                  />
+                  <label htmlFor="gdprCompliant" className="text-sm text-slate-700 cursor-pointer">
+                    Je certifie que mon entreprise est conforme au RGPD
+                  </label>
+                </div>
+
+                <Button
+                  onClick={saveComplianceSettings}
+                  disabled={isSavingCompliance || !complianceConfig.companyName || !complianceConfig.privacyPolicyUrl}
+                  className="w-full bg-gradient-to-r from-violet-500 to-purple-500 hover:from-violet-600 hover:to-purple-600 text-white shadow-lg shadow-violet-500/30"
+                  size="lg"
+                >
+                  {isSavingCompliance ? (
+                    <>
+                      <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                      Enregistrement...
+                    </>
+                  ) : (
+                    <>
+                      <Save className="w-4 h-4 mr-2" />
+                      Enregistrer la configuration
+                    </>
+                  )}
+                </Button>
+
+                <div className="text-xs text-slate-500 p-3 bg-blue-50 rounded-lg border border-blue-200">
+                  <strong>ℹ️ Information:</strong> Ces informations seront affichées dans les mentions légales et les consentements RGPD des formulaires.
+                </div>
+              </CardContent>
+            </Card>
+          </motion.div>
+
+          {/* Card Paramètres RGPD Avancés */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.15 }}
+            whileHover={{ y: -4 }}
+          >
+            <Card className="bg-white border-slate-200 shadow-lg hover:shadow-xl hover:border-purple-300 transition-all duration-300">
+              <CardHeader className="border-b border-slate-100 pb-4">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-violet-500 to-purple-500 flex items-center justify-center">
+                    <Shield className="w-5 h-5 text-white" />
+                  </div>
+                  <div>
+                    <CardTitle className="text-slate-900">Paramètres RGPD</CardTitle>
+                    <CardDescription>Configuration de conformité avancée</CardDescription>
+                  </div>
+                </div>
+              </CardHeader>
+              <CardContent className="pt-6 space-y-4">
                 <div className="space-y-4">
                   <div className="flex items-center justify-between p-4 bg-slate-50 rounded-lg">
                     <div>
-                      <Label className="text-base">RGPD activé</Label>
+                      <Label className="text-base">Activer la conformité RGPD</Label>
                       <p className="text-xs text-slate-600 mt-1">
                         Respecte les règles du Règlement Général sur la Protection des Données
                       </p>

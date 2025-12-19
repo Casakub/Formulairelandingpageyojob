@@ -1,4 +1,5 @@
 import * as kv from './kv_store.tsx';
+import { getSMTPConfig, getComplianceSettings } from './settings.tsx';
 
 interface EmailOptions {
   to: string;
@@ -32,7 +33,7 @@ export class EmailService {
    */
   async loadConfig(): Promise<SMTPConfig | null> {
     try {
-      this.config = await kv.get('settings:smtp');
+      this.config = await getSMTPConfig();
       return this.config;
     } catch (error) {
       console.error('Erreur chargement config SMTP:', error);

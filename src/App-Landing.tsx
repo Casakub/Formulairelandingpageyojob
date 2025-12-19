@@ -48,6 +48,7 @@ import { TestimonialCarousel } from './components/landing/TestimonialCarousel';
 import { LanguageSelector } from './components/landing/LanguageSelector';
 import { useLandingTranslations } from './hooks/useLandingTranslations';
 import { SEOHead } from './components/SEOHead';
+import { log, loggers } from './lib/logger';
 import { getAllLanguageCodes } from './lib/languages';
 import { projectId, publicAnonKey } from './utils/supabase/info';
 import { LogoSvg } from './imports/YojobLogoComplete';
@@ -154,7 +155,7 @@ export default function AppLanding() {
     // 1. Vérifier localStorage (choix manuel de l'utilisateur = priorité max)
     const savedLang = localStorage.getItem('yojob_preferred_language');
     if (savedLang && supportedLangs.includes(savedLang)) {
-      console.log('🌍 Langue chargée depuis localStorage:', savedLang);
+      log.languageChange('default', savedLang, 'localStorage');
       return savedLang;
     }
     
@@ -162,24 +163,24 @@ export default function AppLanding() {
     const urlParams = new URLSearchParams(window.location.search);
     const langParam = urlParams.get('lang');
     if (langParam && supportedLangs.includes(langParam)) {
-      console.log('🌍 Langue chargée depuis URL:', langParam);
+      log.languageChange('default', langParam, 'url');
       return langParam;
     }
     
     // 3. Détecter la langue du navigateur (AUTO-DETECTION 🎯)
     const browserLang = navigator.language.split('-')[0]; // 'pl-PL' -> 'pl', 'fr-FR' -> 'fr'
     if (supportedLangs.includes(browserLang)) {
-      console.log('🌍 Langue détectée automatiquement depuis le navigateur:', browserLang);
+      log.languageChange('default', browserLang, 'auto');
       return browserLang;
     }
     
     // 4. Fallback sur anglais si la langue du navigateur n'est pas supportée, sinon français
     if (supportedLangs.includes('en')) {
-      console.log('🌍 Langue du navigateur non supportée, fallback sur anglais');
+      loggers.language.info('Langue du navigateur non supportée, fallback sur anglais');
       return 'en';
     }
     
-    console.log('🌍 Fallback final sur français');
+    loggers.language.info('Fallback final sur français');
     return 'fr';
   };
 
@@ -197,17 +198,18 @@ export default function AppLanding() {
   // Fallback sur le contenu FR si la langue demandée n'existe pas
   const content = translations[currentLanguage] || translations['fr'] || {};
 
-  // 🐛 DEBUG: Afficher les informations de langue et traductions
+  // 🐛 DEBUG: Afficher les informations de langue et traductions (développement uniquement)
   useEffect(() => {
-    console.log('🌍 === LANDING PAGE DEBUG ===');
-    console.log('Current Language:', currentLanguage);
-    console.log('Available Languages:', availableLanguages);
-    console.log('Translations loaded:', Object.keys(translations));
-    console.log('Content used:', content?.language || 'NO CONTENT');
-    console.log('Stats subtitle:', content.stats?.subtitle);
-    console.log('Is Loading:', isLoading);
-    console.log('Error:', error);
-    console.log('========================');
+    loggers.language.group('Landing Page - État des traductions', true);
+    loggers.language.debug('Langue courante:', currentLanguage);
+    loggers.language.debug('Langues disponibles:', availableLanguages);
+    loggers.language.debug('Traductions chargées:', Object.keys(translations));
+    loggers.language.debug('Contenu utilisé:', content?.language || 'NO CONTENT');
+    loggers.language.debug('Chargement:', isLoading);
+    if (error) {
+      loggers.language.error('Erreur lors du chargement des traductions:', error);
+    }
+    loggers.language.groupEnd();
   }, [currentLanguage, translations, isLoading, error, content]);
 
   // Sticky header effect
@@ -222,7 +224,7 @@ export default function AppLanding() {
   // Écouter les mises à jour de traductions depuis l'admin
   useEffect(() => {
     const handleTranslationsUpdate = () => {
-      console.log('🔄 Traductions mises à jour, rechargement...');
+      loggers.translation.info('Traductions mises à jour, rechargement...');
       refresh();
     };
 
@@ -244,7 +246,7 @@ export default function AppLanding() {
 
   const handleWaitlistSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log('Waitlist email:', waitlistEmail);
+    log.formSubmit('Waitlist', { email: waitlistEmail, language: currentLanguage });
     
     try {
       // Envoyer au backend Prospects
@@ -278,20 +280,20 @@ export default function AppLanding() {
         setSuccessMessage(successMsg);
         setShowSuccessModal(true);
         setWaitlistEmail('');
-        console.log('✅ Prospect waitlist créé:', data.prospectId);
+        log.formSuccess('Waitlist', data.prospectId);
       } else {
         // Vérifier si c'est une erreur de duplication
         if (data.isDuplicate || data.errorCode === '23505') {
           setDuplicateEmail(waitlistEmail);
           setShowDuplicateModal(true);
           setWaitlistEmail('');
-          console.log('⚠️ Email déjà inscrit:', waitlistEmail);
+          loggers.form.warn('Email déjà inscrit à la waitlist:', waitlistEmail);
         } else {
           throw new Error(data.error || 'Erreur lors de l\'inscription');
         }
       }
     } catch (error: any) {
-      console.error('❌ Erreur waitlist submit:', error);
+      log.formError('Waitlist', error);
       
       // Détecter l'erreur de duplication dans le message d'erreur
       const errorMessage = error?.message || '';
@@ -313,7 +315,7 @@ export default function AppLanding() {
 
   const handleContactSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log('Contact form:', formData);
+    log.formSubmit('Contact', { ...formData, language: currentLanguage });
     
     try {
       // Envoyer au backend Prospects
@@ -359,7 +361,7 @@ export default function AppLanding() {
           needType: '',
           message: '',
         });
-        console.log('✅ Prospect contact créé:', data.prospectId);
+        log.formSuccess('Contact', data.prospectId);
       } else {
         // Vérifier si c'est une erreur de duplication
         if (data.isDuplicate || data.errorCode === '23505') {
@@ -374,13 +376,13 @@ export default function AppLanding() {
             needType: '',
             message: '',
           });
-          console.log('⚠️ Email déjà inscrit:', formData.email);
+          loggers.form.warn('Email déjà inscrit au contact:', formData.email);
         } else {
           throw new Error(data.error || 'Erreur lors de l\'envoi');
         }
       }
     } catch (error: any) {
-      console.error('❌ Erreur contact submit:', error);
+      log.formError('Contact', error);
       
       // Détecter l'erreur de duplication dans le message d'erreur
       const errorMessage = error?.message || '';
