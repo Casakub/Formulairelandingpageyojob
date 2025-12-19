@@ -20,6 +20,7 @@ import { Badge } from './components/ui/badge';
 import { Progress } from './components/ui/progress';
 import { LogoSvg } from './imports/YojobLogoComplete';
 import { toast } from 'sonner@2.0.3';
+import { projectId, publicAnonKey } from './utils/supabase/info';
 
 // Import des composants d'étapes (à créer)
 import { Step1Entreprise } from './components/devis/Step1Entreprise';
@@ -264,11 +265,11 @@ export default function DemandeDevis() {
     
     try {
       // Envoyer les données au backend
-      const response = await fetch(`https://${import.meta.env.VITE_SUPABASE_PROJECT_ID}.supabase.co/functions/v1/make-server-10092a63/devis`, {
+      const response = await fetch(`https://${projectId}.supabase.co/functions/v1/make-server-10092a63/devis`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`
+          'Authorization': `Bearer ${publicAnonKey}`
         },
         body: JSON.stringify(formData)
       });
