@@ -1078,7 +1078,7 @@ function ActorCard({ icon, title, description, color }: { icon: React.ReactNode;
   };
 
   return (
-    <div className={`bg-gradient-to-br ${colorClasses[color as keyof typeof colorClasses]} border rounded-lg p-4 text-center`}>
+    <div className={`bg-gradient-to-br ${colorClasses[color as keyof typeof colorClasses]} border rounded-lg p-4 text-center transition-all duration-300 hover:scale-105 hover:shadow-[0_0_30px_rgba(6,182,212,0.5)] hover:border-cyan-400/50`}>
       <div className="flex justify-center mb-3">{icon}</div>
       <h4 className="text-white mb-1">{title}</h4>
       <p className="text-white/70 text-xs">{description}</p>

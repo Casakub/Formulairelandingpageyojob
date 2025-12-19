@@ -1975,13 +1975,7 @@ export default function AppLanding() {
               >
                 CGV
               </a>
-              <span className="text-white/30">•</span>
-              <a 
-                href="/push-translations" 
-                className="hover:text-cyan-400 transition-colors underline"
-              >
-                Admin
-              </a>
+
             </div>
           </motion.div>
         </div>
