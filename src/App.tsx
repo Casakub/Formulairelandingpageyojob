@@ -9,6 +9,8 @@ import ServiceInterimEuropeen from './ServiceInterimEuropeen';
 import ServiceRecrutementSpecialise from './ServiceRecrutementSpecialise';
 import ServiceConseilConformite from './ServiceConseilConformite';
 import ServiceDetachementPersonnel from './ServiceDetachementPersonnel';
+import DemandeDevis from './DemandeDevis';
+import ConfirmationDevis from './ConfirmationDevis';
 import { Toaster } from './components/ui/sonner';
 
 export default function App() {
@@ -150,6 +152,24 @@ export default function App() {
     return (
       <>
         <AppPushTranslations />
+        <Toaster position="top-right" />
+      </>
+    );
+  }
+
+  if (currentPath === '/devis') {
+    return (
+      <>
+        <DemandeDevis />
+        <Toaster position="top-right" />
+      </>
+    );
+  }
+
+  if (currentPath === '/confirmation-devis') {
+    return (
+      <>
+        <ConfirmationDevis />
         <Toaster position="top-right" />
       </>
     );

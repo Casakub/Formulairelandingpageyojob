@@ -1,4 +1,5 @@
 import * as React from 'react';
+import { createPortal } from 'react-dom';
 import { ChevronDown } from 'lucide-react';
 
 interface SelectProps {
@@ -33,15 +34,20 @@ const SelectContext = React.createContext<{
   onValueChange: (value: string) => void;
   isOpen: boolean;
   setIsOpen: (open: boolean) => void;
+  triggerRef: React.RefObject<HTMLButtonElement> | null;
 }>({
   value: '',
   onValueChange: () => {},
   isOpen: false,
   setIsOpen: () => {},
+  triggerRef: null,
 });
 
 export function Select({ value = '', onValueChange, children, disabled = false }: SelectProps) {
   const [isOpen, setIsOpen] = React.useState(false);
+  const triggerRef = React.useRef<HTMLButtonElement>(null);
+
+  console.log('🔵 [Select] Render - isOpen:', isOpen, 'disabled:', disabled);
 
   return (
     <SelectContext.Provider
@@ -50,6 +56,7 @@ export function Select({ value = '', onValueChange, children, disabled = false }
         onValueChange: onValueChange || (() => {}),
         isOpen: !disabled && isOpen,
         setIsOpen,
+        triggerRef,
       }}
     >
       <div className="relative">
@@ -60,12 +67,21 @@ export function Select({ value = '', onValueChange, children, disabled = false }
 }
 
 export function SelectTrigger({ className = '', children }: SelectTriggerProps) {
-  const { isOpen, setIsOpen } = React.useContext(SelectContext);
+  const { isOpen, setIsOpen, triggerRef } = React.useContext(SelectContext);
+
+  const handleClick = (e: React.MouseEvent) => {
+    console.log('🟢 [SelectTrigger] Click détecté! isOpen avant:', isOpen);
+    e.preventDefault();
+    e.stopPropagation();
+    setIsOpen(!isOpen);
+    console.log('🟢 [SelectTrigger] setIsOpen appelé avec:', !isOpen);
+  };
 
   return (
     <button
+      ref={triggerRef}
       type="button"
-      onClick={() => setIsOpen(!isOpen)}
+      onClick={handleClick}
       className={`flex h-10 w-full items-center justify-between rounded-md border border-slate-200 bg-white px-3 py-2 text-sm placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-slate-400 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 ${className}`}
     >
       {children}
@@ -85,41 +101,123 @@ export function SelectValue({ placeholder }: SelectValueProps) {
 }
 
 export function SelectContent({ children, className = '' }: SelectContentProps) {
-  const { isOpen, setIsOpen } = React.useContext(SelectContext);
+  const { isOpen, setIsOpen, triggerRef } = React.useContext(SelectContext);
   const ref = React.useRef<HTMLDivElement>(null);
+  const [position, setPosition] = React.useState({ top: 0, left: 0, width: 0 });
+  const justOpenedRef = React.useRef(false);
 
-  React.useEffect(() => {
+  console.log('🟣 [SelectContent] Render - isOpen:', isOpen, 'position:', position);
+
+  React.useLayoutEffect(() => {
+    console.log('🟣 [SelectContent] useLayoutEffect - isOpen:', isOpen);
+    if (!isOpen) return;
+
+    // Marquer que le dropdown vient de s'ouvrir
+    justOpenedRef.current = true;
+
+    // Fonction pour calculer la position
+    const updatePosition = () => {
+      const trigger = triggerRef.current;
+      if (trigger) {
+        const rect = trigger.getBoundingClientRect();
+        const newPosition = {
+          top: rect.bottom + 4, // Position fixed + petit offset de 4px
+          left: rect.left,      // Position fixed : pas besoin de window.scrollX
+          width: rect.width
+        };
+        console.log('🟣 [SelectContent] Position calculée:', newPosition, 'rect:', rect);
+        setPosition(newPosition);
+      } else {
+        console.log('⚠️ [SelectContent] Trigger ref non disponible!');
+      }
+    };
+
+    // Calculer la position immédiatement
+    updatePosition();
+
+    // Recalculer si la fenêtre est redimensionnée ou scrollée
+    window.addEventListener('scroll', updatePosition, true);
+    window.addEventListener('resize', updatePosition);
+
+    // Handler pour les clics en dehors
     const handleClickOutside = (event: MouseEvent) => {
-      if (ref.current && !ref.current.contains(event.target as Node)) {
+      // Ignorer si le dropdown vient juste de s'ouvrir
+      if (justOpenedRef.current) {
+        console.log('🟣 [SelectContent] Click ignoré (justOpened)');
+        return;
+      }
+
+      const target = event.target as Node;
+      
+      // Fermer si le clic est en dehors du trigger ET du dropdown
+      if (
+        ref.current && !ref.current.contains(target) &&
+        triggerRef.current && !triggerRef.current.contains(target)
+      ) {
+        console.log('🟣 [SelectContent] Fermeture (click outside)');
         setIsOpen(false);
       }
     };
 
-    if (isOpen) {
+    // Réinitialiser le flag après un délai
+    const flagTimeout = setTimeout(() => {
+      justOpenedRef.current = false;
+      console.log('🟣 [SelectContent] justOpened flag réinitialisé');
+    }, 100);
+
+    // Ajouter l'event listener après un délai
+    const listenerTimeout = setTimeout(() => {
+      console.log('🟣 [SelectContent] Event listener ajouté');
       document.addEventListener('mousedown', handleClickOutside);
-    }
+    }, 100);
 
+    // Cleanup function
     return () => {
+      console.log('🟣 [SelectContent] Cleanup');
+      clearTimeout(flagTimeout);
+      clearTimeout(listenerTimeout);
       document.removeEventListener('mousedown', handleClickOutside);
+      window.removeEventListener('scroll', updatePosition, true);
+      window.removeEventListener('resize', updatePosition);
     };
-  }, [isOpen, setIsOpen]);
+  }, [isOpen, setIsOpen, triggerRef]);
 
-  if (!isOpen) return null;
+  if (!isOpen) {
+    console.log('🟣 [SelectContent] Pas de render (isOpen=false)');
+    return null;
+  }
 
-  return (
+  const handleContentClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+  };
+
+  console.log('🟣 [SelectContent] RENDER du dropdown!');
+
+  return createPortal(
     <div
       ref={ref}
-      className={`absolute z-50 mt-1 max-h-60 w-full overflow-auto rounded-md border border-slate-200 bg-white shadow-lg ${className}`}
+      onClick={handleContentClick}
+      style={{
+        position: 'fixed',
+        top: `${position.top}px`,
+        left: `${position.left}px`,
+        width: `${position.width}px`,
+        zIndex: 99999
+      }}
+      className={`max-h-60 overflow-auto rounded-md shadow-lg ${className}`}
     >
       {children}
-    </div>
+    </div>,
+    document.body
   );
 }
 
 export function SelectItem({ value, children, className = '' }: SelectItemProps) {
   const { value: selectedValue, onValueChange, setIsOpen } = React.useContext(SelectContext);
 
-  const handleClick = () => {
+  const handleClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
     onValueChange(value);
     setIsOpen(false);
   };

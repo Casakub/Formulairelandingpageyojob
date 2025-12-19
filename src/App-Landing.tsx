@@ -1865,14 +1865,22 @@ export default function AppLanding() {
                 {content.footer?.columns?.services?.title || 'Services'}
               </h3>
               <ul className="space-y-2.5 text-sm">
-                {(content.footer?.columns?.services?.links || []).map((link, index) => (
-                  <motion.li key={index} whileHover={{ x: 5 }} transition={{ duration: 0.2 }}>
-                    <a href={link.href} className="text-white/80 hover:text-white transition-colors inline-flex items-center gap-2 group">
-                      <ArrowRight className="w-3 h-3 opacity-0 group-hover:opacity-100 transition-opacity" />
-                      {link.label}
-                    </a>
-                  </motion.li>
-                ))}
+                {(content.footer?.columns?.services?.links || []).map((link, index) => {
+                  const serviceFooterUrls = [
+                    '/services/interim-europeen',
+                    '/services/recrutement-specialise', 
+                    '/services/conseil-conformite',
+                    '/services/detachement-personnel'
+                  ];
+                  return (
+                    <motion.li key={index} whileHover={{ x: 5 }} transition={{ duration: 0.2 }}>
+                      <a href={serviceFooterUrls[index] || link.href} className="text-white/80 hover:text-white transition-colors inline-flex items-center gap-2 group">
+                        <ArrowRight className="w-3 h-3 opacity-0 group-hover:opacity-100 transition-opacity" />
+                        {link.label}
+                      </a>
+                    </motion.li>
+                  );
+                })}
               </ul>
             </motion.div>
 

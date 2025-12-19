@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Helmet } from 'react-helmet-async';
+import { Helmet, HelmetProvider } from 'react-helmet-async';
 import { motion } from 'motion/react';
 import {
   Plane,
@@ -101,7 +101,7 @@ export default function ServiceDetachementPersonnel() {
     {
       icon: <Handshake className="w-8 h-8" />,
       title: "Coordination complète",
-      description: "Interface unique entre vous et l'ETT européenne",
+      description: "Interface unique entre vous et l'ETT européen",
       color: "from-blue-500 to-blue-600"
     },
     {
@@ -178,29 +178,37 @@ export default function ServiceDetachementPersonnel() {
 
   return (
     <>
-      <Helmet>
-        <title>Détachement de Personnel Européen | Travailleurs détachés | YOJOB</title>
-        <meta name="description" content="Simplifiez le détachement de travailleurs européens en France. Gestion complète : sélection, formalités, hébergement, transport." />
-      </Helmet>
+      <HelmetProvider>
+        <Helmet>
+          <title>Détachement de Personnel Européen | Travailleurs détachés | YOJOB</title>
+          <meta name="description" content="Simplifiez le détachement de travailleurs européens en France. Gestion complète : sélection, formalités, hébergement, transport." />
+        </Helmet>
+      </HelmetProvider>
 
       <div className="min-h-screen bg-gradient-to-br from-blue-900 via-violet-900 to-cyan-900">
         {/* Header */}
-        <header className="fixed top-0 left-0 right-0 z-50 bg-white/10 backdrop-blur-md border-b border-white/10">
+        <header className="relative z-10 border-b border-white/10 bg-white/5 backdrop-blur-md">
           <div className="container mx-auto px-4 py-4">
             <div className="flex items-center justify-between">
-              <a href="/" className="flex items-center gap-3">
-                <div className="w-12 h-12">
-                  <LogoSvg className="w-full h-full" effects={true} aria-label="YOJOB" />
+              <a href="/" className="flex items-center gap-3 group">
+                <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-[#1E3A8A] via-[#06B6D4] to-[#7C3AED] p-0.5 shadow-lg shadow-cyan-500/30 group-hover:shadow-cyan-500/50 transition-all duration-300">
+                  <div className="w-full h-full rounded-[10px] bg-white/95 backdrop-blur-sm flex items-center justify-center">
+                    <LogoSvg className="w-8 h-8" />
+                  </div>
                 </div>
-                <span className="text-white text-xl">YOJOB</span>
+                <span className="text-white text-xl hidden sm:block group-hover:text-cyan-400 transition-colors">
+                  YOJOB
+                </span>
               </a>
-              <nav className="hidden md:flex items-center gap-6">
-                <a href="/" className="text-white/80 hover:text-white transition-colors">Accueil</a>
-                <a href="/#reseau" className="text-white/80 hover:text-white transition-colors">Notre réseau</a>
-                <a href="/#contact" className="text-white/80 hover:text-white transition-colors">Contact</a>
-              </nav>
-              <Button className="bg-gradient-to-r from-cyan-500 to-green-500 hover:from-cyan-600 hover:to-green-600 text-white rounded-full">
-                Demander un devis
+              <Button
+                className="relative overflow-hidden group rounded-full bg-gradient-to-r from-cyan-500 to-green-500 hover:from-cyan-600 hover:to-green-600 text-white shadow-lg hover:shadow-cyan-500/50 transition-all duration-300 px-6 py-2.5"
+                onClick={() => document.getElementById('contact')?.scrollIntoView({ behavior: 'smooth' })}
+              >
+                <span className="relative z-10 flex items-center gap-2">
+                  <FileText className="w-4 h-4" />
+                  Devis gratuit
+                </span>
+                <div className="absolute inset-0 -translate-x-full group-hover:translate-x-full transition-transform duration-700 bg-gradient-to-r from-transparent via-white/40 to-transparent" />
               </Button>
             </div>
           </div>
@@ -230,12 +238,14 @@ export default function ServiceDetachementPersonnel() {
                   De la sélection des candidats à leur intégration sur site, nous coordonnons l'ensemble du processus de détachement avec nos ETT partenaires.
                 </p>
                 <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                  <Button className="bg-white text-blue-900 hover:bg-cyan-50 rounded-full px-8 py-6 text-lg shadow-2xl hover:shadow-white/70 transition-all group">
-                    <span className="flex items-center">
-                      Demander un devis
-                      <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
-                    </span>
-                  </Button>
+                  <a href="/devis">
+                    <Button className="bg-white text-blue-900 hover:bg-cyan-50 rounded-full px-8 py-6 text-lg shadow-2xl hover:shadow-white/70 transition-all group w-full sm:w-auto">
+                      <span className="flex items-center">
+                        Demander un devis
+                        <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
+                      </span>
+                    </Button>
+                  </a>
                   <Button 
                     variant="outline" 
                     className="border-white/30 text-white hover:bg-white/10 rounded-full px-8 py-6 text-lg backdrop-blur-sm"
@@ -577,12 +587,14 @@ export default function ServiceDetachementPersonnel() {
               <p className="text-xl text-white/80 mb-8 leading-relaxed">
                 Confiez-nous la coordination complète de vos détachements européens
               </p>
-              <Button className="bg-white text-blue-900 hover:bg-cyan-50 rounded-full px-12 py-6 text-lg shadow-2xl hover:shadow-white/70 transition-all group">
-                <span className="flex items-center">
-                  Demander un devis
-                  <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
-                </span>
-              </Button>
+              <a href="/devis">
+                <Button className="bg-white text-blue-900 hover:bg-cyan-50 rounded-full px-12 py-6 text-lg shadow-2xl hover:shadow-white/70 transition-all group">
+                  <span className="flex items-center">
+                    Demander un devis
+                    <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
+                  </span>
+                </Button>
+              </a>
               <p className="text-white/60 text-sm mt-6">
                 ✓ Réponse sous 24h • ✓ Sans engagement
               </p>
@@ -596,9 +608,9 @@ export default function ServiceDetachementPersonnel() {
             <div className="text-center text-white/60 text-sm">
               <p>© 2026 YOJOB. Tous droits réservés.</p>
               <div className="flex gap-4 justify-center mt-4">
-                <a href="/mentions-legales" className="hover:text-white transition-colors">Mentions légales</a>
+                <a href="/legal" className="hover:text-white transition-colors">Mentions légales</a>
                 <span>•</span>
-                <a href="/politique-confidentialite" className="hover:text-white transition-colors">Politique de confidentialité</a>
+                <a href="/privacy" className="hover:text-white transition-colors">Politique de confidentialité</a>
                 <span>•</span>
                 <a href="/cgv" className="hover:text-white transition-colors">CGV</a>
               </div>

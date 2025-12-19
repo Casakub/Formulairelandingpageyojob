@@ -29,6 +29,7 @@ import pushTranslationsRoutes from "./push-translations.tsx";
 import { seedWithProfiles } from "./seed-with-profiles.tsx";
 import { seedFromConfig } from "./seed-from-config.tsx";
 import { seedClientWorkerTranslations } from "./seed-client-worker-translations.tsx";
+import devisRoutes from "./devis.tsx";
 
 const app = new Hono();
 
@@ -240,5 +241,8 @@ app.post("/make-server-10092a63/seed-from-config", seedFromConfig);
 
 // Seed client-worker translations endpoint
 app.post("/make-server-10092a63/seed-client-worker-translations", seedClientWorkerTranslations);
+
+// Devis endpoints
+app.route("/make-server-10092a63/devis", devisRoutes);
 
 Deno.serve(app.fetch);
