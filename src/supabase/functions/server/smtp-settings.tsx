@@ -16,6 +16,13 @@ const DEFAULT_SMTP_CONFIG = {
 
 // Paramètres de conformité par défaut
 const DEFAULT_COMPLIANCE_SETTINGS = {
+  // ComplianceConfig (informations entreprise)
+  companyName: '',
+  dpoName: '',
+  dpoEmail: '',
+  privacyPolicyUrl: '',
+  gdprCompliant: false,
+  // ComplianceSettings (paramètres techniques)
   gdpr_enabled: true,
   unsubscribe_link: true,
   double_optin: false,
@@ -342,16 +349,21 @@ app.get('/compliance', async (c) => {
 // PUT /settings/compliance - Sauvegarder paramètres conformité
 app.put('/compliance', async (c) => {
   try {
+    console.log('📥 [PUT /compliance] Début de la requête');
     const settings = await c.req.json();
+    console.log('📥 [PUT /compliance] Settings reçus:', JSON.stringify(settings, null, 2));
     
     await kv.set('settings:compliance', settings);
+    console.log('✅ [PUT /compliance] Settings sauvegardés dans KV store');
 
-    return c.json({
+    const response = {
       success: true,
       message: 'Paramètres de conformité sauvegardés',
-    });
+    };
+    console.log('📤 [PUT /compliance] Réponse:', JSON.stringify(response));
+    return c.json(response);
   } catch (error: any) {
-    console.error('Erreur sauvegarde conformité:', error);
+    console.error('❌ [PUT /compliance] Erreur sauvegarde conformité:', error);
     return c.json({
       success: false,
       error: error.message,

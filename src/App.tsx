@@ -2,6 +2,9 @@ import { useState, useEffect } from 'react';
 import AppLanding from './App-Landing';
 import AppSurvey from './App-Survey-Original';
 import AppPushTranslations from './App-Push-Translations';
+import Privacy from './Privacy';
+import Legal from './Legal';
+import CGV from './CGV';
 import { Toaster } from './components/ui/sonner';
 
 export default function App() {
@@ -49,6 +52,33 @@ export default function App() {
     return (
       <>
         <AppLanding />
+        <Toaster position="top-right" />
+      </>
+    );
+  }
+
+  if (currentPath === '/privacy') {
+    return (
+      <>
+        <Privacy />
+        <Toaster position="top-right" />
+      </>
+    );
+  }
+
+  if (currentPath === '/legal') {
+    return (
+      <>
+        <Legal />
+        <Toaster position="top-right" />
+      </>
+    );
+  }
+
+  if (currentPath === '/cgv') {
+    return (
+      <>
+        <CGV />
         <Toaster position="top-right" />
       </>
     );

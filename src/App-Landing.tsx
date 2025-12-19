@@ -1945,17 +1945,40 @@ export default function AppLanding() {
             viewport={{ once: true }}
             transition={{ duration: 0.6, delay: 0.4 }}
           >
-            <div className="flex flex-col sm:flex-row items-center justify-center gap-2 text-sm text-white/80">
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-2 text-sm text-white/80 mb-3">
               <p>{content.footer?.bottom?.copyright || '© 2024 YOJOB. Tous droits réservés.'}</p>
               {/* Badge Supabase Live */}
               <Badge className="bg-green-500/20 backdrop-blur-md border-green-400/30 text-green-300 px-3 py-1 shadow-lg flex items-center gap-1.5">
                 <span className="w-2 h-2 bg-green-400 rounded-full animate-pulse" />
                 Traductions Live • {availableLanguages.length} langues
               </Badge>
-              {/* Lien Admin */}
+            </div>
+            {/* Footer Links */}
+            <div className="flex flex-wrap items-center justify-center gap-4 text-xs text-white/50">
+              <a 
+                href="/privacy" 
+                className="hover:text-cyan-400 transition-colors underline decoration-dotted"
+              >
+                Politique de confidentialité
+              </a>
+              <span className="text-white/30">•</span>
+              <a 
+                href="/legal" 
+                className="hover:text-cyan-400 transition-colors underline decoration-dotted"
+              >
+                Mentions légales
+              </a>
+              <span className="text-white/30">•</span>
+              <a 
+                href="/cgv" 
+                className="hover:text-cyan-400 transition-colors underline decoration-dotted"
+              >
+                CGV
+              </a>
+              <span className="text-white/30">•</span>
               <a 
                 href="/push-translations" 
-                className="text-xs text-white/40 hover:text-cyan-400 transition-colors underline"
+                className="hover:text-cyan-400 transition-colors underline"
               >
                 Admin
               </a>

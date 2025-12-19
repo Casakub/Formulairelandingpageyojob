@@ -113,6 +113,7 @@ export function SettingsPanel() {
   useEffect(() => {
     loadApiKey();
     loadSMTPSettings();
+    loadComplianceSettings();
   }, []);
 
   const loadApiKey = async () => {
@@ -398,6 +399,48 @@ export function SettingsPanel() {
     }
   };
 
+  const loadComplianceSettings = async () => {
+    try {
+      const { projectId, publicAnonKey } = await import('../../utils/supabase/info');
+      
+      const response = await fetch(
+        `https://${projectId}.supabase.co/functions/v1/make-server-10092a63/settings/compliance`,
+        {
+          method: 'GET',
+          headers: {
+            'Authorization': `Bearer ${publicAnonKey}`
+          }
+        }
+      );
+
+      if (response.ok) {
+        const result = await response.json();
+        if (result.success && result.settings) {
+          const settings = result.settings;
+          
+          // Séparer les settings en deux objets
+          setComplianceConfig({
+            companyName: settings.companyName || '',
+            dpoName: settings.dpoName || '',
+            dpoEmail: settings.dpoEmail || '',
+            privacyPolicyUrl: settings.privacyPolicyUrl || '',
+            gdprCompliant: settings.gdprCompliant || false,
+          });
+          
+          setComplianceSettings({
+            gdpr_enabled: settings.gdpr_enabled !== undefined ? settings.gdpr_enabled : true,
+            unsubscribe_link: settings.unsubscribe_link !== undefined ? settings.unsubscribe_link : true,
+            double_optin: settings.double_optin || false,
+            data_retention_days: settings.data_retention_days || 365,
+            consent_tracking: settings.consent_tracking !== undefined ? settings.consent_tracking : true,
+          });
+        }
+      }
+    } catch (error) {
+      console.error('Error loading compliance settings:', error);
+    }
+  };
+
   const saveSMTPSettings = async () => {
     setIsSavingSMTP(true);
     try {
@@ -478,31 +521,49 @@ export function SettingsPanel() {
     try {
       const { projectId, publicAnonKey } = await import('../../utils/supabase/info');
       
+      // Fusionner les deux configurations en une seule
+      const mergedSettings = {
+        ...complianceConfig,
+        ...complianceSettings
+      };
+      
       const response = await fetch(
         `https://${projectId}.supabase.co/functions/v1/make-server-10092a63/settings/compliance`,
         {
-          method: 'POST',
+          method: 'PUT',
           headers: {
             'Content-Type': 'application/json',
             'Authorization': `Bearer ${publicAnonKey}`
           },
-          body: JSON.stringify(complianceConfig)
+          body: JSON.stringify(mergedSettings)
         }
       );
 
-      if (!response.ok) {
-        const error = await response.json();
-        throw new Error(error.error || 'Failed to save compliance settings');
+      const responseText = await response.text();
+      console.log('📡 [Compliance] Response status:', response.status);
+      console.log('📡 [Compliance] Response text:', responseText);
+      
+      let result;
+      try {
+        result = JSON.parse(responseText);
+      } catch (parseError) {
+        console.error('❌ [Compliance] Failed to parse JSON:', parseError);
+        console.error('📄 [Compliance] Raw response:', responseText);
+        throw new Error(`Invalid JSON response: ${responseText.substring(0, 100)}`);
       }
 
-      const result = await response.json();
+      if (!response.ok) {
+        throw new Error(result.error || 'Failed to save compliance settings');
+      }
       
-      setComplianceConfig(result);
-      
-      toast.success('✅ Paramètres de conformité sauvegardés avec succès !');
+      if (result.success) {
+        toast.success('✅ Paramètres de conformité sauvegardés avec succès !');
+      } else {
+        throw new Error(result.error || 'Failed to save compliance settings');
+      }
       
     } catch (error) {
-      console.error('Error saving compliance settings:', error);
+      console.error('❌ [Compliance] Error saving compliance settings:', error);
       toast.error('❌ Erreur lors de la sauvegarde: ' + (error instanceof Error ? error.message : 'Erreur inconnue'));
     } finally {
       setIsSavingCompliance(false);
