@@ -30,6 +30,7 @@ import { Textarea } from '../ui/textarea';
 import { Badge } from '../ui/badge';
 import { TasksSection } from './TasksSection';
 import { EventsSection } from './EventsSection';
+import { ProspectAutomationPanel } from './ProspectAutomationPanel';
 import { projectId, publicAnonKey } from '../../utils/supabase/info';
 
 interface ProspectSheetProps {
@@ -919,6 +920,19 @@ export function ProspectSheet({ prospect, open, onClose, onUpdate }: ProspectShe
 
               {/* Section Événements (commune à tous) */}
               <EventsSection prospectId={prospect.id} onUpdate={onUpdate} />
+
+              {/* Section Automatisations (commune à tous) */}
+              <div className="mt-6">
+                <h3 className="text-slate-900 mb-3 flex items-center gap-2">
+                  <span className="text-lg">⚡</span>
+                  Automatisations
+                </h3>
+                <ProspectAutomationPanel 
+                  prospectId={prospect.id}
+                  prospectEmail={prospect.email}
+                  prospectType={prospect.type}
+                />
+              </div>
             </div>
 
             {/* Footer */}

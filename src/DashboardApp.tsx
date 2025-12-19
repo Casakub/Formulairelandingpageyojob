@@ -7,33 +7,34 @@ import {
   Languages, 
   Download, 
   Plug, 
-  FileType, 
   Settings, 
-  Users,
+  Users, 
+  Workflow,
+  Calendar,
   User,
   LogOut,
-  Menu,
-  X,
-  ArrowLeft,
   ChevronLeft,
   ChevronRight,
-  Calendar
+  ArrowLeft,
+  Menu,
+  X,
 } from 'lucide-react';
 import { Button } from './components/ui/button';
-import { TranslationProvider } from './contexts/TranslationContext';
-import { UnifiedTranslationManager } from './components/dashboard/UnifiedTranslationManager';
+import { Badge } from './components/ui/badge';
 import { DashboardOverview } from './components/dashboard/DashboardOverview';
 import { DynamicResultsOverview } from './components/dashboard/DynamicResultsOverview';
 import { QuestionManagerV2 } from './components/dashboard/QuestionManagerV2';
+import { TranslationProvider } from './context/TranslationContext';
+import { UnifiedTranslationManager } from './components/dashboard/UnifiedTranslationManager';
 import { ExportImportManager } from './components/dashboard/ExportImportManager';
 import { IntegrationManager } from './components/dashboard/IntegrationManager';
 import { SettingsPanel } from './components/dashboard/SettingsPanel';
 import { ProspectsPage } from './components/dashboard/ProspectsPage';
 import { AgendaPage } from './components/dashboard/AgendaPage';
+import { AutomationsPage } from './components/dashboard/AutomationsPage';
 import { useAuth } from './hooks/useAuth';
-import { Badge } from './components/ui/badge';
 
-type TabType = 'overview' | 'agenda' | 'questions' | 'results' | 'integrations' | 'translations' | 'settings' | 'export' | 'prospects';
+type TabType = 'overview' | 'agenda' | 'questions' | 'results' | 'integrations' | 'translations' | 'settings' | 'export' | 'prospects' | 'automations';
 
 interface DashboardAppProps {
   onBackToSurvey?: () => void;
@@ -54,7 +55,8 @@ export default function DashboardApp({ onBackToSurvey }: DashboardAppProps = {})
     { id: 'export' as TabType, label: 'Export', icon: Download, color: 'from-green-500 to-emerald-500' },
     { id: 'integrations' as TabType, label: 'Intégrations', icon: Plug, color: 'from-orange-500 to-amber-500' },
     { id: 'settings' as TabType, label: 'Paramètres', icon: Settings, color: 'from-slate-500 to-gray-500' },
-    { id: 'prospects' as TabType, label: 'Prospects', icon: Users, color: 'from-emerald-500 to-teal-500' }
+    { id: 'prospects' as TabType, label: 'Prospects', icon: Users, color: 'from-emerald-500 to-teal-500' },
+    { id: 'automations' as TabType, label: 'Automatisations', icon: Workflow, color: 'from-pink-500 to-red-500' }
   ];
 
   return (
@@ -333,6 +335,9 @@ export default function DashboardApp({ onBackToSurvey }: DashboardAppProps = {})
             )}
             {activeTab === 'agenda' && (
               <AgendaPage key="agenda" />
+            )}
+            {activeTab === 'automations' && (
+              <AutomationsPage key="automations" />
             )}
           </AnimatePresence>
         </div>
