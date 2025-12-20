@@ -195,6 +195,18 @@ export interface RecapitulatifDevis {
     tauxHoraireBrut: number;
     tauxETTFinal: number;
     coutMensuel: number;
+    // 🆕 Détails du coefficient
+    coeffBase?: number;
+    facteurPays?: number;
+    coeffFinal?: number;
+    labelPays?: string;
+    // 🆕 Détails des options/suppléments
+    supplementHebergement?: number;
+    supplementTransport?: number;
+    supplementPanierRepas?: number;
+    hebergementActif?: boolean;
+    transportActif?: boolean;
+    panierRepasActif?: boolean;
   }>;
   totalHT: number;
   totalTTC: number;
@@ -203,21 +215,49 @@ export interface RecapitulatifDevis {
 }
 
 export function calculerRecapitulatif(
-  postes: Array<PosteData & { poste: string; classification: string }>,
+  postes: Array<PosteData & { poste: string; classification: string; coeffBase?: number; facteurPays?: number; labelPays?: string }>,
   dateDebut: string,
   dateFin: string | null
 ): RecapitulatifDevis {
   const dureeMission = calculerDureeMission(dateDebut, dateFin);
   
-  const postesRecap = postes.map(poste => ({
-    secteur: poste.secteur,
-    poste: poste.poste,
-    classification: poste.classification,
-    quantite: poste.quantite,
-    tauxHoraireBrut: calculerTauxHoraireBrut(poste.salaireBrut, poste.baseHoraire),
-    tauxETTFinal: calculerTauxETTFinal(poste),
-    coutMensuel: calculerCoutMensuel(poste)
-  }));
+  const postesRecap = postes.map(poste => {
+    const tauxHoraireBrut = calculerTauxHoraireBrut(poste.salaireBrut, poste.baseHoraire);
+    const tauxETTFinal = calculerTauxETTFinal(poste);
+    
+    // 🆕 Calculer les suppléments individuels
+    const supplementHebergement = !poste.hebergementEU ? SUPPLEMENTS.hebergement : 0;
+    const supplementTransport = poste.transportETT ? SUPPLEMENTS.transport : 0;
+    const montantPanierJour = poste.panierRepas ? getPanierRepas(poste.region) : 0;
+    const supplementPanierRepas = montantPanierJour > 0 ? montantPanierJour / 7 : 0;
+    
+    // 🆕 Calculer le coefficient final si disponible
+    const coeffFinal = (poste.coeffBase && poste.facteurPays) 
+      ? calculerCoefficientComplet(poste.coeffBase, poste.facteurPays)
+      : undefined;
+    
+    return {
+      secteur: poste.secteur,
+      poste: poste.poste,
+      classification: poste.classification,
+      quantite: poste.quantite,
+      tauxHoraireBrut,
+      tauxETTFinal,
+      coutMensuel: calculerCoutMensuel(poste),
+      // 🆕 Détails du coefficient
+      coeffBase: poste.coeffBase,
+      facteurPays: poste.facteurPays,
+      coeffFinal,
+      labelPays: poste.labelPays,
+      // 🆕 Détails des suppléments
+      supplementHebergement,
+      supplementTransport,
+      supplementPanierRepas,
+      hebergementActif: !poste.hebergementEU,
+      transportActif: poste.transportETT,
+      panierRepasActif: poste.panierRepas,
+    };
+  });
   
   const totalHT = calculerTotalDevis(postes);
   const totalTTC = parseFloat((totalHT * 1.20).toFixed(2)); // TVA 20%

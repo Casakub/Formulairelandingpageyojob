@@ -60,12 +60,18 @@ export interface DevisFormData {
     id: string;
     secteur: string;
     convention: string;
+    nationalite: string;  // 🆕 Code pays (RO, PL, PT, etc.)
     poste: string;
     classification: string;
     quantite: number;
     salaireBrut: number;
     tauxHoraireBrut: number;
     tauxETT: number;
+    // 🆕 Détails du coefficient pour affichage
+    coeffBase: number;
+    facteurPays: number;
+    coeffFinal: number;
+    labelPays: string;
   }>;
   
   // Étape 4: Conditions
@@ -153,12 +159,18 @@ export default function DemandeDevis() {
         id: crypto.randomUUID(),
         secteur: '',
         convention: '',
+        nationalite: '',  // 🆕 Code pays (RO, PL, PT, etc.)
         poste: '',
         classification: '',
         quantite: 1,
         salaireBrut: 0,
         tauxHoraireBrut: 0,
-        tauxETT: 0
+        tauxETT: 0,
+        // 🆕 Détails du coefficient pour affichage
+        coeffBase: 0,
+        facteurPays: 0,
+        coeffFinal: 0,
+        labelPays: ''
       }
     ],
     conditions: {

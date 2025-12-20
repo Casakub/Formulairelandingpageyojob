@@ -28,7 +28,11 @@ export function StepRecapitulatif({ formData, onSubmit, isSubmitting }: StepReca
     hebergementEU: formData.conditions.hebergement.chargeEU,
     transportETT: formData.conditions.transportLocal.chargeETT,
     panierRepas: formData.conditions.repas.type === 'panier',
-    region: formData.entreprise.region
+    region: formData.entreprise.region,
+    // 🆕 Passer les détails du coefficient
+    coeffBase: poste.coeffBase,
+    facteurPays: poste.facteurPays,
+    labelPays: poste.labelPays,
   }));
 
   const recap = calculerRecapitulatif(
@@ -131,18 +135,70 @@ export function StepRecapitulatif({ formData, onSubmit, isSubmitting }: StepReca
                 <div>
                   <h4 className="text-white font-medium">{poste.poste}</h4>
                   <p className="text-white/60 text-sm">{poste.secteur} • {poste.classification}</p>
+                  {poste.labelPays && (
+                    <p className="text-cyan-300/80 text-sm mt-1">
+                      📍 Nationalité: {poste.labelPays}
+                    </p>
+                  )}
                 </div>
                 <span className="bg-cyan-500/20 text-cyan-200 px-3 py-1 rounded-full text-sm">
                   × {poste.quantite}
                 </span>
               </div>
+
+              {/* 🆕 Coefficient ETT */}
+              {poste.coeffFinal && (
+                <div className="mb-3 p-3 rounded-lg bg-violet-500/10 border border-violet-400/20">
+                  <p className="text-violet-200 text-xs mb-1">📊 Coefficient ETT appliqué</p>
+                  <div className="flex items-center gap-2 text-sm">
+                    <span className="text-white/70">
+                      Coeff. base: <span className="text-white font-medium">{poste.coeffBase?.toFixed(2)}</span>
+                    </span>
+                    <span className="text-white/50">×</span>
+                    <span className="text-white/70">
+                      Facteur pays: <span className="text-white font-medium">{poste.facteurPays?.toFixed(2)}</span>
+                    </span>
+                    <span className="text-white/50">=</span>
+                    <span className="text-green-400 font-medium">{poste.coeffFinal.toFixed(2)}</span>
+                  </div>
+                </div>
+              )}
+
+              {/* 🆕 Options/Suppléments actifs */}
+              {(poste.hebergementActif || poste.transportActif || poste.panierRepasActif) && (
+                <div className="mb-3 p-3 rounded-lg bg-cyan-500/10 border border-cyan-400/20">
+                  <p className="text-cyan-200 text-xs mb-2">✨ Options incluses dans le taux ETT</p>
+                  <div className="space-y-1 text-sm">
+                    {poste.hebergementActif && (
+                      <div className="flex items-center justify-between">
+                        <span className="text-white/70">✓ Hébergement</span>
+                        <span className="text-green-400 font-medium">+{formaterMontant(poste.supplementHebergement || 0)}/h</span>
+                      </div>
+                    )}
+                    {poste.transportActif && (
+                      <div className="flex items-center justify-between">
+                        <span className="text-white/70">✓ Transport local</span>
+                        <span className="text-green-400 font-medium">+{formaterMontant(poste.supplementTransport || 0)}/h</span>
+                      </div>
+                    )}
+                    {poste.panierRepasActif && (
+                      <div className="flex items-center justify-between">
+                        <span className="text-white/70">✓ Panier repas</span>
+                        <span className="text-green-400 font-medium">+{formaterMontant(poste.supplementPanierRepas || 0)}/h</span>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
+
+              {/* Calculs finaux */}
               <div className="grid grid-cols-3 gap-4 text-sm">
                 <div>
                   <p className="text-white/60">Taux horaire brut</p>
                   <p className="text-white font-medium">{formaterMontant(poste.tauxHoraireBrut)}/h</p>
                 </div>
                 <div>
-                  <p className="text-white/60">Taux ETT</p>
+                  <p className="text-white/60">Taux ETT final</p>
                   <p className="text-white font-medium">{formaterMontant(poste.tauxETTFinal)}/h</p>
                 </div>
                 <div>
