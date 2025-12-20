@@ -1,0 +1,179 @@
+{
+  "supplements_horaires": {
+    "hebergement": {
+      "montant": 3.50,
+      "unite": "€/h",
+      "description": "Supplément hébergement si NON à charge de l'entreprise utilisatrice"
+    },
+    "transport": {
+      "montant": 1.50,
+      "unite": "€/h",
+      "description": "Supplément transport si à charge de l'ETT"
+    }
+  },
+  "paniers_repas": {
+    "AUVERGNE-RHÔNE-ALPES": {
+      "Bâtiment": 10.50,
+      "Métallurgie": 5.94,
+      "TP": 10.50,
+      "Hôtellerie": 5.94,
+      "Restauration": 5.94,
+      "Plasturgie": 5.94,
+      "Automobile Carrosserie": 5.94,
+      "Sylviculture": 9.00,
+      "Cartonnerie": 5.94,
+      "Autre": 8.00
+    },
+    "BOURGOGNE-FRANCHE-COMTÉ": {
+      "Bâtiment": 10.00,
+      "Métallurgie": 5.94,
+      "TP": 10.00,
+      "Hôtellerie": 5.94,
+      "Restauration": 5.94,
+      "Plasturgie": 5.94,
+      "Automobile Carrosserie": 5.94,
+      "Sylviculture": 9.00,
+      "Cartonnerie": 5.94,
+      "Autre": 8.00
+    },
+    "BRETAGNE": {
+      "Bâtiment": 10.00,
+      "Métallurgie": 5.94,
+      "TP": 10.00,
+      "Hôtellerie": 5.94,
+      "Restauration": 5.94,
+      "Plasturgie": 5.94,
+      "Automobile Carrosserie": 5.94,
+      "Sylviculture": 9.00,
+      "Cartonnerie": 5.94,
+      "Autre": 8.00
+    },
+    "CENTRE-VAL DE LOIRE": {
+      "Bâtiment": 10.00,
+      "Métallurgie": 5.94,
+      "TP": 10.00,
+      "Hôtellerie": 5.94,
+      "Restauration": 5.94,
+      "Plasturgie": 5.94,
+      "Automobile Carrosserie": 5.94,
+      "Sylviculture": 9.00,
+      "Cartonnerie": 5.94,
+      "Autre": 8.00
+    },
+    "CORSE": {
+      "Bâtiment": 10.50,
+      "Métallurgie": 5.94,
+      "TP": 10.50,
+      "Hôtellerie": 5.94,
+      "Restauration": 5.94,
+      "Plasturgie": 5.94,
+      "Automobile Carrosserie": 5.94,
+      "Sylviculture": 9.00,
+      "Cartonnerie": 5.94,
+      "Autre": 8.00
+    },
+    "GRAND EST": {
+      "Bâtiment": 10.00,
+      "Métallurgie": 5.94,
+      "TP": 10.00,
+      "Hôtellerie": 5.94,
+      "Restauration": 5.94,
+      "Plasturgie": 5.94,
+      "Automobile Carrosserie": 5.94,
+      "Sylviculture": 9.00,
+      "Cartonnerie": 5.94,
+      "Autre": 8.00
+    },
+    "HAUTS-DE-FRANCE": {
+      "Bâtiment": 10.00,
+      "Métallurgie": 5.94,
+      "TP": 10.00,
+      "Hôtellerie": 5.94,
+      "Restauration": 5.94,
+      "Plasturgie": 5.94,
+      "Automobile Carrosserie": 5.94,
+      "Sylviculture": 9.00,
+      "Cartonnerie": 5.94,
+      "Autre": 8.00
+    },
+    "ÎLE-DE-FRANCE": {
+      "Bâtiment": 12.50,
+      "Métallurgie": 5.94,
+      "TP": 12.50,
+      "Hôtellerie": 5.94,
+      "Restauration": 5.94,
+      "Plasturgie": 5.94,
+      "Automobile Carrosserie": 5.94,
+      "Sylviculture": 9.00,
+      "Cartonnerie": 5.94,
+      "Autre": 8.00
+    },
+    "NORMANDIE": {
+      "Bâtiment": 10.00,
+      "Métallurgie": 5.94,
+      "TP": 10.00,
+      "Hôtellerie": 5.94,
+      "Restauration": 5.94,
+      "Plasturgie": 5.94,
+      "Automobile Carrosserie": 5.94,
+      "Sylviculture": 9.00,
+      "Cartonnerie": 5.94,
+      "Autre": 8.00
+    },
+    "NOUVELLE-AQUITAINE": {
+      "Bâtiment": 10.00,
+      "Métallurgie": 5.94,
+      "TP": 10.00,
+      "Hôtellerie": 5.94,
+      "Restauration": 5.94,
+      "Plasturgie": 5.94,
+      "Automobile Carrosserie": 5.94,
+      "Sylviculture": 9.00,
+      "Cartonnerie": 5.94,
+      "Autre": 8.00
+    },
+    "OCCITANIE": {
+      "Bâtiment": 10.50,
+      "Métallurgie": 5.94,
+      "TP": 10.50,
+      "Hôtellerie": 5.94,
+      "Restauration": 5.94,
+      "Plasturgie": 5.94,
+      "Automobile Carrosserie": 5.94,
+      "Sylviculture": 9.00,
+      "Cartonnerie": 5.94,
+      "Autre": 8.00
+    },
+    "PAYS DE LA LOIRE": {
+      "Bâtiment": 10.00,
+      "Métallurgie": 5.94,
+      "TP": 10.00,
+      "Hôtellerie": 5.94,
+      "Restauration": 5.94,
+      "Plasturgie": 5.94,
+      "Automobile Carrosserie": 5.94,
+      "Sylviculture": 9.00,
+      "Cartonnerie": 5.94,
+      "Autre": 8.00
+    },
+    "PROVENCE-ALPES-CÔTE D'AZUR": {
+      "Bâtiment": 11.50,
+      "Métallurgie": 5.94,
+      "TP": 11.50,
+      "Hôtellerie": 5.94,
+      "Restauration": 5.94,
+      "Plasturgie": 5.94,
+      "Automobile Carrosserie": 5.94,
+      "Sylviculture": 9.00,
+      "Cartonnerie": 5.94,
+      "Autre": 8.00
+    }
+  },
+  "metadata": {
+    "version": "1.0.0",
+    "derniere_modification": "2024-12-20",
+    "modifie_par": "Initialisation système",
+    "description": "Suppléments horaires (hébergement, transport) et paniers repas par région et secteur",
+    "note_paniers_repas": "Les montants sont exprimés en €/jour. Pour calculer le supplément horaire, diviser par 7h (moyenne journalière)."
+  }
+}

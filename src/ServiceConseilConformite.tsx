@@ -230,19 +230,21 @@ export default function ServiceConseilConformite() {
                 </p>
                 <div className="flex flex-col sm:flex-row gap-4 justify-center">
                   <a href="/devis">
-                    <Button className="bg-white text-blue-900 hover:bg-cyan-50 rounded-full px-8 py-6 text-lg shadow-2xl hover:shadow-white/70 transition-all group w-full sm:w-auto">
-                      <span className="flex items-center">
+                    <Button className="relative overflow-hidden group rounded-full bg-gradient-to-r from-cyan-500 to-violet-600 hover:from-cyan-600 hover:to-violet-700 text-white shadow-2xl hover:shadow-cyan-500/50 transition-all px-12 py-6 text-lg">
+                      <span className="relative z-10 flex items-center">
                         Demander un devis
                         <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
                       </span>
+                      <div className="absolute inset-0 -translate-x-full group-hover:translate-x-full transition-transform duration-700 bg-gradient-to-r from-transparent via-white/40 to-transparent" />
                     </Button>
                   </a>
                   <Button 
                     variant="outline" 
-                    className="border-white/30 text-white hover:bg-white/10 rounded-full px-8 py-6 text-lg backdrop-blur-sm"
+                    className="relative overflow-hidden group rounded-full border-white/30 bg-white/10 backdrop-blur-md text-white hover:bg-white/20 hover:border-cyan-400/50 shadow-lg hover:shadow-cyan-500/30 transition-all px-8 py-6 text-lg w-full sm:w-auto"
                     onClick={() => document.getElementById('processus')?.scrollIntoView({ behavior: 'smooth' })}
                   >
-                    Découvrir le processus
+                    <span className="relative z-10">Découvrir le processus</span>
+                    <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 bg-gradient-to-r from-cyan-500/10 to-violet-500/10" />
                   </Button>
                 </div>
               </motion.div>
@@ -535,11 +537,12 @@ export default function ServiceConseilConformite() {
                 Bénéficiez de notre expertise réglementaire et évitez les risques de non-conformité
               </p>
               <a href="/devis">
-                <Button className="bg-white text-blue-900 hover:bg-cyan-50 rounded-full px-12 py-6 text-lg shadow-2xl hover:shadow-white/70 transition-all group">
-                  <span className="flex items-center">
+                <Button className="relative overflow-hidden group rounded-full bg-gradient-to-r from-cyan-500 to-violet-600 hover:from-cyan-600 hover:to-violet-700 text-white shadow-2xl hover:shadow-cyan-500/50 transition-all px-12 py-6 text-lg">
+                  <span className="relative z-10 flex items-center">
                     Demander un devis
                     <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
                   </span>
+                  <div className="absolute inset-0 -translate-x-full group-hover:translate-x-full transition-transform duration-700 bg-gradient-to-r from-transparent via-white/40 to-transparent" />
                 </Button>
               </a>
               <p className="text-white/60 text-sm mt-6">

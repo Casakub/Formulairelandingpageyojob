@@ -893,6 +893,10 @@
     margin-inline: auto;
   }
 
+  .my-2 {
+    margin-block: calc(var(--spacing) * 2);
+  }
+
   .my-4 {
     margin-block: calc(var(--spacing) * 4);
   }
@@ -5784,6 +5788,16 @@
     color: var(--color-cyan-300);
   }
 
+  .text-cyan-300\/70 {
+    color: color-mix(in srgb, oklch(.865 .127 207.078) 70%, transparent);
+  }
+
+  @supports (color: color-mix(in lab, red, red)) {
+    .text-cyan-300\/70 {
+      color: color-mix(in oklab, var(--color-cyan-300) 70%, transparent);
+    }
+  }
+
   .text-cyan-400 {
     color: var(--color-cyan-400);
   }
@@ -7016,6 +7030,16 @@
     color: var(--foreground);
   }
 
+  .placeholder\:text-green-400\/40::placeholder {
+    color: color-mix(in srgb, oklch(.792 .209 151.711) 40%, transparent);
+  }
+
+  @supports (color: color-mix(in lab, red, red)) {
+    .placeholder\:text-green-400\/40::placeholder {
+      color: color-mix(in oklab, var(--color-green-400) 40%, transparent);
+    }
+  }
+
   .placeholder\:text-muted-foreground::placeholder {
     color: var(--muted-foreground);
   }
@@ -7962,6 +7986,13 @@
   @media (hover: hover) {
     .hover\:to-violet-600:hover {
       --tw-gradient-to: var(--color-violet-600);
+      --tw-gradient-stops: var(--tw-gradient-via-stops, var(--tw-gradient-position), var(--tw-gradient-from) var(--tw-gradient-from-position), var(--tw-gradient-to) var(--tw-gradient-to-position));
+    }
+  }
+
+  @media (hover: hover) {
+    .hover\:to-violet-700:hover {
+      --tw-gradient-to: var(--color-violet-700);
       --tw-gradient-stops: var(--tw-gradient-via-stops, var(--tw-gradient-position), var(--tw-gradient-from) var(--tw-gradient-from-position), var(--tw-gradient-to) var(--tw-gradient-to-position));
     }
   }
@@ -9450,6 +9481,16 @@
   @supports (color: color-mix(in lab, red, red)) {
     .\[\&\>span\]\:text-white\/60 > span {
       color: color-mix(in oklab, var(--color-white) 60%, transparent);
+    }
+  }
+
+  .\[\&\>span\]\:text-white\/90 > span {
+    color: #ffffffe6;
+  }
+
+  @supports (color: color-mix(in lab, red, red)) {
+    .\[\&\>span\]\:text-white\/90 > span {
+      color: color-mix(in oklab, var(--color-white) 90%, transparent);
     }
   }
 

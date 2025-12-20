@@ -1,0 +1,153 @@
+{
+  "coefficients": {
+    "Bâtiment": {
+      "Ouvrier Exécution": 1.92,
+      "Ouvrier Professionnel": 1.94,
+      "Compagnon Professionnel": 1.96,
+      "Maître Ouvrier": 1.98,
+      "Chef Equipe": 2.05
+    },
+    "Métallurgie": {
+      "Groupe A - Classe 1": 1.92,
+      "Groupe A - Classe 2": 1.93,
+      "Groupe B - Classe 3": 1.94,
+      "Groupe B - Classe 4": 1.95,
+      "Groupe C - Classe 5": 1.96,
+      "Groupe C - Classe 6": 1.97,
+      "Groupe D - Classe 7": 1.98,
+      "Groupe D - Classe 8": 1.99,
+      "Groupe E - Classe 9": 2.00,
+      "Groupe E - Classe 10": 2.01
+    },
+    "TP": {
+      "Manoeuvre": 1.92,
+      "Manoeuvre spécialisé": 1.94,
+      "Ouvrier professionnel": 1.96,
+      "Ouvrier professionnel confirmé": 1.98,
+      "Compagnon": 2.00,
+      "Chef d'équipe": 2.02
+    },
+    "Hôtellerie": {
+      "Employé débutant": 1.92,
+      "Employé qualifié": 1.94,
+      "Employé hautement qualifié": 1.96,
+      "Agent de maîtrise": 1.98
+    },
+    "Restauration": {
+      "Employé débutant": 1.92,
+      "Employé qualifié": 1.94,
+      "Employé hautement qualifié": 1.96,
+      "Agent de maîtrise": 1.98
+    },
+    "Plasturgie": {
+      "Ouvrier débutant": 1.92,
+      "Ouvrier qualifié": 2.00,
+      "Ouvrier hautement qualifié": 2.08
+    },
+    "Automobile Carrosserie": {
+      "Ouvriers - Échelon 1": 1.92,
+      "Ouvriers - Échelon 2": 1.93,
+      "Ouvriers - Échelon 3": 1.94,
+      "Ouvriers - Échelon 4": 1.95,
+      "Ouvriers - Échelon 5": 1.96,
+      "Ouvriers - Échelon 6": 1.97,
+      "Ouvriers - Échelon 7": 1.98,
+      "Ouvriers - Échelon 8": 1.99,
+      "Ouvriers - Échelon 9": 2.00,
+      "Ouvriers - Échelon 10": 2.01,
+      "Ouvriers - Échelon 11": 2.02,
+      "Ouvriers - Échelon 12": 2.03
+    },
+    "Sylviculture": {
+      "Ouvrier - Niveau I": 1.92,
+      "Ouvrier - Niveau II": 1.94
+    },
+    "Cartonnerie": {
+      "Coefficient 180": 1.90,
+      "Coefficient 190": 1.92,
+      "Coefficient 195": 1.93,
+      "Coefficient 200": 1.94,
+      "Coefficient 210": 1.96,
+      "Coefficient 220": 1.98,
+      "Coefficient 240": 2.00,
+      "Coefficient 260": 2.02,
+      "Coefficient 275": 2.04,
+      "Coefficient 290": 2.06,
+      "Coefficient 315": 2.08,
+      "Coefficient 350": 2.10
+    },
+    "Autre": {
+      "Non défini": 1.92
+    }
+  },
+  "mapping_anciennes_classifications": {
+    "Bâtiment": {
+      "N1P1": "Ouvrier Exécution",
+      "N1P2": "Ouvrier Professionnel",
+      "N2P1": "Compagnon Professionnel",
+      "N2P2": "Compagnon Professionnel",
+      "N3P1": "Maître Ouvrier",
+      "N3P2": "Maître Ouvrier",
+      "N4P1": "Chef Equipe",
+      "N4P2": "Chef Equipe"
+    },
+    "Métallurgie": {
+      "Niveau I": "Groupe A - Classe 1",
+      "Niveau II": "Groupe B - Classe 3",
+      "Niveau III": "Groupe C - Classe 5",
+      "Niveau IV": "Groupe D - Classe 7",
+      "Niveau V": "Groupe E - Classe 9"
+    },
+    "TP": {
+      "N1": "Manoeuvre",
+      "N2": "Manoeuvre spécialisé",
+      "N3": "Ouvrier professionnel",
+      "N4": "Compagnon"
+    },
+    "Hôtellerie": {
+      "Niveau I": "Employé débutant",
+      "Niveau II": "Employé qualifié",
+      "Niveau III": "Employé hautement qualifié",
+      "Niveau IV": "Agent de maîtrise",
+      "Niveau V": "Agent de maîtrise"
+    },
+    "Restauration": {
+      "Niveau I": "Employé débutant",
+      "Niveau II": "Employé qualifié",
+      "Niveau III": "Employé hautement qualifié",
+      "Niveau IV": "Agent de maîtrise",
+      "Niveau V": "Agent de maîtrise"
+    },
+    "Plasturgie": {
+      "Niveau I": "Ouvrier débutant",
+      "Niveau II": "Ouvrier qualifié",
+      "Niveau III": "Ouvrier hautement qualifié",
+      "Niveau IV": "Ouvrier hautement qualifié"
+    },
+    "Automobile Carrosserie": {
+      "Niveau I": "Ouvriers - Échelon 1",
+      "Niveau II": "Ouvriers - Échelon 4",
+      "Niveau III": "Ouvriers - Échelon 7",
+      "Niveau IV": "Ouvriers - Échelon 10"
+    },
+    "Sylviculture": {
+      "Niveau I": "Ouvrier - Niveau I",
+      "Niveau II": "Ouvrier - Niveau II",
+      "Niveau III": "Ouvrier - Niveau II",
+      "Niveau IV": "Ouvrier - Niveau II"
+    },
+    "Cartonnerie": {
+      "Niveau I": "Coefficient 180",
+      "Niveau II": "Coefficient 210",
+      "Niveau III": "Coefficient 260",
+      "Niveau IV": "Coefficient 315"
+    }
+  },
+  "metadata": {
+    "version": "1.0.0",
+    "derniere_modification": "2024-12-20",
+    "modifie_par": "Initialisation système",
+    "description": "Coefficients de base par secteur et classification. Ces coefficients sont multipliés par le facteur pays pour obtenir le coefficient final appliqué au taux horaire brut.",
+    "note": "Le mapping_anciennes_classifications permet la rétrocompatibilité avec les anciennes dénominations de classifications présentes dans devis-data.ts"
+  }
+}

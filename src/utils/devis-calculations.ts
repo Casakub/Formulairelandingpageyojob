@@ -13,6 +13,10 @@ interface PosteData {
   region: string;
 }
 
+// ============================================
+// ANCIENNES FONCTIONS (compatibilité)
+// ============================================
+
 /**
  * Calcule le taux horaire brut
  */
@@ -23,6 +27,7 @@ export function calculerTauxHoraireBrut(salaireMensuel: number, baseHoraire: num
 
 /**
  * Calcule le taux ETT de base (taux horaire × coefficient)
+ * @deprecated Utiliser calculerTauxETTAvecPays pour les nouveaux devis
  */
 export function calculerTauxETTBase(tauxHoraireBrut: number, secteur: string): number {
   const coefficient = COEFFICIENTS[secteur] || 1.40;
@@ -225,4 +230,120 @@ export function calculerRecapitulatif(
     dureeMission,
     totalMission
   };
+}
+
+// ============================================
+// NOUVELLES FONCTIONS (avec pays)
+// ============================================
+
+/**
+ * Calcule le coefficient complet (coefficient base × facteur pays)
+ * Formule : Coeff final = Coeff base × Facteur pays
+ * 
+ * @param coeffBase - Coefficient de base (secteur + classification), ex: 1.92
+ * @param facteurPays - Facteur multiplicateur du pays, ex: 1.05 pour Portugal
+ * @returns Coefficient final arrondi à 2 décimales
+ * 
+ * @example
+ * calculerCoefficientComplet(1.92, 1.05) // 2.02
+ */
+export function calculerCoefficientComplet(
+  coeffBase: number,
+  facteurPays: number
+): number {
+  const coeffFinal = coeffBase * facteurPays;
+  return Math.round(coeffFinal * 100) / 100;
+}
+
+/**
+ * Calcule le taux ETT avec prise en compte du pays d'origine
+ * Formule : Taux ETT = Taux horaire brut × Coefficient complet
+ * 
+ * @param tauxHoraireBrut - Taux horaire brut du salarié
+ * @param coeffBase - Coefficient de base (secteur + classification)
+ * @param facteurPays - Facteur multiplicateur du pays
+ * @returns Taux ETT arrondi à 2 décimales
+ * 
+ * @example
+ * calculerTauxETTAvecPays(12.50, 1.92, 1.05) // 25.25
+ */
+export function calculerTauxETTAvecPays(
+  tauxHoraireBrut: number,
+  coeffBase: number,
+  facteurPays: number
+): number {
+  const coeffFinal = calculerCoefficientComplet(coeffBase, facteurPays);
+  const tauxETT = tauxHoraireBrut * coeffFinal;
+  return Math.round(tauxETT * 100) / 100;
+}
+
+/**
+ * Calcule le coût mensuel estimé pour un profil
+ * Formule : Coût = Taux ETT × Base horaire × Quantité
+ * 
+ * @param tauxETT - Taux ETT final (avec ou sans suppléments)
+ * @param baseHoraire - Nombre d'heures mensuelles (ex: 151.67)
+ * @param quantite - Nombre de personnes
+ * @returns Coût mensuel total arrondi à 2 décimales
+ */
+export function calculerCoutMensuelProfil(
+  tauxETT: number,
+  baseHoraire: number,
+  quantite: number
+): number {
+  const cout = tauxETT * baseHoraire * quantite;
+  return Math.round(cout * 100) / 100;
+}
+
+/**
+ * Calcule le taux ETT complet avec tous les suppléments
+ * Formule : Taux ETT + Hébergement + Transport + Panier repas
+ * 
+ * @param tauxHoraireBrut - Taux horaire brut du salarié
+ * @param coeffBase - Coefficient de base (secteur + classification)
+ * @param facteurPays - Facteur multiplicateur du pays
+ * @param supplementHebergement - Montant supplément hébergement (€/h)
+ * @param supplementTransport - Montant supplément transport (€/h)
+ * @param options - Options pour les suppléments
+ * @returns Taux ETT complet avec suppléments
+ * 
+ * @example
+ * calculerTauxETTComplet(12.50, 1.92, 1.05, 3.50, 1.50, {
+ *   hebergementNonFourni: true,
+ *   transportETT: true,
+ *   panierRepas: 10.50
+ * }) // 30.75
+ */
+export function calculerTauxETTComplet(
+  tauxHoraireBrut: number,
+  coeffBase: number,
+  facteurPays: number,
+  supplementHebergement: number,
+  supplementTransport: number,
+  options: {
+    hebergementNonFourni?: boolean;
+    transportETT?: boolean;
+    panierRepas?: number; // montant du panier en €/jour, 0 si non applicable
+  }
+): number {
+  // Taux ETT de base
+  let tauxETT = calculerTauxETTAvecPays(tauxHoraireBrut, coeffBase, facteurPays);
+
+  // Supplément hébergement (si non fourni par l'entreprise utilisatrice)
+  if (options.hebergementNonFourni) {
+    tauxETT += supplementHebergement;
+  }
+
+  // Supplément transport (si à charge de l'ETT)
+  if (options.transportETT) {
+    tauxETT += supplementTransport;
+  }
+
+  // Supplément panier repas (montant/jour ÷ 7h)
+  if (options.panierRepas && options.panierRepas > 0) {
+    const supplementPanierHoraire = options.panierRepas / 7;
+    tauxETT += supplementPanierHoraire;
+  }
+
+  return Math.round(tauxETT * 100) / 100;
 }

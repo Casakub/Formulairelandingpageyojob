@@ -1,0 +1,70 @@
+{
+  "facteurs": {
+    "RO": {
+      "code": "RO",
+      "label": "Roumanie",
+      "facteur": 1.00,
+      "description": "Coefficient de référence"
+    },
+    "PL": {
+      "code": "PL",
+      "label": "Pologne",
+      "facteur": 1.02,
+      "description": "Légère majoration liée aux coûts de détachement"
+    },
+    "PT": {
+      "code": "PT",
+      "label": "Portugal",
+      "facteur": 1.05,
+      "description": "Majoration standard pour pays d'Europe du Sud"
+    },
+    "ES": {
+      "code": "ES",
+      "label": "Espagne",
+      "facteur": 1.06,
+      "description": "Majoration standard pour pays d'Europe du Sud"
+    },
+    "BG": {
+      "code": "BG",
+      "label": "Bulgarie",
+      "facteur": 0.98,
+      "description": "Légère réduction liée aux coûts de détachement"
+    },
+    "HU": {
+      "code": "HU",
+      "label": "Hongrie",
+      "facteur": 1.01,
+      "description": "Coefficient proche de la référence"
+    },
+    "SK": {
+      "code": "SK",
+      "label": "Slovaquie",
+      "facteur": 1.00,
+      "description": "Coefficient de référence"
+    },
+    "CZ": {
+      "code": "CZ",
+      "label": "Tchéquie",
+      "facteur": 1.03,
+      "description": "Légère majoration liée aux coûts de détachement"
+    },
+    "HR": {
+      "code": "HR",
+      "label": "Croatie",
+      "facteur": 1.01,
+      "description": "Coefficient proche de la référence"
+    },
+    "SI": {
+      "code": "SI",
+      "label": "Slovénie",
+      "facteur": 1.04,
+      "description": "Majoration liée aux coûts de détachement"
+    }
+  },
+  "metadata": {
+    "version": "1.0.0",
+    "derniere_modification": "2024-12-20",
+    "modifie_par": "Initialisation système",
+    "description": "Facteurs multiplicateurs par pays appliqués aux coefficients de base. Formule : Coefficient final = Coefficient base × Facteur pays"
+  }
+}
