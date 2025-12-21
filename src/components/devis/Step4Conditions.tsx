@@ -8,6 +8,8 @@ import { MOTIFS_RECOURS, PERIODES_ESSAI, DELAIS_PAIEMENT } from '../../data/devi
 import { getPanierRepasByPays } from '../../data/devis-data-pays';
 import { formaterMontant } from '../../utils/devis-calculations';
 import { useState } from 'react';
+import { useDevisTranslationStatic } from '../../hooks/useDevisTranslation';
+import type { DevisLanguage } from '../../src/i18n/devis/types';
 
 interface Step4ConditionsProps {
   data: {
@@ -33,16 +35,18 @@ interface Step4ConditionsProps {
   pays: string;  // 🆕 Pays de l'entreprise cliente
   region: string;
   onChange: (data: any) => void;
+  lang?: DevisLanguage;
 }
 
-export function Step4Conditions({ data, pays, region, onChange }: Step4ConditionsProps) {
+export function Step4Conditions({ data, pays, region, onChange, lang = 'fr' }: Step4ConditionsProps) {
+  const { t, isLoading: isLoadingTranslations } = useDevisTranslationStatic(lang);
   const [dateError, setDateError] = useState('');
 
   const handleChange = (field: string, value: any) => {
     // 🆕 Valider la date de fin si on change la date de fin
     if (field === 'dateFin' && value && data.dateDebut) {
       if (new Date(value) < new Date(data.dateDebut)) {
-        setDateError('La date de fin ne peut pas être antérieure à la date de début');
+        setDateError(t.step4.dateError);
         return;
       } else {
         setDateError('');
@@ -73,12 +77,20 @@ export function Step4Conditions({ data, pays, region, onChange }: Step4Condition
   const montantPanierJour = getPanierRepasByPays(pays, region);
   const supplementPanierHoraire = montantPanierJour / 7;
 
+  if (isLoadingTranslations) {
+    return (
+      <div className="flex items-center justify-center py-12">
+        <div className="text-white/70">{t.common.loading}</div>
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-6">
       <div>
-        <h2 className="text-white text-2xl mb-2">Conditions de mission</h2>
+        <h2 className="text-white text-2xl mb-2">{t.step4.title}</h2>
         <p className="text-white/70">
-          Précisez les modalités et conditions de la mission.
+          {t.step4.subtitle}
         </p>
       </div>
 
@@ -86,7 +98,7 @@ export function Step4Conditions({ data, pays, region, onChange }: Step4Condition
         {/* Date de début */}
         <div>
           <Label htmlFor="dateDebut" className="text-white mb-2 block">
-            Date de début <span className="text-red-400">*</span>
+            {t.step4.fields.dateDebut.label} <span className="text-red-400">{t.common.required}</span>
           </Label>
           <Input
             id="dateDebut"
@@ -101,7 +113,7 @@ export function Step4Conditions({ data, pays, region, onChange }: Step4Condition
         {/* Date de fin */}
         <div>
           <Label htmlFor="dateFin" className="text-white mb-2 block">
-            Date de fin (optionnel)
+            {t.step4.fields.dateFin.label}
           </Label>
           <Input
             id="dateFin"
@@ -117,7 +129,7 @@ export function Step4Conditions({ data, pays, region, onChange }: Step4Condition
         {/* Période d'essai */}
         <div>
           <Label className="text-white mb-2 block">
-            Période d'essai
+            {t.step4.fields.periodeEssai.label}
           </Label>
           <Select value={data.periodeEssai} onValueChange={(value) => handleChange('periodeEssai', value)}>
             <SelectTrigger className="bg-white/10 border-white/20 text-white">
@@ -136,7 +148,7 @@ export function Step4Conditions({ data, pays, region, onChange }: Step4Condition
         {/* Base horaire */}
         <div>
           <Label htmlFor="baseHoraire" className="text-white mb-2 block">
-            Base horaire mensuelle
+            {t.step4.fields.baseHoraire.label}
           </Label>
           <Input
             id="baseHoraire"
@@ -146,20 +158,20 @@ export function Step4Conditions({ data, pays, region, onChange }: Step4Condition
             className="bg-white/10 border-white/20 text-white"
             step="0.01"
           />
-          <p className="text-white/60 text-xs mt-1">Défaut : 151.67h (base légale)</p>
+          <p className="text-white/60 text-xs mt-1">{t.step4.fields.baseHoraire.helper}</p>
         </div>
 
         {/* Lieu(x) de mission */}
         <div className="md:col-span-2">
           <Label htmlFor="lieuxMission" className="text-white mb-2 block">
-            Lieu(x) de mission <span className="text-red-400">*</span>
+            {t.step4.fields.lieuxMission.label} <span className="text-red-400">{t.common.required}</span>
           </Label>
           <Input
             id="lieuxMission"
             value={data.lieuxMission}
             onChange={(e) => handleChange('lieuxMission', e.target.value)}
             className="bg-white/10 border-white/20 text-white placeholder:text-white/40"
-            placeholder="Adresse du site de mission"
+            placeholder={t.step4.fields.lieuxMission.placeholder}
             required
           />
         </div>
@@ -167,11 +179,11 @@ export function Step4Conditions({ data, pays, region, onChange }: Step4Condition
         {/* Motif du recours */}
         <div>
           <Label className="text-white mb-2 block">
-            Motif du recours
+            {t.step4.fields.motifRecours.label}
           </Label>
           <Select value={data.motifRecours} onValueChange={(value) => handleChange('motifRecours', value)}>
             <SelectTrigger className="bg-white/10 border-white/20 text-white">
-              <SelectValue placeholder="Sélectionnez un motif" />
+              <SelectValue placeholder={t.step4.fields.motifRecours.placeholder} />
             </SelectTrigger>
             <SelectContent className="bg-gray-900 border-white/20">
               {MOTIFS_RECOURS.map((motif) => (
@@ -186,11 +198,11 @@ export function Step4Conditions({ data, pays, region, onChange }: Step4Condition
         {/* Délai de paiement */}
         <div>
           <Label className="text-white mb-2 block">
-            Délai de paiement souhaité
+            {t.step4.fields.delaiPaiement.label}
           </Label>
           <Select value={data.delaiPaiement} onValueChange={(value) => handleChange('delaiPaiement', value)}>
             <SelectTrigger className="bg-white/10 border-white/20 text-white">
-              <SelectValue placeholder="Sélectionnez un délai" />
+              <SelectValue placeholder={t.step4.fields.delaiPaiement.placeholder} />
             </SelectTrigger>
             <SelectContent className="bg-gray-900 border-white/20">
               {DELAIS_PAIEMENT.map((delai) => (
@@ -205,12 +217,12 @@ export function Step4Conditions({ data, pays, region, onChange }: Step4Condition
 
       {/* Section Hébergement */}
       <div className="border border-white/10 rounded-lg p-6 bg-white/5">
-        <h3 className="text-white text-lg mb-4">🏠 Hébergement</h3>
+        <h3 className="text-white text-lg mb-4">{t.step4.hebergement.title}</h3>
         <div className="space-y-4">
           <div className="flex items-center justify-between">
             <div>
-              <Label className="text-white">Hébergement à la charge de l'EU ?</Label>
-              <p className="text-white/60 text-sm">Si non, supplément de +3.50€/h appliqué</p>
+              <Label className="text-white">{t.step4.hebergement.chargeEU.label}</Label>
+              <p className="text-white/60 text-sm">{t.step4.hebergement.chargeEU.helper}</p>
             </div>
             <Switch
               checked={data.hebergement.chargeEU}
@@ -221,21 +233,21 @@ export function Step4Conditions({ data, pays, region, onChange }: Step4Condition
           {!data.hebergement.chargeEU && (
             <div className="bg-yellow-500/10 border border-yellow-500/30 rounded-lg p-3">
               <p className="text-yellow-200 text-sm">
-                ⚠️ Supplément hébergement : +3.50€/h ajouté au taux ETT
+                {t.step4.hebergement.supplementWarning}
               </p>
             </div>
           )}
 
           <div>
             <Label htmlFor="commentaireHebergement" className="text-white mb-2 block">
-              Commentaire hébergement
+              {t.step4.hebergement.commentaire.label}
             </Label>
             <Textarea
               id="commentaireHebergement"
               value={data.hebergement.commentaire}
               onChange={(e) => handleNestedChange('hebergement', 'commentaire', e.target.value)}
               className="bg-white/10 border-white/20 text-white placeholder:text-white/40"
-              placeholder="Précisions sur l'hébergement..."
+              placeholder={t.step4.hebergement.commentaire.placeholder}
               rows={3}
             />
           </div>
@@ -244,11 +256,11 @@ export function Step4Conditions({ data, pays, region, onChange }: Step4Condition
 
       {/* Section Transport local */}
       <div className="border border-white/10 rounded-lg p-6 bg-white/5">
-        <h3 className="text-white text-lg mb-4">🚗 Transport local</h3>
+        <h3 className="text-white text-lg mb-4">{t.step4.transport.title}</h3>
         <div className="flex items-center justify-between">
           <div>
-            <Label className="text-white">Transport à la charge de l'ETT ?</Label>
-            <p className="text-white/60 text-sm">Si oui, supplément de +1.50€/h appliqué</p>
+            <Label className="text-white">{t.step4.transport.chargeETT.label}</Label>
+            <p className="text-white/60 text-sm">{t.step4.transport.chargeETT.helper}</p>
           </div>
           <Switch
             checked={data.transportLocal.chargeETT}
@@ -259,7 +271,7 @@ export function Step4Conditions({ data, pays, region, onChange }: Step4Condition
         {data.transportLocal.chargeETT && (
           <div className="bg-cyan-500/10 border border-cyan-500/30 rounded-lg p-3 mt-4">
             <p className="text-cyan-200 text-sm">
-              ✓ Supplément transport : +1.50€/h ajouté au taux ETT
+              {t.step4.transport.supplementInfo}
             </p>
           </div>
         )}
@@ -267,25 +279,25 @@ export function Step4Conditions({ data, pays, region, onChange }: Step4Condition
 
       {/* Section Repas */}
       <div className="border border-white/10 rounded-lg p-6 bg-white/5">
-        <h3 className="text-white text-lg mb-4">🍽️ Repas</h3>
+        <h3 className="text-white text-lg mb-4">{t.step4.repas.title}</h3>
         <RadioGroup value={data.repas.type} onValueChange={(value: any) => handleNestedChange('repas', 'type', value)}>
           <div className="space-y-3">
             <div className="flex items-center space-x-2">
               <RadioGroupItem value="restaurant" id="restaurant" className="border-white/20" />
               <Label htmlFor="restaurant" className="text-white cursor-pointer">
-                Restaurant d'entreprise
+                {t.step4.repas.options.restaurant}
               </Label>
             </div>
             <div className="flex items-center space-x-2">
               <RadioGroupItem value="panier" id="panier" className="border-white/20" />
               <Label htmlFor="panier" className="text-white cursor-pointer">
-                Panier repas
+                {t.step4.repas.options.panier}
               </Label>
             </div>
             <div className="flex items-center space-x-2">
               <RadioGroupItem value="non-concerne" id="non-concerne" className="border-white/20" />
               <Label htmlFor="non-concerne" className="text-white cursor-pointer">
-                Non concerné
+                {t.step4.repas.options.nonConcerne}
               </Label>
             </div>
           </div>
@@ -295,8 +307,8 @@ export function Step4Conditions({ data, pays, region, onChange }: Step4Condition
           <div className="bg-green-500/10 border border-green-500/30 rounded-lg p-4 mt-4">
             <p className="text-green-200/80 text-sm mt-1">
               {getPanierRepasByPays(pays, region) > 0
-                ? `Montant : ${formaterMontant(getPanierRepasByPays(pays, region))}/jour`
-                : 'Montant non défini pour cette région'}
+                ? t.step4.repas.montantInfo.replace('{montant}', formaterMontant(getPanierRepasByPays(pays, region)))
+                : t.step4.repas.montantNonDefini}
             </p>
             {/* ❌ SUPPRIMÉ : Le panier repas n'est pas un supplément horaire */}
           </div>

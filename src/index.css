@@ -1309,6 +1309,10 @@
     max-height: 92vh;
   }
 
+  .max-h-\[300px\] {
+    max-height: 300px;
+  }
+
   .max-h-\[400px\] {
     max-height: 400px;
   }
@@ -1479,6 +1483,10 @@
 
   .w-\[1px\] {
     width: 1px;
+  }
+
+  .w-\[120px\] {
+    width: 120px;
   }
 
   .w-\[180px\] {
@@ -2586,16 +2594,6 @@
     border-color: var(--color-violet-500);
   }
 
-  .border-violet-500\/30 {
-    border-color: color-mix(in srgb, oklch(.606 .25 292.717) 30%, transparent);
-  }
-
-  @supports (color: color-mix(in lab, red, red)) {
-    .border-violet-500\/30 {
-      border-color: color-mix(in oklab, var(--color-violet-500) 30%, transparent);
-    }
-  }
-
   .border-violet-600 {
     border-color: var(--color-violet-600);
   }
@@ -2967,6 +2965,16 @@
   @supports (color: color-mix(in lab, red, red)) {
     .bg-cyan-500\/20 {
       background-color: color-mix(in oklab, var(--color-cyan-500) 20%, transparent);
+    }
+  }
+
+  .bg-cyan-500\/30 {
+    background-color: color-mix(in srgb, oklch(.715 .143 215.221) 30%, transparent);
+  }
+
+  @supports (color: color-mix(in lab, red, red)) {
+    .bg-cyan-500\/30 {
+      background-color: color-mix(in oklab, var(--color-cyan-500) 30%, transparent);
     }
   }
 
@@ -9727,6 +9735,10 @@
 
   .\[\&\:last-child\]\:pb-6:last-child {
     padding-bottom: calc(var(--spacing) * 6);
+  }
+
+  .\[\&\>span\]\:text-white > span {
+    color: var(--color-white);
   }
 
   .\[\&\>span\]\:text-white\/60 > span {

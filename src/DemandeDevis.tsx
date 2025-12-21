@@ -30,6 +30,11 @@ import { Step4Conditions } from './components/devis/Step4Conditions';
 import { Step5Candidats } from './components/devis/Step5Candidats';
 import { StepRecapitulatif } from './components/devis/StepRecapitulatif';
 
+// Import du système de traduction
+import { LanguageSelector, getSuggestedLanguage } from './src/i18n/devis';
+import type { DevisLanguage } from './src/i18n/devis/types';
+import { useDevisTranslationStatic } from './hooks/useDevisTranslation';
+
 // Types pour les données du formulaire
 export interface DevisFormData {
   // Étape 1: Entreprise
@@ -124,17 +129,23 @@ export interface DevisFormData {
   };
 }
 
-const STEPS = [
-  { id: 1, title: 'Entreprise', icon: Building2, badge: '🏢 Votre entreprise' },
-  { id: 2, title: 'Contact', icon: User, badge: '👤 Votre contact' },
-  { id: 3, title: 'Besoins', icon: Briefcase, badge: '💼 Vos besoins' },
-  { id: 4, title: 'Conditions', icon: FileText, badge: '📋 Conditions' },
-  { id: 5, title: 'Candidats', icon: Users, badge: '👷 Profil recherché' },
-  { id: 6, title: 'Récapitulatif', icon: FileCheck, badge: '✅ Récapitulatif' }
-];
-
 export default function DemandeDevis() {
   const [currentStep, setCurrentStep] = useState(1);
+  const [lang, setLang] = useState<DevisLanguage>('fr');
+  
+  // Charger les traductions pour la langue active
+  const { t } = useDevisTranslationStatic(lang);
+  
+  // Générer les steps avec traductions dynamiquement
+  const STEPS = [
+    { id: 1, title: t.navigation.steps.entreprise.title, icon: Building2, badge: t.navigation.steps.entreprise.badge },
+    { id: 2, title: t.navigation.steps.contact.title, icon: User, badge: t.navigation.steps.contact.badge },
+    { id: 3, title: t.navigation.steps.besoins.title, icon: Briefcase, badge: t.navigation.steps.besoins.badge },
+    { id: 4, title: t.navigation.steps.conditions.title, icon: FileText, badge: t.navigation.steps.conditions.badge },
+    { id: 5, title: t.navigation.steps.candidats.title, icon: Users, badge: t.navigation.steps.candidats.badge },
+    { id: 6, title: t.navigation.steps.recapitulatif.title, icon: FileCheck, badge: t.navigation.steps.recapitulatif.badge }
+  ];
+
   const [formData, setFormData] = useState<DevisFormData>({
     entreprise: {
       pays: 'France', // Valeur par défaut
@@ -337,6 +348,7 @@ export default function DemandeDevis() {
           <Step1Entreprise
             data={formData.entreprise}
             onChange={(data) => updateFormData('entreprise', data)}
+            lang={lang}
           />
         );
       case 2:
@@ -344,6 +356,7 @@ export default function DemandeDevis() {
           <Step2Contact
             data={formData.contact}
             onChange={(data) => updateFormData('contact', data)}
+            lang={lang}
           />
         );
       case 3:
@@ -353,6 +366,7 @@ export default function DemandeDevis() {
             pays={formData.entreprise.pays}
             region={formData.entreprise.region}
             onChange={(data) => updateFormData('postes', data)}
+            lang={lang}
           />
         );
       case 4:
@@ -362,6 +376,7 @@ export default function DemandeDevis() {
             pays={formData.entreprise.pays}
             region={formData.entreprise.region}
             onChange={(data) => updateFormData('conditions', data)}
+            lang={lang}
           />
         );
       case 5:
@@ -369,6 +384,7 @@ export default function DemandeDevis() {
           <Step5Candidats
             data={formData.candidats}
             onChange={(data) => updateFormData('candidats', data)}
+            lang={lang}
           />
         );
       case 6:
@@ -376,6 +392,7 @@ export default function DemandeDevis() {
           <StepRecapitulatif
             formData={formData}
             onSubmit={handleSubmit}
+            lang={lang}
             isSubmitting={isSubmitting}
           />
         );
@@ -408,13 +425,23 @@ export default function DemandeDevis() {
                   YOJOB
                 </span>
               </a>
-              <Button
-                className="relative overflow-hidden group rounded-full bg-white/10 backdrop-blur-md text-white border border-white/20 hover:bg-white/20 hover:border-cyan-400/50 shadow-lg hover:shadow-cyan-500/30 transition-all duration-300"
-                onClick={() => window.history.back()}
-              >
-                <ArrowLeft className="w-4 h-4 mr-2" />
-                Retour
-              </Button>
+
+              {/* Language Selector */}
+              <div className="flex items-center gap-4">
+                <LanguageSelector 
+                  value={lang} 
+                  onChange={setLang}
+                  suggestedCountry={formData.entreprise.pays}
+                  showMVPOnly={true}
+                />
+                <Button
+                  className="relative overflow-hidden group rounded-full bg-white/10 backdrop-blur-md text-white border border-white/20 hover:bg-white/20 hover:border-cyan-400/50 shadow-lg hover:shadow-cyan-500/30 transition-all duration-300"
+                  onClick={() => window.history.back()}
+                >
+                  <ArrowLeft className="w-4 h-4 mr-2" />
+                  Retour
+                </Button>
+              </div>
             </div>
           </div>
         </header>

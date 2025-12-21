@@ -9,6 +9,8 @@ import { SECTEURS } from '../../data/devis-data';
 import { getSalairesByPaysRegion, getCoefficientByPays } from '../../data/devis-data-pays';
 import { calculerTauxHoraireBrut, calculerTauxETTAvecPays, formaterMontant, calculerCoutMensuelProfil } from '../../utils/devis-calculations';
 import { useDevisConfig } from '../../hooks/useDevisConfig';
+import { useDevisTranslationStatic } from '../../hooks/useDevisTranslation';
+import type { DevisLanguage } from '../../src/i18n/devis/types';
 
 interface Poste {
   id: string;
@@ -33,9 +35,11 @@ interface Step3BesoinsProps {
   pays: string;  // 🆕 Pays de l'entreprise cliente
   region: string;
   onChange: (data: Poste[]) => void;
+  lang?: DevisLanguage;
 }
 
-export function Step3Besoins({ data, pays, region, onChange }: Step3BesoinsProps) {
+export function Step3Besoins({ data, pays, region, onChange, lang = 'fr' }: Step3BesoinsProps) {
+  const { t, isLoading: isLoadingTranslations } = useDevisTranslationStatic(lang);
   // 🆕 Charger la configuration dynamique
   const { getPaysActifs, getCoefficientDetail, getPaysInfo, isLoading } = useDevisConfig();
   const paysDisponibles = getPaysActifs();
@@ -121,12 +125,20 @@ export function Step3Besoins({ data, pays, region, onChange }: Step3BesoinsProps
     onChange(updatedPostes);
   };
 
+  if (isLoadingTranslations) {
+    return (
+      <div className="flex items-center justify-center py-12">
+        <div className="text-white/70">{t.common.loading}</div>
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-6">
       <div>
-        <h2 className="text-white text-2xl mb-2">Vos besoins en recrutement</h2>
+        <h2 className="text-white text-2xl mb-2">{t.step3.title}</h2>
         <p className="text-white/70">
-          Ajoutez autant de profils que nécessaire pour votre projet.
+          {t.step3.subtitle}
         </p>
       </div>
 
@@ -135,7 +147,7 @@ export function Step3Besoins({ data, pays, region, onChange }: Step3BesoinsProps
           <Card key={poste.id} className="border border-white/10 bg-white/5 backdrop-blur-sm">
             <CardHeader className="flex flex-row items-center justify-between">
               <CardTitle className="text-white">
-                Profil {index + 1}
+                {t.step3.profileLabel} {index + 1}
               </CardTitle>
               {data.length > 1 && (
                 <Button
@@ -145,7 +157,7 @@ export function Step3Besoins({ data, pays, region, onChange }: Step3BesoinsProps
                   className="text-red-400 hover:text-red-300 hover:bg-red-500/10"
                 >
                   <Trash2 className="w-4 h-4 mr-2" />
-                  Supprimer
+                  {t.step3.removeProfile}
                 </Button>
               )}
             </CardHeader>
@@ -154,14 +166,14 @@ export function Step3Besoins({ data, pays, region, onChange }: Step3BesoinsProps
                 {/* Secteur d'activité */}
                 <div>
                   <Label className="text-white mb-2 block">
-                    Secteur d'activité <span className="text-red-400">*</span>
+                    {t.step3.fields.secteur.label} <span className="text-red-400">{t.common.required}</span>
                   </Label>
                   <Select
                     value={poste.secteur}
                     onValueChange={(value) => handlePosteChange(poste.id, 'secteur', value)}
                   >
                     <SelectTrigger className="bg-white/10 border-white/20 text-white [&>span]:text-white/90">
-                      <SelectValue placeholder="Sélectionnez un secteur" className="text-white/90 text-[14px]" />
+                      <SelectValue placeholder={t.step3.fields.secteur.placeholder} className="text-white/90 text-[14px]" />
                     </SelectTrigger>
                     <SelectContent position="popper" sideOffset={5} className="bg-[#2d1b69]/95 backdrop-blur-xl border border-white/20 text-white z-50">
                       {Object.keys(SECTEURS).map((secteur) => (
@@ -176,20 +188,20 @@ export function Step3Besoins({ data, pays, region, onChange }: Step3BesoinsProps
                 {/* Convention collective */}
                 <div>
                   <Label className="text-white mb-2 block">
-                    Convention collective
+                    {t.step3.fields.convention.label}
                   </Label>
                   <Input
                     value={poste.convention}
                     className="bg-white/10 border-white/20 text-white/90 placeholder:text-white/40"
                     readOnly
-                    placeholder="Auto-rempli selon le secteur"
+                    placeholder={t.step3.fields.convention.placeholder}
                   />
                 </div>
 
                 {/* 🆕 Nationalité souhaitée */}
                 <div>
                   <Label className="text-white mb-2 block">
-                    Nationalité souhaitée <span className="text-red-400">*</span>
+                    {t.step3.fields.nationalite.label} <span className="text-red-400">{t.common.required}</span>
                   </Label>
                   <Select
                     value={poste.nationalite}
@@ -203,7 +215,7 @@ export function Step3Besoins({ data, pays, region, onChange }: Step3BesoinsProps
                           <span>{getPaysInfo(poste.nationalite)?.label || poste.nationalite}</span>
                         </div>
                       ) : (
-                        <span className="text-white/60">{isLoading ? "Chargement des pays..." : "Sélectionnez un pays"}</span>
+                        <span className="text-white/60">{isLoading ? t.common.loading : t.step3.fields.nationalite.placeholder}</span>
                       )}
                     </SelectTrigger>
                     <SelectContent position="popper" sideOffset={5} className="bg-[#2d1b69]/95 backdrop-blur-xl border border-white/20 text-white z-50">
@@ -223,14 +235,14 @@ export function Step3Besoins({ data, pays, region, onChange }: Step3BesoinsProps
                     </SelectContent>
                   </Select>
                   {isLoading && (
-                    <p className="text-xs text-cyan-300/70 mt-1">⏳ Chargement de la configuration...</p>
+                    <p className="text-xs text-cyan-300/70 mt-1">{t.step3.loadingConfig}</p>
                   )}
                 </div>
 
                 {/* Poste recherché */}
                 <div>
                   <Label className="text-white mb-2 block">
-                    Poste recherché <span className="text-red-400">*</span>
+                    {t.step3.fields.poste.label} <span className="text-red-400">{t.common.required}</span>
                   </Label>
                   <Select
                     value={poste.poste}
@@ -238,7 +250,7 @@ export function Step3Besoins({ data, pays, region, onChange }: Step3BesoinsProps
                     disabled={!poste.secteur}
                   >
                     <SelectTrigger className="bg-white/10 border-white/20 text-white [&>span]:text-white/90">
-                      <SelectValue placeholder="Sélectionnez un poste" />
+                      <SelectValue placeholder={t.step3.fields.poste.placeholder} />
                     </SelectTrigger>
                     <SelectContent position="popper" sideOffset={5} className="bg-[#2d1b69]/95 backdrop-blur-xl border border-white/20 text-white z-50">
                       {poste.secteur && SECTEURS[poste.secteur as keyof typeof SECTEURS]?.postes.map((p) => (
@@ -253,7 +265,7 @@ export function Step3Besoins({ data, pays, region, onChange }: Step3BesoinsProps
                 {/* Classification */}
                 <div>
                   <Label className="text-white mb-2 block">
-                    Classification <span className="text-red-400">*</span>
+                    {t.step3.fields.classification.label} <span className="text-red-400">{t.common.required}</span>
                   </Label>
                   <Select
                     value={poste.classification}
@@ -261,7 +273,7 @@ export function Step3Besoins({ data, pays, region, onChange }: Step3BesoinsProps
                     disabled={!poste.secteur}
                   >
                     <SelectTrigger className="bg-white/10 border-white/20 text-white [&>span]:text-white/90">
-                      <SelectValue placeholder="Sélectionnez une classification" />
+                      <SelectValue placeholder={t.step3.fields.classification.placeholder} />
                     </SelectTrigger>
                     <SelectContent position="popper" sideOffset={5} className="bg-[#2d1b69]/95 backdrop-blur-xl border border-white/20 text-white z-50">
                       {poste.secteur && SECTEURS[poste.secteur as keyof typeof SECTEURS]?.classifications.map((c) => (
@@ -276,7 +288,7 @@ export function Step3Besoins({ data, pays, region, onChange }: Step3BesoinsProps
                 {/* Quantité */}
                 <div>
                   <Label className="text-white mb-2 block">
-                    Quantité de personnes <span className="text-red-400">*</span>
+                    {t.step3.fields.quantite.label} <span className="text-red-400">{t.common.required}</span>
                   </Label>
                   <Input
                     type="number"
@@ -290,13 +302,13 @@ export function Step3Besoins({ data, pays, region, onChange }: Step3BesoinsProps
                 {/* Salaire brut mensuel */}
                 <div>
                   <Label className="text-white mb-2 block">
-                    Salaire brut mensuel
+                    {t.step3.fields.salaireBrut.label}
                   </Label>
                   <Input
                     value={poste.salaireBrut > 0 ? formaterMontant(poste.salaireBrut) : ''}
                     className="bg-green-500/10 border-green-500/30 text-green-200 font-medium placeholder:text-green-400/40"
                     readOnly
-                    placeholder="Auto-calculé"
+                    placeholder={t.step3.fields.salaireBrut.placeholder}
                   />
                 </div>
               </div>
@@ -336,13 +348,13 @@ export function Step3Besoins({ data, pays, region, onChange }: Step3BesoinsProps
         className="w-full relative overflow-hidden group rounded-full border-cyan-400/30 bg-cyan-500/10 backdrop-blur-sm text-cyan-200 hover:bg-cyan-500/20 hover:border-cyan-400/50 transition-all py-6"
       >
         <Plus className="w-5 h-5 mr-2" />
-        Ajouter un profil
+        {t.step3.addProfile}
       </Button>
 
       {!region && (
         <div className="bg-yellow-500/10 border border-yellow-500/30 rounded-lg p-4">
           <p className="text-yellow-200 text-sm">
-            ⚠️ Veuillez sélectionner une région à l'étape 1 pour calculer les salaires
+            {t.step3.missingRegionWarning}
           </p>
         </div>
       )}

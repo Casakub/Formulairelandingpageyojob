@@ -4,6 +4,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '.
 import { Switch } from '../ui/switch';
 import { Checkbox } from '../ui/checkbox';
 import { NIVEAUX_LANGUE, LANGUES, EPIS } from '../../data/devis-data';
+import { useDevisTranslationStatic } from '../../hooks/useDevisTranslation';
+import type { DevisLanguage } from '../../src/i18n/devis/types';
 
 interface Step5CandidatsProps {
   data: {
@@ -31,9 +33,12 @@ interface Step5CandidatsProps {
     epis: string[];
   };
   onChange: (data: any) => void;
+  lang?: DevisLanguage;
 }
 
-export function Step5Candidats({ data, onChange }: Step5CandidatsProps) {
+export function Step5Candidats({ data, onChange, lang = 'fr' }: Step5CandidatsProps) {
+  const { t, isLoading: isLoadingTranslations } = useDevisTranslationStatic(lang);
+
   const handleNestedChange = (section: string, field: string, value: any) => {
     onChange({
       ...data,
@@ -65,24 +70,32 @@ export function Step5Candidats({ data, onChange }: Step5CandidatsProps) {
     });
   };
 
+  if (isLoadingTranslations) {
+    return (
+      <div className="flex items-center justify-center py-12">
+        <div className="text-white/70">{t.common.loading}</div>
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-6">
       <div>
-        <h2 className="text-white text-2xl mb-2">Profil recherché</h2>
+        <h2 className="text-white text-2xl mb-2">{t.step5.title}</h2>
         <p className="text-white/70">
-          Définissez les compétences et équipements requis pour les candidats.
+          {t.step5.subtitle}
         </p>
       </div>
 
       {/* Section Expérience & Compétences */}
       <div className="border border-white/10 rounded-lg p-6 bg-white/5">
-        <h3 className="text-white text-lg mb-4">💼 Expérience & Compétences</h3>
+        <h3 className="text-white text-lg mb-4">{t.step5.experience.title}</h3>
         
         <div className="space-y-4">
           {/* Expérience */}
           <div className="space-y-3">
             <div className="flex items-center justify-between">
-              <Label className="text-white">Expérience obligatoire ?</Label>
+              <Label className="text-white">{t.step5.experience.obligatoire.label}</Label>
               <Switch
                 checked={data.experience.obligatoire}
                 onCheckedChange={(checked) => handleNestedChange('experience', 'obligatoire', checked)}
@@ -92,7 +105,7 @@ export function Step5Candidats({ data, onChange }: Step5CandidatsProps) {
             {data.experience.obligatoire && (
               <div>
                 <Label htmlFor="anneesExp" className="text-white mb-2 block">
-                  Nombre d'années minimum
+                  {t.step5.experience.annees.label}
                 </Label>
                 <Input
                   id="anneesExp"
@@ -101,7 +114,7 @@ export function Step5Candidats({ data, onChange }: Step5CandidatsProps) {
                   onChange={(e) => handleNestedChange('experience', 'annees', parseInt(e.target.value))}
                   className="bg-white/10 border-white/20 text-white"
                   min={0}
-                  placeholder="Ex: 2"
+                  placeholder={t.step5.experience.annees.placeholder}
                 />
               </div>
             )}
@@ -110,7 +123,7 @@ export function Step5Candidats({ data, onChange }: Step5CandidatsProps) {
           {/* Formation */}
           <div className="space-y-3">
             <div className="flex items-center justify-between">
-              <Label className="text-white">Formation obligatoire ?</Label>
+              <Label className="text-white">{t.step5.formation.obligatoire.label}</Label>
               <Switch
                 checked={data.formation.obligatoire}
                 onCheckedChange={(checked) => handleNestedChange('formation', 'obligatoire', checked)}
@@ -120,14 +133,14 @@ export function Step5Candidats({ data, onChange }: Step5CandidatsProps) {
             {data.formation.obligatoire && (
               <div>
                 <Label htmlFor="typeFormation" className="text-white mb-2 block">
-                  Type de formation
+                  {t.step5.formation.type.label}
                 </Label>
                 <Input
                   id="typeFormation"
                   value={data.formation.type || ''}
                   onChange={(e) => handleNestedChange('formation', 'type', e.target.value)}
                   className="bg-white/10 border-white/20 text-white placeholder:text-white/40"
-                  placeholder="Ex: CAP Maçonnerie, BEP Électrotechnique"
+                  placeholder={t.step5.formation.type.placeholder}
                 />
               </div>
             )}
@@ -136,7 +149,7 @@ export function Step5Candidats({ data, onChange }: Step5CandidatsProps) {
           {/* Travail à risque */}
           <div className="space-y-3">
             <div className="flex items-center justify-between">
-              <Label className="text-white">Travail à risque ?</Label>
+              <Label className="text-white">{t.step5.travailRisque.active.label}</Label>
               <Switch
                 checked={data.travailRisque.active}
                 onCheckedChange={(checked) => handleNestedChange('travailRisque', 'active', checked)}
@@ -146,14 +159,14 @@ export function Step5Candidats({ data, onChange }: Step5CandidatsProps) {
             {data.travailRisque.active && (
               <div>
                 <Label htmlFor="precisionsRisque" className="text-white mb-2 block">
-                  Précisions
+                  {t.step5.travailRisque.precisions.label}
                 </Label>
                 <Input
                   id="precisionsRisque"
                   value={data.travailRisque.precisions || ''}
                   onChange={(e) => handleNestedChange('travailRisque', 'precisions', e.target.value)}
                   className="bg-white/10 border-white/20 text-white placeholder:text-white/40"
-                  placeholder="Ex: Travail en hauteur, exposition produits chimiques..."
+                  placeholder={t.step5.travailRisque.precisions.placeholder}
                 />
               </div>
             )}
@@ -163,7 +176,7 @@ export function Step5Candidats({ data, onChange }: Step5CandidatsProps) {
 
       {/* Section Langues */}
       <div className="border border-white/10 rounded-lg p-6 bg-white/5">
-        <h3 className="text-white text-lg mb-4">🗣️ Langues</h3>
+        <h3 className="text-white text-lg mb-4">{t.step5.langues.title}</h3>
         <div className="space-y-3">
           {LANGUES.map((langue) => (
             <div key={langue} className="grid grid-cols-2 gap-4 items-center">
@@ -190,13 +203,13 @@ export function Step5Candidats({ data, onChange }: Step5CandidatsProps) {
 
       {/* Section Permis & Équipements */}
       <div className="border border-white/10 rounded-lg p-6 bg-white/5">
-        <h3 className="text-white text-lg mb-4">🚗 Permis & Équipements</h3>
+        <h3 className="text-white text-lg mb-4">{t.step5.permis.title}</h3>
         
         <div className="space-y-4">
           {/* Permis de conduire */}
           <div className="space-y-3">
             <div className="flex items-center justify-between">
-              <Label className="text-white">Permis de conduire requis ?</Label>
+              <Label className="text-white">{t.step5.permis.requis.label}</Label>
               <Switch
                 checked={data.permis.requis}
                 onCheckedChange={(checked) => handleNestedChange('permis', 'requis', checked)}
@@ -206,14 +219,14 @@ export function Step5Candidats({ data, onChange }: Step5CandidatsProps) {
             {data.permis.requis && (
               <div>
                 <Label htmlFor="categoriePermis" className="text-white mb-2 block">
-                  Catégorie
+                  {t.step5.permis.categorie.label}
                 </Label>
                 <Input
                   id="categoriePermis"
                   value={data.permis.categorie || ''}
                   onChange={(e) => handleNestedChange('permis', 'categorie', e.target.value)}
                   className="bg-white/10 border-white/20 text-white placeholder:text-white/40"
-                  placeholder="Ex: B, C, CE, CACES R489..."
+                  placeholder={t.step5.permis.categorie.placeholder}
                 />
               </div>
             )}
@@ -222,7 +235,7 @@ export function Step5Candidats({ data, onChange }: Step5CandidatsProps) {
           {/* Petit outillage */}
           <div className="space-y-3">
             <div className="flex items-center justify-between">
-              <Label className="text-white">Petit outillage nécessaire ?</Label>
+              <Label className="text-white">{t.step5.outillage.requis.label}</Label>
               <Switch
                 checked={data.outillage.requis}
                 onCheckedChange={(checked) => handleNestedChange('outillage', 'requis', checked)}
@@ -232,14 +245,14 @@ export function Step5Candidats({ data, onChange }: Step5CandidatsProps) {
             {data.outillage.requis && (
               <div>
                 <Label htmlFor="typeOutillage" className="text-white mb-2 block">
-                  Type d'outillage
+                  {t.step5.outillage.type.label}
                 </Label>
                 <Input
                   id="typeOutillage"
                   value={data.outillage.type || ''}
                   onChange={(e) => handleNestedChange('outillage', 'type', e.target.value)}
                   className="bg-white/10 border-white/20 text-white placeholder:text-white/40"
-                  placeholder="Ex: Outillage électroportatif, marteau, niveau..."
+                  placeholder={t.step5.outillage.type.placeholder}
                 />
               </div>
             )}
@@ -249,12 +262,11 @@ export function Step5Candidats({ data, onChange }: Step5CandidatsProps) {
 
       {/* Section EPI */}
       <div className="border border-white/10 rounded-lg p-6 bg-white/5">
-        <h3 className="text-white text-lg mb-4">🦺 EPI - Équipements de Protection Individuelle</h3>
+        <h3 className="text-white text-lg mb-4">{t.step5.epi.title}</h3>
         
         <div className="bg-blue-500/10 border border-blue-500/30 rounded-lg p-4 mb-4">
           <p className="text-blue-200 text-sm">
-            ℹ️ Conformément à l'article L.1251-23 du Code du travail, l'EU est responsable des EPI. 
-            Casque et chaussures de sécurité fournis par l'ETT.
+            {t.step5.epi.infoLegale}
           </p>
         </div>
 
@@ -277,7 +289,7 @@ export function Step5Candidats({ data, onChange }: Step5CandidatsProps) {
         {data.epis.length > 0 && (
           <div className="mt-4 p-3 bg-green-500/10 border border-green-500/30 rounded-lg">
             <p className="text-green-200 text-sm">
-              ✓ {data.epis.length} EPI sélectionné{data.epis.length > 1 ? 's' : ''}
+              {t.step5.epi.selectionCount.replace('{count}', data.epis.length.toString())}
             </p>
           </div>
         )}

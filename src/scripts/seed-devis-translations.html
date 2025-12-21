@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>🌍 Seed Traductions Devis - YOJOB</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+      background: linear-gradient(135deg, #1E3A8A 0%, #7C3AED 50%, #06B6D4 100%);
+      min-height: 100vh;
+      padding: 20px;
+      color: #fff;
+    }
+
+    .container {
+      max-width: 900px;
+      margin: 0 auto;
+      background: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(20px);
+      border-radius: 20px;
+      padding: 40px;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+
+    h1 {
+      font-size: 2.5rem;
+      margin-bottom: 10px;
+      text-align: center;
+      background: linear-gradient(to right, #fff, #06B6D4);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .subtitle {
+      text-align: center;
+      margin-bottom: 30px;
+      opacity: 0.8;
+    }
+
+    .info-box {
+      background: rgba(6, 182, 212, 0.2);
+      border: 1px solid rgba(6, 182, 212, 0.5);
+      border-radius: 12px;
+      padding: 20px;
+      margin-bottom: 30px;
+    }
+
+    .info-box h3 {
+      color: #06B6D4;
+      margin-bottom: 10px;
+    }
+
+    .info-box ul {
+      list-style: none;
+      padding-left: 0;
+    }
+
+    .info-box li {
+      padding: 5px 0;
+      padding-left: 25px;
+      position: relative;
+    }
+
+    .info-box li:before {
+      content: "✓";
+      position: absolute;
+      left: 0;
+      color: #10B981;
+      font-weight: bold;
+    }
+
+    .controls {
+      display: flex;
+      gap: 15px;
+      margin-bottom: 30px;
+      flex-wrap: wrap;
+    }
+
+    .btn {
+      flex: 1;
+      min-width: 200px;
+      padding: 15px 30px;
+      border: none;
+      border-radius: 12px;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, #06B6D4, #10B981);
+      color: white;
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(6, 182, 212, 0.4);
+    }
+
+    .btn-secondary {
+      background: linear-gradient(135deg, #7C3AED, #EC4899);
+      color: white;
+    }
+
+    .btn-secondary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(124, 58, 237, 0.4);
+    }
+
+    .btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      transform: none !important;
+    }
+
+    .log-container {
+      background: rgba(0, 0, 0, 0.4);
+      border-radius: 12px;
+      padding: 20px;
+      max-height: 500px;
+      overflow-y: auto;
+      font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+      font-size: 0.9rem;
+      line-height: 1.6;
+    }
+
+    .log-entry {
+      padding: 5px 0;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .log-entry:last-child {
+      border-bottom: none;
+    }
+
+    .log-success {
+      color: #10B981;
+    }
+
+    .log-error {
+      color: #EF4444;
+    }
+
+    .log-warning {
+      color: #F59E0B;
+    }
+
+    .log-info {
+      color: #06B6D4;
+    }
+
+    .progress-bar {
+      width: 100%;
+      height: 30px;
+      background: rgba(0, 0, 0, 0.3);
+      border-radius: 15px;
+      overflow: hidden;
+      margin-bottom: 20px;
+    }
+
+    .progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #06B6D4, #10B981);
+      width: 0%;
+      transition: width 0.5s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-weight: bold;
+      font-size: 0.85rem;
+    }
+
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: 15px;
+      margin-bottom: 30px;
+    }
+
+    .stat-card {
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 12px;
+      padding: 15px;
+      text-align: center;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+
+    .stat-value {
+      font-size: 2rem;
+      font-weight: bold;
+      background: linear-gradient(to right, #06B6D4, #10B981);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .stat-label {
+      font-size: 0.85rem;
+      opacity: 0.8;
+      margin-top: 5px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>🌍 Seed Traductions Devis</h1>
+    <p class="subtitle">Initialisation des traductions multi-langues pour le formulaire de demande de devis</p>
+
+    <div class="info-box">
+      <h3>📋 Informations</h3>
+      <ul>
+        <li><strong>Langue de base :</strong> Français (fr)</li>
+        <li><strong>MVP (6 langues) :</strong> FR, EN, DE, ES, PL, RO</li>
+        <li><strong>Total clés :</strong> ~170 clés à traduire</li>
+        <li><strong>Stockage :</strong> KV Store Supabase</li>
+      </ul>
+    </div>
+
+    <div class="stats">
+      <div class="stat-card">
+        <div class="stat-value" id="stat-languages">0</div>
+        <div class="stat-label">Langues chargées</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value" id="stat-keys">0</div>
+        <div class="stat-label">Clés traduites</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value" id="stat-success">0</div>
+        <div class="stat-label">Succès</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value" id="stat-errors">0</div>
+        <div class="stat-label">Erreurs</div>
+      </div>
+    </div>
+
+    <div class="progress-bar">
+      <div class="progress-fill" id="progress">0%</div>
+    </div>
+
+    <div class="controls">
+      <button class="btn btn-primary" onclick="seedFrench()" id="btn-fr">
+        🇫🇷 Seed Français (Base)
+      </button>
+      <button class="btn btn-secondary" onclick="seedMVP()" id="btn-mvp">
+        🌍 Seed MVP (6 langues)
+      </button>
+      <button class="btn btn-secondary" onclick="listLanguages()" id="btn-list">
+        📋 Lister langues disponibles
+      </button>
+    </div>
+
+    <div class="log-container" id="log">
+      <div class="log-entry log-info">🎬 Prêt à démarrer...</div>
+    </div>
+  </div>
+
+  <script type="module">
+    // Configuration
+    const PROJECT_ID = 'nhbmcxqstdyqcdwlmdvh';
+    const ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5oYm1jeHFzdGR5cWNkd2xtZHZoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzI3MjE1OTUsImV4cCI6MjA0ODI5NzU5NX0.uQpzp4E_PnKo50ynbFLjfJ2w1A0KLVGJUlwAV5Y3iiM';
+    const API_URL = `https://${PROJECT_ID}.supabase.co/functions/v1/make-server-10092a63`;
+
+    // Statistiques
+    let stats = {
+      languages: 0,
+      keys: 0,
+      success: 0,
+      errors: 0
+    };
+
+    function updateStats() {
+      document.getElementById('stat-languages').textContent = stats.languages;
+      document.getElementById('stat-keys').textContent = stats.keys;
+      document.getElementById('stat-success').textContent = stats.success;
+      document.getElementById('stat-errors').textContent = stats.errors;
+    }
+
+    function updateProgress(percent) {
+      const progressBar = document.getElementById('progress');
+      progressBar.style.width = `${percent}%`;
+      progressBar.textContent = `${Math.round(percent)}%`;
+    }
+
+    function log(message, type = 'info') {
+      const logContainer = document.getElementById('log');
+      const entry = document.createElement('div');
+      entry.className = `log-entry log-${type}`;
+      
+      const timestamp = new Date().toLocaleTimeString('fr-FR');
+      entry.textContent = `[${timestamp}] ${message}`;
+      
+      logContainer.appendChild(entry);
+      logContainer.scrollTop = logContainer.scrollHeight;
+    }
+
+    async function makeRequest(endpoint, options = {}) {
+      const url = `${API_URL}${endpoint}`;
+      const response = await fetch(url, {
+        ...options,
+        headers: {
+          'Authorization': `Bearer ${ANON_KEY}`,
+          'Content-Type': 'application/json',
+          ...options.headers
+        }
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+      }
+
+      return response.json();
+    }
+
+    // Seed français uniquement
+    window.seedFrench = async function() {
+      const btn = document.getElementById('btn-fr');
+      btn.disabled = true;
+
+      try {
+        log('🇫🇷 Chargement des traductions françaises...', 'info');
+
+        const { fr } = await import('/src/i18n/devis/locales/fr.ts');
+
+        log('📤 Envoi vers le backend...', 'info');
+
+        const result = await makeRequest('/devis-translations/seed', {
+          method: 'POST',
+          body: JSON.stringify({ lang: 'fr', translations: fr })
+        });
+
+        if (result.success) {
+          stats.languages = 1;
+          stats.success = 1;
+          stats.keys = 170; // Estimation
+          updateStats();
+          updateProgress(100);
+          log('✅ Traductions françaises initialisées avec succès !', 'success');
+        } else {
+          throw new Error(result.error || 'Erreur inconnue');
+        }
+
+      } catch (error) {
+        stats.errors++;
+        updateStats();
+        log(`❌ Erreur: ${error.message}`, 'error');
+      } finally {
+        btn.disabled = false;
+      }
+    };
+
+    // Seed MVP (6 langues)
+    window.seedMVP = async function() {
+      const btn = document.getElementById('btn-mvp');
+      btn.disabled = true;
+
+      try {
+        log('🌍 Démarrage du seed MVP (6 langues)...', 'info');
+        log('⚠️ ATTENTION: Cette fonctionnalité nécessite les traductions EN, DE, ES, PL, RO', 'warning');
+        log('💡 Pour l\'instant, seul le français est disponible. Les autres langues seront traduites via Claude.', 'info');
+
+        // Pour l'instant, on seed uniquement le français
+        await window.seedFrench();
+
+        log('✅ MVP initialisé (Français uniquement pour le moment)', 'success');
+        log('📝 TODO: Utiliser Claude pour traduire automatiquement les 5 autres langues', 'warning');
+
+      } catch (error) {
+        stats.errors++;
+        updateStats();
+        log(`❌ Erreur: ${error.message}`, 'error');
+      } finally {
+        btn.disabled = false;
+      }
+    };
+
+    // Lister les langues disponibles
+    window.listLanguages = async function() {
+      const btn = document.getElementById('btn-list');
+      btn.disabled = true;
+
+      try {
+        log('📋 Récupération de la liste des langues...', 'info');
+
+        const result = await makeRequest('/devis-translations/');
+
+        if (result.success) {
+          log(`✅ ${result.total} langue(s) disponible(s):`, 'success');
+          
+          result.availableLanguages.forEach(lang => {
+            const date = lang.lastUpdated ? new Date(lang.lastUpdated).toLocaleDateString('fr-FR') : 'N/A';
+            log(`   🌍 ${lang.code.toUpperCase()} - Version ${lang.version || 'N/A'} - MAJ: ${date}`, 'info');
+          });
+        } else {
+          throw new Error(result.error || 'Erreur inconnue');
+        }
+
+      } catch (error) {
+        log(`❌ Erreur: ${error.message}`, 'error');
+      } finally {
+        btn.disabled = false;
+      }
+    };
+
+    // Log initial
+    log('🎯 Système de traduction devis prêt', 'success');
+    log('💡 Commencez par seed le français (base locale)', 'info');
+  </script>
+</body>
+</html>

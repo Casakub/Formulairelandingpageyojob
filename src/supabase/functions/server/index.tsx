@@ -30,6 +30,7 @@ import { seedWithProfiles } from "./seed-with-profiles.tsx";
 import { seedFromConfig } from "./seed-from-config.tsx";
 import { seedClientWorkerTranslations } from "./seed-client-worker-translations.tsx";
 import devisRoutes from "./devis.tsx";
+import devisTranslationsRoutes from "./devis-translations.tsx";
 
 const app = new Hono();
 
@@ -261,5 +262,6 @@ app.post("/make-server-10092a63/seed-client-worker-translations", seedClientWork
 
 // Devis endpoints
 app.route("/make-server-10092a63/devis", devisRoutes);
+app.route("/make-server-10092a63/devis-translations", devisTranslationsRoutes);
 
 Deno.serve(app.fetch);

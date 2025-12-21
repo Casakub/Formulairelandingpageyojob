@@ -13,14 +13,18 @@ import {
   calculerTauxETTComplet
 } from '../../utils/devis-calculations';
 import { getPanierRepasByPays } from '../../data/devis-data-pays';
+import { useDevisTranslationStatic } from '../../hooks/useDevisTranslation';
+import type { DevisLanguage } from '../../src/i18n/devis/types';
 
 interface StepRecapitulatifProps {
   formData: DevisFormData;
   onSubmit: () => void;
   isSubmitting: boolean;
+  lang?: DevisLanguage;
 }
 
-export function StepRecapitulatif({ formData, onSubmit, isSubmitting }: StepRecapitulatifProps) {
+export function StepRecapitulatif({ formData, onSubmit, isSubmitting, lang = 'fr' }: StepRecapitulatifProps) {
+  const { t, isLoading: isLoadingTranslations } = useDevisTranslationStatic(lang);
   const [accepteConditions, setAccepteConditions] = useState(false);
 
   // 🆕 Recalcul complet avec nouvelles fonctions
@@ -110,18 +114,26 @@ export function StepRecapitulatif({ formData, onSubmit, isSubmitting }: StepReca
 
   const handleSubmit = () => {
     if (!accepteConditions) {
-      alert('Veuillez accepter les conditions avant de continuer');
+      alert(t.recapitulatif.acceptConditionsError);
       return;
     }
     onSubmit();
   };
 
+  if (isLoadingTranslations) {
+    return (
+      <div className="flex items-center justify-center py-12">
+        <div className="text-white/70">{t.common.loading}</div>
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-6">
       <div>
-        <h2 className="text-white text-2xl mb-2">Récapitulatif de votre demande</h2>
+        <h2 className="text-white text-2xl mb-2">{t.recapitulatif.title}</h2>
         <p className="text-white/70">
-          Vérifiez les informations avant d'envoyer votre demande de devis.
+          {t.recapitulatif.subtitle}
         </p>
       </div>
 
@@ -130,30 +142,30 @@ export function StepRecapitulatif({ formData, onSubmit, isSubmitting }: StepReca
         <CardHeader>
           <CardTitle className="text-white flex items-center gap-2">
             <Building2 className="w-5 h-5 text-blue-400" />
-            Entreprise
+            {t.recapitulatif.entreprise.title}
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-2">
           <div className="grid md:grid-cols-2 gap-4">
             <div>
-              <p className="text-white/60 text-sm">Raison sociale</p>
+              <p className="text-white/60 text-sm">{t.recapitulatif.entreprise.raisonSociale}</p>
               <p className="text-white">{formData.entreprise.raisonSociale}</p>
             </div>
             <div>
-              <p className="text-white/60 text-sm">SIRET</p>
+              <p className="text-white/60 text-sm">{t.recapitulatif.entreprise.siret}</p>
               <p className="text-white">{formData.entreprise.siret}</p>
             </div>
             <div>
-              <p className="text-white/60 text-sm">Pays</p>
+              <p className="text-white/60 text-sm">{t.recapitulatif.entreprise.pays}</p>
               <p className="text-white">{formData.entreprise.pays || 'France'}</p>
             </div>
             <div>
-              <p className="text-white/60 text-sm">Ville</p>
+              <p className="text-white/60 text-sm">{t.recapitulatif.entreprise.ville}</p>
               <p className="text-white">{formData.entreprise.ville}</p>
             </div>
             {formData.entreprise.region && (
               <div>
-                <p className="text-white/60 text-sm">Région/État</p>
+                <p className="text-white/60 text-sm">{t.recapitulatif.entreprise.region}</p>
                 <p className="text-white">{formData.entreprise.region}</p>
               </div>
             )}
@@ -166,26 +178,26 @@ export function StepRecapitulatif({ formData, onSubmit, isSubmitting }: StepReca
         <CardHeader>
           <CardTitle className="text-white flex items-center gap-2">
             <User className="w-5 h-5 text-cyan-400" />
-            Contact
+            {t.recapitulatif.contact.title}
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-2">
           <div className="grid md:grid-cols-2 gap-4">
             <div>
-              <p className="text-white/60 text-sm">Nom et prénom</p>
+              <p className="text-white/60 text-sm">{t.recapitulatif.contact.nomPrenom}</p>
               <p className="text-white">{formData.contact.prenom} {formData.contact.nom}</p>
             </div>
             <div>
-              <p className="text-white/60 text-sm">Email</p>
+              <p className="text-white/60 text-sm">{t.recapitulatif.contact.email}</p>
               <p className="text-white">{formData.contact.email}</p>
             </div>
             <div>
-              <p className="text-white/60 text-sm">Téléphone</p>
+              <p className="text-white/60 text-sm">{t.recapitulatif.contact.telephone}</p>
               <p className="text-white">{formData.contact.telephonePortable}</p>
             </div>
             {formData.contact.fonction && (
               <div>
-                <p className="text-white/60 text-sm">Fonction</p>
+                <p className="text-white/60 text-sm">{t.recapitulatif.contact.fonction}</p>
                 <p className="text-white">{formData.contact.fonction}</p>
               </div>
             )}
@@ -198,7 +210,7 @@ export function StepRecapitulatif({ formData, onSubmit, isSubmitting }: StepReca
         <CardHeader>
           <CardTitle className="text-white flex items-center gap-2">
             <Briefcase className="w-5 h-5 text-violet-400" />
-            Postes demandés ({formData.postes.length})
+            {t.recapitulatif.postes.title} ({formData.postes.length})
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
@@ -261,14 +273,14 @@ export function StepRecapitulatif({ formData, onSubmit, isSubmitting }: StepReca
                 {/* Coefficient ETT */}
                 {poste.coeffBase && poste.facteurPays && (
                   <div className="p-3 rounded-lg bg-violet-500/10 border border-violet-400/20">
-                    <p className="text-violet-200 text-xs mb-1">📊 Coefficient ETT appliqué</p>
+                    <p className="text-violet-200 text-xs mb-1">{t.recapitulatif.postes.coeffETT}</p>
                     <div className="flex items-center gap-2 text-sm">
                       <span className="text-white/70">
-                        Coeff. base: <span className="text-white font-medium">{poste.coeffBase.toFixed(2)}</span>
+                        {t.recapitulatif.postes.coeffBase}: <span className="text-white font-medium">{poste.coeffBase.toFixed(2)}</span>
                       </span>
                       <span className="text-white/50">×</span>
                       <span className="text-white/70">
-                        Facteur pays: <span className="text-white font-medium">{poste.facteurPays.toFixed(2)}</span>
+                        {t.recapitulatif.postes.facteurPays}: <span className="text-white font-medium">{poste.facteurPays.toFixed(2)}</span>
                       </span>
                       <span className="text-white/50">=</span>
                       <span className="text-green-400 font-medium">
@@ -281,17 +293,17 @@ export function StepRecapitulatif({ formData, onSubmit, isSubmitting }: StepReca
                 {/* 🆕 Suppléments horaires (sans panier) */}
                 {(!formData.conditions.hebergement.chargeEU || formData.conditions.transportLocal.chargeETT) && (
                   <div className="p-3 rounded-lg bg-cyan-500/10 border border-cyan-400/20">
-                    <p className="text-cyan-200 text-xs mb-2">✨ Suppléments horaires (inclus dans le taux)</p>
+                    <p className="text-cyan-200 text-xs mb-2">{t.recapitulatif.postes.supplementsHoraires}</p>
                     <div className="space-y-1 text-sm">
                       {!formData.conditions.hebergement.chargeEU && (
                         <div className="flex items-center justify-between">
-                          <span className="text-white/70">✓ Hébergement</span>
+                          <span className="text-white/70">{t.recapitulatif.postes.hebergement}</span>
                           <span className="text-green-400 font-medium">+{formaterMontant(3.50)}/h</span>
                         </div>
                       )}
                       {formData.conditions.transportLocal.chargeETT && (
                         <div className="flex items-center justify-between">
-                          <span className="text-white/70">✓ Transport local</span>
+                          <span className="text-white/70">{t.recapitulatif.postes.transport}</span>
                           <span className="text-green-400 font-medium">+{formaterMontant(1.50)}/h</span>
                         </div>
                       )}
@@ -302,7 +314,7 @@ export function StepRecapitulatif({ formData, onSubmit, isSubmitting }: StepReca
                 {/* 🆕 Panier repas (séparé) */}
                 {montantPanierJour > 0 && (
                   <div className="p-3 rounded-lg bg-green-500/10 border border-green-400/20">
-                    <p className="text-green-200 text-xs mb-2">🍽️ Panier repas (facturé par jour)</p>
+                    <p className="text-green-200 text-xs mb-2">{t.recapitulatif.postes.panierRepas}</p>
                     <div className="text-sm space-y-1">
                       <div className="flex items-center justify-between text-white/70">
                         <span>
@@ -322,14 +334,14 @@ export function StepRecapitulatif({ formData, onSubmit, isSubmitting }: StepReca
                     <div className="flex items-center gap-2 mb-2">
                       <Clock className="w-4 h-4 text-orange-400" />
                       <p className="text-orange-200 text-xs">
-                        📅 Base horaire : {baseHoraire}h/mois (heures supplémentaires détectées)
+                        {t.recapitulatif.postes.baseHoraire.replace('{heures}', baseHoraire.toString())}
                       </p>
                     </div>
                     <div className="space-y-2 text-sm">
                       {/* Heures normales */}
                       <div className="flex items-center justify-between">
                         <span className="text-white/70">
-                          Heures normales (0-35h/sem) : {detailHeures.heuresNormales}h × {formaterMontant(tauxETTAvecSupplements)}/h
+                          {t.recapitulatif.postes.heuresNormales} : {detailHeures.heuresNormales}h × {formaterMontant(tauxETTAvecSupplements)}/h
                         </span>
                         <span className="text-white font-medium">
                           {formaterMontant(detailHeures.coutHeuresNormales)}
@@ -340,7 +352,7 @@ export function StepRecapitulatif({ formData, onSubmit, isSubmitting }: StepReca
                       {detailHeures.heures25 > 0 && (
                         <div className="flex items-center justify-between">
                           <span className="text-white/70">
-                            Heures supp. +25% (36e-43e h) : {detailHeures.heures25}h × {formaterMontant(tauxETTAvecSupplements * 1.25)}/h
+                            {t.recapitulatif.postes.heuresSup25} : {detailHeures.heures25}h × {formaterMontant(tauxETTAvecSupplements * 1.25)}/h
                           </span>
                           <span className="text-orange-400 font-medium">
                             {formaterMontant(detailHeures.coutHeures25)}
@@ -352,7 +364,7 @@ export function StepRecapitulatif({ formData, onSubmit, isSubmitting }: StepReca
                       {detailHeures.heures50 > 0 && (
                         <div className="flex items-center justify-between">
                           <span className="text-white/70">
-                            Heures supp. +50% (44e+ h) : {detailHeures.heures50}h × {formaterMontant(tauxETTAvecSupplements * 1.50)}/h
+                            {t.recapitulatif.postes.heuresSup50} : {detailHeures.heures50}h × {formaterMontant(tauxETTAvecSupplements * 1.50)}/h
                           </span>
                           <span className="text-red-400 font-medium">
                             {formaterMontant(detailHeures.coutHeures50)}
@@ -362,7 +374,7 @@ export function StepRecapitulatif({ formData, onSubmit, isSubmitting }: StepReca
                       
                       <div className="border-t border-white/10 pt-2 mt-2">
                         <div className="flex items-center justify-between">
-                          <span className="text-white font-medium">Sous-total main d'œuvre (par personne)</span>
+                          <span className="text-white font-medium">{t.recapitulatif.postes.sousTotal}</span>
                           <span className="text-cyan-400 font-bold">
                             {formaterMontant(detailHeures.coutTotal / poste.quantite)}
                           </span>
@@ -376,15 +388,15 @@ export function StepRecapitulatif({ formData, onSubmit, isSubmitting }: StepReca
                 <div className="border-t border-white/10 pt-3 mt-3">
                   <div className="grid grid-cols-3 gap-4 text-sm">
                     <div>
-                      <p className="text-white/60">Taux horaire brut</p>
+                      <p className="text-white/60">{t.recapitulatif.postes.tauxHoraireBrut}</p>
                       <p className="text-white font-medium">{formaterMontant(tauxHoraireBrut)}/h</p>
                     </div>
                     <div>
-                      <p className="text-white/60">Taux ETT final</p>
+                      <p className="text-white/60">{t.recapitulatif.postes.tauxETTFinal}</p>
                       <p className="text-white font-medium">{formaterMontant(tauxETTAvecSupplements)}/h</p>
                     </div>
                     <div>
-                      <p className="text-white/60">Coût mensuel total</p>
+                      <p className="text-white/60">{t.recapitulatif.postes.coutMensuel}</p>
                       <p className="text-green-400 font-bold">
                         {formaterMontant(detailHeures.coutTotal + panierMensuel)}
                       </p>
@@ -402,27 +414,27 @@ export function StepRecapitulatif({ formData, onSubmit, isSubmitting }: StepReca
         <CardHeader>
           <CardTitle className="text-white flex items-center gap-2">
             <FileText className="w-5 h-5 text-green-400" />
-            Conditions de mission
+            {t.recapitulatif.conditions.title}
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-2">
           <div className="grid md:grid-cols-2 gap-4">
             <div>
-              <p className="text-white/60 text-sm">Date de début</p>
+              <p className="text-white/60 text-sm">{t.recapitulatif.conditions.dateDebut}</p>
               <p className="text-white">{new Date(formData.conditions.dateDebut).toLocaleDateString('fr-FR')}</p>
             </div>
             {formData.conditions.dateFin && (
               <div>
-                <p className="text-white/60 text-sm">Date de fin</p>
+                <p className="text-white/60 text-sm">{t.recapitulatif.conditions.dateFin}</p>
                 <p className="text-white">{new Date(formData.conditions.dateFin).toLocaleDateString('fr-FR')}</p>
               </div>
             )}
             <div>
-              <p className="text-white/60 text-sm">Durée estimée</p>
-              <p className="text-white">{recap.dureeMission} mois</p>
+              <p className="text-white/60 text-sm">{t.recapitulatif.conditions.dureeEstimee}</p>
+              <p className="text-white">{recap.dureeMission} {t.recapitulatif.conditions.mois}</p>
             </div>
             <div>
-              <p className="text-white/60 text-sm">Lieu de mission</p>
+              <p className="text-white/60 text-sm">{t.recapitulatif.conditions.lieuMission}</p>
               <p className="text-white">{formData.conditions.lieuxMission}</p>
             </div>
           </div>
@@ -434,18 +446,18 @@ export function StepRecapitulatif({ formData, onSubmit, isSubmitting }: StepReca
         <CardContent className="p-6">
           <div className="space-y-4">
             <div className="flex items-center justify-between text-lg">
-              <span className="text-white">Total mensuel HT</span>
+              <span className="text-white">{t.recapitulatif.totaux.mensuelHT}</span>
               <span className="text-white font-medium">{formaterMontant(totalHT)}</span>
             </div>
             <div className="flex items-center justify-between text-lg">
-              <span className="text-white">Total mensuel TTC</span>
+              <span className="text-white">{t.recapitulatif.totaux.mensuelTTC}</span>
               <span className="text-white font-medium">{formaterMontant(totalTTC)}</span>
             </div>
             <div className="h-px bg-white/20 my-4"></div>
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-white text-sm">Coût total mission</p>
-                <p className="text-white/60 text-xs">({dureeMission} mois)</p>
+                <p className="text-white text-sm">{t.recapitulatif.totaux.totalMission}</p>
+                <p className="text-white/60 text-xs">({dureeMission} {t.recapitulatif.conditions.mois})</p>
               </div>
               <span className="text-3xl font-bold bg-gradient-to-r from-cyan-400 to-green-400 bg-clip-text text-transparent">
                 {formaterMontant(totalMission)}
@@ -458,7 +470,7 @@ export function StepRecapitulatif({ formData, onSubmit, isSubmitting }: StepReca
       {/* Note légale */}
       <div className="bg-yellow-500/10 border border-yellow-500/30 rounded-lg p-4">
         <p className="text-yellow-200 text-sm">
-          ℹ️ Cette estimation est donnée à titre indicatif. Le tarif définitif sera confirmé après validation par notre équipe et l'ETT partenaire sélectionnée.
+          {t.recapitulatif.noteLegale}
         </p>
       </div>
 
@@ -472,9 +484,9 @@ export function StepRecapitulatif({ formData, onSubmit, isSubmitting }: StepReca
         />
         <div className="flex-1">
           <Label htmlFor="conditions" className="text-white cursor-pointer">
-            J'accepte que mes données soient traitées conformément à la{' '}
+            {t.recapitulatif.acceptConditions.text}{' '}
             <a href="/privacy" className="text-cyan-400 hover:underline">
-              politique de confidentialité
+              {t.recapitulatif.acceptConditions.lien}
             </a>
           </Label>
         </div>
@@ -490,12 +502,12 @@ export function StepRecapitulatif({ formData, onSubmit, isSubmitting }: StepReca
           {isSubmitting ? (
             <>
               <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin mr-2" />
-              Envoi en cours...
+              {t.recapitulatif.boutonEnvoi.enCours}
             </>
           ) : (
             <>
               <CheckCircle className="w-5 h-5 mr-2" />
-              Envoyer ma demande de devis
+              {t.recapitulatif.boutonEnvoi.texte}
               <ArrowRight className="w-5 h-5 ml-2" />
             </>
           )}
@@ -504,7 +516,7 @@ export function StepRecapitulatif({ formData, onSubmit, isSubmitting }: StepReca
       </Button>
 
       <p className="text-center text-white/60 text-sm">
-        ✓ Réponse sous 24h ouvrées • ✓ Sans engagement
+        {t.recapitulatif.footer}
       </p>
     </div>
   );
