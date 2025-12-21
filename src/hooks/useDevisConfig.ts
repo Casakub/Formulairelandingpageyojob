@@ -46,6 +46,13 @@ interface SupplementsData {
   paniers_repas: Record<string, Record<string, number>>;
 }
 
+// 🆕 Interface pour le mapping des classifications
+interface MappingClassifications {
+  [secteur: string]: {
+    [ancienCode: string]: string; // N2 -> "Manoeuvre spécialisé"
+  };
+}
+
 /**
  * Hook personnalisé pour gérer la configuration dynamique des devis
  * Charge les données depuis les fichiers JSON de configuration
@@ -61,6 +68,7 @@ export function useDevisConfig() {
   const [facteursPays, setFacteursPays] = useState<Record<string, FacteurPays>>({});
   const [salaires, setSalaires] = useState<Record<string, Record<string, Record<string, number>>>>({});
   const [supplements, setSupplements] = useState<SupplementsData | null>(null);
+  const [mappingClassifications, setMappingClassifications] = useState<MappingClassifications>({});
 
   // Chargement des données au montage du composant
   useEffect(() => {
@@ -106,6 +114,7 @@ export function useDevisConfig() {
         setFacteursPays(facteursData.facteurs || {});
         setSalaires(salairesData.salaires || {});
         setSupplements(supplementsData);
+        setMappingClassifications(coeffsData.mapping_anciennes_classifications || {});
 
         console.log('✅ [useDevisConfig] Configuration chargée avec succès !');
         console.log(`   - Pays: ${paysData.pays?.length || 0} pays chargés`);
@@ -137,22 +146,65 @@ export function useDevisConfig() {
   };
 
   /**
+   * 🆕 Retourne les informations d'un pays (flag, label) à partir de son code
+   */
+  const getPaysInfo = (code: string): Pays | null => {
+    return pays.find(p => p.code === code) || PAYS_FALLBACK.find(p => p.code === code) || null;
+  };
+
+  /**
    * Calcule le coefficient final avec la formule : Coeff base × Facteur pays
+   * 🆕 Utilise le mapping des classifications pour convertir les codes courts
    */
   const getCoefficient = (secteur: string, classification: string, paysCode: string): number => {
-    const coeffBase = coefficientsBase[secteur]?.[classification] ?? 1.92;
+    // 🆕 Convertir la classification si nécessaire (N2 -> "Manoeuvre spécialisé")
+    const classificationMappee = mappingClassifications[secteur]?.[classification] || classification;
+    
+    const coeffBase = coefficientsBase[secteur]?.[classificationMappee] ?? 1.92;
     const facteurPays = facteursPays[paysCode]?.facteur ?? 1.00;
     const coeffFinal = coeffBase * facteurPays;
+    
+    // 🆕 Log de débogage
+    console.log('🔍 [getCoefficient] Calcul:', {
+      secteur,
+      classificationOriginale: classification,
+      classificationMappee,
+      coeffBase,
+      facteurPays,
+      coeffFinal: Math.round(coeffFinal * 100) / 100
+    });
+    
     return Math.round(coeffFinal * 100) / 100;
   };
 
   /**
    * Retourne le détail complet du coefficient pour l'affichage
+   * 🆕 Utilise le mapping des classifications pour convertir les codes courts
    */
   const getCoefficientDetail = (secteur: string, classification: string, paysCode: string): CoefficientDetail => {
-    const coeffBase = coefficientsBase[secteur]?.[classification] ?? 1.92;
+    // 🆕 Convertir la classification si nécessaire (N2 -> "Manoeuvre spécialisé")
+    const classificationMappee = mappingClassifications[secteur]?.[classification] || classification;
+    
+    const coeffBase = coefficientsBase[secteur]?.[classificationMappee] ?? 1.92;
     const facteur = facteursPays[paysCode]?.facteur ?? 1.00;
-    const labelPays = facteursPays[paysCode]?.label ?? 'Inconnu';
+    
+    // 🆕 Chercher le label d'abord dans facteursPays, sinon dans pays[], sinon fallback
+    let labelPays = facteursPays[paysCode]?.label;
+    if (!labelPays) {
+      const paysInfo = pays.find(p => p.code === paysCode);
+      labelPays = paysInfo?.label ?? 'Inconnu';
+    }
+    
+    // 🆕 Log de débogage
+    console.log('🔍 [getCoefficientDetail] Détail:', {
+      secteur,
+      classificationOriginale: classification,
+      classificationMappee,
+      coeffBase,
+      paysCode,
+      facteur,
+      labelPays
+    });
     
     return {
       coeffBase,
@@ -311,5 +363,11 @@ export function useDevisConfig() {
     // Fonctions pour le dashboard admin
     getCoefficientsParSecteur,
     getAllFacteursPays,
+    
+    // 🆕 Fonction pour obtenir les informations d'un pays
+    getPaysInfo,
+    
+    // 🆕 Mapping des classifications
+    mappingClassifications,
   };
 }

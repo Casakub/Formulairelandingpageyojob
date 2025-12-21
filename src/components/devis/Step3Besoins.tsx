@@ -35,7 +35,7 @@ interface Step3BesoinsProps {
 
 export function Step3Besoins({ data, region, onChange }: Step3BesoinsProps) {
   // 🆕 Charger la configuration dynamique
-  const { getPaysActifs, getCoefficientDetail, isLoading } = useDevisConfig();
+  const { getPaysActifs, getCoefficientDetail, getPaysInfo, isLoading } = useDevisConfig();
   const paysDisponibles = getPaysActifs();
 
   const handleAddPoste = () => {
@@ -91,6 +91,18 @@ export function Step3Besoins({ data, region, onChange }: Step3BesoinsProps) {
           updated.facteurPays = detail.facteurPays;
           updated.coeffFinal = detail.coeffFinal;
           updated.labelPays = detail.labelPays;
+          
+          // 🆕 Log de débogage pour vérifier le calcul
+          console.log('🔄 [Step3Besoins] Recalcul du coefficient:', {
+            champ: field,
+            secteur: updated.secteur,
+            classification: updated.classification,
+            nationalite: updated.nationalite,
+            coeffBase: detail.coeffBase,
+            facteurPays: detail.facteurPays,
+            coeffFinal: detail.coeffFinal,
+            labelPays: detail.labelPays
+          });
         }
 
         // Recalculer les taux
@@ -182,7 +194,14 @@ export function Step3Besoins({ data, region, onChange }: Step3BesoinsProps) {
                     disabled={isLoading || paysDisponibles.length === 0}
                   >
                     <SelectTrigger className="bg-white/10 border-white/20 text-white [&>span]:text-white/90">
-                      <SelectValue placeholder={isLoading ? "Chargement des pays..." : "Sélectionnez un pays"} />
+                      {poste.nationalite ? (
+                        <div className="flex items-center">
+                          <span className="mr-2">{getPaysInfo(poste.nationalite)?.flag || '🌍'}</span>
+                          <span>{getPaysInfo(poste.nationalite)?.label || poste.nationalite}</span>
+                        </div>
+                      ) : (
+                        <span className="text-white/60">{isLoading ? "Chargement des pays..." : "Sélectionnez un pays"}</span>
+                      )}
                     </SelectTrigger>
                     <SelectContent position="popper" sideOffset={5} className="bg-[#2d1b69]/95 backdrop-blur-xl border border-white/20 text-white z-50">
                       {paysDisponibles.length > 0 ? (
@@ -282,57 +301,22 @@ export function Step3Besoins({ data, region, onChange }: Step3BesoinsProps) {
               {/* Résumé des calculs */}
               {poste.salaireBrut > 0 && (
                 <div className="space-y-3 mt-4">
-                  {/* Taux horaire et ETT */}
-                  <div className="grid md:grid-cols-2 gap-4 p-4 bg-cyan-500/10 border border-cyan-500/30 rounded-lg">
-                    <div>
-                      <p className="text-cyan-200 text-sm mb-1">Taux horaire brut</p>
-                      <p className="text-white text-xl font-medium">{formaterMontant(poste.tauxHoraireBrut)}/h</p>
-                    </div>
-                    <div>
-                      <p className="text-cyan-200 text-sm mb-1">Taux ETT estimé</p>
-                      <p className="text-white text-xl font-medium">{formaterMontant(poste.tauxETT)}/h</p>
-                    </div>
-                  </div>
-
-                  {/* Détail du coefficient */}
-                  <div className="p-4 bg-violet-500/10 border border-violet-500/30 rounded-lg">
-                    <p className="text-violet-200 text-sm mb-3 font-medium">💰 Détail du calcul</p>
-                    <div className="space-y-2 text-sm">
+                  {/* 🆕 Rémunération simplifiée - SANS taux ETT (incomplet car sans options) */}
+                  <div className="p-4 bg-gradient-to-r from-green-500/10 to-cyan-500/10 border border-green-500/30 rounded-lg">
+                    <p className="text-green-200 text-sm mb-3 font-medium">💶 Rémunération du salarié</p>
+                    <div className="space-y-3">
                       <div className="flex justify-between items-center">
-                        <span className="text-white/70">Coefficient de base</span>
-                        <span className="text-white font-medium">{poste.coeffBase}</span>
+                        <span className="text-white/70">Salaire brut mensuel</span>
+                        <span className="text-white text-xl font-medium">{formaterMontant(poste.salaireBrut)}</span>
                       </div>
-                      <div className="flex justify-between items-center text-xs text-white/50">
-                        <span>({poste.secteur} - {poste.classification})</span>
+                      <div className="flex justify-between items-center">
+                        <span className="text-white/70">Taux horaire brut</span>
+                        <span className="text-white text-xl font-medium">{formaterMontant(poste.tauxHoraireBrut)}/h</span>
                       </div>
-                      
-                      {poste.facteurPays !== 1.00 && (
-                        <>
-                          <div className="flex justify-between items-center">
-                            <span className="text-white/70">Facteur pays</span>
-                            <span className="text-white font-medium">× {poste.facteurPays}</span>
-                          </div>
-                          <div className="flex justify-between items-center text-xs text-white/50">
-                            <span>({poste.labelPays})</span>
-                          </div>
-                          <div className="border-t border-white/10 my-2"></div>
-                        </>
-                      )}
-                      
-                      <div className="flex justify-between items-center pt-1">
-                        <span className="text-cyan-200 font-medium">Coefficient final</span>
-                        <span className="text-cyan-200 font-bold">{poste.coeffFinal}</span>
-                      </div>
-                      
                       <div className="border-t border-white/10 my-2"></div>
-                      
-                      <div className="flex justify-between items-center">
-                        <span className="text-white/70">Coût mensuel estimé</span>
-                        <span className="text-white font-medium">{formaterMontant(poste.tauxETT * 151.67 * poste.quantite)}</span>
-                      </div>
-                      <div className="flex justify-between items-center text-xs text-white/50">
-                        <span>({poste.quantite} {poste.quantite > 1 ? 'personnes' : 'personne'} × 151,67h × {formaterMontant(poste.tauxETT)}/h)</span>
-                      </div>
+                      <p className="text-white/50 text-xs text-center">
+                        (Base 151,67h/mois selon convention collective)
+                      </p>
                     </div>
                   </div>
                 </div>
