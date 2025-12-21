@@ -1,6 +1,7 @@
 import { Input } from '../ui/input';
 import { Label } from '../ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select';
+import { PhoneInput } from '../ui/phone-input';
 import { validerEmail, validerTelephone } from '../../utils/devis-calculations';
 import { useState } from 'react';
 import { useDevisTranslationStatic } from '../../hooks/useDevisTranslation';
@@ -18,9 +19,10 @@ interface Step2ContactProps {
   };
   onChange: (data: any) => void;
   lang?: DevisLanguage;
+  suggestedCountry?: string; // 🆕 Pays de l'entreprise pour suggérer le code pays
 }
 
-export function Step2Contact({ data, onChange, lang = 'fr' }: Step2ContactProps) {
+export function Step2Contact({ data, onChange, lang = 'fr', suggestedCountry }: Step2ContactProps) {
   const { t, isLoading } = useDevisTranslationStatic(lang);
   const [emailError, setEmailError] = useState('');
   const [telError, setTelError] = useState('');
@@ -164,15 +166,14 @@ export function Step2Contact({ data, onChange, lang = 'fr' }: Step2ContactProps)
           <Label htmlFor="telephone" className="text-white mb-2 block">
             {t.step2.fields.telephone.label} <span className="text-red-400">{t.common.required}</span>
           </Label>
-          <Input
-            id="telephone"
-            type="tel"
+          <PhoneInput
             value={data.telephonePortable}
-            onChange={(e) => handleChange('telephonePortable', e.target.value)}
+            onChange={(value) => handleChange('telephonePortable', value)}
             onBlur={handleTelBlur}
-            className={`bg-white/10 border-white/20 text-white placeholder:text-white/40 ${telError ? 'border-red-500' : ''}`}
-            placeholder={t.step2.fields.telephone.placeholder}
+            error={!!telError}
             required
+            lang={lang}
+            suggestedCountry={suggestedCountry}
           />
           {telError && <p className="text-red-400 text-sm mt-1">{telError}</p>}
         </div>

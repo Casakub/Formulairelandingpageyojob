@@ -173,13 +173,57 @@ export function validerEmail(email: string): boolean {
 }
 
 /**
- * Valide un numéro de téléphone français
+ * Valide un numéro de téléphone international (27 pays EU)
+ * Format attendu: +33612345678, +49151234567, etc.
  */
 export function validerTelephone(tel: string): boolean {
-  const telClean = tel.replace(/\s/g, '');
-  // Format: 0XXXXXXXXX (10 chiffres) ou +33XXXXXXXXX
-  const regex = /^(?:(?:\+|00)33|0)[1-9](?:\d{8})$/;
-  return regex.test(telClean);
+  if (!tel || tel.trim() === '') return false;
+  
+  const telClean = tel.replace(/\s/g, '').replace(/[\-()]/g, '');
+  
+  // Doit commencer par +
+  if (!telClean.startsWith('+')) return false;
+  
+  // Liste des codes pays EU et leurs longueurs attendues (code + numéro)
+  const validFormats: Record<string, number[]> = {
+    '+33': [11, 12],   // France: +33 + 9 chiffres
+    '+49': [12, 13],   // Allemagne: +49 + 10-11 chiffres
+    '+34': [11, 12],   // Espagne: +34 + 9 chiffres
+    '+48': [11, 12],   // Pologne: +48 + 9 chiffres
+    '+40': [11, 12],   // Roumanie: +40 + 9 chiffres
+    '+39': [12, 13],   // Italie: +39 + 10 chiffres
+    '+351': [12, 13],  // Portugal: +351 + 9 chiffres
+    '+31': [11, 12],   // Pays-Bas: +31 + 9 chiffres
+    '+32': [11, 12],   // Belgique: +32 + 9 chiffres
+    '+43': [13, 14],   // Autriche: +43 + 10-11 chiffres
+    '+30': [12, 13],   // Grèce: +30 + 10 chiffres
+    '+420': [12, 13],  // Tchéquie: +420 + 9 chiffres
+    '+36': [11, 12],   // Hongrie: +36 + 9 chiffres
+    '+46': [11, 12],   // Suède: +46 + 9 chiffres
+    '+45': [10, 11],   // Danemark: +45 + 8 chiffres
+    '+358': [12, 13],  // Finlande: +358 + 9-10 chiffres
+    '+353': [12, 13],  // Irlande: +353 + 9 chiffres
+    '+421': [12, 13],  // Slovaquie: +421 + 9 chiffres
+    '+359': [12, 13],  // Bulgarie: +359 + 9 chiffres
+    '+385': [12, 13],  // Croatie: +385 + 9 chiffres
+    '+386': [11, 12],  // Slovénie: +386 + 8 chiffres
+    '+370': [11, 12],  // Lituanie: +370 + 8 chiffres
+    '+371': [11, 12],  // Lettonie: +371 + 8 chiffres
+    '+372': [11, 12],  // Estonie: +372 + 8 chiffres
+    '+352': [12, 13],  // Luxembourg: +352 + 9 chiffres
+    '+357': [11, 12],  // Chypre: +357 + 8 chiffres
+    '+356': [11, 12],  // Malte: +356 + 8 chiffres
+  };
+  
+  // Trouver le code pays correspondant
+  for (const [dialCode, validLengths] of Object.entries(validFormats)) {
+    if (telClean.startsWith(dialCode)) {
+      const totalLength = telClean.length;
+      return validLengths.includes(totalLength);
+    }
+  }
+  
+  return false;
 }
 
 /**

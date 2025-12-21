@@ -260,31 +260,31 @@ export default function DemandeDevis() {
       case 1:
         // Validation entreprise
         if (!formData.entreprise.raisonSociale || !formData.entreprise.siret || !formData.entreprise.ville) {
-          toast.error('Veuillez remplir tous les champs obligatoires');
+          toast.error(t.validation.fillRequired);
           return false;
         }
         // Région obligatoire uniquement pour la France
         const estFrance = formData.entreprise.pays === 'France' || !formData.entreprise.pays;
         if (estFrance && !formData.entreprise.region) {
-          toast.error('Veuillez sélectionner une région');
+          toast.error(t.validation.selectRegion);
           return false;
         }
         break;
       case 2:
         if (!formData.contact.nom || !formData.contact.prenom || !formData.contact.email || !formData.contact.telephonePortable) {
-          toast.error('Veuillez remplir tous les champs obligatoires');
+          toast.error(t.validation.fillRequired);
           return false;
         }
         break;
       case 3:
         if (formData.postes.length === 0 || !formData.postes[0].secteur) {
-          toast.error('Veuillez ajouter au moins un poste');
+          toast.error(t.validation.addAtLeastOnePosition);
           return false;
         }
         break;
       case 4:
         if (!formData.conditions.dateDebut || !formData.conditions.lieuxMission) {
-          toast.error('Veuillez remplir tous les champs obligatoires');
+          toast.error(t.validation.fillRequired);
           return false;
         }
         break;
@@ -357,6 +357,7 @@ export default function DemandeDevis() {
             data={formData.contact}
             onChange={(data) => updateFormData('contact', data)}
             lang={lang}
+            suggestedCountry={formData.entreprise.pays}
           />
         );
       case 3:
@@ -405,8 +406,8 @@ export default function DemandeDevis() {
     <>
       <HelmetProvider>
         <Helmet>
-          <title>Demande de devis | YOJOB</title>
-          <meta name="description" content="Demandez un devis pour vos besoins en personnel intérimaire européen." />
+          <title>{t.meta.pageTitle}</title>
+          <meta name="description" content={t.meta.pageDescription} />
         </Helmet>
       </HelmetProvider>
 
@@ -439,7 +440,7 @@ export default function DemandeDevis() {
                   onClick={() => window.history.back()}
                 >
                   <ArrowLeft className="w-4 h-4 mr-2" />
-                  Retour
+                  {t.navigation.back}
                 </Button>
               </div>
             </div>
@@ -451,7 +452,9 @@ export default function DemandeDevis() {
           <div className="max-w-4xl mx-auto">
             <div className="mb-4">
               <div className="flex items-center justify-between mb-2">
-                <span className="text-white/80 text-sm">Étape {currentStep} sur {STEPS.length}</span>
+                <span className="text-white/80 text-sm">
+                  {t.navigation.stepOf.replace('{step}', String(currentStep)).replace('{total}', String(STEPS.length))}
+                </span>
                 <span className="text-white/80 text-sm">{Math.round(progress)}%</span>
               </div>
               <Progress value={progress} className="h-2 bg-white/10" />
@@ -532,7 +535,7 @@ export default function DemandeDevis() {
                       className="relative overflow-hidden group rounded-full border-white/30 bg-white/10 backdrop-blur-sm text-white hover:bg-white/20 hover:border-white/50 transition-all px-8 py-6 text-lg shadow-lg hover:shadow-cyan-500/30 disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                       <ArrowLeft className="w-5 h-5 mr-2" />
-                      Précédent
+                      {t.common.previous}
                     </Button>
                     
                     <Button
@@ -540,7 +543,7 @@ export default function DemandeDevis() {
                       className="relative overflow-hidden group rounded-full bg-gradient-to-r from-cyan-500 to-green-500 hover:from-cyan-600 hover:to-green-600 text-white shadow-lg hover:shadow-cyan-500/50 transition-all px-8 py-6 text-lg"
                     >
                       <span className="relative z-10 flex items-center">
-                        Suivant
+                        {t.common.next}
                         <ArrowRight className="w-5 h-5 ml-2" />
                       </span>
                       <div className="absolute inset-0 -translate-x-full group-hover:translate-x-full transition-transform duration-700 bg-gradient-to-r from-transparent via-white/40 to-transparent" />

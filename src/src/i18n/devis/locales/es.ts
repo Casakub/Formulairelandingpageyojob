@@ -38,6 +38,8 @@ export const es: DevisTranslations = {
 
   // === NAVEGACIÓN ===
   navigation: {
+    back: "Atrás",
+    stepOf: "Paso {step} de {total}",
     steps: {
       entreprise: {
         title: "Empresa",
@@ -64,6 +66,36 @@ export const es: DevisTranslations = {
         badge: "✅ Resumen",
       },
     },
+  },
+
+  // === VALIDACIÓN ===
+  validation: {
+    fillRequired: "Por favor, rellene todos los campos obligatorios",
+    selectRegion: "Por favor, seleccione una región",
+    addAtLeastOnePosition: "Por favor, añada al menos un puesto",
+    invalidEmail: "Por favor, introduzca una dirección de correo electrónico válida",
+    invalidPhone: "Por favor, introduzca un número de teléfono válido",
+    invalidSIRET: "Por favor, introduzca un número SIRET válido (14 dígitos)",
+    dateRequired: "Por favor, introduzca la fecha de inicio",
+    missionLocationRequired: "Por favor, introduzca el lugar de misión",
+  },
+
+  // === MENSAJES ===
+  messages: {
+    success: {
+      quoteSent: "¡Presupuesto enviado con éxito!",
+      redirecting: "Redirigiendo...",
+    },
+    error: {
+      submitError: "Error al enviar el presupuesto",
+      genericError: "Ha ocurrido un error",
+    },
+  },
+
+  // === META ===
+  meta: {
+    pageTitle: "Solicitud de presupuesto | YOJOB",
+    pageDescription: "Solicite un presupuesto para sus necesidades de personal temporal europeo.",
   },
 
   // === PASO 1: EMPRESA ===
@@ -160,6 +192,10 @@ export const es: DevisTranslations = {
       secteur: {
         label: "Sector de Actividad",
         placeholder: "Seleccione un sector",
+      },
+      convention: {
+        label: "Convenio Colectivo",
+        placeholder: "Automático según el sector",
       },
       poste: {
         label: "Puesto",

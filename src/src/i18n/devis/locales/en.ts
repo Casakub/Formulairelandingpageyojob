@@ -38,6 +38,8 @@ export const en: DevisTranslations = {
 
   // === NAVIGATION ===
   navigation: {
+    back: "Back",
+    stepOf: "Step {step} of {total}",
     steps: {
       entreprise: {
         title: "Company",
@@ -64,6 +66,36 @@ export const en: DevisTranslations = {
         badge: "✅ Summary",
       },
     },
+  },
+
+  // === VALIDATION ===
+  validation: {
+    fillRequired: "Please fill in all required fields",
+    selectRegion: "Please select a region",
+    addAtLeastOnePosition: "Please add at least one position",
+    invalidEmail: "Please enter a valid email address",
+    invalidPhone: "Please enter a valid phone number",
+    invalidSIRET: "Please enter a valid SIRET number (14 digits)",
+    dateRequired: "Please enter the start date",
+    missionLocationRequired: "Please enter the mission location",
+  },
+
+  // === MESSAGES ===
+  messages: {
+    success: {
+      quoteSent: "Quote sent successfully!",
+      redirecting: "Redirecting...",
+    },
+    error: {
+      submitError: "Error sending quote",
+      genericError: "An error occurred",
+    },
+  },
+
+  // === META ===
+  meta: {
+    pageTitle: "Request a quote | YOJOB",
+    pageDescription: "Request a quote for your European temporary staffing needs.",
   },
 
   // === STEP 1: COMPANY ===
@@ -160,6 +192,10 @@ export const en: DevisTranslations = {
       secteur: {
         label: "Industry Sector",
         placeholder: "Select a sector",
+      },
+      convention: {
+        label: "Collective Agreement",
+        placeholder: "Automatic based on sector",
       },
       poste: {
         label: "Position",

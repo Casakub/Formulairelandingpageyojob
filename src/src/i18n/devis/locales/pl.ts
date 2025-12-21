@@ -38,6 +38,8 @@ export const pl: DevisTranslations = {
 
   // === NAWIGACJA ===
   navigation: {
+    back: "Wstecz",
+    stepOf: "Krok {step} z {total}",
     steps: {
       entreprise: {
         title: "Firma",
@@ -64,6 +66,36 @@ export const pl: DevisTranslations = {
         badge: "✅ Podsumowanie",
       },
     },
+  },
+
+  // === WALIDACJA ===
+  validation: {
+    fillRequired: "Proszę wypełnić wszystkie wymagane pola",
+    selectRegion: "Proszę wybrać region",
+    addAtLeastOnePosition: "Proszę dodać co najmniej jedno stanowisko",
+    invalidEmail: "Proszę podać prawidłowy adres e-mail",
+    invalidPhone: "Proszę podać prawidłowy numer telefonu",
+    invalidSIRET: "Proszę podać prawidłowy numer SIRET (14 cyfr)",
+    dateRequired: "Proszę podać datę rozpoczęcia",
+    missionLocationRequired: "Proszę podać miejsce misji",
+  },
+
+  // === WIADOMOŚCI ===
+  messages: {
+    success: {
+      quoteSent: "Wycena została wysłana pomyślnie!",
+      redirecting: "Przekierowywanie...",
+    },
+    error: {
+      submitError: "Błąd podczas wysyłania wyceny",
+      genericError: "Wystąpił błąd",
+    },
+  },
+
+  // === META ===
+  meta: {
+    pageTitle: "Zapytanie ofertowe | YOJOB",
+    pageDescription: "Poproś o wycenę dla swoich potrzeb dotyczących europejskiego personelu tymczasowego.",
   },
 
   // === KROK 1: FIRMA ===
@@ -160,6 +192,10 @@ export const pl: DevisTranslations = {
       secteur: {
         label: "Sektor Branżowy",
         placeholder: "Wybierz sektor",
+      },
+      convention: {
+        label: "Układ Zbiorowy",
+        placeholder: "Automatyczny według sektora",
       },
       poste: {
         label: "Stanowisko",

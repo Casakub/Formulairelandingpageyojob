@@ -37,6 +37,8 @@ export interface DevisTranslations {
 
   // === NAVIGATION ===
   navigation: {
+    back: string;
+    stepOf: string; // "Étape {step} sur {total}"
     steps: {
       entreprise: {
         title: string;
@@ -63,6 +65,36 @@ export interface DevisTranslations {
         badge: string;
       };
     };
+  };
+
+  // === VALIDATION ===
+  validation: {
+    fillRequired: string;
+    selectRegion: string;
+    addAtLeastOnePosition: string;
+    invalidEmail: string;
+    invalidPhone: string;
+    invalidSIRET: string;
+    dateRequired: string;
+    missionLocationRequired: string;
+  };
+
+  // === MESSAGES ===
+  messages: {
+    success: {
+      quoteSent: string;
+      redirecting: string;
+    };
+    error: {
+      submitError: string;
+      genericError: string;
+    };
+  };
+
+  // === META ===
+  meta: {
+    pageTitle: string;
+    pageDescription: string;
   };
 
   // === ÉTAPE 1 : ENTREPRISE ===
@@ -157,6 +189,10 @@ export interface DevisTranslations {
     subtitle: string;
     fields: {
       secteur: {
+        label: string;
+        placeholder: string;
+      };
+      convention: {
         label: string;
         placeholder: string;
       };
@@ -472,6 +508,19 @@ export interface DevisTranslations {
     genericError: string;
     loadingError: string;
     submitError: string;
+  };
+
+  // === SECTEURS & MÉTIERS ===
+  secteurs: {
+    [secteurKey: string]: {
+      label: string;
+      postes: {
+        [posteKey: string]: string;
+      };
+      classifications: {
+        [classificationKey: string]: string;
+      };
+    };
   };
 }
 

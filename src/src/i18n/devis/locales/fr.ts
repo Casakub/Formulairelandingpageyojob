@@ -39,6 +39,8 @@ export const fr: DevisTranslations = {
 
   // === NAVIGATION ===
   navigation: {
+    back: "Retour",
+    stepOf: "Étape {step} sur {total}",
     steps: {
       entreprise: {
         title: "Entreprise",
@@ -65,6 +67,36 @@ export const fr: DevisTranslations = {
         badge: "✅ Récapitulatif",
       },
     },
+  },
+
+  // === VALIDATION ===
+  validation: {
+    fillRequired: "Veuillez remplir tous les champs obligatoires",
+    selectRegion: "Veuillez sélectionner une région",
+    addAtLeastOnePosition: "Veuillez ajouter au moins un poste",
+    invalidEmail: "Veuillez saisir une adresse email valide",
+    invalidPhone: "Veuillez saisir un numéro de téléphone valide",
+    invalidSIRET: "Veuillez saisir un numéro SIRET valide (14 chiffres)",
+    dateRequired: "Veuillez renseigner la date de début",
+    missionLocationRequired: "Veuillez renseigner le lieu de mission",
+  },
+
+  // === MESSAGES ===
+  messages: {
+    success: {
+      quoteSent: "Devis envoyé avec succès !",
+      redirecting: "Redirection en cours...",
+    },
+    error: {
+      submitError: "Erreur lors de l'envoi du devis",
+      genericError: "Une erreur est survenue",
+    },
+  },
+
+  // === META ===
+  meta: {
+    pageTitle: "Demande de devis | YOJOB",
+    pageDescription: "Demandez un devis pour vos besoins en personnel intérimaire européen.",
   },
 
   // === ÉTAPE 1 : ENTREPRISE ===
@@ -161,6 +193,10 @@ export const fr: DevisTranslations = {
       secteur: {
         label: "Secteur d'activité",
         placeholder: "Sélectionnez un secteur",
+      },
+      convention: {
+        label: "Convention collective",
+        placeholder: "Automatique selon le secteur",
       },
       poste: {
         label: "Poste recherché",
@@ -474,5 +510,194 @@ export const fr: DevisTranslations = {
     genericError: "Une erreur est survenue. Veuillez réessayer.",
     loadingError: "Erreur lors du chargement des données",
     submitError: "Erreur lors de l'envoi de la demande",
+  },
+
+  // === SECTEURS & MÉTIERS ===
+  secteurs: {
+    batiment: {
+      label: "Bâtiment",
+      postes: {
+        macon: "Maçon",
+        coffreur: "Coffreur",
+        ferrailleur: "Ferrailleur",
+        carreleur: "Carreleur",
+        platrier: "Plâtrier",
+        peintre: "Peintre",
+        plombier: "Plombier",
+        electricien: "Électricien",
+        couvreur: "Couvreur",
+        menuisier: "Menuisier",
+        chef_equipe_batiment: "Chef d'équipe",
+        chef_chantier: "Chef de chantier",
+      },
+      classifications: {
+        n1p1: "N1P1",
+        n1p2: "N1P2",
+        n2p1: "N2P1",
+        n2p2: "N2P2",
+        n3p1: "N3P1",
+        n3p2: "N3P2",
+        n4p1: "N4P1",
+        n4p2: "N4P2",
+      },
+    },
+    metallurgie: {
+      label: "Métallurgie",
+      postes: {
+        soudeur: "Soudeur",
+        chaudronnier: "Chaudronnier",
+        tuyauteur: "Tuyauteur",
+        tourneur: "Tourneur",
+        fraiseur: "Fraiseur",
+        usineur: "Usineur",
+        mecanicien_industriel: "Mécanicien industriel",
+        monteur: "Monteur",
+        controleur_qualite: "Contrôleur qualité",
+        ajusteur: "Ajusteur",
+        chef_equipe_metallurgie: "Chef d'équipe",
+      },
+      classifications: {
+        niveau_1: "Niveau I",
+        niveau_2: "Niveau II",
+        niveau_3: "Niveau III",
+        niveau_4: "Niveau IV",
+        niveau_5: "Niveau V",
+      },
+    },
+    tp: {
+      label: "Travaux Publics",
+      postes: {
+        conducteur_engins: "Conducteur d'engins",
+        terrassier: "Terrassier",
+        canalisateur: "Canalisateur",
+        constructeur_routes: "Constructeur de routes",
+        coffreur_bancheur: "Coffreur bancheur",
+        macon_vrd: "Maçon VRD",
+        chef_equipe_tp: "Chef d'équipe TP",
+        manoeuvre_tp: "Manœuvre TP",
+      },
+      classifications: {
+        n1: "N1",
+        n2: "N2",
+        n3: "N3",
+        n4: "N4",
+      },
+    },
+    hotellerie: {
+      label: "Hôtellerie",
+      postes: {
+        receptionniste: "Réceptionniste",
+        femme_chambre: "Femme de chambre",
+        agent_entretien: "Agent d'entretien",
+        bagagiste: "Bagagiste",
+        concierge: "Concierge",
+        night_audit: "Night audit",
+        gouvernante: "Gouvernante",
+        chef_reception: "Chef de réception",
+      },
+      classifications: {
+        niveau_1: "Niveau I",
+        niveau_2: "Niveau II",
+        niveau_3: "Niveau III",
+        niveau_4: "Niveau IV",
+        niveau_5: "Niveau V",
+      },
+    },
+    restauration: {
+      label: "Restauration",
+      postes: {
+        cuisinier: "Cuisinier",
+        commis_cuisine: "Commis de cuisine",
+        chef_partie: "Chef de partie",
+        serveur: "Serveur",
+        barman: "Barman",
+        plongeur: "Plongeur",
+        chef_rang: "Chef de rang",
+        maitre_hotel: "Maître d'hôtel",
+        second_cuisine: "Second de cuisine",
+        chef_cuisine: "Chef de cuisine",
+      },
+      classifications: {
+        niveau_1: "Niveau I",
+        niveau_2: "Niveau II",
+        niveau_3: "Niveau III",
+        niveau_4: "Niveau IV",
+        niveau_5: "Niveau V",
+      },
+    },
+    plasturgie: {
+      label: "Plasturgie",
+      postes: {
+        operateur_injection: "Opérateur injection",
+        operateur_extrusion: "Opérateur extrusion",
+        regleur: "Régleur",
+        operateur_thermoformage: "Opérateur thermoformage",
+        controleur_qualite_plasturgie: "Contrôleur qualité",
+        technicien_maintenance: "Technicien maintenance",
+        chef_equipe_plasturgie: "Chef d'équipe",
+      },
+      classifications: {
+        niveau_1: "Niveau I",
+        niveau_2: "Niveau II",
+        niveau_3: "Niveau III",
+        niveau_4: "Niveau IV",
+      },
+    },
+    automobile_carrosserie: {
+      label: "Automobile & Carrosserie",
+      postes: {
+        carrossier: "Carrossier",
+        peintre_automobile: "Peintre automobile",
+        mecanicien_auto: "Mécanicien auto",
+        electricien_auto: "Électricien auto",
+        chef_atelier: "Chef d'atelier",
+        controleur_technique: "Contrôleur technique",
+      },
+      classifications: {
+        niveau_1: "Niveau I",
+        niveau_2: "Niveau II",
+        niveau_3: "Niveau III",
+        niveau_4: "Niveau IV",
+      },
+    },
+    sylviculture: {
+      label: "Sylviculture",
+      postes: {
+        bucheron: "Bûcheron",
+        elagueur: "Élagueur",
+        conducteur_engins_forestiers: "Conducteur d'engins forestiers",
+        chef_equipe_sylviculture: "Chef d'équipe sylviculture",
+      },
+      classifications: {
+        niveau_1: "Niveau I",
+        niveau_2: "Niveau II",
+        niveau_3: "Niveau III",
+        niveau_4: "Niveau IV",
+      },
+    },
+    cartonnerie: {
+      label: "Cartonnerie",
+      postes: {
+        operateur_production: "Opérateur de production",
+        conducteur_ligne: "Conducteur de ligne",
+        regleur_cartonnerie: "Régleur",
+        chef_equipe_cartonnerie: "Chef d'équipe",
+      },
+      classifications: {
+        niveau_1: "Niveau I",
+        niveau_2: "Niveau II",
+        niveau_3: "Niveau III",
+        niveau_4: "Niveau IV",
+      },
+    },
+    autre: {
+      label: "Autre",
+      postes: {
+        autre_poste: "Autre poste (à préciser)",
+      },
+      classifications: {
+        a_definir: "À définir",
+      },
+    },
   },
 };

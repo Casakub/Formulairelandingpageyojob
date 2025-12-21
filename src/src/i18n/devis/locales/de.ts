@@ -38,6 +38,8 @@ export const de: DevisTranslations = {
 
   // === NAVIGATION ===
   navigation: {
+    back: "Zurück",
+    stepOf: "Schritt {step} von {total}",
     steps: {
       entreprise: {
         title: "Unternehmen",
@@ -64,6 +66,36 @@ export const de: DevisTranslations = {
         badge: "✅ Zusammenfassung",
       },
     },
+  },
+
+  // === VALIDATION ===
+  validation: {
+    fillRequired: "Bitte füllen Sie alle Pflichtfelder aus",
+    selectRegion: "Bitte wählen Sie eine Region",
+    addAtLeastOnePosition: "Bitte fügen Sie mindestens eine Stelle hinzu",
+    invalidEmail: "Bitte geben Sie eine gültige E-Mail-Adresse ein",
+    invalidPhone: "Bitte geben Sie eine gültige Telefonnummer ein",
+    invalidSIRET: "Bitte geben Sie eine gültige SIRET-Nummer ein (14 Ziffern)",
+    dateRequired: "Bitte geben Sie das Startdatum ein",
+    missionLocationRequired: "Bitte geben Sie den Einsatzort ein",
+  },
+
+  // === MESSAGES ===
+  messages: {
+    success: {
+      quoteSent: "Angebot erfolgreich gesendet!",
+      redirecting: "Weiterleitung...",
+    },
+    error: {
+      submitError: "Fehler beim Senden des Angebots",
+      genericError: "Ein Fehler ist aufgetreten",
+    },
+  },
+
+  // === META ===
+  meta: {
+    pageTitle: "Angebotsanfrage | YOJOB",
+    pageDescription: "Fordern Sie ein Angebot für Ihren europäischen Zeitarbeitsbedarf an.",
   },
 
   // === SCHRITT 1: UNTERNEHMEN ===
@@ -160,6 +192,10 @@ export const de: DevisTranslations = {
       secteur: {
         label: "Branche",
         placeholder: "Wählen Sie eine Branche",
+      },
+      convention: {
+        label: "Tarifvertrag",
+        placeholder: "Automatisch je nach Branche",
       },
       poste: {
         label: "Position",

@@ -38,6 +38,8 @@ export const ro: DevisTranslations = {
 
   // === NAVIGARE ===
   navigation: {
+    back: "Înapoi",
+    stepOf: "Pasul {step} din {total}",
     steps: {
       entreprise: {
         title: "Companie",
@@ -64,6 +66,36 @@ export const ro: DevisTranslations = {
         badge: "✅ Rezumat",
       },
     },
+  },
+
+  // === VALIDARE ===
+  validation: {
+    fillRequired: "Vă rugăm să completați toate câmpurile obligatorii",
+    selectRegion: "Vă rugăm să selectați o regiune",
+    addAtLeastOnePosition: "Vă rugăm să adăugați cel puțin un post",
+    invalidEmail: "Vă rugăm să introduceți o adresă de email validă",
+    invalidPhone: "Vă rugăm să introduceți un număr de telefon valid",
+    invalidSIRET: "Vă rugăm să introduceți un număr SIRET valid (14 cifre)",
+    dateRequired: "Vă rugăm să introduceți data de începere",
+    missionLocationRequired: "Vă rugăm să introduceți locația misiunii",
+  },
+
+  // === MESAJE ===
+  messages: {
+    success: {
+      quoteSent: "Oferta a fost trimisă cu succes!",
+      redirecting: "Redirecționare...",
+    },
+    error: {
+      submitError: "Eroare la trimiterea ofertei",
+      genericError: "A apărut o eroare",
+    },
+  },
+
+  // === META ===
+  meta: {
+    pageTitle: "Cerere de ofertă | YOJOB",
+    pageDescription: "Solicitați o ofertă pentru nevoile dvs. de personal temporar european.",
   },
 
   // === PASUL 1: COMPANIE ===
@@ -161,9 +193,13 @@ export const ro: DevisTranslations = {
         label: "Sector de Activitate",
         placeholder: "Selectați un sector",
       },
+      convention: {
+        label: "Acord Colectiv",
+        placeholder: "Automat în funcție de sector",
+      },
       poste: {
-        label: "Poziție",
-        placeholder: "Selectați o poziție",
+        label: "Post",
+        placeholder: "Selectați un post",
       },
       classification: {
         label: "Clasificare / Calificare",
