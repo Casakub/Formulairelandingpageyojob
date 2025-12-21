@@ -92,6 +92,7 @@ devis.post('/', async (c) => {
       nouveau: 0,
       enCours: 0,
       devisEnvoye: 0,
+      signe: 0,
       converti: 0,
       perdu: 0
     };
@@ -323,6 +324,7 @@ devis.get('/api/stats', async (c) => {
       nouveau: 0,
       enCours: 0,
       devisEnvoye: 0,
+      signe: 0,
       converti: 0,
       perdu: 0
     };

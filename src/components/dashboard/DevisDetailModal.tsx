@@ -860,7 +860,7 @@ export function DevisDetailModal({ devisId, onClose }: DevisDetailModalProps) {
               )}
 
               {/* Section Certificat de Signature Électronique */}
-              {devis.signature && (
+              {devis.signature && devis.signature.signataire && (
                 <div className="border-2 border-green-200 rounded-lg overflow-hidden bg-gradient-to-br from-green-50 to-emerald-50">
                   <div className="w-full p-4 bg-gradient-to-r from-green-100 to-emerald-100">
                     <div className="flex items-center gap-3">
@@ -884,23 +884,23 @@ export function DevisDetailModal({ devisId, onClose }: DevisDetailModalProps) {
                       <div className="grid md:grid-cols-2 gap-4">
                         <div>
                           <p className="text-slate-500 text-sm">Nom complet</p>
-                          <p className="text-slate-900">{devis.signature.signataire.prenom} {devis.signature.signataire.nom}</p>
+                          <p className="text-slate-900">{devis.signature.signataire?.prenom} {devis.signature.signataire?.nom}</p>
                         </div>
                         <div>
                           <p className="text-slate-500 text-sm">Fonction</p>
-                          <p className="text-slate-900">{devis.signature.signataire.fonction}</p>
+                          <p className="text-slate-900">{devis.signature.signataire?.fonction}</p>
                         </div>
                         <div>
                           <p className="text-slate-500 text-sm">Email</p>
-                          <p className="text-cyan-600">{devis.signature.signataire.email}</p>
+                          <p className="text-cyan-600">{devis.signature.signataire?.email}</p>
                         </div>
                         <div>
                           <p className="text-slate-500 text-sm">Entreprise</p>
-                          <p className="text-slate-900">{devis.signature.signataire.entreprise}</p>
+                          <p className="text-slate-900">{devis.signature.signataire?.entreprise}</p>
                         </div>
                         <div className="md:col-span-2">
                           <p className="text-slate-500 text-sm">SIRET</p>
-                          <p className="text-slate-900 font-mono">{devis.signature.signataire.siret}</p>
+                          <p className="text-slate-900 font-mono">{devis.signature.signataire?.siret}</p>
                         </div>
                       </div>
                     </div>
@@ -916,20 +916,20 @@ export function DevisDetailModal({ devisId, onClose }: DevisDetailModalProps) {
                       <div className="grid md:grid-cols-2 gap-4">
                         <div>
                           <p className="text-slate-500 text-sm">Date et heure (Paris)</p>
-                          <p className="text-slate-900">{devis.signature.metadata.timestampReadable}</p>
+                          <p className="text-slate-900">{devis.signature.metadata?.timestampReadable}</p>
                         </div>
                         <div>
                           <p className="text-slate-500 text-sm">Horodatage ISO 8601</p>
-                          <p className="text-slate-900 font-mono text-xs">{devis.signature.metadata.timestamp}</p>
+                          <p className="text-slate-900 font-mono text-xs">{devis.signature.metadata?.timestamp}</p>
                         </div>
                         <div>
                           <p className="text-slate-500 text-sm">Adresse IP</p>
-                          <p className="text-green-600 font-mono">{devis.signature.metadata.ipAddress}</p>
+                          <p className="text-green-600 font-mono">{devis.signature.metadata?.ipAddress}</p>
                         </div>
                         <div>
                           <p className="text-slate-500 text-sm">Navigateur (User-Agent)</p>
-                          <p className="text-slate-900 text-xs truncate" title={devis.signature.metadata.userAgent}>
-                            {devis.signature.metadata.userAgent.substring(0, 50)}...
+                          <p className="text-slate-900 text-xs truncate" title={devis.signature.metadata?.userAgent}>
+                            {devis.signature.metadata?.userAgent?.substring(0, 50)}...
                           </p>
                         </div>
                       </div>
@@ -947,16 +947,16 @@ export function DevisDetailModal({ devisId, onClose }: DevisDetailModalProps) {
                         <div>
                           <p className="text-slate-500 text-sm">Algorithme de hachage</p>
                           <Badge className="bg-violet-100 text-violet-700 border-violet-200 mt-1">
-                            {devis.signature.integrite.hashAlgorithm}
+                            {devis.signature.integrite?.hashAlgorithm}
                           </Badge>
                         </div>
                         <div>
                           <p className="text-slate-500 text-sm mb-1">Empreinte numérique du devis</p>
                           <p className="text-slate-900 font-mono text-xs bg-slate-50 p-3 rounded border border-slate-200 break-all">
-                            {devis.signature.integrite.documentHash}
+                            {devis.signature.integrite?.documentHash}
                           </p>
                           <p className="text-slate-500 text-xs mt-1">
-                            Cette empreinte garantit que le devis {devis.signature.integrite.devisNumero} n'a pas été modifié depuis la signature.
+                            Cette empreinte garantit que le devis {devis.signature.integrite?.devisNumero} n'a pas été modifié depuis la signature.
                           </p>
                         </div>
                       </div>
@@ -970,10 +970,10 @@ export function DevisDetailModal({ devisId, onClose }: DevisDetailModalProps) {
                         <CheckCircle className="w-5 h-5 text-green-600 mt-0.5 flex-shrink-0" />
                         <div>
                           <p className="text-green-900 text-sm leading-relaxed">
-                            {devis.signature.consentement.mentions}
+                            {devis.signature.consentement?.mentions}
                           </p>
                           <p className="text-green-700 text-xs mt-2">
-                            CGV acceptées le {new Date(devis.signature.consentement.dateAcceptation).toLocaleString('fr-FR', {
+                            CGV acceptées le {devis.signature.consentement?.dateAcceptation && new Date(devis.signature.consentement.dateAcceptation).toLocaleString('fr-FR', {
                               dateStyle: 'full',
                               timeStyle: 'long',
                               timeZone: 'Europe/Paris'

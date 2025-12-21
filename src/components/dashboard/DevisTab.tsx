@@ -9,7 +9,8 @@ import {
   Clock,
   CheckCircle,
   AlertCircle,
-  Download
+  Download,
+  PenTool
 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '../ui/card';
 import { Button } from '../ui/button';
@@ -49,6 +50,7 @@ interface DevisStats {
   nouveau: number;
   enCours: number;
   devisEnvoye: number;
+  signe: number;
   converti: number;
   perdu: number;
 }
@@ -61,6 +63,7 @@ export function DevisTab() {
     nouveau: 0,
     enCours: 0,
     devisEnvoye: 0,
+    signe: 0,
     converti: 0,
     perdu: 0
   });
@@ -68,6 +71,7 @@ export function DevisTab() {
   const [recherche, setRecherche] = useState('');
   const [filtreStatut, setFiltreStatut] = useState('tous');
   const [devisDetailId, setDevisDetailId] = useState<string | null>(null);
+  const [carteActive, setCarteActive] = useState<string | null>(null);
 
   useEffect(() => {
     chargerDonnees();
@@ -159,11 +163,29 @@ export function DevisTab() {
     }
   };
 
+  // Fonction pour mapper les titres des cartes vers les statuts de filtrage
+  const handleCardClick = (titre: string) => {
+    const mapTitreToStatut: Record<string, string> = {
+      'Total': 'tous',
+      'Nouveau': 'nouveau',
+      'En cours': 'enCours',
+      'Devis envoyé': 'devisEnvoye',
+      'Signé': 'signe',
+      'Converti': 'converti',
+      'Perdu': 'perdu'
+    };
+    
+    const statut = mapTitreToStatut[titre] || 'tous';
+    setFiltreStatut(statut);
+    setCarteActive(titre);
+  };
+
   const getStatutBadge = (statut: string) => {
     const badges = {
       'nouveau': { bg: '#fef3c7', text: '#b45309', label: 'Nouveau' },
       'enCours': { bg: '#dbeafe', text: '#1d4ed8', label: 'En cours' },
       'devisEnvoye': { bg: '#ede9fe', text: '#6d28d9', label: 'Devis envoyé' },
+      'signe': { bg: '#d1fae5', text: '#059669', label: '✍️ Signé' },
       'converti': { bg: '#d1fae5', text: '#047857', label: 'Converti' },
       'perdu': { bg: '#fee2e2', text: '#b91c1c', label: 'Perdu' }
     };
@@ -204,6 +226,14 @@ export function DevisTab() {
       textColor: 'text-violet-600'
     },
     {
+      titre: 'Signé',
+      valeur: stats.signe,
+      icone: PenTool,
+      couleur: 'from-emerald-500 to-emerald-600',
+      bgColor: 'bg-emerald-50',
+      textColor: 'text-emerald-600'
+    },
+    {
       titre: 'Converti',
       valeur: stats.converti,
       icone: CheckCircle,
@@ -232,20 +262,29 @@ export function DevisTab() {
   return (
     <div className="space-y-6">
       {/* Stats Cards */}
-      <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4">
+      <div className="grid grid-cols-2 md:grid-cols-4 xl:grid-cols-7 gap-4">
         {cardsStats.map((card, index) => {
           const Icone = card.icone;
+          const estActive = carteActive === card.titre;
           return (
             <motion.div
               key={card.titre}
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: index * 0.05 }}
+              onClick={() => handleCardClick(card.titre)}
             >
-              <Card className={`border-slate-200 ${card.bgColor}/50 backdrop-blur-sm hover:shadow-lg transition-shadow`}>
+              <Card className={`
+                border-2 cursor-pointer transition-all duration-300
+                ${estActive 
+                  ? `border-${card.textColor.replace('text-', '')} shadow-xl scale-105` 
+                  : 'border-slate-200 hover:border-slate-300'
+                }
+                ${card.bgColor}/50 backdrop-blur-sm hover:shadow-lg
+              `}>
                 <CardContent className="p-4">
                   <div className="flex items-center justify-between mb-2">
-                    <div className={`p-2 rounded-lg bg-gradient-to-br ${card.couleur}`}>
+                    <div className={`p-2 rounded-lg bg-gradient-to-br ${card.couleur} ${estActive ? 'shadow-lg' : ''}`}>
                       <Icone className="w-4 h-4 text-white" />
                     </div>
                     <p className={`text-2xl ${card.textColor}`}>{card.valeur}</p>
