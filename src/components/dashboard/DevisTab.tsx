@@ -17,6 +17,7 @@ import { Input } from '../ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select';
 import { Badge } from '../ui/badge';
 import { projectId, publicAnonKey } from '../../utils/supabase/info';
+import { DevisDetailModal } from './DevisDetailModal';
 
 interface Devis {
   id: string;
@@ -429,29 +430,12 @@ export function DevisTab() {
         )}
       </div>
 
-      {/* TODO: Modal détail devis */}
+      {/* Modal détail devis */}
       {devisDetailId && (
-        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
-          <Card className="max-w-4xl w-full max-h-[90vh] overflow-auto">
-            <CardHeader>
-              <CardTitle>Détail de la demande</CardTitle>
-              <Button 
-                onClick={() => setDevisDetailId(null)}
-                className="absolute top-4 right-4"
-                variant="ghost"
-                size="sm"
-              >
-                ✕
-              </Button>
-            </CardHeader>
-            <CardContent>
-              <p className="text-slate-600">
-                Fonctionnalité en cours de développement...
-              </p>
-              {/* TODO: Implémenter le détail complet du devis */}
-            </CardContent>
-          </Card>
-        </div>
+        <DevisDetailModal
+          devisId={devisDetailId}
+          onClose={() => setDevisDetailId(null)}
+        />
       )}
     </div>
   );
