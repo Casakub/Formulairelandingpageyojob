@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { SECTEURS, REGIONS } from '../data/devis-data';
+import { configData } from '../data/config/index';
 
 // Types pour les données de configuration
 interface Pays {
@@ -55,14 +56,14 @@ interface MappingClassifications {
 
 /**
  * Hook personnalisé pour gérer la configuration dynamique des devis
- * Charge les données depuis les fichiers JSON de configuration
+ * Charge les données depuis les fichiers de configuration
  */
 export function useDevisConfig() {
   // État de chargement
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  // Données chargées depuis les JSON
+  // Données chargées depuis la config
   const [pays, setPays] = useState<Pays[]>([]);
   const [coefficientsBase, setCoefficientsBase] = useState<Record<string, Record<string, number>>>({});
   const [facteursPays, setFacteursPays] = useState<Record<string, FacteurPays>>({});
@@ -72,48 +73,26 @@ export function useDevisConfig() {
 
   // Chargement des données au montage du composant
   useEffect(() => {
-    const loadConfig = async () => {
+    const loadConfig = () => {
       try {
         setIsLoading(true);
         setError(null);
 
         console.log('🔄 [useDevisConfig] Début du chargement de la configuration...');
 
-        // Charger tous les fichiers JSON en parallèle
-        const [paysData, coeffsData, facteursData, salairesData, supplementsData] = await Promise.all([
-          fetch('/data/config/pays.json').then(res => {
-            console.log('📥 [useDevisConfig] pays.json - Status:', res.status);
-            if (!res.ok) throw new Error(`Erreur HTTP ${res.status} pour pays.json`);
-            return res.json();
-          }),
-          fetch('/data/config/coefficients-base.json').then(res => {
-            console.log('📥 [useDevisConfig] coefficients-base.json - Status:', res.status);
-            if (!res.ok) throw new Error(`Erreur HTTP ${res.status} pour coefficients-base.json`);
-            return res.json();
-          }),
-          fetch('/data/config/facteurs-pays.json').then(res => {
-            console.log('📥 [useDevisConfig] facteurs-pays.json - Status:', res.status);
-            if (!res.ok) throw new Error(`Erreur HTTP ${res.status} pour facteurs-pays.json`);
-            return res.json();
-          }),
-          fetch('/data/config/salaires.json').then(res => {
-            console.log('📥 [useDevisConfig] salaires.json - Status:', res.status);
-            if (!res.ok) throw new Error(`Erreur HTTP ${res.status} pour salaires.json`);
-            return res.json();
-          }),
-          fetch('/data/config/supplements.json').then(res => {
-            console.log('📥 [useDevisConfig] supplements.json - Status:', res.status);
-            if (!res.ok) throw new Error(`Erreur HTTP ${res.status} pour supplements.json`);
-            return res.json();
-          })
-        ]);
+        // Utiliser les données du fichier index.ts
+        const paysData = configData.pays;
+        const coeffsData = configData.coefficients;
+        const facteursData = configData.facteurs;
+        const salairesData = configData.salaires;
+        const supplementsData = configData.supplements;
 
         // Stocker les données
         setPays(paysData.pays || []);
         setCoefficientsBase(coeffsData.coefficients || {});
         setFacteursPays(facteursData.facteurs || {});
         setSalaires(salairesData.salaires || {});
-        setSupplements(supplementsData);
+        setSupplements(supplementsData as any);
         setMappingClassifications(coeffsData.mapping_anciennes_classifications || {});
 
         console.log('✅ [useDevisConfig] Configuration chargée avec succès !');

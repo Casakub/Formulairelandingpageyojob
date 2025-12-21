@@ -356,9 +356,9 @@ export function StepRecapitulatif({ formData, onSubmit, isSubmitting }: StepReca
                       
                       <div className="border-t border-white/10 pt-2 mt-2">
                         <div className="flex items-center justify-between">
-                          <span className="text-white font-medium">Sous-total main d'œuvre</span>
+                          <span className="text-white font-medium">Sous-total main d'œuvre (par personne)</span>
                           <span className="text-cyan-400 font-bold">
-                            {formaterMontant(detailHeures.coutTotal)}
+                            {formaterMontant(detailHeures.coutTotal / poste.quantite)}
                           </span>
                         </div>
                       </div>
