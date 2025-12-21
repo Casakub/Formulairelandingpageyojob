@@ -345,4 +345,162 @@ devis.get('/api/stats', async (c) => {
   }
 });
 
+/**
+ * POST /make-server-10092a63/generer-pdf
+ * Générer un PDF pour un devis
+ */
+devis.post('/generer-pdf', async (c) => {
+  try {
+    const { devisId, inclureCGV } = await c.req.json();
+    
+    console.log(`📄 Génération PDF pour devis: ${devisId}`);
+    
+    // Récupérer le devis
+    const prospect = await kv.get(`prospects:${devisId}`);
+    
+    if (!prospect) {
+      return c.json(
+        {
+          success: false,
+          error: 'Devis non trouvé'
+        },
+        404
+      );
+    }
+    
+    // TODO: Implémenter la génération PDF réelle avec react-pdf
+    // Pour l'instant, on retourne un placeholder
+    
+    const pdfData = {
+      id: crypto.randomUUID(),
+      devisId,
+      numero: prospect.numero,
+      pdfUrl: '#', // URL temporaire
+      statut: 'genere',
+      dateGeneration: new Date().toISOString(),
+      inclureCGV
+    };
+    
+    // Sauvegarder les métadonnées du PDF
+    await kv.set(`pdf:${pdfData.id}`, pdfData);
+    
+    console.log(`✅ PDF généré: ${pdfData.id}`);
+    
+    return c.json({
+      success: true,
+      pdfUrl: pdfData.pdfUrl,
+      pdfId: pdfData.id,
+      message: 'PDF généré avec succès'
+    });
+    
+  } catch (error) {
+    console.error('❌ Erreur génération PDF:', error);
+    return c.json(
+      {
+        success: false,
+        error: 'Erreur lors de la génération du PDF',
+        details: error.message
+      },
+      500
+    );
+  }
+});
+
+/**
+ * POST /make-server-10092a63/signer-devis
+ * Signer un devis électroniquement
+ */
+devis.post('/signer-devis', async (c) => {
+  try {
+    const { devisId, signatureBase64, accepteCGV } = await c.req.json();
+    
+    if (!accepteCGV) {
+      return c.json(
+        {
+          success: false,
+          error: 'Vous devez accepter les CGV'
+        },
+        400
+      );
+    }
+    
+    console.log(`✍️ Signature devis: ${devisId}`);
+    
+    // Récupérer le devis
+    const prospect = await kv.get(`prospects:${devisId}`);
+    
+    if (!prospect) {
+      return c.json(
+        {
+          success: false,
+          error: 'Devis non trouvé'
+        },
+        404
+      );
+    }
+    
+    // Vérifier qu'il n'est pas déjà signé
+    if (prospect.statut === 'signe') {
+      return c.json(
+        {
+          success: false,
+          error: 'Ce devis a déjà été signé'
+        },
+        400
+      );
+    }
+    
+    // Enregistrer la signature
+    const signatureData = {
+      image: signatureBase64,
+      ipAddress: c.req.header('x-forwarded-for') || c.req.header('x-real-ip') || 'unknown',
+      userAgent: c.req.header('user-agent') || 'unknown',
+      timestamp: new Date().toISOString(),
+      accepteCGV: true
+    };
+    
+    // Mettre à jour le statut du devis
+    const prospectMisAJour = {
+      ...prospect,
+      statut: 'signe',
+      signature: signatureData,
+      updatedAt: new Date().toISOString()
+    };
+    
+    await kv.set(`prospects:${devisId}`, prospectMisAJour);
+    
+    // Mettre à jour les stats
+    const stats = await kv.get('prospects:stats') || {};
+    if (stats[prospect.statut]) stats[prospect.statut] -= 1;
+    if (stats['signe']) {
+      stats['signe'] += 1;
+    } else {
+      stats['signe'] = 1;
+    }
+    await kv.set('prospects:stats', stats);
+    
+    console.log(`✅ Devis signé: ${devisId}`);
+    
+    // TODO: Envoyer email de confirmation
+    // TODO: Régénérer le PDF avec la signature
+    
+    return c.json({
+      success: true,
+      message: 'Devis signé avec succès',
+      data: prospectMisAJour
+    });
+    
+  } catch (error) {
+    console.error('❌ Erreur signature devis:', error);
+    return c.json(
+      {
+        success: false,
+        error: 'Erreur lors de la signature du devis',
+        details: error.message
+      },
+      500
+    );
+  }
+});
+
 export default devis;

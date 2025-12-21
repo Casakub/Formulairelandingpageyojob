@@ -11,6 +11,7 @@ import ServiceConseilConformite from './ServiceConseilConformite';
 import ServiceDetachementPersonnel from './ServiceDetachementPersonnel';
 import DemandeDevis from './DemandeDevis';
 import ConfirmationDevis from './ConfirmationDevis';
+import RecapDevis from './RecapDevis';
 import { Toaster } from './components/ui/sonner';
 
 export default function App() {
@@ -170,6 +171,16 @@ export default function App() {
     return (
       <>
         <ConfirmationDevis />
+        <Toaster position="top-right" />
+      </>
+    );
+  }
+
+  // Route dynamique pour /recap-devis/:id
+  if (currentPath.startsWith('/recap-devis/')) {
+    return (
+      <>
+        <RecapDevis />
         <Toaster position="top-right" />
       </>
     );

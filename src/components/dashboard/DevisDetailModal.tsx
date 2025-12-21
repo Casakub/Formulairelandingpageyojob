@@ -22,7 +22,8 @@ import {
   Car,
   CheckCircle,
   AlertCircle,
-  TrendingUp
+  TrendingUp,
+  Loader2
 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '../ui/card';
 import { Button } from '../ui/button';
@@ -30,6 +31,7 @@ import { Badge } from '../ui/badge';
 import { Separator } from '../ui/separator';
 import { useState, useEffect } from 'react';
 import { projectId, publicAnonKey } from '../../utils/supabase/info';
+import { toast } from 'sonner';
 
 interface DevisDetailModalProps {
   devisId: string;
@@ -138,6 +140,7 @@ interface Devis {
 export function DevisDetailModal({ devisId, onClose }: DevisDetailModalProps) {
   const [devis, setDevis] = useState<Devis | null>(null);
   const [loading, setLoading] = useState(true);
+  const [isGeneratingPDF, setIsGeneratingPDF] = useState(false);
   const [sectionsOuvertes, setSectionsOuvertes] = useState({
     entreprise: true,
     contact: true,
@@ -179,6 +182,7 @@ export function DevisDetailModal({ devisId, onClose }: DevisDetailModalProps) {
       }
     } catch (error) {
       console.error('Erreur chargement devis:', error);
+      toast.error('Erreur de chargement du devis');
     } finally {
       setLoading(false);
     }
@@ -218,6 +222,46 @@ export function DevisDetailModal({ devisId, onClose }: DevisDetailModalProps) {
       coutRepas,
       coutTotal
     };
+  };
+
+  const handleGeneratePDF = async () => {
+    try {
+      setIsGeneratingPDF(true);
+      toast.info('Génération du PDF en cours...');
+
+      const response = await fetch(
+        `https://${projectId}.supabase.co/functions/v1/make-server-10092a63/devis/generer-pdf`,
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${publicAnonKey}`
+          },
+          body: JSON.stringify({
+            devisId,
+            inclureCGV: true
+          })
+        }
+      );
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Erreur génération PDF');
+      }
+
+      const result = await response.json();
+      
+      // Télécharger le PDF
+      if (result.pdfUrl) {
+        window.open(result.pdfUrl, '_blank');
+        toast.success('PDF généré avec succès !');
+      }
+    } catch (error) {
+      console.error('Erreur génération PDF:', error);
+      toast.error('Impossible de générer le PDF');
+    } finally {
+      setIsGeneratingPDF(false);
+    }
   };
 
   if (loading) {
@@ -289,7 +333,7 @@ export function DevisDetailModal({ devisId, onClose }: DevisDetailModalProps) {
                 </div>
                 <div className="flex items-center gap-2">
                   <Button
-                    onClick={() => {/* TODO: Export PDF */}}
+                    onClick={handleGeneratePDF}
                     className="bg-gradient-to-r from-violet-500 to-purple-500 hover:from-violet-600 hover:to-purple-600 text-white"
                     size="sm"
                   >
@@ -864,7 +908,7 @@ export function DevisDetailModal({ devisId, onClose }: DevisDetailModalProps) {
                   Fermer
                 </Button>
                 <Button
-                  onClick={() => {/* TODO: Export PDF */}}
+                  onClick={handleGeneratePDF}
                   className="bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-600 hover:to-blue-600 text-white"
                 >
                   <Download className="w-4 h-4 mr-2" />

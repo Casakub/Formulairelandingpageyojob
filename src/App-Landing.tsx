@@ -791,17 +791,18 @@ export default function AppLanding() {
                 transition={{ delay: 0.7 }}
                 className="flex flex-col sm:flex-row gap-2.5 lg:gap-4 mb-5 lg:mb-0"
               >
-                <Button
-                  onClick={scrollToContact}
-                  size="lg"
-                  className="relative overflow-hidden group rounded-full bg-white text-blue-900 hover:bg-cyan-50 shadow-2xl hover:shadow-white/70 transition-all duration-300 hover:scale-105"
-                >
-                  <span className="relative z-10 flex items-center justify-center">
-                    {content.hero?.ctaPrimaryLabel || 'Trouver du personnel'}
-                    <ArrowRight className="ml-2 w-5 h-5" />
-                  </span>
-                  <div className="absolute inset-0 -translate-x-full group-hover:translate-x-full transition-transform duration-700 bg-gradient-to-r from-transparent via-white/40 to-transparent" />
-                </Button>
+                <a href="/devis">
+                  <Button
+                    size="lg"
+                    className="relative overflow-hidden group rounded-full bg-white text-blue-900 hover:bg-cyan-50 shadow-2xl hover:shadow-white/70 transition-all duration-300 hover:scale-105"
+                  >
+                    <span className="relative z-10 flex items-center justify-center">
+                      {content.hero?.ctaPrimaryLabel || 'Trouver du personnel'}
+                      <ArrowRight className="ml-2 w-5 h-5" />
+                    </span>
+                    <div className="absolute inset-0 -translate-x-full group-hover:translate-x-full transition-transform duration-700 bg-gradient-to-r from-transparent via-white/40 to-transparent" />
+                  </Button>
+                </a>
                 <Button
                   onClick={scrollToServices}
                   size="lg"

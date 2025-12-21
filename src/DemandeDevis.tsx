@@ -276,6 +276,8 @@ export default function DemandeDevis() {
     setIsSubmitting(true);
     
     try {
+      console.log('📤 Envoi du devis au backend...');
+      
       // Envoyer les données au backend
       const response = await fetch(`https://${projectId}.supabase.co/functions/v1/make-server-10092a63/devis`, {
         method: 'POST',
@@ -287,17 +289,33 @@ export default function DemandeDevis() {
       });
 
       if (!response.ok) {
-        throw new Error('Erreur lors de l\'envoi du devis');
+        const errorData = await response.json();
+        console.error('❌ Erreur backend:', errorData);
+        throw new Error(errorData.error || 'Erreur lors de l\'envoi du devis');
       }
 
       const result = await response.json();
+      console.log('✅ Devis créé avec succès:', result);
       
-      // Rediriger vers la page de confirmation
-      window.location.href = `/confirmation-devis?ref=${result.numero}`;
+      // Afficher le toast de succès AVANT la redirection
+      toast.success('Devis envoyé avec succès ! Redirection en cours...');
+      
+      // Attendre 500ms pour que le toast soit visible
+      await new Promise(resolve => setTimeout(resolve, 500));
+      
+      // Navigation client-side (compatible Figma Make et production)
+      const targetUrl = `/recap-devis/${result.id}?numero=${result.numero}`;
+      window.history.pushState({}, '', targetUrl);
+      
+      // Déclencher l'événement popstate pour que App.tsx mette à jour la route
+      window.dispatchEvent(new PopStateEvent('popstate'));
+      
+      // Scroll to top
+      window.scrollTo({ top: 0, behavior: 'smooth' });
       
     } catch (error) {
-      console.error('Erreur:', error);
-      toast.error('Une erreur est survenue. Veuillez réessayer.');
+      console.error('❌ Erreur lors de la soumission:', error);
+      toast.error(`Une erreur est survenue : ${error.message}`);
     } finally {
       setIsSubmitting(false);
     }

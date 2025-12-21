@@ -36,7 +36,6 @@
         '@radix-ui/react-switch@1.1.3': '@radix-ui/react-switch',
         '@radix-ui/react-slot@1.1.2': '@radix-ui/react-slot',
         '@radix-ui/react-slider@1.2.3': '@radix-ui/react-slider',
-        '@radix-ui/react-separator@1.1.2': '@radix-ui/react-separator',
         '@radix-ui/react-scroll-area@1.2.3': '@radix-ui/react-scroll-area',
         '@radix-ui/react-radio-group@1.2.3': '@radix-ui/react-radio-group',
         '@radix-ui/react-progress@1.1.2': '@radix-ui/react-progress',

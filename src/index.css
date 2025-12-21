@@ -262,6 +262,7 @@
     --animate-spin: spin 1s linear infinite;
     --animate-ping: ping 1s cubic-bezier(0, 0, .2, 1) infinite;
     --animate-pulse: pulse 2s cubic-bezier(.4, 0, .6, 1) infinite;
+    --animate-bounce: bounce 1s infinite;
     --blur-sm: 8px;
     --blur-md: 12px;
     --blur-lg: 16px;
@@ -900,6 +901,10 @@
     margin-block: calc(var(--spacing) * 2);
   }
 
+  .my-3 {
+    margin-block: calc(var(--spacing) * 3);
+  }
+
   .my-4 {
     margin-block: calc(var(--spacing) * 4);
   }
@@ -1256,6 +1261,10 @@
     height: 1.15rem;
   }
 
+  .h-\[1px\] {
+    height: 1px;
+  }
+
   .h-\[calc\(100\%-1px\)\] {
     height: calc(100% - 1px);
   }
@@ -1464,6 +1473,10 @@
     width: calc(var(--spacing) * 96);
   }
 
+  .w-\[1px\] {
+    width: 1px;
+  }
+
   .w-\[180px\] {
     width: 180px;
   }
@@ -1636,6 +1649,10 @@
 
   .transform {
     transform: var(--tw-rotate-x) var(--tw-rotate-y) var(--tw-rotate-z) var(--tw-skew-x) var(--tw-skew-y);
+  }
+
+  .animate-bounce {
+    animation: var(--animate-bounce);
   }
 
   .animate-in {
@@ -2858,10 +2875,6 @@
     .bg-blue-900\/20 {
       background-color: color-mix(in oklab, var(--color-blue-900) 20%, transparent);
     }
-  }
-
-  .bg-border {
-    background-color: var(--border);
   }
 
   .bg-card {
@@ -6560,6 +6573,16 @@
     }
   }
 
+  .shadow-violet-500\/50 {
+    --tw-shadow-color: color-mix(in srgb, oklch(.606 .25 292.717) 50%, transparent);
+  }
+
+  @supports (color: color-mix(in lab, red, red)) {
+    .shadow-violet-500\/50 {
+      --tw-shadow-color: color-mix(in oklab, color-mix(in oklab, var(--color-violet-500) 50%, transparent) var(--tw-shadow-alpha), transparent);
+    }
+  }
+
   .ring-ring\/50 {
     --tw-ring-color: var(--ring);
   }
@@ -8431,6 +8454,18 @@
   }
 
   @media (hover: hover) {
+    .hover\:shadow-green-500\/50:hover {
+      --tw-shadow-color: color-mix(in srgb, oklch(.723 .219 149.579) 50%, transparent);
+    }
+
+    @supports (color: color-mix(in lab, red, red)) {
+      .hover\:shadow-green-500\/50:hover {
+        --tw-shadow-color: color-mix(in oklab, color-mix(in oklab, var(--color-green-500) 50%, transparent) var(--tw-shadow-alpha), transparent);
+      }
+    }
+  }
+
+  @media (hover: hover) {
     .hover\:shadow-orange-500\/40:hover {
       --tw-shadow-color: color-mix(in srgb, oklch(.705 .213 47.604) 40%, transparent);
     }
@@ -8724,10 +8759,6 @@
     height: 100%;
   }
 
-  .data-\[orientation\=horizontal\]\:h-px[data-orientation="horizontal"] {
-    height: 1px;
-  }
-
   .data-\[orientation\=horizontal\]\:w-full[data-orientation="horizontal"] {
     width: 100%;
   }
@@ -8750,10 +8781,6 @@
 
   .data-\[orientation\=vertical\]\:w-full[data-orientation="vertical"] {
     width: 100%;
-  }
-
-  .data-\[orientation\=vertical\]\:w-px[data-orientation="vertical"] {
-    width: 1px;
   }
 
   .data-\[orientation\=vertical\]\:flex-col[data-orientation="vertical"] {
@@ -10258,6 +10285,18 @@ html {
 @keyframes pulse {
   50% {
     opacity: .5;
+  }
+}
+
+@keyframes bounce {
+  0%, 100% {
+    animation-timing-function: cubic-bezier(.8, 0, 1, 1);
+    transform: translateY(-25%);
+  }
+
+  50% {
+    animation-timing-function: cubic-bezier(0, 0, .2, 1);
+    transform: none;
   }
 }
 
