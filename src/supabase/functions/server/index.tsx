@@ -36,17 +36,26 @@ const app = new Hono();
 // Enable logger
 app.use('*', logger(console.log));
 
-// Middleware pour capturer les "broken pipe" silencieusement
+// Middleware pour capturer les "broken pipe" et autres erreurs réseau silencieusement
 app.use('*', async (c, next) => {
   try {
     await next();
   } catch (err: any) {
-    // Les erreurs "broken pipe" sont normales pendant le développement (hot reload)
+    // Les erreurs réseau sont normales pendant le développement (hot reload)
     // et quand le client ferme la connexion avant la réponse
-    if (err?.code === 'EPIPE' || err?.message?.includes('broken pipe')) {
+    const isNetworkError = 
+      err?.code === 'EPIPE' || 
+      err?.code === 'ECONNRESET' ||
+      err?.name === 'Http' ||
+      err?.message?.includes('broken pipe') ||
+      err?.message?.includes('connection reset');
+    
+    if (isNetworkError) {
       // Ne pas logger ces erreurs car elles sont attendues
-      return new Response(null, { status: 499 }); // Client Closed Request
+      // Retourner 499 (Client Closed Request) sans erreur
+      return c.text('', 499);
     }
+    
     // Re-throw les autres erreurs pour qu'elles soient gérées par onError
     throw err;
   }
@@ -54,9 +63,17 @@ app.use('*', async (c, next) => {
 
 // Middleware global de gestion d'erreurs
 app.onError((err: any, c) => {
-  // Les erreurs broken pipe sont normales pendant le hot reload
-  if (err?.code === 'EPIPE' || err?.message?.includes('broken pipe')) {
-    return new Response(null, { status: 499 }); // Client Closed Request
+  // Ignorer toutes les erreurs réseau
+  const isNetworkError = 
+    err?.code === 'EPIPE' || 
+    err?.code === 'ECONNRESET' ||
+    err?.name === 'Http' ||
+    err?.message?.includes('broken pipe') ||
+    err?.message?.includes('connection reset');
+  
+  if (isNetworkError) {
+    // Retourner une réponse vide avec code 499
+    return c.text('', 499);
   }
   
   // Log des vraies erreurs seulement

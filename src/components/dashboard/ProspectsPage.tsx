@@ -2,6 +2,7 @@ import { ProspectSheet } from './ProspectSheet';
 import { NewProspectDialog } from './NewProspectDialog';
 import { ProspectsExport } from './ProspectsExport';
 import { ProspectsSetupBanner } from './ProspectsSetupBanner';
+import { DevisTab } from './DevisTab';
 import { projectId, publicAnonKey } from '../../utils/supabase/info';
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
@@ -24,11 +25,14 @@ import {
   AlertCircle,
   Phone,
   XCircle,
+  FileText,
+  BarChart3,
 } from 'lucide-react';
 import { Card, CardContent, CardHeader } from '../ui/card';
 import { Button } from '../ui/button';
 import { Input } from '../ui/input';
 import { Badge } from '../ui/badge';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '../ui/tabs';
 
 type ProspectType = 'all' | 'client' | 'agency' | 'interim' | 'waitlist' | 'contact';
 type ProspectStatus = 'new' | 'contacted' | 'qualified' | 'converted' | 'lost' | 'archived';

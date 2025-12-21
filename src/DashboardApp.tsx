@@ -29,7 +29,7 @@ import { UnifiedTranslationManager } from './components/dashboard/UnifiedTransla
 import { ExportImportManager } from './components/dashboard/ExportImportManager';
 import { IntegrationManager } from './components/dashboard/IntegrationManager';
 import { SettingsPanel } from './components/dashboard/SettingsPanel';
-import { ProspectsPage } from './components/dashboard/ProspectsPage';
+import { ProspectsPageWithTabs } from './components/dashboard/ProspectsPageWithTabs';
 import { AgendaPage } from './components/dashboard/AgendaPage';
 import { AutomationsPage } from './components/dashboard/AutomationsPage';
 import { useAuth } from './hooks/useAuth';
@@ -331,7 +331,7 @@ export default function DashboardApp({ onBackToSurvey }: DashboardAppProps = {})
               <SettingsPanel key="settings" />
             )}
             {activeTab === 'prospects' && (
-              <ProspectsPage key="prospects" />
+              <ProspectsPageWithTabs key="prospects" />
             )}
             {activeTab === 'agenda' && (
               <AgendaPage key="agenda" />

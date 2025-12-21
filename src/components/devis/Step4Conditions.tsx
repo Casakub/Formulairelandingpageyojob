@@ -6,6 +6,7 @@ import { Switch } from '../ui/switch';
 import { RadioGroup, RadioGroupItem } from '../ui/radio-group';
 import { MOTIFS_RECOURS, PERIODES_ESSAI, DELAIS_PAIEMENT, getPanierRepas } from '../../data/devis-data';
 import { formaterMontant } from '../../utils/devis-calculations';
+import { useState } from 'react';
 
 interface Step4ConditionsProps {
   data: {
@@ -33,7 +34,24 @@ interface Step4ConditionsProps {
 }
 
 export function Step4Conditions({ data, region, onChange }: Step4ConditionsProps) {
+  const [dateError, setDateError] = useState('');
+
   const handleChange = (field: string, value: any) => {
+    // 🆕 Valider la date de fin si on change la date de fin
+    if (field === 'dateFin' && value && data.dateDebut) {
+      if (new Date(value) < new Date(data.dateDebut)) {
+        setDateError('La date de fin ne peut pas être antérieure à la date de début');
+        return;
+      } else {
+        setDateError('');
+      }
+    }
+    
+    // 🆕 Réinitialiser l'erreur si on change la date de début
+    if (field === 'dateDebut') {
+      setDateError('');
+    }
+    
     onChange({
       ...data,
       [field]: value
@@ -89,7 +107,9 @@ export function Step4Conditions({ data, region, onChange }: Step4ConditionsProps
             value={data.dateFin}
             onChange={(e) => handleChange('dateFin', e.target.value)}
             className="bg-white/10 border-white/20 text-white"
+            disabled={!!dateError}
           />
+          {dateError && <p className="text-red-400 text-sm mt-1">{dateError}</p>}
         </div>
 
         {/* Période d'essai */}
@@ -271,12 +291,12 @@ export function Step4Conditions({ data, region, onChange }: Step4ConditionsProps
 
         {data.repas.type === 'panier' && region && (
           <div className="bg-green-500/10 border border-green-500/30 rounded-lg p-4 mt-4">
-            <p className="text-green-200 text-sm mb-2">
-              ✓ Panier repas : {formaterMontant(montantPanierJour)}/jour
+            <p className="text-green-200/80 text-sm mt-1">
+              {getPanierRepas(region) > 0
+                ? `Montant : ${formaterMontant(getPanierRepas(region))}/jour`
+                : 'Montant non défini pour cette région'}
             </p>
-            <p className="text-white/70 text-sm">
-              Supplément horaire : +{formaterMontant(supplementPanierHoraire)}/h
-            </p>
+            {/* ❌ SUPPRIMÉ : Le panier repas n'est pas un supplément horaire */}
           </div>
         )}
       </div>
