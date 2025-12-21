@@ -3,9 +3,16 @@ import { Button } from '../ui/button';
 import { Checkbox } from '../ui/checkbox';
 import { Label } from '../ui/label';
 import { useState } from 'react';
-import { ArrowRight, Download, CheckCircle, Building2, User, Briefcase, FileText } from 'lucide-react';
+import { ArrowRight, Download, CheckCircle, Building2, User, Briefcase, FileText, Clock } from 'lucide-react';
 import { DevisFormData } from '../../DemandeDevis';
-import { calculerRecapitulatif, formaterMontant } from '../../utils/devis-calculations';
+import { 
+  calculerRecapitulatif, 
+  formaterMontant, 
+  calculerCoutAvecHeuresSup, 
+  calculerPanierRepasMensuel,
+  calculerTauxETTComplet
+} from '../../utils/devis-calculations';
+import { getPanierRepas } from '../../data/devis-data';
 
 interface StepRecapitulatifProps {
   formData: DevisFormData;
@@ -16,7 +23,67 @@ interface StepRecapitulatifProps {
 export function StepRecapitulatif({ formData, onSubmit, isSubmitting }: StepRecapitulatifProps) {
   const [accepteConditions, setAccepteConditions] = useState(false);
 
-  // Calculer le récapitulatif complet
+  // 🆕 Recalcul complet avec nouvelles fonctions
+  const calculerTotalCorrect = () => {
+    let totalMensuel = 0;
+    
+    formData.postes.forEach(poste => {
+      const baseHoraire = formData.conditions.baseHoraire;
+      const tauxHoraireBrut = poste.salaireBrut / 151.67;
+      
+      // Taux ETT avec suppléments horaires (sans panier)
+      const tauxETTAvecSupplements = calculerTauxETTComplet(
+        tauxHoraireBrut,
+        poste.coeffBase || 1.92,
+        poste.facteurPays || 1.00,
+        3.50,
+        1.50,
+        {
+          hebergementNonFourni: !formData.conditions.hebergement.chargeEU,
+          transportETT: formData.conditions.transportLocal.chargeETT
+        }
+      );
+      
+      // Coût main d'œuvre avec heures sup
+      const detailHeures = calculerCoutAvecHeuresSup(
+        tauxETTAvecSupplements,
+        baseHoraire,
+        poste.quantite
+      );
+      
+      // Panier repas mensuel séparé
+      const montantPanierJour = formData.conditions.repas.type === 'panier'
+        ? getPanierRepas(formData.entreprise.region)
+        : 0;
+      const panierMensuel = calculerPanierRepasMensuel(
+        montantPanierJour,
+        baseHoraire,
+        poste.quantite
+      );
+      
+      totalMensuel += detailHeures.coutTotal + panierMensuel;
+    });
+    
+    return totalMensuel;
+  };
+  
+  const totalHT = calculerTotalCorrect();
+  const totalTTC = Math.round(totalHT * 1.20 * 100) / 100;
+  
+  // Calculer durée mission
+  const calculerDuree = (dateDebut: string, dateFin: string | null): number => {
+    if (!dateFin) return 1;
+    const debut = new Date(dateDebut);
+    const fin = new Date(dateFin);
+    const diffTime = Math.abs(fin.getTime() - debut.getTime());
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+    return Math.max(1, Math.ceil(diffDays / 30));
+  };
+  
+  const dureeMission = calculerDuree(formData.conditions.dateDebut, formData.conditions.dateFin);
+  const totalMission = Math.round(totalHT * dureeMission * 100) / 100;
+
+  // Calculer le récapitulatif complet (pour compatibilité)
   const postesAvecDetails = formData.postes.map(poste => ({
     ...poste,
     secteur: poste.secteur,
@@ -129,85 +196,198 @@ export function StepRecapitulatif({ formData, onSubmit, isSubmitting }: StepReca
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
-          {recap.postes.map((poste, index) => (
-            <div key={index} className="border border-white/10 rounded-lg p-4 bg-white/5">
-              <div className="flex items-start justify-between mb-3">
-                <div>
-                  <h4 className="text-white font-medium">{poste.poste}</h4>
-                  <p className="text-white/60 text-sm">{poste.secteur} • {poste.classification}</p>
-                  {poste.labelPays && (
-                    <p className="text-cyan-300/80 text-sm mt-1">
-                      📍 Nationalité: {poste.labelPays}
-                    </p>
-                  )}
-                </div>
-                <span className="bg-cyan-500/20 text-cyan-200 px-3 py-1 rounded-full text-sm">
-                  × {poste.quantite}
-                </span>
-              </div>
-
-              {/* 🆕 Coefficient ETT */}
-              {poste.coeffFinal && (
-                <div className="mb-3 p-3 rounded-lg bg-violet-500/10 border border-violet-400/20">
-                  <p className="text-violet-200 text-xs mb-1">📊 Coefficient ETT appliqué</p>
-                  <div className="flex items-center gap-2 text-sm">
-                    <span className="text-white/70">
-                      Coeff. base: <span className="text-white font-medium">{poste.coeffBase?.toFixed(2)}</span>
-                    </span>
-                    <span className="text-white/50">×</span>
-                    <span className="text-white/70">
-                      Facteur pays: <span className="text-white font-medium">{poste.facteurPays?.toFixed(2)}</span>
-                    </span>
-                    <span className="text-white/50">=</span>
-                    <span className="text-green-400 font-medium">{poste.coeffFinal.toFixed(2)}</span>
-                  </div>
-                </div>
-              )}
-
-              {/* 🆕 Options/Suppléments actifs */}
-              {(poste.hebergementActif || poste.transportActif || poste.panierRepasActif) && (
-                <div className="mb-3 p-3 rounded-lg bg-cyan-500/10 border border-cyan-400/20">
-                  <p className="text-cyan-200 text-xs mb-2">✨ Options incluses dans le taux ETT</p>
-                  <div className="space-y-1 text-sm">
-                    {poste.hebergementActif && (
-                      <div className="flex items-center justify-between">
-                        <span className="text-white/70">✓ Hébergement</span>
-                        <span className="text-green-400 font-medium">+{formaterMontant(poste.supplementHebergement || 0)}/h</span>
-                      </div>
-                    )}
-                    {poste.transportActif && (
-                      <div className="flex items-center justify-between">
-                        <span className="text-white/70">✓ Transport local</span>
-                        <span className="text-green-400 font-medium">+{formaterMontant(poste.supplementTransport || 0)}/h</span>
-                      </div>
-                    )}
-                    {poste.panierRepasActif && (
-                      <div className="flex items-center justify-between">
-                        <span className="text-white/70">✓ Panier repas</span>
-                        <span className="text-green-400 font-medium">+{formaterMontant(poste.supplementPanierRepas || 0)}/h</span>
-                      </div>
+          {formData.postes.map((poste, index) => {
+            // 🆕 Recalculer avec les nouvelles fonctions
+            const baseHoraire = formData.conditions.baseHoraire;
+            const tauxHoraireBrut = poste.salaireBrut / 151.67; // Toujours sur base légale
+            
+            // Taux ETT avec suppléments horaires uniquement (sans panier)
+            const tauxETTAvecSupplements = calculerTauxETTComplet(
+              tauxHoraireBrut,
+              poste.coeffBase || 1.92,
+              poste.facteurPays || 1.00,
+              3.50, // Hébergement
+              1.50, // Transport
+              {
+                hebergementNonFourni: !formData.conditions.hebergement.chargeEU,
+                transportETT: formData.conditions.transportLocal.chargeETT
+              }
+            );
+            
+            // Détail des heures supplémentaires
+            const detailHeures = calculerCoutAvecHeuresSup(
+              tauxETTAvecSupplements,
+              baseHoraire,
+              poste.quantite
+            );
+            
+            // Panier repas mensuel (séparé)
+            const montantPanierJour = formData.conditions.repas.type === 'panier' 
+              ? getPanierRepas(formData.entreprise.region)
+              : 0;
+            const panierMensuel = calculerPanierRepasMensuel(
+              montantPanierJour,
+              baseHoraire,
+              poste.quantite
+            );
+            
+            const joursParMois = Math.round(baseHoraire / 7);
+            const hasHeuresSup = baseHoraire > 151.67;
+            
+            return (
+              <div key={index} className="border border-white/10 rounded-lg p-4 bg-white/5 space-y-3">
+                {/* En-tête du poste */}
+                <div className="flex items-start justify-between">
+                  <div>
+                    <h4 className="text-white font-medium">{poste.poste}</h4>
+                    <p className="text-white/60 text-sm">{poste.secteur} • {poste.classification}</p>
+                    {poste.labelPays && (
+                      <p className="text-cyan-300/80 text-sm mt-1">
+                        📍 Nationalité: {poste.labelPays}
+                      </p>
                     )}
                   </div>
+                  <span className="bg-cyan-500/20 text-cyan-200 px-3 py-1 rounded-full text-sm">
+                    × {poste.quantite}
+                  </span>
                 </div>
-              )}
 
-              {/* Calculs finaux */}
-              <div className="grid grid-cols-3 gap-4 text-sm">
-                <div>
-                  <p className="text-white/60">Taux horaire brut</p>
-                  <p className="text-white font-medium">{formaterMontant(poste.tauxHoraireBrut)}/h</p>
-                </div>
-                <div>
-                  <p className="text-white/60">Taux ETT final</p>
-                  <p className="text-white font-medium">{formaterMontant(poste.tauxETTFinal)}/h</p>
-                </div>
-                <div>
-                  <p className="text-white/60">Coût mensuel</p>
-                  <p className="text-green-400 font-medium">{formaterMontant(poste.coutMensuel)}</p>
+                {/* Coefficient ETT */}
+                {poste.coeffBase && poste.facteurPays && (
+                  <div className="p-3 rounded-lg bg-violet-500/10 border border-violet-400/20">
+                    <p className="text-violet-200 text-xs mb-1">📊 Coefficient ETT appliqué</p>
+                    <div className="flex items-center gap-2 text-sm">
+                      <span className="text-white/70">
+                        Coeff. base: <span className="text-white font-medium">{poste.coeffBase.toFixed(2)}</span>
+                      </span>
+                      <span className="text-white/50">×</span>
+                      <span className="text-white/70">
+                        Facteur pays: <span className="text-white font-medium">{poste.facteurPays.toFixed(2)}</span>
+                      </span>
+                      <span className="text-white/50">=</span>
+                      <span className="text-green-400 font-medium">
+                        {(poste.coeffBase * poste.facteurPays).toFixed(2)}
+                      </span>
+                    </div>
+                  </div>
+                )}
+
+                {/* 🆕 Suppléments horaires (sans panier) */}
+                {(!formData.conditions.hebergement.chargeEU || formData.conditions.transportLocal.chargeETT) && (
+                  <div className="p-3 rounded-lg bg-cyan-500/10 border border-cyan-400/20">
+                    <p className="text-cyan-200 text-xs mb-2">✨ Suppléments horaires (inclus dans le taux)</p>
+                    <div className="space-y-1 text-sm">
+                      {!formData.conditions.hebergement.chargeEU && (
+                        <div className="flex items-center justify-between">
+                          <span className="text-white/70">✓ Hébergement</span>
+                          <span className="text-green-400 font-medium">+{formaterMontant(3.50)}/h</span>
+                        </div>
+                      )}
+                      {formData.conditions.transportLocal.chargeETT && (
+                        <div className="flex items-center justify-between">
+                          <span className="text-white/70">✓ Transport local</span>
+                          <span className="text-green-400 font-medium">+{formaterMontant(1.50)}/h</span>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                )}
+
+                {/* 🆕 Panier repas (séparé) */}
+                {montantPanierJour > 0 && (
+                  <div className="p-3 rounded-lg bg-green-500/10 border border-green-400/20">
+                    <p className="text-green-200 text-xs mb-2">🍽️ Panier repas (facturé par jour)</p>
+                    <div className="text-sm space-y-1">
+                      <div className="flex items-center justify-between text-white/70">
+                        <span>
+                          {formaterMontant(montantPanierJour)}/jour × {joursParMois} jours × {poste.quantite} pers.
+                        </span>
+                        <span className="text-green-400 font-medium">
+                          {formaterMontant(panierMensuel)}/mois
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {/* 🆕 Détail heures supplémentaires */}
+                {hasHeuresSup && (
+                  <div className="p-3 rounded-lg bg-orange-500/10 border border-orange-400/20">
+                    <div className="flex items-center gap-2 mb-2">
+                      <Clock className="w-4 h-4 text-orange-400" />
+                      <p className="text-orange-200 text-xs">
+                        📅 Base horaire : {baseHoraire}h/mois (heures supplémentaires détectées)
+                      </p>
+                    </div>
+                    <div className="space-y-2 text-sm">
+                      {/* Heures normales */}
+                      <div className="flex items-center justify-between">
+                        <span className="text-white/70">
+                          Heures normales (0-35h/sem) : {detailHeures.heuresNormales}h × {formaterMontant(tauxETTAvecSupplements)}/h
+                        </span>
+                        <span className="text-white font-medium">
+                          {formaterMontant(detailHeures.coutHeuresNormales)}
+                        </span>
+                      </div>
+                      
+                      {/* Heures +25% */}
+                      {detailHeures.heures25 > 0 && (
+                        <div className="flex items-center justify-between">
+                          <span className="text-white/70">
+                            Heures supp. +25% (36e-43e h) : {detailHeures.heures25}h × {formaterMontant(tauxETTAvecSupplements * 1.25)}/h
+                          </span>
+                          <span className="text-orange-400 font-medium">
+                            {formaterMontant(detailHeures.coutHeures25)}
+                          </span>
+                        </div>
+                      )}
+                      
+                      {/* Heures +50% */}
+                      {detailHeures.heures50 > 0 && (
+                        <div className="flex items-center justify-between">
+                          <span className="text-white/70">
+                            Heures supp. +50% (44e+ h) : {detailHeures.heures50}h × {formaterMontant(tauxETTAvecSupplements * 1.50)}/h
+                          </span>
+                          <span className="text-red-400 font-medium">
+                            {formaterMontant(detailHeures.coutHeures50)}
+                          </span>
+                        </div>
+                      )}
+                      
+                      <div className="border-t border-white/10 pt-2 mt-2">
+                        <div className="flex items-center justify-between">
+                          <span className="text-white font-medium">Sous-total main d'œuvre</span>
+                          <span className="text-cyan-400 font-bold">
+                            {formaterMontant(detailHeures.coutTotal)}
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {/* Résumé final */}
+                <div className="border-t border-white/10 pt-3 mt-3">
+                  <div className="grid grid-cols-3 gap-4 text-sm">
+                    <div>
+                      <p className="text-white/60">Taux horaire brut</p>
+                      <p className="text-white font-medium">{formaterMontant(tauxHoraireBrut)}/h</p>
+                    </div>
+                    <div>
+                      <p className="text-white/60">Taux ETT final</p>
+                      <p className="text-white font-medium">{formaterMontant(tauxETTAvecSupplements)}/h</p>
+                    </div>
+                    <div>
+                      <p className="text-white/60">Coût mensuel total</p>
+                      <p className="text-green-400 font-bold">
+                        {formaterMontant(detailHeures.coutTotal + panierMensuel)}
+                      </p>
+                    </div>
+                  </div>
                 </div>
               </div>
-            </div>
-          ))}
+            );
+          })}
         </CardContent>
       </Card>
 
@@ -249,20 +429,20 @@ export function StepRecapitulatif({ formData, onSubmit, isSubmitting }: StepReca
           <div className="space-y-4">
             <div className="flex items-center justify-between text-lg">
               <span className="text-white">Total mensuel HT</span>
-              <span className="text-white font-medium">{formaterMontant(recap.totalHT)}</span>
+              <span className="text-white font-medium">{formaterMontant(totalHT)}</span>
             </div>
             <div className="flex items-center justify-between text-lg">
               <span className="text-white">Total mensuel TTC</span>
-              <span className="text-white font-medium">{formaterMontant(recap.totalTTC)}</span>
+              <span className="text-white font-medium">{formaterMontant(totalTTC)}</span>
             </div>
             <div className="h-px bg-white/20 my-4"></div>
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-white text-sm">Coût total mission</p>
-                <p className="text-white/60 text-xs">({recap.dureeMission} mois)</p>
+                <p className="text-white/60 text-xs">({dureeMission} mois)</p>
               </div>
               <span className="text-3xl font-bold bg-gradient-to-r from-cyan-400 to-green-400 bg-clip-text text-transparent">
-                {formaterMontant(recap.totalMission)}
+                {formaterMontant(totalMission)}
               </span>
             </div>
           </div>

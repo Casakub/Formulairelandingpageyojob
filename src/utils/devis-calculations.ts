@@ -36,6 +36,8 @@ export function calculerTauxETTBase(tauxHoraireBrut: number, secteur: string): n
 
 /**
  * Calcule les suppléments horaires
+ * ⚠️ IMPORTANT : Le panier repas n'est PAS inclus dans le taux horaire
+ * Il est facturé séparément par jour travaillé
  */
 export function calculerSupplements(
   hebergementEU: boolean,
@@ -56,13 +58,8 @@ export function calculerSupplements(
     supplements += SUPPLEMENTS.transport;
   }
   
-  // Supplément panier repas
-  if (panierRepas) {
-    const montantPanierJour = getPanierRepas(region);
-    // Montant panier / 7 heures de travail (moyenne journalière)
-    const supplementPanierHoraire = montantPanierJour / 7;
-    supplements += supplementPanierHoraire;
-  }
+  // ❌ SUPPRIMÉ : Le panier repas ne s'ajoute PAS au taux horaire
+  // Il est facturé séparément (voir calculerPanierRepasMensuel)
   
   return parseFloat(supplements.toFixed(2));
 }
@@ -336,8 +333,8 @@ export function calculerCoutMensuelProfil(
 }
 
 /**
- * Calcule le taux ETT complet avec tous les suppléments
- * Formule : Taux ETT + Hébergement + Transport + Panier repas
+ * Calcule le taux ETT complet avec suppléments horaires uniquement
+ * ⚠️ IMPORTANT : Le panier repas n'est PAS inclus, il est facturé séparément
  * 
  * @param tauxHoraireBrut - Taux horaire brut du salarié
  * @param coeffBase - Coefficient de base (secteur + classification)
@@ -345,14 +342,13 @@ export function calculerCoutMensuelProfil(
  * @param supplementHebergement - Montant supplément hébergement (€/h)
  * @param supplementTransport - Montant supplément transport (€/h)
  * @param options - Options pour les suppléments
- * @returns Taux ETT complet avec suppléments
+ * @returns Taux ETT complet avec suppléments horaires uniquement
  * 
  * @example
  * calculerTauxETTComplet(12.50, 1.92, 1.05, 3.50, 1.50, {
  *   hebergementNonFourni: true,
- *   transportETT: true,
- *   panierRepas: 10.50
- * }) // 30.75
+ *   transportETT: true
+ * }) // 29.88 (sans panier repas)
  */
 export function calculerTauxETTComplet(
   tauxHoraireBrut: number,
@@ -363,7 +359,6 @@ export function calculerTauxETTComplet(
   options: {
     hebergementNonFourni?: boolean;
     transportETT?: boolean;
-    panierRepas?: number; // montant du panier en €/jour, 0 si non applicable
   }
 ): number {
   // Taux ETT de base
@@ -379,11 +374,113 @@ export function calculerTauxETTComplet(
     tauxETT += supplementTransport;
   }
 
-  // Supplément panier repas (montant/jour ÷ 7h)
-  if (options.panierRepas && options.panierRepas > 0) {
-    const supplementPanierHoraire = options.panierRepas / 7;
-    tauxETT += supplementPanierHoraire;
-  }
+  // ❌ SUPPRIMÉ : Le panier repas n'est plus dans cette fonction
+  // Utiliser calculerPanierRepasMensuel() pour le panier
 
   return Math.round(tauxETT * 100) / 100;
+}
+
+/**
+ * 🆕 Calcule le montant mensuel du panier repas (facturé séparément)
+ * Formule : Montant panier/jour × Jours travaillés/mois × Quantité personnes
+ * 
+ * @param montantPanierJour - Montant du panier repas par jour (€)
+ * @param baseHoraire - Base horaire mensuelle (ex: 151.67h, 169h)
+ * @param quantite - Nombre de personnes
+ * @returns Montant mensuel total du panier repas
+ * 
+ * @example
+ * calculerPanierRepasMensuel(10.00, 151.67, 4)
+ * // Jours: 151.67 / 7 ≈ 21.67 → 22 jours
+ * // Total: 10 × 22 × 4 = 880,00 €
+ */
+export function calculerPanierRepasMensuel(
+  montantPanierJour: number,
+  baseHoraire: number,
+  quantite: number
+): number {
+  if (montantPanierJour <= 0) return 0;
+  
+  // Calcul du nombre de jours travaillés (base 7h/jour)
+  const joursParMois = Math.round(baseHoraire / 7);
+  
+  const montantMensuel = montantPanierJour * joursParMois * quantite;
+  
+  return Math.round(montantMensuel * 100) / 100;
+}
+
+/**
+ * 🆕 Structure du détail des heures supplémentaires
+ */
+export interface DetailHeuresSup {
+  baseHoraire: number;
+  heuresNormales: number;      // 0-151,67h
+  heures25: number;             // 151,67-186,33h (majoration +25%)
+  heures50: number;             // Au-delà de 186,33h (majoration +50%)
+  coutHeuresNormales: number;   // Taux × heures normales
+  coutHeures25: number;         // Taux × 1,25 × heures 25%
+  coutHeures50: number;         // Taux × 1,50 × heures 50%
+  coutUnitaire: number;         // Total pour 1 personne
+  coutTotal: number;            // Total pour quantité personnes
+}
+
+/**
+ * 🆕 Calcule le coût mensuel avec majorations heures supplémentaires
+ * Formule : 
+ * - 0-151,67h : Taux normal
+ * - 151,67-186,33h : Taux × 1,25 (+25%)
+ * - Au-delà de 186,33h : Taux × 1,50 (+50%)
+ * 
+ * @param tauxETT - Taux ETT final (avec suppléments hébergement/transport)
+ * @param baseHoraire - Base horaire mensuelle (ex: 151.67, 169, 186.33)
+ * @param quantite - Nombre de personnes
+ * @returns Détail complet du calcul avec majorations
+ * 
+ * @example
+ * calculerCoutAvecHeuresSup(28.09, 169, 4)
+ * // Heures normales: 151.67h × 28.09 = 4 260.81 €
+ * // Heures +25%: 17.33h × 28.09 × 1.25 = 608.65 €
+ * // Total unitaire: 4 869.46 €
+ * // Total pour 4 pers.: 19 477.84 €
+ */
+export function calculerCoutAvecHeuresSup(
+  tauxETT: number,
+  baseHoraire: number,
+  quantite: number
+): DetailHeuresSup {
+  const SEUIL_NORMAL = 151.67;  // 35h/semaine × 52 semaines / 12 mois
+  const SEUIL_25 = 186.33;       // 43h/semaine × 52 semaines / 12 mois
+  
+  // Calcul de la répartition des heures
+  let heuresNormales = Math.min(baseHoraire, SEUIL_NORMAL);
+  let heures25 = 0;
+  let heures50 = 0;
+  
+  if (baseHoraire > SEUIL_NORMAL) {
+    heures25 = Math.min(baseHoraire - SEUIL_NORMAL, SEUIL_25 - SEUIL_NORMAL);
+  }
+  
+  if (baseHoraire > SEUIL_25) {
+    heures50 = baseHoraire - SEUIL_25;
+  }
+  
+  // Calcul des coûts par tranche
+  const coutHeuresNormales = tauxETT * heuresNormales;
+  const coutHeures25 = tauxETT * 1.25 * heures25;
+  const coutHeures50 = tauxETT * 1.50 * heures50;
+  
+  const coutUnitaire = coutHeuresNormales + coutHeures25 + coutHeures50;
+  const coutTotal = coutUnitaire * quantite;
+  
+  return {
+    baseHoraire,
+    heuresNormales: Math.round(heuresNormales * 100) / 100,
+    heures25: Math.round(heures25 * 100) / 100,
+    heures50: Math.round(heures50 * 100) / 100,
+    coutHeuresNormales: Math.round(coutHeuresNormales * 100) / 100,
+    coutHeures25: Math.round(coutHeures25 * 100) / 100,
+    coutHeures50: Math.round(coutHeures50 * 100) / 100,
+    coutUnitaire: Math.round(coutUnitaire * 100) / 100,
+    coutTotal: Math.round(coutTotal * 100) / 100
+  };
 }
