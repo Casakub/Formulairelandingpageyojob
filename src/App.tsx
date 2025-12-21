@@ -32,34 +32,27 @@ export default function App() {
       const target = e.target as HTMLElement;
       const anchor = target.closest('a');
       
-      console.log('🖱️ Click detected on:', target.tagName, target);
-      console.log('🔍 Closest anchor:', anchor);
+      // Ne traiter que les clics sur des liens <a>
+      if (!anchor || !anchor.href) {
+        // Ignorer silencieusement les clics sur les boutons, etc.
+        return;
+      }
       
-      if (anchor && anchor.href) {
-        console.log('✅ Anchor found with href:', anchor.href);
-        
-        const url = new URL(anchor.href);
-        console.log('📍 Parsed URL:', { origin: url.origin, pathname: url.pathname });
-        
-        // Only handle same-origin links
-        if (url.origin === window.location.origin) {
-          // Don't handle hash links
-          if (anchor.getAttribute('href')?.startsWith('#')) {
-            console.log('⏭️ Hash link, skipping');
-            return;
-          }
-          
-          console.log('🔗 Navigation intercepted:', url.pathname);
-          e.preventDefault();
-          e.stopPropagation();
-          window.history.pushState({}, '', url.pathname);
-          setCurrentPath(url.pathname);
-          window.scrollTo({ top: 0, behavior: 'smooth' });
-        } else {
-          console.log('🌐 External link, allowing default behavior');
+      const url = new URL(anchor.href);
+      
+      // Only handle same-origin links
+      if (url.origin === window.location.origin) {
+        // Don't handle hash links
+        if (anchor.getAttribute('href')?.startsWith('#')) {
+          return;
         }
-      } else {
-        console.log('❌ No anchor or href found');
+        
+        // Intercepter la navigation client-side
+        e.preventDefault();
+        e.stopPropagation();
+        window.history.pushState({}, '', url.pathname);
+        setCurrentPath(url.pathname);
+        window.scrollTo({ top: 0, behavior: 'smooth' });
       }
     };
 

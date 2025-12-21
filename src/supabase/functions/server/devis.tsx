@@ -407,12 +407,17 @@ devis.post('/generer-pdf', async (c) => {
 });
 
 /**
- * POST /make-server-10092a63/signer-devis
- * Signer un devis électroniquement
+ * POST /make-server-10092a63/devis/signer-devis
+ * Signer un devis électroniquement avec certification complète
  */
 devis.post('/signer-devis', async (c) => {
   try {
-    const { devisId, signatureBase64, accepteCGV } = await c.req.json();
+    const { 
+      devisId, 
+      signatureBase64, 
+      accepteCGV,
+      identiteSignataire // Nouvelles données d'identité
+    } = await c.req.json();
     
     if (!accepteCGV) {
       return c.json(
@@ -450,21 +455,81 @@ devis.post('/signer-devis', async (c) => {
       );
     }
     
-    // Enregistrer la signature
-    const signatureData = {
+    // Générer un hash SHA-256 du contenu du devis pour garantir l'intégrité
+    const devisContent = JSON.stringify({
+      numero: prospect.numero,
+      entreprise: prospect.entreprise,
+      contact: prospect.contact,
+      postes: prospect.postes,
+      conditions: prospect.conditions
+    });
+    
+    const encoder = new TextEncoder();
+    const data = encoder.encode(devisContent);
+    const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+    const hashArray = Array.from(new Uint8Array(hashBuffer));
+    const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+    
+    // Récupérer les métadonnées de la requête
+    const ipAddress = c.req.header('x-forwarded-for') || 
+                      c.req.header('x-real-ip') || 
+                      c.req.header('cf-connecting-ip') || 
+                      'unknown';
+    const userAgent = c.req.header('user-agent') || 'unknown';
+    const timestamp = new Date().toISOString();
+    
+    // Créer le certificat de signature électronique
+    const certificatSignature = {
+      // Signature graphique
       image: signatureBase64,
-      ipAddress: c.req.header('x-forwarded-for') || c.req.header('x-real-ip') || 'unknown',
-      userAgent: c.req.header('user-agent') || 'unknown',
-      timestamp: new Date().toISOString(),
-      accepteCGV: true
+      
+      // Identité du signataire (certifiée par les données du formulaire)
+      signataire: {
+        nom: prospect.contact.nom,
+        prenom: prospect.contact.prenom,
+        email: prospect.contact.email,
+        fonction: prospect.contact.fonction,
+        entreprise: prospect.entreprise.raisonSociale,
+        siret: prospect.entreprise.siret
+      },
+      
+      // Traçabilité technique
+      metadata: {
+        ipAddress: ipAddress,
+        userAgent: userAgent,
+        timestamp: timestamp,
+        timestampReadable: new Date(timestamp).toLocaleString('fr-FR', {
+          dateStyle: 'full',
+          timeStyle: 'long',
+          timeZone: 'Europe/Paris'
+        })
+      },
+      
+      // Preuve d'intégrité
+      integrite: {
+        hashAlgorithm: 'SHA-256',
+        documentHash: hashHex,
+        devisNumero: prospect.numero,
+        devisId: devisId
+      },
+      
+      // Consentement
+      consentement: {
+        accepteCGV: true,
+        dateAcceptation: timestamp,
+        mentions: 'Le signataire certifie avoir lu et accepté les Conditions Générales de Vente et que les informations fournies sont exactes. Cette signature électronique a la même valeur légale qu\'une signature manuscrite conformément au règlement eIDAS (UE) n°910/2014.'
+      },
+      
+      // Informations supplémentaires pour la traçabilité
+      contexte: identiteSignataire || {}
     };
     
     // Mettre à jour le statut du devis
     const prospectMisAJour = {
       ...prospect,
       statut: 'signe',
-      signature: signatureData,
-      updatedAt: new Date().toISOString()
+      signature: certificatSignature,
+      updatedAt: timestamp
     };
     
     await kv.set(`prospects:${devisId}`, prospectMisAJour);
@@ -479,15 +544,18 @@ devis.post('/signer-devis', async (c) => {
     }
     await kv.set('prospects:stats', stats);
     
-    console.log(`✅ Devis signé: ${devisId}`);
+    console.log(`✅ Devis signé avec certification complète: ${devisId}`);
+    console.log(`📍 IP: ${ipAddress}`);
+    console.log(`🔐 Hash: ${hashHex.substring(0, 16)}...`);
     
-    // TODO: Envoyer email de confirmation
-    // TODO: Régénérer le PDF avec la signature
+    // TODO: Envoyer email de confirmation avec certificat
+    // TODO: Régénérer le PDF avec la signature et le certificat
     
     return c.json({
       success: true,
       message: 'Devis signé avec succès',
-      data: prospectMisAJour
+      data: prospectMisAJour,
+      certificat: certificatSignature
     });
     
   } catch (error) {

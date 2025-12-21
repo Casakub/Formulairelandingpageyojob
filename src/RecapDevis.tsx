@@ -80,6 +80,7 @@ export default function RecapDevis() {
   const [isGeneratingPDF, setIsGeneratingPDF] = useState(false);
   const [acceptCGV, setAcceptCGV] = useState(false);
   const [showSignature, setShowSignature] = useState(false);
+  const [userIp, setUserIp] = useState<string>('Récupération...');
   const signatureRef = useRef<SignatureCanvas>(null);
 
   // Récupérer l'ID du devis depuis l'URL
@@ -89,7 +90,20 @@ export default function RecapDevis() {
 
   useEffect(() => {
     loadDevisData();
+    fetchUserIp();
   }, [devisId]);
+
+  const fetchUserIp = async () => {
+    try {
+      // Utiliser un service public pour récupérer l'IP
+      const response = await fetch('https://api.ipify.org?format=json');
+      const data = await response.json();
+      setUserIp(data.ip);
+    } catch (error) {
+      console.error('Erreur récupération IP:', error);
+      setUserIp('Non disponible');
+    }
+  };
 
   const loadDevisData = async () => {
     try {
@@ -172,7 +186,7 @@ export default function RecapDevis() {
       const signatureData = signatureRef.current.toDataURL();
 
       const response = await fetch(
-        `https://${projectId}.supabase.co/functions/v1/make-server-10092a63/signer-devis`,
+        `https://${projectId}.supabase.co/functions/v1/make-server-10092a63/devis/signer-devis`,
         {
           method: 'POST',
           headers: {
@@ -188,7 +202,9 @@ export default function RecapDevis() {
       );
 
       if (!response.ok) {
-        throw new Error('Erreur lors de la signature');
+        const errorData = await response.json();
+        console.error('❌ Erreur backend signature:', errorData);
+        throw new Error(errorData.error || 'Erreur lors de la signature');
       }
 
       const result = await response.json();
@@ -198,8 +214,8 @@ export default function RecapDevis() {
       await loadDevisData();
       setShowSignature(false);
     } catch (error) {
-      console.error('Erreur signature:', error);
-      toast.error('Impossible de signer le devis');
+      console.error('❌ Erreur signature:', error);
+      toast.error(`Impossible de signer le devis : ${error.message}`);
     } finally {
       setIsSigning(false);
     }
@@ -562,6 +578,47 @@ export default function RecapDevis() {
                     </Button>
                   ) : (
                     <div className="space-y-6">
+                      {/* Récapitulatif d'identité du signataire */}
+                      <div className="p-6 rounded-xl bg-gradient-to-br from-blue-500/10 to-cyan-500/10 backdrop-blur-sm border border-white/20">
+                        <h4 className="text-white mb-4 flex items-center gap-2">
+                          <User className="w-5 h-5" />
+                          Identité du signataire
+                        </h4>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+                          <div>
+                            <p className="text-white/60 mb-1">Nom complet</p>
+                            <p className="text-white font-medium">
+                              {devisData.contact.prenom} {devisData.contact.nom}
+                            </p>
+                          </div>
+                          <div>
+                            <p className="text-white/60 mb-1">Fonction</p>
+                            <p className="text-white font-medium">{devisData.contact.fonction}</p>
+                          </div>
+                          <div>
+                            <p className="text-white/60 mb-1">Email</p>
+                            <p className="text-cyan-400 font-medium">{devisData.contact.email}</p>
+                          </div>
+                          <div>
+                            <p className="text-white/60 mb-1">Entreprise</p>
+                            <p className="text-white font-medium">{devisData.entreprise.raisonSociale}</p>
+                          </div>
+                          <div>
+                            <p className="text-white/60 mb-1">SIRET</p>
+                            <p className="text-white font-medium font-mono">{devisData.entreprise.siret}</p>
+                          </div>
+                          <div>
+                            <p className="text-white/60 mb-1">Adresse IP</p>
+                            <p className="text-green-400 font-medium font-mono">{userIp}</p>
+                          </div>
+                        </div>
+                        <div className="mt-4 p-3 rounded-lg bg-white/5 border border-white/10">
+                          <p className="text-white/70 text-xs leading-relaxed">
+                            🔒 Ces informations seront enregistrées dans le certificat de signature électronique pour garantir la traçabilité et la conformité légale selon le règlement eIDAS (UE) n°910/2014.
+                          </p>
+                        </div>
+                      </div>
+
                       {/* Canvas de signature */}
                       <div>
                         <Label className="text-white mb-2 block">Dessinez votre signature ci-dessous</Label>

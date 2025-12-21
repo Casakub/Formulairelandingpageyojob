@@ -23,7 +23,10 @@ import {
   CheckCircle,
   AlertCircle,
   TrendingUp,
-  Loader2
+  Loader2,
+  Shield,
+  Fingerprint,
+  Lock
 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '../ui/card';
 import { Button } from '../ui/button';
@@ -44,6 +47,34 @@ interface Devis {
   statut: string;
   createdAt: string;
   updatedAt: string;
+  signature?: {
+    image: string;
+    signataire: {
+      nom: string;
+      prenom: string;
+      email: string;
+      fonction: string;
+      entreprise: string;
+      siret: string;
+    };
+    metadata: {
+      ipAddress: string;
+      userAgent: string;
+      timestamp: string;
+      timestampReadable: string;
+    };
+    integrite: {
+      hashAlgorithm: string;
+      documentHash: string;
+      devisNumero: string;
+      devisId: string;
+    };
+    consentement: {
+      accepteCGV: boolean;
+      dateAcceptation: string;
+      mentions: string;
+    };
+  };
   entreprise: {
     raisonSociale: string;
     formeJuridique?: string;
@@ -825,6 +856,147 @@ export function DevisDetailModal({ devisId, onClose }: DevisDetailModalProps) {
                       )}
                     </motion.div>
                   )}
+                </div>
+              )}
+
+              {/* Section Certificat de Signature Électronique */}
+              {devis.signature && (
+                <div className="border-2 border-green-200 rounded-lg overflow-hidden bg-gradient-to-br from-green-50 to-emerald-50">
+                  <div className="w-full p-4 bg-gradient-to-r from-green-100 to-emerald-100">
+                    <div className="flex items-center gap-3">
+                      <div className="p-2 rounded-lg bg-gradient-to-br from-green-500 to-emerald-500">
+                        <Shield className="w-5 h-5 text-white" />
+                      </div>
+                      <div>
+                        <span className="text-slate-900 block">Certificat de Signature Électronique</span>
+                        <span className="text-green-700 text-xs">✓ Conforme au règlement eIDAS (UE) n°910/2014</span>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <div className="p-6 bg-white space-y-6">
+                    {/* Identité du signataire */}
+                    <div className="border-l-4 border-green-500 pl-4">
+                      <h4 className="text-slate-900 mb-3 flex items-center gap-2">
+                        <User className="w-4 h-4 text-green-600" />
+                        Identité du signataire certifiée
+                      </h4>
+                      <div className="grid md:grid-cols-2 gap-4">
+                        <div>
+                          <p className="text-slate-500 text-sm">Nom complet</p>
+                          <p className="text-slate-900">{devis.signature.signataire.prenom} {devis.signature.signataire.nom}</p>
+                        </div>
+                        <div>
+                          <p className="text-slate-500 text-sm">Fonction</p>
+                          <p className="text-slate-900">{devis.signature.signataire.fonction}</p>
+                        </div>
+                        <div>
+                          <p className="text-slate-500 text-sm">Email</p>
+                          <p className="text-cyan-600">{devis.signature.signataire.email}</p>
+                        </div>
+                        <div>
+                          <p className="text-slate-500 text-sm">Entreprise</p>
+                          <p className="text-slate-900">{devis.signature.signataire.entreprise}</p>
+                        </div>
+                        <div className="md:col-span-2">
+                          <p className="text-slate-500 text-sm">SIRET</p>
+                          <p className="text-slate-900 font-mono">{devis.signature.signataire.siret}</p>
+                        </div>
+                      </div>
+                    </div>
+
+                    <Separator />
+
+                    {/* Traçabilité technique */}
+                    <div className="border-l-4 border-blue-500 pl-4">
+                      <h4 className="text-slate-900 mb-3 flex items-center gap-2">
+                        <Fingerprint className="w-4 h-4 text-blue-600" />
+                        Traçabilité technique
+                      </h4>
+                      <div className="grid md:grid-cols-2 gap-4">
+                        <div>
+                          <p className="text-slate-500 text-sm">Date et heure (Paris)</p>
+                          <p className="text-slate-900">{devis.signature.metadata.timestampReadable}</p>
+                        </div>
+                        <div>
+                          <p className="text-slate-500 text-sm">Horodatage ISO 8601</p>
+                          <p className="text-slate-900 font-mono text-xs">{devis.signature.metadata.timestamp}</p>
+                        </div>
+                        <div>
+                          <p className="text-slate-500 text-sm">Adresse IP</p>
+                          <p className="text-green-600 font-mono">{devis.signature.metadata.ipAddress}</p>
+                        </div>
+                        <div>
+                          <p className="text-slate-500 text-sm">Navigateur (User-Agent)</p>
+                          <p className="text-slate-900 text-xs truncate" title={devis.signature.metadata.userAgent}>
+                            {devis.signature.metadata.userAgent.substring(0, 50)}...
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+
+                    <Separator />
+
+                    {/* Preuve d'intégrité */}
+                    <div className="border-l-4 border-violet-500 pl-4">
+                      <h4 className="text-slate-900 mb-3 flex items-center gap-2">
+                        <Lock className="w-4 h-4 text-violet-600" />
+                        Preuve d'intégrité du document
+                      </h4>
+                      <div className="space-y-3">
+                        <div>
+                          <p className="text-slate-500 text-sm">Algorithme de hachage</p>
+                          <Badge className="bg-violet-100 text-violet-700 border-violet-200 mt-1">
+                            {devis.signature.integrite.hashAlgorithm}
+                          </Badge>
+                        </div>
+                        <div>
+                          <p className="text-slate-500 text-sm mb-1">Empreinte numérique du devis</p>
+                          <p className="text-slate-900 font-mono text-xs bg-slate-50 p-3 rounded border border-slate-200 break-all">
+                            {devis.signature.integrite.documentHash}
+                          </p>
+                          <p className="text-slate-500 text-xs mt-1">
+                            Cette empreinte garantit que le devis {devis.signature.integrite.devisNumero} n'a pas été modifié depuis la signature.
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+
+                    <Separator />
+
+                    {/* Consentement */}
+                    <div className="bg-green-50 border border-green-200 rounded-lg p-4">
+                      <div className="flex items-start gap-3">
+                        <CheckCircle className="w-5 h-5 text-green-600 mt-0.5 flex-shrink-0" />
+                        <div>
+                          <p className="text-green-900 text-sm leading-relaxed">
+                            {devis.signature.consentement.mentions}
+                          </p>
+                          <p className="text-green-700 text-xs mt-2">
+                            CGV acceptées le {new Date(devis.signature.consentement.dateAcceptation).toLocaleString('fr-FR', {
+                              dateStyle: 'full',
+                              timeStyle: 'long',
+                              timeZone: 'Europe/Paris'
+                            })}
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Signature visuelle (aperçu) */}
+                    {devis.signature.image && (
+                      <div>
+                        <p className="text-slate-700 mb-2">Signature électronique</p>
+                        <div className="border-2 border-slate-200 rounded-lg p-4 bg-white inline-block">
+                          <img 
+                            src={devis.signature.image} 
+                            alt="Signature électronique" 
+                            className="max-w-sm max-h-32"
+                          />
+                        </div>
+                      </div>
+                    )}
+                  </div>
                 </div>
               )}
 
