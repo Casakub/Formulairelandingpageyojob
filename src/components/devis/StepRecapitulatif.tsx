@@ -12,7 +12,7 @@ import {
   calculerPanierRepasMensuel,
   calculerTauxETTComplet
 } from '../../utils/devis-calculations';
-import { getPanierRepas } from '../../data/devis-data';
+import { getPanierRepasByPays } from '../../data/devis-data-pays';
 
 interface StepRecapitulatifProps {
   formData: DevisFormData;
@@ -53,7 +53,7 @@ export function StepRecapitulatif({ formData, onSubmit, isSubmitting }: StepReca
       
       // Panier repas mensuel séparé
       const montantPanierJour = formData.conditions.repas.type === 'panier'
-        ? getPanierRepas(formData.entreprise.region)
+        ? getPanierRepasByPays(formData.entreprise.pays)
         : 0;
       const panierMensuel = calculerPanierRepasMensuel(
         montantPanierJour,
@@ -144,13 +144,19 @@ export function StepRecapitulatif({ formData, onSubmit, isSubmitting }: StepReca
               <p className="text-white">{formData.entreprise.siret}</p>
             </div>
             <div>
+              <p className="text-white/60 text-sm">Pays</p>
+              <p className="text-white">{formData.entreprise.pays || 'France'}</p>
+            </div>
+            <div>
               <p className="text-white/60 text-sm">Ville</p>
               <p className="text-white">{formData.entreprise.ville}</p>
             </div>
-            <div>
-              <p className="text-white/60 text-sm">Région</p>
-              <p className="text-white">{formData.entreprise.region}</p>
-            </div>
+            {formData.entreprise.region && (
+              <div>
+                <p className="text-white/60 text-sm">Région/État</p>
+                <p className="text-white">{formData.entreprise.region}</p>
+              </div>
+            )}
           </div>
         </CardContent>
       </Card>
@@ -223,7 +229,7 @@ export function StepRecapitulatif({ formData, onSubmit, isSubmitting }: StepReca
             
             // Panier repas mensuel (séparé)
             const montantPanierJour = formData.conditions.repas.type === 'panier' 
-              ? getPanierRepas(formData.entreprise.region)
+              ? getPanierRepasByPays(formData.entreprise.pays)
               : 0;
             const panierMensuel = calculerPanierRepasMensuel(
               montantPanierJour,

@@ -34,6 +34,7 @@ import { StepRecapitulatif } from './components/devis/StepRecapitulatif';
 export interface DevisFormData {
   // Étape 1: Entreprise
   entreprise: {
+    pays: string;
     raisonSociale: string;
     siret: string;
     codeAPE: string;
@@ -136,6 +137,7 @@ export default function DemandeDevis() {
   const [currentStep, setCurrentStep] = useState(1);
   const [formData, setFormData] = useState<DevisFormData>({
     entreprise: {
+      pays: 'France', // Valeur par défaut
       raisonSociale: '',
       siret: '',
       codeAPE: '',
@@ -245,8 +247,15 @@ export default function DemandeDevis() {
     // Validation basique (à améliorer)
     switch (currentStep) {
       case 1:
+        // Validation entreprise
         if (!formData.entreprise.raisonSociale || !formData.entreprise.siret || !formData.entreprise.ville) {
           toast.error('Veuillez remplir tous les champs obligatoires');
+          return false;
+        }
+        // Région obligatoire uniquement pour la France
+        const estFrance = formData.entreprise.pays === 'France' || !formData.entreprise.pays;
+        if (estFrance && !formData.entreprise.region) {
+          toast.error('Veuillez sélectionner une région');
           return false;
         }
         break;
@@ -341,6 +350,7 @@ export default function DemandeDevis() {
         return (
           <Step3Besoins
             data={formData.postes}
+            pays={formData.entreprise.pays}
             region={formData.entreprise.region}
             onChange={(data) => updateFormData('postes', data)}
           />
@@ -349,6 +359,7 @@ export default function DemandeDevis() {
         return (
           <Step4Conditions
             data={formData.conditions}
+            pays={formData.entreprise.pays}
             region={formData.entreprise.region}
             onChange={(data) => updateFormData('conditions', data)}
           />

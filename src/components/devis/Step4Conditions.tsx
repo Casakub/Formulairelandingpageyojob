@@ -4,7 +4,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '.
 import { Textarea } from '../ui/textarea';
 import { Switch } from '../ui/switch';
 import { RadioGroup, RadioGroupItem } from '../ui/radio-group';
-import { MOTIFS_RECOURS, PERIODES_ESSAI, DELAIS_PAIEMENT, getPanierRepas } from '../../data/devis-data';
+import { MOTIFS_RECOURS, PERIODES_ESSAI, DELAIS_PAIEMENT } from '../../data/devis-data';
+import { getPanierRepasByPays } from '../../data/devis-data-pays';
 import { formaterMontant } from '../../utils/devis-calculations';
 import { useState } from 'react';
 
@@ -29,11 +30,12 @@ interface Step4ConditionsProps {
       montant?: number;
     };
   };
+  pays: string;  // 🆕 Pays de l'entreprise cliente
   region: string;
   onChange: (data: any) => void;
 }
 
-export function Step4Conditions({ data, region, onChange }: Step4ConditionsProps) {
+export function Step4Conditions({ data, pays, region, onChange }: Step4ConditionsProps) {
   const [dateError, setDateError] = useState('');
 
   const handleChange = (field: string, value: any) => {
@@ -68,7 +70,7 @@ export function Step4Conditions({ data, region, onChange }: Step4ConditionsProps
     });
   };
 
-  const montantPanierJour = getPanierRepas(region);
+  const montantPanierJour = getPanierRepasByPays(pays, region);
   const supplementPanierHoraire = montantPanierJour / 7;
 
   return (
@@ -292,8 +294,8 @@ export function Step4Conditions({ data, region, onChange }: Step4ConditionsProps
         {data.repas.type === 'panier' && region && (
           <div className="bg-green-500/10 border border-green-500/30 rounded-lg p-4 mt-4">
             <p className="text-green-200/80 text-sm mt-1">
-              {getPanierRepas(region) > 0
-                ? `Montant : ${formaterMontant(getPanierRepas(region))}/jour`
+              {getPanierRepasByPays(pays, region) > 0
+                ? `Montant : ${formaterMontant(getPanierRepasByPays(pays, region))}/jour`
                 : 'Montant non défini pour cette région'}
             </p>
             {/* ❌ SUPPRIMÉ : Le panier repas n'est pas un supplément horaire */}

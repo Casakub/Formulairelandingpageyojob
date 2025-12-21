@@ -414,6 +414,12 @@ export function DevisDetailModal({ devisId, onClose }: DevisDetailModalProps) {
                             <p className="text-slate-500 text-sm">Raison sociale</p>
                             <p className="text-slate-900">{devis.entreprise.raisonSociale}</p>
                           </div>
+                          {devis.entreprise.pays && (
+                            <div>
+                              <p className="text-slate-500 text-sm">Pays</p>
+                              <p className="text-slate-900">🌍 {devis.entreprise.pays}</p>
+                            </div>
+                          )}
                           {devis.entreprise.formeJuridique && (
                             <div>
                               <p className="text-slate-500 text-sm">Forme juridique</p>

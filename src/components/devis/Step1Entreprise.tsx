@@ -1,12 +1,13 @@
 import { Input } from '../ui/input';
 import { Label } from '../ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select';
-import { REGIONS } from '../../data/devis-data';
+import { REGIONS, PAYS_EUROPEENS } from '../../data/devis-data';
 import { validerSIRET } from '../../utils/devis-calculations';
 import { useState, useEffect } from 'react';
 
 interface Step1EntrepriseProps {
   data: {
+    pays: string;
     raisonSociale: string;
     siret: string;
     codeAPE: string;
@@ -22,6 +23,7 @@ interface Step1EntrepriseProps {
 
 export function Step1Entreprise({ data, onChange }: Step1EntrepriseProps) {
   const [siretError, setSiretError] = useState('');
+  const estFrance = data.pays === 'France' || !data.pays;
 
   const handleChange = (field: string, value: string) => {
     onChange({
@@ -31,7 +33,8 @@ export function Step1Entreprise({ data, onChange }: Step1EntrepriseProps) {
   };
 
   const handleSiretBlur = () => {
-    if (data.siret && !validerSIRET(data.siret)) {
+    // Valider SIRET uniquement pour la France
+    if (estFrance && data.siret && !validerSIRET(data.siret)) {
       setSiretError('SIRET invalide (14 chiffres requis)');
     } else {
       setSiretError('');
@@ -48,6 +51,29 @@ export function Step1Entreprise({ data, onChange }: Step1EntrepriseProps) {
       </div>
 
       <div className="grid md:grid-cols-2 gap-4">
+        {/* Pays */}
+        <div className="md:col-span-2">
+          <Label className="text-white mb-2 block">
+            Pays <span className="text-red-400">*</span>
+          </Label>
+          <Select value={data.pays} onValueChange={(value) => handleChange('pays', value)} required>
+            <SelectTrigger className="bg-white/10 border-white/20 text-white [&>span]:text-white/60">
+              <SelectValue placeholder="Sélectionnez un pays" />
+            </SelectTrigger>
+            <SelectContent className="bg-[#2d1b69]/95 backdrop-blur-xl border border-white/20 text-white z-[9999] p-[0px] overflow-hidden">
+              {PAYS_EUROPEENS.map((pays) => (
+                <SelectItem 
+                  key={pays} 
+                  value={pays}
+                  className="hover:bg-white/10 focus:bg-white/10 text-white"
+                >
+                  {pays}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+
         {/* Raison sociale */}
         <div className="md:col-span-2">
           <Label htmlFor="raisonSociale" className="text-white mb-2 block">
@@ -154,27 +180,39 @@ export function Step1Entreprise({ data, onChange }: Step1EntrepriseProps) {
           />
         </div>
 
-        {/* Région */}
+        {/* Région - Conditionnel selon le pays */}
         <div>
           <Label className="text-white mb-2 block">
-            Région <span className="text-red-400">*</span>
+            Région/État {estFrance && <span className="text-red-400">*</span>}
           </Label>
-          <Select value={data.region} onValueChange={(value) => handleChange('region', value)} required>
-            <SelectTrigger className="bg-white/10 border-white/20 text-white [&>span]:text-white/60">
-              <SelectValue placeholder="Sélectionnez une région" />
-            </SelectTrigger>
-            <SelectContent className="bg-[#2d1b69]/95 backdrop-blur-xl border border-white/20 text-white z-[9999] p-[0px] overflow-hidden">
-              {REGIONS.map((region) => (
-                <SelectItem 
-                  key={region} 
-                  value={region}
-                  className="hover:bg-white/10 focus:bg-white/10 text-white"
-                >
-                  {region}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+          {estFrance ? (
+            // France : Sélecteur avec les 13 régions françaises
+            <Select value={data.region} onValueChange={(value) => handleChange('region', value)} required>
+              <SelectTrigger className="bg-white/10 border-white/20 text-white [&>span]:text-white/60">
+                <SelectValue placeholder="Sélectionnez une région" />
+              </SelectTrigger>
+              <SelectContent className="bg-[#2d1b69]/95 backdrop-blur-xl border border-white/20 text-white z-[9999] p-[0px] overflow-hidden">
+                {REGIONS.map((region) => (
+                  <SelectItem 
+                    key={region} 
+                    value={region}
+                    className="hover:bg-white/10 focus:bg-white/10 text-white"
+                  >
+                    {region}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          ) : (
+            // Autres pays : Champ texte libre
+            <Input
+              id="region"
+              value={data.region}
+              onChange={(e) => handleChange('region', e.target.value)}
+              className="bg-white/10 border-white/20 text-white placeholder:text-white/40"
+              placeholder="Ex: Bavaria, Cataluña, Lombardia..."
+            />
+          )}
         </div>
 
         {/* Site internet */}

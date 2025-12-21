@@ -5,7 +5,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '.
 import { Button } from '../ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '../ui/card';
 import { Plus, Trash2 } from 'lucide-react';
-import { SECTEURS, getSalairesByRegion } from '../../data/devis-data';
+import { SECTEURS } from '../../data/devis-data';
+import { getSalairesByPaysRegion, getCoefficientByPays } from '../../data/devis-data-pays';
 import { calculerTauxHoraireBrut, calculerTauxETTAvecPays, formaterMontant, calculerCoutMensuelProfil } from '../../utils/devis-calculations';
 import { useDevisConfig } from '../../hooks/useDevisConfig';
 
@@ -29,11 +30,12 @@ interface Poste {
 
 interface Step3BesoinsProps {
   data: Poste[];
+  pays: string;  // 🆕 Pays de l'entreprise cliente
   region: string;
   onChange: (data: Poste[]) => void;
 }
 
-export function Step3Besoins({ data, region, onChange }: Step3BesoinsProps) {
+export function Step3Besoins({ data, pays, region, onChange }: Step3BesoinsProps) {
   // 🆕 Charger la configuration dynamique
   const { getPaysActifs, getCoefficientDetail, getPaysInfo, isLoading } = useDevisConfig();
   const paysDisponibles = getPaysActifs();
@@ -78,8 +80,9 @@ export function Step3Besoins({ data, region, onChange }: Step3BesoinsProps) {
         }
 
         // Auto-remplir le salaire si la classification change
-        if (field === 'classification' && value && updated.secteur && region) {
-          const salaires = getSalairesByRegion(region, updated.secteur);
+        if (field === 'classification' && value && updated.secteur) {
+          // 🆕 Utiliser le pays et la région pour obtenir le bon salaire
+          const salaires = getSalairesByPaysRegion(pays, updated.secteur, region);
           updated.salaireBrut = salaires[value] || 0;
         }
 

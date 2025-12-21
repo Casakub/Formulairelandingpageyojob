@@ -1,5 +1,35 @@
 // Données de référence pour le système de devis YOJOB
 
+export const PAYS_EUROPEENS = [
+  'France',
+  'Allemagne',
+  'Autriche',
+  'Belgique',
+  'Bulgarie',
+  'Croatie',
+  'Chypre',
+  'Danemark',
+  'Espagne',
+  'Estonie',
+  'Finlande',
+  'Grèce',
+  'Hongrie',
+  'Irlande',
+  'Italie',
+  'Lettonie',
+  'Lituanie',
+  'Luxembourg',
+  'Malte',
+  'Pays-Bas',
+  'Pologne',
+  'Portugal',
+  'République tchèque',
+  'Roumanie',
+  'Slovaquie',
+  'Slovénie',
+  'Suède'
+] as const;
+
 export const REGIONS = [
   'AUVERGNE-RHÔNE-ALPES',
   'BOURGOGNE-FRANCHE-COMTÉ',

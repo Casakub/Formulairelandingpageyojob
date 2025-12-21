@@ -40,6 +40,7 @@ devis.post('/', async (c) => {
       
       // Informations entreprise
       entreprise: {
+        pays: data.entreprise.pays || 'France', // Valeur par défaut pour rétrocompatibilité
         raisonSociale: data.entreprise.raisonSociale,
         siret: data.entreprise.siret,
         codeAPE: data.entreprise.codeAPE,
