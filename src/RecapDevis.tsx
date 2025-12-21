@@ -170,7 +170,7 @@ export default function RecapDevis() {
     }
   };
 
-  const handleSign = async () => {
+  const handleSignDevis = async () => {
     if (!signatureRef.current || signatureRef.current.isEmpty()) {
       toast.error('Veuillez signer avant de valider');
       return;
@@ -184,6 +184,15 @@ export default function RecapDevis() {
     try {
       setIsSigning(true);
       const signatureData = signatureRef.current.toDataURL();
+
+      console.log('📝 Démarrage signature électronique...');
+      console.log('🔐 Informations de traçabilité:');
+      console.log(`  - Signataire: ${devisData.contact.prenom} ${devisData.contact.nom}`);
+      console.log(`  - Email: ${devisData.contact.email}`);
+      console.log(`  - Entreprise: ${devisData.entreprise.raisonSociale}`);
+      console.log(`  - SIRET: ${devisData.entreprise.siret}`);
+      console.log(`  - Adresse IP: ${userIp}`);
+      console.log(`  - Timestamp: ${new Date().toISOString()}`);
 
       const response = await fetch(
         `https://${projectId}.supabase.co/functions/v1/make-server-10092a63/devis/signer-devis`,
@@ -208,6 +217,12 @@ export default function RecapDevis() {
       }
 
       const result = await response.json();
+      
+      console.log('✅ Signature réussie avec certificat:', result.certificat);
+      console.log('🔒 Hash SHA-256:', result.certificat?.integrite?.documentHash);
+      console.log('📍 IP enregistrée:', result.certificat?.metadata?.ipAddress);
+      console.log('🕐 Timestamp:', result.certificat?.metadata?.timestampReadable);
+      
       toast.success('Devis signé avec succès ! Un email de confirmation vous a été envoyé.');
       
       // Recharger les données
@@ -664,14 +679,14 @@ export default function RecapDevis() {
                         <Button
                           onClick={() => setShowSignature(false)}
                           variant="outline"
-                          className="flex-1 border-white/30 text-white hover:bg-white/10"
+                          className="flex-1 bg-white/10 backdrop-blur-sm border-2 border-white/30 text-white hover:bg-white/20 hover:border-white/50 transition-all"
                         >
                           Annuler
                         </Button>
                         <Button
-                          onClick={handleSign}
-                          disabled={isSigning || !acceptCGV}
-                          className="flex-1 relative overflow-hidden group rounded-full bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white shadow-lg hover:shadow-green-500/50 transition-all"
+                          onClick={handleSignDevis}
+                          disabled={!acceptCGV || isSigning}
+                          className="flex-1 relative overflow-hidden group rounded-lg bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white shadow-lg hover:shadow-green-500/50 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                         >
                           {isSigning ? (
                             <>
