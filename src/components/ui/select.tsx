@@ -35,16 +35,21 @@ const SelectContext = React.createContext<{
   isOpen: boolean;
   setIsOpen: (open: boolean) => void;
   triggerRef: React.RefObject<HTMLButtonElement> | null;
+  valueLabel: string;
+  setValueLabel: (label: string) => void;
 }>({
   value: '',
   onValueChange: () => {},
   isOpen: false,
   setIsOpen: () => {},
   triggerRef: null,
+  valueLabel: '',
+  setValueLabel: () => {},
 });
 
 export function Select({ value = '', onValueChange, children, disabled = false }: SelectProps) {
   const [isOpen, setIsOpen] = React.useState(false);
+  const [valueLabel, setValueLabel] = React.useState('');
   const triggerRef = React.useRef<HTMLButtonElement>(null);
 
   console.log('🔵 [Select] Render - isOpen:', isOpen, 'disabled:', disabled);
@@ -57,6 +62,8 @@ export function Select({ value = '', onValueChange, children, disabled = false }
         isOpen: !disabled && isOpen,
         setIsOpen,
         triggerRef,
+        valueLabel,
+        setValueLabel,
       }}
     >
       <div className="relative">
@@ -91,11 +98,11 @@ export function SelectTrigger({ className = '', children }: SelectTriggerProps) 
 }
 
 export function SelectValue({ placeholder }: SelectValueProps) {
-  const { value } = React.useContext(SelectContext);
+  const { value, valueLabel } = React.useContext(SelectContext);
   
   return (
     <span className={value ? '' : 'text-slate-500'}>
-      {value || placeholder}
+      {valueLabel || placeholder}
     </span>
   );
 }
@@ -213,16 +220,29 @@ export function SelectContent({ children, className = '' }: SelectContentProps) 
 }
 
 export function SelectItem({ value, children, className = '' }: SelectItemProps) {
-  const { value: selectedValue, onValueChange, setIsOpen } = React.useContext(SelectContext);
+  const { value: selectedValue, onValueChange, setIsOpen, setValueLabel } = React.useContext(SelectContext);
 
   const handleClick = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
+    
+    // Extraire le texte du label
+    const label = typeof children === 'string' ? children : extractTextFromChildren(children);
+    
     onValueChange(value);
+    setValueLabel(label);
     setIsOpen(false);
   };
 
   const isSelected = value === selectedValue;
+  
+  // Si cet item est sélectionné, mettre à jour le label au montage
+  React.useEffect(() => {
+    if (isSelected) {
+      const label = typeof children === 'string' ? children : extractTextFromChildren(children);
+      setValueLabel(label);
+    }
+  }, [isSelected, children, setValueLabel]);
 
   return (
     <button
@@ -235,4 +255,17 @@ export function SelectItem({ value, children, className = '' }: SelectItemProps)
       {children}
     </button>
   );
+}
+
+// Fonction utilitaire pour extraire le texte des children React
+function extractTextFromChildren(children: React.ReactNode): string {
+  if (typeof children === 'string') return children;
+  if (typeof children === 'number') return String(children);
+  if (Array.isArray(children)) {
+    return children.map(extractTextFromChildren).join('');
+  }
+  if (React.isValidElement(children)) {
+    return extractTextFromChildren(children.props.children);
+  }
+  return '';
 }

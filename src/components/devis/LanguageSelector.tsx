@@ -46,12 +46,7 @@ export function LanguageSelector({
       
       <Select value={value} onValueChange={onChange}>
         <SelectTrigger className="min-w-[200px] bg-white/10 border-white/20 text-white hover:bg-white/15 transition-colors [&>span]:text-white">
-          <SelectValue>
-            {(() => {
-              const currentLang = DEVIS_LANGUAGES.find(l => l.code === value);
-              return currentLang ? `${currentLang.flag} ${currentLang.label}` : 'Sélectionner une langue';
-            })()}
-          </SelectValue>
+          <SelectValue placeholder="Sélectionner une langue" />
         </SelectTrigger>
         
         <SelectContent className="bg-[#2d1b69]/95 backdrop-blur-xl border border-white/20 text-white max-h-[400px] overflow-y-auto z-[9999]">
@@ -64,21 +59,7 @@ export function LanguageSelector({
                 value={lang.code}
                 className="hover:bg-white/10 focus:bg-white/10 text-white cursor-pointer py-2 px-3"
               >
-                <div className="flex items-center justify-between w-full gap-3">
-                  <div className="flex items-center gap-2">
-                    <span className="text-xl">{lang.flag}</span>
-                    <div className="flex flex-col">
-                      <span className="font-medium">{lang.label}</span>
-                      <span className="text-xs text-white/60">{lang.nativeName}</span>
-                    </div>
-                  </div>
-                  
-                  {isSuggested && (
-                    <span className="text-xs bg-cyan-500/30 text-cyan-300 px-2 py-0.5 rounded-full">
-                      Suggéré
-                    </span>
-                  )}
-                </div>
+                {lang.flag} {lang.label}
               </SelectItem>
             );
           })}
@@ -110,12 +91,7 @@ export function LanguageSelectorCompact({
     <div className={`flex items-center gap-2 ${className}`}>
       <Select value={value} onValueChange={onChange}>
         <SelectTrigger className="w-[120px] bg-white/10 border-white/20 text-white [&>span]:text-white">
-          <SelectValue>
-            {(() => {
-              const currentLang = DEVIS_LANGUAGES.find(l => l.code === value);
-              return currentLang ? `${currentLang.flag} ${currentLang.code.toUpperCase()}` : 'Langue';
-            })()}
-          </SelectValue>
+          <SelectValue placeholder="Langue" />
         </SelectTrigger>
         
         <SelectContent className="bg-[#2d1b69]/95 backdrop-blur-xl border border-white/20 text-white max-h-[300px] overflow-y-auto z-[9999]">
@@ -125,10 +101,7 @@ export function LanguageSelectorCompact({
               value={lang.code}
               className="hover:bg-white/10 focus:bg-white/10 text-white"
             >
-              <span className="flex items-center gap-2">
-                <span>{lang.flag}</span>
-                <span>{lang.code.toUpperCase()}</span>
-              </span>
+              {lang.flag} {lang.code.toUpperCase()}
             </SelectItem>
           ))}
         </SelectContent>

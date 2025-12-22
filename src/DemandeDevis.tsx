@@ -133,6 +133,15 @@ export default function DemandeDevis() {
   const [currentStep, setCurrentStep] = useState(1);
   const [lang, setLang] = useState<DevisLanguage>('fr');
   
+  // 🔍 DEBUG: Wrapper pour setLang avec logging
+  const handleLanguageChange = (newLang: DevisLanguage) => {
+    console.log('🌐 [DemandeDevis] Changement de langue:', { from: lang, to: newLang });
+    setLang(newLang);
+  };
+  
+  // 🔍 DEBUG: Log quand lang change
+  console.log('🔄 [DemandeDevis] Re-render avec lang =', lang);
+  
   // Charger les traductions pour la langue active
   const { t } = useDevisTranslationStatic(lang);
   
@@ -431,7 +440,7 @@ export default function DemandeDevis() {
               <div className="flex items-center gap-4">
                 <LanguageSelector 
                   value={lang} 
-                  onChange={setLang}
+                  onChange={handleLanguageChange}
                   suggestedCountry={formData.entreprise.pays}
                   showMVPOnly={true}
                 />

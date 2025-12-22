@@ -2972,16 +2972,6 @@
     }
   }
 
-  .bg-cyan-500\/30 {
-    background-color: color-mix(in srgb, oklch(.715 .143 215.221) 30%, transparent);
-  }
-
-  @supports (color: color-mix(in lab, red, red)) {
-    .bg-cyan-500\/30 {
-      background-color: color-mix(in oklab, var(--color-cyan-500) 30%, transparent);
-    }
-  }
-
   .bg-cyan-600 {
     background-color: var(--color-cyan-600);
   }
