@@ -262,7 +262,7 @@ export function StepRecapitulatif({ formData, onSubmit, isSubmitting, lang = 'fr
                     <p className="text-white/60 text-sm">{translateSecteur(poste.secteur, lang)} • {translateClassification(poste.secteur, poste.classification, lang)}</p>
                     {poste.labelPays && (
                       <p className="text-cyan-300/80 text-sm mt-1">
-                        📍 Nationalité: {translatePays(poste.labelPays, lang)}
+                        📍 {t.step3.fields.nationalite.label}: {translatePays(poste.labelPays, lang)}
                       </p>
                     )}
                   </div>

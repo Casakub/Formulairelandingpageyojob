@@ -230,3 +230,54 @@ html {
     transform: translateX(100%);
   }
 }
+
+/* Styles d'impression pour le devis */
+@media print {
+  @page {
+    size: A4;
+    margin: 2cm;
+  }
+
+  /* Masquer les éléments non nécessaires à l'impression */
+  body * {
+    visibility: hidden;
+  }
+
+  #printable-content,
+  #printable-content * {
+    visibility: visible;
+  }
+
+  #printable-content {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+  }
+
+  /* Éviter les sauts de page à l'intérieur des éléments */
+  h1, h2, h3, h4, h5, h6 {
+    page-break-after: avoid;
+    page-break-inside: avoid;
+  }
+
+  table, figure, img {
+    page-break-inside: avoid;
+  }
+
+  /* Masquer le header et les boutons de la modale */
+  .print\\:hidden {
+    display: none !important;
+  }
+
+  /* Supprimer les ombres et effets */
+  .print\\:shadow-none {
+    box-shadow: none !important;
+  }
+
+  /* Assurer les couleurs et arrière-plans pour l'impression */
+  * {
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+}
