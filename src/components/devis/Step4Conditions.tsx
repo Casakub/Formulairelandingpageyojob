@@ -6,7 +6,7 @@ import { Switch } from '../ui/switch';
 import { RadioGroup, RadioGroupItem } from '../ui/radio-group';
 import { getPanierRepasByPays } from '../../data/devis-data-pays';
 import { formaterMontant } from '../../utils/devis-calculations';
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { useDevisTranslationStatic } from '../../hooks/useDevisTranslation';
 import type { DevisLanguage } from '../../src/i18n/devis/types';
 
@@ -41,36 +41,41 @@ export function Step4Conditions({ data, pays, region, onChange, lang = 'fr' }: S
   const { t, isLoading: isLoadingTranslations } = useDevisTranslationStatic(lang);
   const [dateError, setDateError] = useState('');
 
-  // 🆕 Helper functions pour afficher les valeurs traduites
-  const getPeriodeEssaiLabel = (value: string) => {
-    if (!value) return t.step4.fields.periodeEssai.placeholder;
-    return t.step4.fields.periodeEssai.options[value as '2' | '3' | '5' | '15'] || value;
-  };
+  // 🔍 DEBUG: Log de la langue active
+  console.log('🌍 [Step4] Langue active:', lang);
+  console.log('🔍 [Step4] Traductions chargées:', {
+    motifRecours: t.step4.fields.motifRecours.options,
+    periodeEssai: t.step4.fields.periodeEssai.options,
+    delaiPaiement: t.step4.fields.delaiPaiement.options
+  });
 
-  const getMotifRecoursLabel = (value: string) => {
-    if (!value) return t.step4.fields.motifRecours.placeholder;
-    const labels: Record<string, string> = {
-      accroissement: t.step4.fields.motifRecours.options.accroissement,
-      remplacement: t.step4.fields.motifRecours.options.remplacement,
-      saisonnier: t.step4.fields.motifRecours.options.saisonnier,
-      exportation: t.step4.fields.motifRecours.options.exportation,
-      autre: t.step4.fields.motifRecours.options.autre,
-    };
-    return labels[value] || value;
-  };
+  // ✅ SOLUTION: Utiliser useMemo pour recalculer les labels quand lang ou data changent
+  const periodeEssaiLabel = useMemo(() => {
+    if (!data.periodeEssai) return t.step4.fields.periodeEssai.placeholder;
+    const options = t.step4.fields.periodeEssai.options;
+    const label = options[data.periodeEssai as keyof typeof options] || t.step4.fields.periodeEssai.placeholder;
+    console.log('📋 [useMemo periodeEssai]', { value: data.periodeEssai, label, lang });
+    return label;
+  }, [data.periodeEssai, lang, t]);
 
-  const getDelaiPaiementLabel = (value: string) => {
-    if (!value) return t.step4.fields.delaiPaiement.placeholder;
-    const labels: Record<string, string> = {
-      reception: t.step4.fields.delaiPaiement.options.reception,
-      j30: t.step4.fields.delaiPaiement.options.j30,
-      j45: t.step4.fields.delaiPaiement.options.j45,
-      j60: t.step4.fields.delaiPaiement.options.j60,
-    };
-    return labels[value] || value;
-  };
+  const motifRecoursLabel = useMemo(() => {
+    if (!data.motifRecours) return t.step4.fields.motifRecours.placeholder;
+    const options = t.step4.fields.motifRecours.options;
+    const label = options[data.motifRecours as keyof typeof options] || t.step4.fields.motifRecours.placeholder;
+    console.log('🎯 [useMemo motifRecours]', { value: data.motifRecours, label, lang });
+    return label;
+  }, [data.motifRecours, lang, t]);
+
+  const delaiPaiementLabel = useMemo(() => {
+    if (!data.delaiPaiement) return t.step4.fields.delaiPaiement.placeholder;
+    const options = t.step4.fields.delaiPaiement.options;
+    const label = options[data.delaiPaiement as keyof typeof options] || t.step4.fields.delaiPaiement.placeholder;
+    console.log('💰 [useMemo delaiPaiement]', { value: data.delaiPaiement, label, lang });
+    return label;
+  }, [data.delaiPaiement, lang, t]);
 
   const handleChange = (field: string, value: any) => {
+    console.log('✏️ [handleChange]', { field, value, lang });
     // 🆕 Valider la date de fin si on change la date de fin
     if (field === 'dateFin' && value && data.dateDebut) {
       if (new Date(value) < new Date(data.dateDebut)) {
@@ -115,6 +120,16 @@ export function Step4Conditions({ data, pays, region, onChange, lang = 'fr' }: S
 
   return (
     <div className="space-y-6">
+      {/* 🔍 DEBUG PANEL - À RETIRER EN PRODUCTION */}
+      <div className="bg-purple-500/10 border border-purple-400/30 rounded-lg p-4">
+        <p className="text-purple-200 text-sm">
+          🔍 <strong>DEBUG:</strong> Langue active = <strong className="text-purple-100">{lang}</strong>
+        </p>
+        <p className="text-purple-200/70 text-xs mt-1">
+          Vérifiez que la langue affichée correspond au sélecteur de langue en haut de page
+        </p>
+      </div>
+
       <div>
         <h2 className="text-white text-2xl mb-2">{t.step4.title}</h2>
         <p className="text-white/70">
@@ -159,11 +174,9 @@ export function Step4Conditions({ data, pays, region, onChange, lang = 'fr' }: S
           <Label className="text-white mb-2 block">
             {t.step4.fields.periodeEssai.label}
           </Label>
-          <Select key={`periodeEssai-${lang}`} value={data.periodeEssai} onValueChange={(value) => handleChange('periodeEssai', value)}>
+          <Select key={`periodeEssai-${lang}-${data.periodeEssai}`} value={data.periodeEssai} onValueChange={(value) => handleChange('periodeEssai', value)}>
             <SelectTrigger className="bg-white/10 border-white/20 text-white">
-              <SelectValue>
-                {getPeriodeEssaiLabel(data.periodeEssai)}
-              </SelectValue>
+              <SelectValue placeholder={periodeEssaiLabel} />
             </SelectTrigger>
             <SelectContent className="bg-gray-900 border-white/20">
               <SelectItem value="2" className="text-white hover:bg-white/10">
@@ -218,11 +231,9 @@ export function Step4Conditions({ data, pays, region, onChange, lang = 'fr' }: S
           <Label className="text-white mb-2 block">
             {t.step4.fields.motifRecours.label}
           </Label>
-          <Select key={`motifRecours-${lang}`} value={data.motifRecours} onValueChange={(value) => handleChange('motifRecours', value)}>
+          <Select key={`motifRecours-${lang}-${data.motifRecours}`} value={data.motifRecours} onValueChange={(value) => handleChange('motifRecours', value)}>
             <SelectTrigger className="bg-white/10 border-white/20 text-white">
-              <SelectValue>
-                {getMotifRecoursLabel(data.motifRecours)}
-              </SelectValue>
+              <SelectValue placeholder={motifRecoursLabel} />
             </SelectTrigger>
             <SelectContent className="bg-gray-900 border-white/20">
               <SelectItem value="accroissement" className="text-white hover:bg-white/10">
@@ -249,11 +260,9 @@ export function Step4Conditions({ data, pays, region, onChange, lang = 'fr' }: S
           <Label className="text-white mb-2 block">
             {t.step4.fields.delaiPaiement.label}
           </Label>
-          <Select key={`delaiPaiement-${lang}`} value={data.delaiPaiement} onValueChange={(value) => handleChange('delaiPaiement', value)}>
+          <Select key={`delaiPaiement-${lang}-${data.delaiPaiement}`} value={data.delaiPaiement} onValueChange={(value) => handleChange('delaiPaiement', value)}>
             <SelectTrigger className="bg-white/10 border-white/20 text-white">
-              <SelectValue>
-                {getDelaiPaiementLabel(data.delaiPaiement)}
-              </SelectValue>
+              <SelectValue placeholder={delaiPaiementLabel} />
             </SelectTrigger>
             <SelectContent className="bg-gray-900 border-white/20">
               <SelectItem value="reception" className="text-white hover:bg-white/10">

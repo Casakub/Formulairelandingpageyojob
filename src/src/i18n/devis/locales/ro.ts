@@ -247,6 +247,7 @@ export const ro: DevisTranslations = {
   step4: {
     title: "Condiții de Muncă",
     subtitle: "Specificați condițiile de angajare și beneficiile oferite.",
+    dateError: "Data de încheiere trebuie să fie după data de începere",
     fields: {
       dateDebut: {
         label: "Data Dorită de Începere",

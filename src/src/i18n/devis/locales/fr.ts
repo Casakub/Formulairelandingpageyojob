@@ -248,6 +248,7 @@ export const fr: DevisTranslations = {
   step4: {
     title: "Conditions de travail",
     subtitle: "Précisez les conditions d'emploi et les avantages proposés.",
+    dateError: "La date de fin doit être postérieure à la date de début",
     fields: {
       dateDebut: {
         label: "Date de début souhaitée",
