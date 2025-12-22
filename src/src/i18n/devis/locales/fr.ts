@@ -428,6 +428,25 @@ export const fr: DevisTranslations = {
           label: "Autres langues utiles",
           placeholder: "Ex: Anglais (B1), Allemand (A2)...",
         },
+        // Noms de langues
+        languageNames: {
+          francais: "Français",
+          anglais: "Anglais",
+          portugais: "Portugais",
+          espagnol: "Espagnol",
+          italien: "Italien",
+          autre: "Autre",
+        },
+        // Niveaux de langue
+        levels: {
+          'non-requis': "Non requis",
+          'A1': "A1 - Débutant",
+          'A2': "A2 - Élémentaire",
+          'B1': "B1 - Intermédiaire",
+          'B2': "B2 - Avancé",
+          'C1': "C1 - Autonome",
+          'C2': "C2 - Maîtrise",
+        },
       },
       permis: {
         title: "Permis de conduire",
@@ -471,6 +490,19 @@ export const fr: DevisTranslations = {
         liste: {
           label: "Liste des EPI nécessaires",
           placeholder: "Ex: Casque, chaussures S3, gants anti-coupure, harnais...",
+        },
+        // Liste des EPIs
+        items: {
+          casque: "Casque de sécurité",
+          lunettes: "Lunettes de sécurité",
+          protections_auditives: "Protections auditives",
+          gants: "Gants de protection",
+          chaussures: "Chaussures de sécurité",
+          harnais: "Harnais de sécurité",
+          vetements: "Vêtements de travail",
+          masque: "Masque respiratoire",
+          protection_faciale: "Protection faciale",
+          vetements_visibilite: "Vêtements haute visibilité",
         },
       },
       autresExigences: {
@@ -754,5 +786,36 @@ export const fr: DevisTranslations = {
         a_definir: "À définir",
       },
     },
+  },
+  
+  // === PAYS EUROPÉENS ===
+  pays: {
+    france: "France",
+    allemagne: "Allemagne",
+    autriche: "Autriche",
+    belgique: "Belgique",
+    bulgarie: "Bulgarie",
+    croatie: "Croatie",
+    chypre: "Chypre",
+    danemark: "Danemark",
+    espagne: "Espagne",
+    estonie: "Estonie",
+    finlande: "Finlande",
+    grece: "Grèce",
+    hongrie: "Hongrie",
+    irlande: "Irlande",
+    italie: "Italie",
+    lettonie: "Lettonie",
+    lituanie: "Lituanie",
+    luxembourg: "Luxembourg",
+    malte: "Malte",
+    pays_bas: "Pays-Bas",
+    pologne: "Pologne",
+    portugal: "Portugal",
+    republique_tcheque: "République tchèque",
+    roumanie: "Roumanie",
+    slovaquie: "Slovaquie",
+    slovenie: "Slovénie",
+    suede: "Suède",
   },
 };

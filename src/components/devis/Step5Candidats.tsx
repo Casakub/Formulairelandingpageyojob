@@ -5,6 +5,7 @@ import { Switch } from '../ui/switch';
 import { Checkbox } from '../ui/checkbox';
 import { NIVEAUX_LANGUE, LANGUES, EPIS } from '../../data/devis-data';
 import { useDevisTranslationStatic } from '../../hooks/useDevisTranslation';
+import { translateLanguageName, translateLanguageLevel, translateEPI } from '../../utils/step5-translations';
 import type { DevisLanguage } from '../../src/i18n/devis/types';
 
 interface Step5CandidatsProps {
@@ -180,7 +181,7 @@ export function Step5Candidats({ data, onChange, lang = 'fr' }: Step5CandidatsPr
         <div className="space-y-3">
           {LANGUES.map((langue) => (
             <div key={langue} className="grid grid-cols-2 gap-4 items-center">
-              <Label className="text-white">{langue}</Label>
+              <Label className="text-white">{translateLanguageName(langue, lang)}</Label>
               <Select
                 value={data.langues[langue] || 'non-requis'}
                 onValueChange={(value) => handleLangueChange(langue, value)}
@@ -191,7 +192,7 @@ export function Step5Candidats({ data, onChange, lang = 'fr' }: Step5CandidatsPr
                 <SelectContent className="bg-gray-900 border-white/20">
                   {NIVEAUX_LANGUE.map((niveau) => (
                     <SelectItem key={niveau.value} value={niveau.value} className="text-white hover:bg-white/10">
-                      {niveau.label}
+                      {translateLanguageLevel(niveau.value, lang)}
                     </SelectItem>
                   ))}
                 </SelectContent>
@@ -280,7 +281,7 @@ export function Step5Candidats({ data, onChange, lang = 'fr' }: Step5CandidatsPr
                 className="border-white/20"
               />
               <Label htmlFor={epi} className="text-white cursor-pointer text-sm">
-                {epi}
+                {translateEPI(epi, lang)}
               </Label>
             </div>
           ))}

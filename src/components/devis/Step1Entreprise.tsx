@@ -5,6 +5,7 @@ import { REGIONS, PAYS_EUROPEENS } from '../../data/devis-data';
 import { validerSIRET } from '../../utils/devis-calculations';
 import { useState, useEffect } from 'react';
 import { useDevisTranslationStatic } from '../../hooks/useDevisTranslation';
+import { translatePays } from '../../utils/recapitulatif-translations';
 import type { DevisLanguage } from '../../src/i18n/devis/types';
 
 interface Step1EntrepriseProps {
@@ -79,7 +80,7 @@ export function Step1Entreprise({ data, onChange, lang = 'fr' }: Step1Entreprise
                   value={pays}
                   className="hover:bg-white/10 focus:bg-white/10 text-white"
                 >
-                  {pays}
+                  {translatePays(pays, lang)}
                 </SelectItem>
               ))}
             </SelectContent>

@@ -374,17 +374,17 @@ export const ro: DevisTranslations = {
           label: "Experiență obligatorie",
         },
         annees: {
-          label: "Ani Minimi de Experiență",
+          label: "Ani de experiență minime",
           placeholder: "ex. 3",
           options: {
-            '0-1': "Început (0-1 an)",
+            '0-1': "Începător (0-1 an)",
             '1-3': "Intermediar (1-3 ani)",
-            '3-5': "Experimentat (3-5 ani)",
+            '3-5': "Confirmat (3-5 ani)",
             '5+': "Expert (5+ ani)",
           },
         },
         competences: {
-          label: "Abilități Tehnice Necesare",
+          label: "Competențe tehnice necesare",
           placeholder: "ex. Zidărie, cofrare, citire planuri, sudură TIG...",
         },
       },
@@ -394,8 +394,8 @@ export const ro: DevisTranslations = {
           label: "Formare obligatorie",
         },
         type: {
-          label: "Tipul formării",
-          placeholder: "ex. Certificat zidărie, CACES R489...",
+          label: "Tip de formare",
+          placeholder: "ex. CAP Zidărie, CACES R489...",
         },
       },
       travailRisque: {
@@ -426,6 +426,25 @@ export const ro: DevisTranslations = {
         autres: {
           label: "Alte Limbi Utile",
           placeholder: "ex. Engleză (B1), Germană (A2)...",
+        },
+        // Noms de langues
+        languageNames: {
+          francais: "Franceză",
+          anglais: "Engleză",
+          portugais: "Portugheză",
+          espagnol: "Spaniolă",
+          italien: "Italiană",
+          autre: "Altă limbă",
+        },
+        // Niveaux de langue
+        levels: {
+          'non-requis': "Neobligatoriu",
+          'A1': "A1 - Începător",
+          'A2': "A2 - Elementar",
+          'B1': "B1 - Intermediar",
+          'B2': "B2 - Avansat",
+          'C1': "C1 - Autonom",
+          'C2': "C2 - Competent",
         },
       },
       permis: {
@@ -470,6 +489,19 @@ export const ro: DevisTranslations = {
         liste: {
           label: "Lista EIP Necesare",
           placeholder: "ex. Cască, încălțăminte S3, mănuși anti-tăiere, ham...",
+        },
+        // Liste des EPIs
+        items: {
+          casque: "Cască de protecție",
+          lunettes: "Ochelari de protecție",
+          protections_auditives: "Protecții auditive",
+          gants: "Mănuși de protecție",
+          chaussures: "Încălțăminte de protecție",
+          harnais: "Ham de siguranță",
+          vetements: "Echipament de lucru",
+          masque: "Mască respiratorie",
+          protection_faciale: "Protecție facială",
+          vetements_visibilite: "Echipament de înaltă vizibilitate",
         },
       },
       autresExigences: {
@@ -753,5 +785,36 @@ export const ro: DevisTranslations = {
         a_definir: "De definit",
       },
     },
+  },
+  
+  // === ȚĂRI EUROPENE ===
+  pays: {
+    france: "Franța",
+    allemagne: "Germania",
+    autriche: "Austria",
+    belgique: "Belgia",
+    bulgarie: "Bulgaria",
+    croatie: "Croația",
+    chypre: "Cipru",
+    danemark: "Danemarca",
+    espagne: "Spania",
+    estonie: "Estonia",
+    finlande: "Finlanda",
+    grece: "Grecia",
+    hongrie: "Ungaria",
+    irlande: "Irlanda",
+    italie: "Italia",
+    lettonie: "Letonia",
+    lituanie: "Lituania",
+    luxembourg: "Luxemburg",
+    malte: "Malta",
+    pays_bas: "Țările de Jos",
+    pologne: "Polonia",
+    portugal: "Portugalia",
+    republique_tcheque: "Republica Cehă",
+    roumanie: "România",
+    slovaquie: "Slovacia",
+    slovenie: "Slovenia",
+    suede: "Suedia",
   },
 };

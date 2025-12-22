@@ -14,6 +14,7 @@ import {
 } from '../../utils/devis-calculations';
 import { getPanierRepasByPays } from '../../data/devis-data-pays';
 import { useDevisTranslationStatic } from '../../hooks/useDevisTranslation';
+import { translateSecteur, translatePoste, translateClassification, translatePays } from '../../utils/recapitulatif-translations';
 import type { DevisLanguage } from '../../src/i18n/devis/types';
 
 interface StepRecapitulatifProps {
@@ -257,11 +258,11 @@ export function StepRecapitulatif({ formData, onSubmit, isSubmitting, lang = 'fr
                 {/* En-tête du poste */}
                 <div className="flex items-start justify-between">
                   <div>
-                    <h4 className="text-white font-medium">{poste.poste}</h4>
-                    <p className="text-white/60 text-sm">{poste.secteur} • {poste.classification}</p>
+                    <h4 className="text-white font-medium">{translatePoste(poste.secteur, poste.poste, lang)}</h4>
+                    <p className="text-white/60 text-sm">{translateSecteur(poste.secteur, lang)} • {translateClassification(poste.secteur, poste.classification, lang)}</p>
                     {poste.labelPays && (
                       <p className="text-cyan-300/80 text-sm mt-1">
-                        📍 Nationalité: {poste.labelPays}
+                        📍 Nationalité: {translatePays(poste.labelPays, lang)}
                       </p>
                     )}
                   </div>

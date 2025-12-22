@@ -11,6 +11,7 @@ import { getSalairesByPaysRegion, getCoefficientByPays } from '../../data/devis-
 import { calculerTauxHoraireBrut, calculerTauxETTAvecPays, formaterMontant, calculerCoutMensuelProfil } from '../../utils/devis-calculations';
 import { useDevisConfig } from '../../hooks/useDevisConfig';
 import { useDevisTranslationStatic } from '../../hooks/useDevisTranslation';
+import { translatePays } from '../../utils/recapitulatif-translations';
 import type { DevisLanguage } from '../../src/i18n/devis/types';
 
 // 🔑 Mapping entre clés techniques et labels français pour compatibilité
@@ -271,7 +272,7 @@ export function Step3Besoins({ data, pays, region, onChange, lang = 'fr' }: Step
                       {poste.nationalite ? (
                         <div className="flex items-center">
                           <span className="mr-2">{getPaysInfo(poste.nationalite)?.flag || '🌍'}</span>
-                          <span>{getPaysInfo(poste.nationalite)?.label || poste.nationalite}</span>
+                          <span>{translatePays(getPaysInfo(poste.nationalite)?.label || poste.nationalite, lang)}</span>
                         </div>
                       ) : (
                         <span className="text-white/60">{isLoading ? t.common.loading : t.step3.fields.nationalite.placeholder}</span>
@@ -282,13 +283,13 @@ export function Step3Besoins({ data, pays, region, onChange, lang = 'fr' }: Step
                         paysDisponibles.map((pays) => (
                           <SelectItem key={pays.code} value={pays.code} className="text-white hover:bg-white/10 focus:bg-white/10">
                             <span className="mr-2">{pays.flag}</span>
-                            {pays.label}
+                            {translatePays(pays.label, lang)}
                           </SelectItem>
                         ))
                       ) : (
                         <SelectItem value="RO" className="text-white hover:bg-white/10 focus:bg-white/10">
                           <span className="mr-2">🇷🇴</span>
-                          Roumanie
+                          {translatePays('Roumanie', lang)}
                         </SelectItem>
                       )}
                     </SelectContent>

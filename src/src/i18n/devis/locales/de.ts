@@ -398,6 +398,25 @@ export const de: DevisTranslations = {
           label: "Andere nützliche Sprachen",
           placeholder: "z.B. Englisch (B1), Deutsch (A2)...",
         },
+        // Sprachnamen
+        languageNames: {
+          francais: "Französisch",
+          anglais: "Englisch",
+          portugais: "Portugiesisch",
+          espagnol: "Spanisch",
+          italien: "Italienisch",
+          autre: "Andere",
+        },
+        // Sprachniveaus
+        levels: {
+          'non-requis': "Nicht erforderlich",
+          'A1': "A1 - Anfänger",
+          'A2': "A2 - Grundkenntnisse",
+          'B1': "B1 - Mittelstufe",
+          'B2': "B2 - Fortgeschritten",
+          'C1': "C1 - Autonom",
+          'C2': "C2 - Kompetent",
+        },
       },
       permis: {
         title: "Führerschein",
@@ -411,9 +430,25 @@ export const de: DevisTranslations = {
             d: "Führerschein D (Personentransport)",
           },
         },
+        categorie: {
+          label: "Führerscheinkategorie",
+          placeholder: "z.B. B, C, CE...",
+        },
+      },
+      outillage: {
+        title: "Kleinwerkzeug",
+        requis: {
+          label: "Persönliches Werkzeug erforderlich",
+        },
+        type: {
+          label: "Art des Werkzeugs",
+          placeholder: "z.B. Hammer, Wasserwaage, Maßband, Kelle...",
+        },
       },
       epi: {
         title: "Persönliche Schutzausrüstung (PSA)",
+        infoLegale: "ℹ️ Gemäß den Vorschriften muss der Arbeitgeber PSA bereitstellen, die den Risiken der Stelle entspricht.",
+        selectionCount: "✓ {count} PSA ausgewählt",
         fournis: {
           label: "PSA vom Unternehmen bereitgestellt",
           helper: "Helm, Sicherheitsschuhe, Handschuhe usw.",
@@ -425,6 +460,19 @@ export const de: DevisTranslations = {
         liste: {
           label: "Liste der erforderlichen PSA",
           placeholder: "z.B. Helm, S3-Sicherheitsschuhe, schnittfeste Handschuhe, Geschirr...",
+        },
+        // PSA-Artikel
+        items: {
+          casque: "Schutzhelm",
+          lunettes: "Schutzbrille",
+          protections_auditives: "Gehörschutz",
+          gants: "Schutzhandschuhe",
+          chaussures: "Sicherheitsschuhe",
+          harnais: "Sicherheitsgurt",
+          vetements: "Arbeitskleidung",
+          masque: "Atemschutzmaske",
+          protection_faciale: "Gesichtsschutz",
+          vetements_visibilite: "Warnkleidung",
         },
       },
       autresExigences: {

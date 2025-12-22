@@ -398,6 +398,25 @@ export const es: DevisTranslations = {
           label: "Otros Idiomas Útiles",
           placeholder: "ej. Inglés (B1), Alemán (A2)...",
         },
+        // Nombres de idiomas
+        languageNames: {
+          francais: "Francés",
+          anglais: "Inglés",
+          portugais: "Portugués",
+          espagnol: "Español",
+          italien: "Italiano",
+          autre: "Otro",
+        },
+        // Niveles de idioma
+        levels: {
+          'non-requis': "No requerido",
+          'A1': "A1 - Principiante",
+          'A2': "A2 - Elemental",
+          'B1': "B1 - Intermedio",
+          'B2': "B2 - Avanzado",
+          'C1': "C1 - Autónomo",
+          'C2': "C2 - Dominio",
+        },
       },
       permis: {
         title: "Licencia de Conducir",
@@ -411,9 +430,25 @@ export const es: DevisTranslations = {
             d: "Permiso D (transporte de pasajeros)",
           },
         },
+        categorie: {
+          label: "Categoría de licencia",
+          placeholder: "ej. B, C, CE...",
+        },
+      },
+      outillage: {
+        title: "Herramientas pequeñas",
+        requis: {
+          label: "Herramientas personales requeridas",
+        },
+        type: {
+          label: "Tipo de herramientas",
+          placeholder: "ej. Martillo, nivel, cinta métrica, paleta...",
+        },
       },
       epi: {
         title: "Equipo de Protección Individual (EPI)",
+        infoLegale: "ℹ️ Según la normativa, el empleador debe proporcionar EPI adaptado a los riesgos del puesto.",
+        selectionCount: "✓ {count} EPI seleccionado(s)",
         fournis: {
           label: "EPI proporcionado por la empresa",
           helper: "Casco, zapatos de seguridad, guantes, etc.",
@@ -425,6 +460,19 @@ export const es: DevisTranslations = {
         liste: {
           label: "Lista de EPI Requeridos",
           placeholder: "ej. Casco, zapatos S3, guantes anticorte, arnés...",
+        },
+        // Artículos EPI
+        items: {
+          casque: "Casco de seguridad",
+          lunettes: "Gafas de seguridad",
+          protections_auditives: "Protección auditiva",
+          gants: "Guantes de protección",
+          chaussures: "Zapatos de seguridad",
+          harnais: "Arnés de seguridad",
+          vetements: "Ropa de trabajo",
+          masque: "Máscara respiratoria",
+          protection_faciale: "Protección facial",
+          vetements_visibilite: "Ropa de alta visibilidad",
         },
       },
       autresExigences: {

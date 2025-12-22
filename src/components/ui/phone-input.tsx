@@ -115,13 +115,17 @@ export function PhoneInput({
             </span>
           </SelectValue>
         </SelectTrigger>
-        <SelectContent className="max-h-[300px] overflow-y-auto">
+        <SelectContent className="max-h-[300px] overflow-y-auto bg-[#2d1b69] backdrop-blur-xl border border-white/30 text-white shadow-xl z-[9999]">
           {EU_COUNTRY_CODES.map((country) => (
-            <SelectItem key={country.code} value={country.code}>
+            <SelectItem 
+              key={country.code} 
+              value={country.code}
+              className="hover:bg-white/10 focus:bg-white/10 text-white cursor-pointer"
+            >
               <div className="flex items-center gap-2">
                 <span className="text-xl">{country.flag}</span>
                 <span className="text-sm">{country.name[lang]}</span>
-                <span className="text-xs text-gray-500">{country.dialCode}</span>
+                <span className="text-xs text-white/60">{country.dialCode}</span>
               </div>
             </SelectItem>
           ))}

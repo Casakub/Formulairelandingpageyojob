@@ -398,6 +398,25 @@ export const pl: DevisTranslations = {
           label: "Inne Przydatne Języki",
           placeholder: "np. Angielski (B1), Niemiecki (A2)...",
         },
+        // Nazwy języków
+        languageNames: {
+          francais: "Francuski",
+          anglais: "Angielski",
+          portugais: "Portugalski",
+          espagnol: "Hiszpański",
+          italien: "Włoski",
+          autre: "Inny",
+        },
+        // Poziomy językowe
+        levels: {
+          'non-requis': "Niewymagany",
+          'A1': "A1 - Początkujący",
+          'A2': "A2 - Podstawowy",
+          'B1': "B1 - Średniozaawansowany",
+          'B2': "B2 - Zaawansowany",
+          'C1': "C1 - Autonomiczny",
+          'C2': "C2 - Biegły",
+        },
       },
       permis: {
         title: "Prawo Jazdy",
@@ -411,9 +430,25 @@ export const pl: DevisTranslations = {
             d: "Prawo jazdy kat. D (transport pasażerów)",
           },
         },
+        categorie: {
+          label: "Kategoria prawa jazdy",
+          placeholder: "np. B, C, CE...",
+        },
+      },
+      outillage: {
+        title: "Drobne narzędzia",
+        requis: {
+          label: "Wymagane narzędzia osobiste",
+        },
+        type: {
+          label: "Rodzaj narzędzi",
+          placeholder: "np. Młotek, poziomica, taśma miernicza, kielnia...",
+        },
       },
       epi: {
         title: "Środki Ochrony Osobistej (ŚOO)",
+        infoLegale: "ℹ️ Zgodnie z przepisami, pracodawca musi zapewnić ŚOO dostosowane do zagrożeń stanowiska.",
+        selectionCount: "✓ Wybrano {count} ŚOO",
         fournis: {
           label: "ŚOO zapewnione przez firmę",
           helper: "Kask, buty ochronne, rękawice itp.",
@@ -425,6 +460,19 @@ export const pl: DevisTranslations = {
         liste: {
           label: "Lista Wymaganych ŚOO",
           placeholder: "np. Kask, buty S3, rękawice antyprzecięciowe, szelki...",
+        },
+        // Artykuły ŚOO
+        items: {
+          casque: "Kask ochronny",
+          lunettes: "Okulary ochronne",
+          protections_auditives: "Ochrona słuchu",
+          gants: "Rękawice ochronne",
+          chaussures: "Buty ochronne",
+          harnais: "Szelki bezpieczeństwa",
+          vetements: "Odzież robocza",
+          masque: "Maska oddechowa",
+          protection_faciale: "Ochrona twarzy",
+          vetements_visibilite: "Odzież o wysokiej widoczności",
         },
       },
       autresExigences: {

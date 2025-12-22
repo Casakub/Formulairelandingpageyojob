@@ -398,6 +398,25 @@ export const en: DevisTranslations = {
           label: "Other Useful Languages",
           placeholder: "e.g. English (B1), German (A2)...",
         },
+        // Language names
+        languageNames: {
+          francais: "French",
+          anglais: "English",
+          portugais: "Portuguese",
+          espagnol: "Spanish",
+          italien: "Italian",
+          autre: "Other",
+        },
+        // Language levels
+        levels: {
+          'non-requis': "Not required",
+          'A1': "A1 - Beginner",
+          'A2': "A2 - Elementary",
+          'B1': "B1 - Intermediate",
+          'B2': "B2 - Advanced",
+          'C1': "C1 - Autonomous",
+          'C2': "C2 - Proficient",
+        },
       },
       permis: {
         title: "Driving License",
@@ -411,9 +430,25 @@ export const en: DevisTranslations = {
             d: "License D (passenger transport)",
           },
         },
+        categorie: {
+          label: "License category",
+          placeholder: "e.g. B, C, CE...",
+        },
+      },
+      outillage: {
+        title: "Small tools",
+        requis: {
+          label: "Personal tools required",
+        },
+        type: {
+          label: "Type of tools",
+          placeholder: "e.g. Hammer, level, measuring tape, trowel...",
+        },
       },
       epi: {
         title: "Personal Protective Equipment (PPE)",
+        infoLegale: "ℹ️ According to regulations, the employer must provide PPE adapted to job hazards.",
+        selectionCount: "✓ {count} PPE selected",
         fournis: {
           label: "PPE provided by company",
           helper: "Helmet, safety shoes, gloves, etc.",
@@ -425,6 +460,19 @@ export const en: DevisTranslations = {
         liste: {
           label: "List of Required PPE",
           placeholder: "e.g. Helmet, S3 safety shoes, cut-resistant gloves, harness...",
+        },
+        // PPE items
+        items: {
+          casque: "Safety helmet",
+          lunettes: "Safety glasses",
+          protections_auditives: "Hearing protection",
+          gants: "Protective gloves",
+          chaussures: "Safety shoes",
+          harnais: "Safety harness",
+          vetements: "Work clothing",
+          masque: "Respiratory mask",
+          protection_faciale: "Face protection",
+          vetements_visibilite: "High visibility clothing",
         },
       },
       autresExigences: {
