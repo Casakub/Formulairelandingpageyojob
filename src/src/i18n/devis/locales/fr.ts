@@ -187,8 +187,13 @@ export const fr: DevisTranslations = {
 
   // === ÉTAPE 3 : BESOINS ===
   step3: {
-    title: "Définissez vos besoins",
-    subtitle: "Décrivez précisément les postes recherchés.",
+    title: "Vos besoins en recrutement",
+    subtitle: "Décrivez les profils recherchés et leurs conditions.",
+    profileLabel: "Profil",
+    addProfile: "Ajouter un profil supplémentaire",
+    removeProfile: "Supprimer ce profil",
+    loadingConfig: "Chargement de la configuration...",
+    missingRegionWarning: "⚠️ Veuillez sélectionner votre région à l'étape 1 pour afficher les salaires automatiquement.",
     fields: {
       secteur: {
         label: "Secteur d'activité",
@@ -231,6 +236,12 @@ export const fr: DevisTranslations = {
       facteurPays: "Facteur pays",
       final: "Coefficient final",
     },
+    summary: {
+      title: "Rémunération du salarié",
+      salaireBrutMensuel: "Salaire brut mensuel",
+      tauxHoraireBrut: "Taux horaire brut",
+      baseMensuelle: "(Base 151,67h/mois selon convention collective)",
+    },
   },
 
   // === ÉTAPE 4 : CONDITIONS ===
@@ -256,34 +267,69 @@ export const fr: DevisTranslations = {
         label: "Lieux de mission",
         placeholder: "Ex: Paris 15e, Lyon 3e, Marseille...",
       },
-    },
-    sections: {
-      hebergement: {
-        title: "Hébergement",
-        chargeEU: {
-          label: "Hébergement pris en charge par l'entreprise utilisatrice",
-          helper: "Si NON : supplément horaire de +3.50€/h sera facturé par l'ETT",
-          options: {
-            oui: "Oui, fourni par EU",
-            non: "Non, à charge de l'ETT",
-          },
-        },
-        detailsEU: {
-          type: {
-            label: "Type d'hébergement",
-            options: {
-              hotel: "Hôtel",
-              appartement: "Appartement",
-              foyer: "Foyer",
-              autre: "Autre",
-            },
-          },
-          adresse: {
-            label: "Adresse de l'hébergement",
-            placeholder: "Adresse complète",
-          },
+      periodeEssai: {
+        label: "Période d'essai",
+        placeholder: "Sélectionnez une durée",
+        options: {
+          '2': '2 jours',
+          '3': '3 jours',
+          '5': '5 jours',
+          '15': '15 jours',
         },
       },
+      motifRecours: {
+        label: "Motif du recours à l'intérim",
+        placeholder: "Sélectionnez un motif",
+        options: {
+          accroissement: "Accroissement temporaire d'activité",
+          remplacement: "Remplacement salarié absent",
+          saisonnier: "Travaux saisonniers",
+          exportation: "Commande exceptionnelle à l'exportation",
+          autre: "Autre (à préciser)",
+        },
+      },
+      delaiPaiement: {
+        label: "Délai de paiement souhaité",
+        placeholder: "Sélectionnez un délai",
+        options: {
+          reception: "Paiement à réception",
+          j30: "30 jours",
+          j45: "45 jours",
+          j60: "60 jours",
+        },
+      },
+    },
+    hebergement: {
+      title: "Hébergement",
+      chargeEU: {
+        label: "Hébergement pris en charge par l'entreprise utilisatrice",
+        helper: "Si NON : supplément horaire de +3,50 €/h sera facturé par l'agence",
+      },
+      supplementWarning: "⚠️ Un supplément de +3,50 €/h sera appliqué car l'hébergement n'est pas pris en charge",
+      commentaire: {
+        label: "Précisions sur l'hébergement",
+        placeholder: "Type d'hébergement, adresse, conditions particulières...",
+      },
+    },
+    transport: {
+      title: "Transport Local",
+      chargeETT: {
+        label: "Transport local pris en charge par l'agence",
+        helper: "Si OUI : supplément horaire de +1,50 €/h sera facturé",
+      },
+      supplementInfo: "✓ Un supplément de +1,50 €/h sera appliqué pour couvrir les frais de transport local",
+    },
+    repas: {
+      title: "Repas",
+      options: {
+        restaurant: "Restaurant d'entreprise / Tickets restaurant",
+        panier: "Panier repas (facturé au jour)",
+        nonConcerne: "Non concerné",
+      },
+      montantInfo: "📋 Montant du panier repas : {montant} / jour travaillé (facturé séparément)",
+      montantNonDefini: "⚠️ Montant non défini pour ce pays/région",
+    },
+    sections: {
       transportInternational: {
         title: "Transport international (pays d'origine ↔ France)",
         chargeEU: {
@@ -312,47 +358,6 @@ export const fr: DevisTranslations = {
               mensuel: "Mensuel",
             },
           },
-        },
-      },
-      transportLocal: {
-        title: "Transport local (sur le lieu de mission)",
-        chargeETT: {
-          label: "Transport local pris en charge par l'ETT",
-          helper: "Si OUI : supplément horaire de +1.50€/h sera facturé",
-          options: {
-            oui: "Oui, fourni par ETT",
-            non: "Non",
-          },
-        },
-        detailsETT: {
-          type: {
-            label: "Type de transport",
-            options: {
-              vehicule: "Véhicule de service",
-              transport: "Abonnement transport en commun",
-              velo: "Vélo/Trottinette",
-            },
-          },
-        },
-      },
-      repas: {
-        title: "Restauration",
-        type: {
-          label: "Solution de restauration",
-          options: {
-            restaurant: "Restaurant d'entreprise / Tickets resto",
-            panier: "Panier repas (facturé par jour)",
-            nonConcerne: "Non concerné",
-          },
-        },
-        detailsRestaurant: {
-          budgetJour: {
-            label: "Budget par jour",
-            placeholder: "Ex: 12.00",
-          },
-        },
-        detailsPanier: {
-          info: "Le panier repas sera facturé séparément par jour travaillé selon le barème du pays d'origine",
         },
       },
     },
@@ -516,6 +521,7 @@ export const fr: DevisTranslations = {
   secteurs: {
     batiment: {
       label: "Bâtiment",
+      convention: "Convention collective nationale des ouvriers du bâtiment (3193)",
       postes: {
         macon: "Maçon",
         coffreur: "Coffreur",
@@ -543,6 +549,7 @@ export const fr: DevisTranslations = {
     },
     metallurgie: {
       label: "Métallurgie",
+      convention: "Convention collective de la métallurgie (3109)",
       postes: {
         soudeur: "Soudeur",
         chaudronnier: "Chaudronnier",
@@ -566,6 +573,7 @@ export const fr: DevisTranslations = {
     },
     tp: {
       label: "Travaux Publics",
+      convention: "Convention collective nationale des travaux publics (3005)",
       postes: {
         conducteur_engins: "Conducteur d'engins",
         terrassier: "Terrassier",
@@ -585,6 +593,7 @@ export const fr: DevisTranslations = {
     },
     hotellerie: {
       label: "Hôtellerie",
+      convention: "Convention collective de l'hôtellerie-restauration (3292)",
       postes: {
         receptionniste: "Réceptionniste",
         femme_chambre: "Femme de chambre",
@@ -605,6 +614,7 @@ export const fr: DevisTranslations = {
     },
     restauration: {
       label: "Restauration",
+      convention: "Convention collective de l'hôtellerie-restauration (3292)",
       postes: {
         cuisinier: "Cuisinier",
         commis_cuisine: "Commis de cuisine",
@@ -627,6 +637,7 @@ export const fr: DevisTranslations = {
     },
     plasturgie: {
       label: "Plasturgie",
+      convention: "Convention collective de la plasturgie (0292)",
       postes: {
         operateur_injection: "Opérateur injection",
         operateur_extrusion: "Opérateur extrusion",
@@ -645,6 +656,7 @@ export const fr: DevisTranslations = {
     },
     automobile_carrosserie: {
       label: "Automobile & Carrosserie",
+      convention: "Convention collective de la réparation automobile (1090)",
       postes: {
         carrossier: "Carrossier",
         peintre_automobile: "Peintre automobile",
@@ -662,6 +674,7 @@ export const fr: DevisTranslations = {
     },
     sylviculture: {
       label: "Sylviculture",
+      convention: "Convention collective de l'agriculture (7501)",
       postes: {
         bucheron: "Bûcheron",
         elagueur: "Élagueur",
@@ -677,6 +690,7 @@ export const fr: DevisTranslations = {
     },
     cartonnerie: {
       label: "Cartonnerie",
+      convention: "Convention collective de l'industrie de la transformation (3107)",
       postes: {
         operateur_production: "Opérateur de production",
         conducteur_ligne: "Conducteur de ligne",
@@ -692,6 +706,7 @@ export const fr: DevisTranslations = {
     },
     autre: {
       label: "Autre",
+      convention: "À définir selon activité",
       postes: {
         autre_poste: "Autre poste (à préciser)",
       },

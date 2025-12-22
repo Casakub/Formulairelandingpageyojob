@@ -6323,6 +6323,16 @@
     }
   }
 
+  .text-yellow-100\/70 {
+    color: color-mix(in srgb, oklch(.973 .071 103.193) 70%, transparent);
+  }
+
+  @supports (color: color-mix(in lab, red, red)) {
+    .text-yellow-100\/70 {
+      color: color-mix(in oklab, var(--color-yellow-100) 70%, transparent);
+    }
+  }
+
   .text-yellow-200 {
     color: var(--color-yellow-200);
   }

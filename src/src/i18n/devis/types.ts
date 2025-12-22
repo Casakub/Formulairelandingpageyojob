@@ -229,6 +229,17 @@ export interface DevisTranslations {
       facteurPays: string;
       final: string;
     };
+    summary: {
+      title: string;
+      salaireBrutMensuel: string;
+      tauxHoraireBrut: string;
+      baseMensuelle: string;
+    };
+    profileLabel: string;
+    addProfile: string;
+    removeProfile: string;
+    loadingConfig: string;
+    missingRegionWarning: string;
   };
 
   // === ÉTAPE 4 : CONDITIONS ===
@@ -254,6 +265,67 @@ export interface DevisTranslations {
         label: string;
         placeholder: string;
       };
+      periodeEssai: {
+        label: string;
+        placeholder: string;
+        options: {
+          '2': string;
+          '3': string;
+          '5': string;
+          '15': string;
+        };
+      };
+      motifRecours: {
+        label: string;
+        placeholder: string;
+        options: {
+          accroissement: string;
+          remplacement: string;
+          saisonnier: string;
+          exportation: string;
+          autre: string;
+        };
+      };
+      delaiPaiement: {
+        label: string;
+        placeholder: string;
+        options: {
+          reception: string;
+          j30: string;
+          j45: string;
+          j60: string;
+        };
+      };
+    };
+    hebergement: {
+      title: string;
+      chargeEU: {
+        label: string;
+        helper: string;
+      };
+      supplementWarning: string;
+      commentaire: {
+        label: string;
+        placeholder: string;
+      };
+    };
+    transport: {
+      title: string;
+      chargeETT: {
+        label: string;
+        helper: string;
+      };
+      supplementInfo: string;
+    };
+    repas: {
+      title: string;
+      options: {
+        restaurant: string;
+        panier: string;
+        nonConcerne: string;
+      };
+      montantInfo: string;
+      montantNonDefini: string;
     };
     sections: {
       hebergement: {
@@ -514,6 +586,7 @@ export interface DevisTranslations {
   secteurs: {
     [secteurKey: string]: {
       label: string;
+      convention?: string;  // 🆕 Ajouté pour supporter les conventions traduites
       postes: {
         [posteKey: string]: string;
       };

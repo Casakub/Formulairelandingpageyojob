@@ -6,11 +6,42 @@ import { Button } from '../ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '../ui/card';
 import { Plus, Trash2 } from 'lucide-react';
 import { SECTEURS } from '../../data/devis-data';
+import { SECTEURS_DATA, getPostesForSecteur, getClassificationsForSecteur, getConventionForSecteur } from '../../data/secteurs-keys';
 import { getSalairesByPaysRegion, getCoefficientByPays } from '../../data/devis-data-pays';
 import { calculerTauxHoraireBrut, calculerTauxETTAvecPays, formaterMontant, calculerCoutMensuelProfil } from '../../utils/devis-calculations';
 import { useDevisConfig } from '../../hooks/useDevisConfig';
 import { useDevisTranslationStatic } from '../../hooks/useDevisTranslation';
 import type { DevisLanguage } from '../../src/i18n/devis/types';
+
+// 🔑 Mapping entre clés techniques et labels français pour compatibilité
+const SECTEUR_KEY_TO_LABEL: Record<string, string> = {
+  batiment: 'Bâtiment',
+  metallurgie: 'Métallurgie',
+  tp: 'TP',
+  hotellerie: 'Hôtellerie',
+  restauration: 'Restauration',
+  plasturgie: 'Plasturgie',
+  automobile_carrosserie: 'Automobile Carrosserie',
+  sylviculture: 'Sylviculture',
+  cartonnerie: 'Cartonnerie',
+  autre: 'Autre',
+};
+
+const CLASSIFICATION_KEY_TO_LABEL: Record<string, Record<string, string>> = {
+  batiment: {
+    n1p1: 'N1P1', n1p2: 'N1P2', n2p1: 'N2P1', n2p2: 'N2P2',
+    n3p1: 'N3P1', n3p2: 'N3P2', n4p1: 'N4P1', n4p2: 'N4P2',
+  },
+  metallurgie: { niveau_1: 'Niveau I', niveau_2: 'Niveau II', niveau_3: 'Niveau III', niveau_4: 'Niveau IV', niveau_5: 'Niveau V' },
+  tp: { n1: 'N1', n2: 'N2', n3: 'N3', n4: 'N4' },
+  hotellerie: { niveau_1: 'Niveau I', niveau_2: 'Niveau II', niveau_3: 'Niveau III', niveau_4: 'Niveau IV', niveau_5: 'Niveau V' },
+  restauration: { niveau_1: 'Niveau I', niveau_2: 'Niveau II', niveau_3: 'Niveau III', niveau_4: 'Niveau IV', niveau_5: 'Niveau V' },
+  plasturgie: { niveau_1: 'Niveau I', niveau_2: 'Niveau II', niveau_3: 'Niveau III', niveau_4: 'Niveau IV' },
+  automobile_carrosserie: { niveau_1: 'Niveau I', niveau_2: 'Niveau II', niveau_3: 'Niveau III', niveau_4: 'Niveau IV' },
+  sylviculture: { niveau_1: 'Niveau I', niveau_2: 'Niveau II', niveau_3: 'Niveau III', niveau_4: 'Niveau IV' },
+  cartonnerie: { niveau_1: 'Niveau I', niveau_2: 'Niveau II', niveau_3: 'Niveau III', niveau_4: 'Niveau IV' },
+  autre: { a_definir: 'À définir' },
+};
 
 interface Poste {
   id: string;
@@ -77,33 +108,55 @@ export function Step3Besoins({ data, pays, region, onChange, lang = 'fr' }: Step
 
         // Auto-remplir la convention si le secteur change
         if (field === 'secteur' && value) {
-          updated.convention = SECTEURS[value as keyof typeof SECTEURS]?.convention || '';
+          // ✅ Nouvelle logique : utiliser getConventionForSecteur avec clé technique
+          updated.convention = getConventionForSecteur(value) || '';
           updated.poste = '';
           updated.classification = '';
           updated.salaireBrut = 0;
+          
+          console.log('📋 [Step3Besoins] Convention remplie:', {
+            secteurKey: value,
+            convention: updated.convention
+          });
         }
 
         // Auto-remplir le salaire si la classification change
         if (field === 'classification' && value && updated.secteur) {
-          // 🆕 Utiliser le pays et la région pour obtenir le bon salaire
-          const salaires = getSalairesByPaysRegion(pays, updated.secteur, region);
-          updated.salaireBrut = salaires[value] || 0;
+          // 🔑 Convertir clé technique vers label français pour compatibilité SALAIRES
+          const secteurLabelFr = SECTEUR_KEY_TO_LABEL[updated.secteur] || updated.secteur;
+          const classificationLabelFr = CLASSIFICATION_KEY_TO_LABEL[updated.secteur]?.[value] || value;
+          
+          const salaires = getSalairesByPaysRegion(pays, secteurLabelFr, region);
+          updated.salaireBrut = salaires[classificationLabelFr] || 0;
+          
+          console.log('💶 [Step3Besoins] Calcul salaire:', {
+            secteurKey: updated.secteur,
+            secteurLabelFr,
+            classificationKey: value,
+            classificationLabelFr,
+            salaireBrut: updated.salaireBrut
+          });
         }
 
         // 🆕 Recalculer le coefficient si secteur, classification ou nationalité change
         if ((field === 'secteur' || field === 'classification' || field === 'nationalite') && 
             updated.secteur && updated.classification && updated.nationalite) {
-          const detail = getCoefficientDetail(updated.secteur, updated.classification, updated.nationalite);
+          // 🔑 Convertir clés techniques vers labels français pour compatibilité
+          const secteurLabelFr = SECTEUR_KEY_TO_LABEL[updated.secteur] || updated.secteur;
+          const classificationLabelFr = CLASSIFICATION_KEY_TO_LABEL[updated.secteur]?.[updated.classification] || updated.classification;
+          
+          const detail = getCoefficientDetail(secteurLabelFr, classificationLabelFr, updated.nationalite);
           updated.coeffBase = detail.coeffBase;
           updated.facteurPays = detail.facteurPays;
           updated.coeffFinal = detail.coeffFinal;
           updated.labelPays = detail.labelPays;
           
-          // 🆕 Log de débogage pour vérifier le calcul
           console.log('🔄 [Step3Besoins] Recalcul du coefficient:', {
             champ: field,
-            secteur: updated.secteur,
-            classification: updated.classification,
+            secteurKey: updated.secteur,
+            secteurLabelFr,
+            classificationKey: updated.classification,
+            classificationLabelFr,
             nationalite: updated.nationalite,
             coeffBase: detail.coeffBase,
             facteurPays: detail.facteurPays,
@@ -173,12 +226,16 @@ export function Step3Besoins({ data, pays, region, onChange, lang = 'fr' }: Step
                     onValueChange={(value) => handlePosteChange(poste.id, 'secteur', value)}
                   >
                     <SelectTrigger className="bg-white/10 border-white/20 text-white [&>span]:text-white/90">
-                      <SelectValue placeholder={t.step3.fields.secteur.placeholder} className="text-white/90 text-[14px]" />
+                      <span className="text-white/90">
+                        {poste.secteur && t.secteurs[poste.secteur]?.label 
+                          ? t.secteurs[poste.secteur].label 
+                          : t.step3.fields.secteur.placeholder}
+                      </span>
                     </SelectTrigger>
                     <SelectContent position="popper" sideOffset={5} className="bg-[#2d1b69]/95 backdrop-blur-xl border border-white/20 text-white z-50">
-                      {Object.keys(SECTEURS).map((secteur) => (
-                        <SelectItem key={secteur} value={secteur} className="text-white hover:bg-white/10 focus:bg-white/10">
-                          {secteur}
+                      {Object.keys(SECTEURS_DATA).map((secteurKey) => (
+                        <SelectItem key={secteurKey} value={secteurKey} className="text-white hover:bg-white/10 focus:bg-white/10">
+                          {t.secteurs[secteurKey]?.label || secteurKey}
                         </SelectItem>
                       ))}
                     </SelectContent>
@@ -191,7 +248,9 @@ export function Step3Besoins({ data, pays, region, onChange, lang = 'fr' }: Step
                     {t.step3.fields.convention.label}
                   </Label>
                   <Input
-                    value={poste.convention}
+                    value={poste.secteur && t.secteurs[poste.secteur]?.convention 
+                      ? t.secteurs[poste.secteur].convention 
+                      : poste.convention}
                     className="bg-white/10 border-white/20 text-white/90 placeholder:text-white/40"
                     readOnly
                     placeholder={t.step3.fields.convention.placeholder}
@@ -250,12 +309,16 @@ export function Step3Besoins({ data, pays, region, onChange, lang = 'fr' }: Step
                     disabled={!poste.secteur}
                   >
                     <SelectTrigger className="bg-white/10 border-white/20 text-white [&>span]:text-white/90">
-                      <SelectValue placeholder={t.step3.fields.poste.placeholder} />
+                      <span className="text-white/90">
+                        {poste.poste && poste.secteur && t.secteurs[poste.secteur]?.postes[poste.poste]
+                          ? t.secteurs[poste.secteur].postes[poste.poste]
+                          : t.step3.fields.poste.placeholder}
+                      </span>
                     </SelectTrigger>
                     <SelectContent position="popper" sideOffset={5} className="bg-[#2d1b69]/95 backdrop-blur-xl border border-white/20 text-white z-50">
-                      {poste.secteur && SECTEURS[poste.secteur as keyof typeof SECTEURS]?.postes.map((p) => (
-                        <SelectItem key={p} value={p} className="text-white hover:bg-white/10 focus:bg-white/10">
-                          {p}
+                      {poste.secteur && getPostesForSecteur(poste.secteur).map((posteKey) => (
+                        <SelectItem key={posteKey} value={posteKey} className="text-white hover:bg-white/10 focus:bg-white/10">
+                          {t.secteurs[poste.secteur]?.postes[posteKey] || posteKey}
                         </SelectItem>
                       ))}
                     </SelectContent>
@@ -273,12 +336,16 @@ export function Step3Besoins({ data, pays, region, onChange, lang = 'fr' }: Step
                     disabled={!poste.secteur}
                   >
                     <SelectTrigger className="bg-white/10 border-white/20 text-white [&>span]:text-white/90">
-                      <SelectValue placeholder={t.step3.fields.classification.placeholder} />
+                      <span className="text-white/90">
+                        {poste.classification && poste.secteur && t.secteurs[poste.secteur]?.classifications[poste.classification]
+                          ? t.secteurs[poste.secteur].classifications[poste.classification]
+                          : t.step3.fields.classification.placeholder}
+                      </span>
                     </SelectTrigger>
                     <SelectContent position="popper" sideOffset={5} className="bg-[#2d1b69]/95 backdrop-blur-xl border border-white/20 text-white z-50">
-                      {poste.secteur && SECTEURS[poste.secteur as keyof typeof SECTEURS]?.classifications.map((c) => (
-                        <SelectItem key={c} value={c} className="text-white hover:bg-white/10 focus:bg-white/10">
-                          {c}
+                      {poste.secteur && getClassificationsForSecteur(poste.secteur).map((classKey) => (
+                        <SelectItem key={classKey} value={classKey} className="text-white hover:bg-white/10 focus:bg-white/10">
+                          {t.secteurs[poste.secteur]?.classifications[classKey] || classKey}
                         </SelectItem>
                       ))}
                     </SelectContent>
@@ -314,25 +381,37 @@ export function Step3Besoins({ data, pays, region, onChange, lang = 'fr' }: Step
               </div>
 
               {/* Résumé des calculs */}
-              {poste.salaireBrut > 0 && (
+              {poste.salaireBrut > 0 ? (
                 <div className="space-y-3 mt-4">
                   {/* 🆕 Rémunération simplifiée - SANS taux ETT (incomplet car sans options) */}
                   <div className="p-4 bg-gradient-to-r from-green-500/10 to-cyan-500/10 border border-green-500/30 rounded-lg">
-                    <p className="text-green-200 text-sm mb-3 font-medium">💶 Rémunération du salarié</p>
+                    <p className="text-green-200 text-sm mb-3 font-medium">💶 {t.step3.summary.title}</p>
                     <div className="space-y-3">
                       <div className="flex justify-between items-center">
-                        <span className="text-white/70">Salaire brut mensuel</span>
+                        <span className="text-white/70">{t.step3.summary.salaireBrutMensuel}</span>
                         <span className="text-white text-xl font-medium">{formaterMontant(poste.salaireBrut)}</span>
                       </div>
                       <div className="flex justify-between items-center">
-                        <span className="text-white/70">Taux horaire brut</span>
+                        <span className="text-white/70">{t.step3.summary.tauxHoraireBrut}</span>
                         <span className="text-white text-xl font-medium">{formaterMontant(poste.tauxHoraireBrut)}/h</span>
                       </div>
                       <div className="border-t border-white/10 my-2"></div>
                       <p className="text-white/50 text-xs text-center">
-                        (Base 151,67h/mois selon convention collective)
+                        {t.step3.summary.baseMensuelle}
                       </p>
                     </div>
+                  </div>
+                </div>
+              ) : (
+                // 🆕 Placeholder quand le salaire n'est pas calculé
+                <div className="space-y-3 mt-4">
+                  <div className="p-4 bg-yellow-500/10 border border-yellow-500/30 rounded-lg">
+                    <p className="text-yellow-200 text-sm mb-2 font-medium">⚠️ {t.step3.summary.title}</p>
+                    <p className="text-yellow-100/70 text-xs">
+                      {!region 
+                        ? "Veuillez sélectionner votre région à l'étape 1 pour afficher les salaires."
+                        : "Sélectionnez une classification pour calculer le salaire."}
+                    </p>
                   </div>
                 </div>
               )}

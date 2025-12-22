@@ -188,6 +188,11 @@ export const ro: DevisTranslations = {
   step3: {
     title: "Definiți-vă Nevoile",
     subtitle: "Descrieți cu precizie pozițiile pe care le căutați.",
+    profileLabel: "Profil",
+    addProfile: "Adăugați un profil suplimentar",
+    removeProfile: "Ștergeți acest profil",
+    loadingConfig: "Se încarcă configurația...",
+    missingRegionWarning: "⚠️ Vă rugăm să selectați regiunea la pasul 1 pentru a afișa automat salariile.",
     fields: {
       secteur: {
         label: "Sector de Activitate",
@@ -230,6 +235,12 @@ export const ro: DevisTranslations = {
       facteurPays: "Factor țară",
       final: "Coeficient final",
     },
+    summary: {
+      title: "Remunerația salariatului",
+      salaireBrutMensuel: "Salariu brut lunar",
+      tauxHoraireBrut: "Tarif orar brut",
+      baseMensuelle: "(Bază 151,67h/lună conform convenției colective)",
+    },
   },
 
   // === PASUL 4: CONDIȚII ===
@@ -255,34 +266,69 @@ export const ro: DevisTranslations = {
         label: "Locații Misiune",
         placeholder: "ex. Paris 15, Lyon 3, Marsilia...",
       },
-    },
-    sections: {
-      hebergement: {
-        title: "Cazare",
-        chargeEU: {
-          label: "Cazare asigurată de compania client",
-          helper: "Dacă NU: supliment orar de +3,50 €/oră va fi facturat de agenție",
-          options: {
-            oui: "Da, asigurat de client",
-            non: "Nu, responsabilitatea agenției",
-          },
-        },
-        detailsEU: {
-          type: {
-            label: "Tip de Cazare",
-            options: {
-              hotel: "Hotel",
-              appartement: "Apartament",
-              foyer: "Cămin",
-              autre: "Altul",
-            },
-          },
-          adresse: {
-            label: "Adresa Cazării",
-            placeholder: "Adresă completă",
-          },
+      periodeEssai: {
+        label: "Perioadă de Probă",
+        placeholder: "Selectați o durată",
+        options: {
+          '2': '2 zile',
+          '3': '3 zile',
+          '5': '5 zile',
+          '15': '15 zile',
         },
       },
+      motifRecours: {
+        label: "Motivul utilizării muncii temporare",
+        placeholder: "Selectați un motiv",
+        options: {
+          accroissement: "Creștere temporară a activității",
+          remplacement: "Înlocuire salariat absent",
+          saisonnier: "Lucrări sezoniere",
+          exportation: "Comandă excepțională la export",
+          autre: "Altele (de precizat)",
+        },
+      },
+      delaiPaiement: {
+        label: "Termen de plată dorit",
+        placeholder: "Selectați un termen",
+        options: {
+          reception: "Plată la primire",
+          j30: "30 de zile",
+          j45: "45 de zile",
+          j60: "60 de zile",
+        },
+      },
+    },
+    hebergement: {
+      title: "Cazare",
+      chargeEU: {
+        label: "Cazare asigurată de compania client",
+        helper: "Dacă NU: supliment orar de +3,50 €/oră va fi facturat de agenție",
+      },
+      supplementWarning: "⚠️ Un supliment de +3,50 €/oră va fi aplicat deoarece cazarea nu este asigurată",
+      commentaire: {
+        label: "Detalii despre cazare",
+        placeholder: "Tipul de cazare, adresă, condiții speciale...",
+      },
+    },
+    transport: {
+      title: "Transport Local",
+      chargeETT: {
+        label: "Transport local asigurat de agenție",
+        helper: "Dacă DA: supliment orar de +1,50 €/oră va fi facturat",
+      },
+      supplementInfo: "✓ Un supliment de +1,50 €/oră va fi aplicat pentru acoperirea cheltuielilor de transport local",
+    },
+    repas: {
+      title: "Mese",
+      options: {
+        restaurant: "Cantină firmă / Tichete de masă",
+        panier: "Pachet alimentar (facturat zilnic)",
+        nonConcerne: "Nu se aplică",
+      },
+      montantInfo: "📋 Valoare pachet alimentar: {montant} / zi lucrată (facturat separat)",
+      montantNonDefini: "⚠️ Valoare nedefinită pentru această țară/regiune",
+    },
+    sections: {
       transportInternational: {
         title: "Transport Internațional (țara de origine ↔ Franța)",
         chargeEU: {
@@ -311,47 +357,6 @@ export const ro: DevisTranslations = {
               mensuel: "Lunar",
             },
           },
-        },
-      },
-      transportLocal: {
-        title: "Transport Local (la locul misiunii)",
-        chargeETT: {
-          label: "Transport local asigurat de agenție",
-          helper: "Dacă DA: supliment orar de +1,50 €/oră va fi facturat",
-          options: {
-            oui: "Da, asigurat de agenție",
-            non: "Nu",
-          },
-        },
-        detailsETT: {
-          type: {
-            label: "Tip de Transport",
-            options: {
-              vehicule: "Vehicul de serviciu",
-              transport: "Abonament transport public",
-              velo: "Bicicletă/Trotinetă",
-            },
-          },
-        },
-      },
-      repas: {
-        title: "Mese",
-        type: {
-          label: "Soluție de Masă",
-          options: {
-            restaurant: "Cantină firmă / Tichete de masă",
-            panier: "Pachet alimentar (facturat zilnic)",
-            nonConcerne: "Nu se aplică",
-          },
-        },
-        detailsRestaurant: {
-          budgetJour: {
-            label: "Buget Zilnic",
-            placeholder: "ex. 12,00",
-          },
-        },
-        detailsPanier: {
-          info: "Pachetul alimentar va fi facturat separat pe zi lucrată conform tarifului țării de origine",
         },
       },
     },
@@ -509,5 +514,204 @@ export const ro: DevisTranslations = {
     genericError: "A apărut o eroare. Vă rugăm să încercați din nou.",
     loadingError: "Eroare la încărcarea datelor",
     submitError: "Eroare la trimiterea cererii",
+  },
+
+  // === SECTOARE & MESERII ===
+  secteurs: {
+    batiment: {
+      label: "Construcții",
+      convention: "Convenție colectivă națională a lucrătorilor din construcții (3193)",
+      postes: {
+        macon: "Zidar",
+        coffreur: "Cofreur",
+        ferrailleur: "Fierar betonist",
+        carreleur: "Faianțar",
+        platrier: "Gipsar",
+        peintre: "Zugrav",
+        plombier: "Instalator",
+        electricien: "Electrician",
+        couvreur: "Acoperișor",
+        menuisier: "Tâmplar",
+        chef_equipe_batiment: "Șef echipă",
+        chef_chantier: "Șef șantier",
+      },
+      classifications: {
+        n1p1: "N1P1",
+        n1p2: "N1P2",
+        n2p1: "N2P1",
+        n2p2: "N2P2",
+        n3p1: "N3P1",
+        n3p2: "N3P2",
+        n4p1: "N4P1",
+        n4p2: "N4P2",
+      },
+    },
+    metallurgie: {
+      label: "Metalurgie",
+      convention: "Convenție colectivă a metalurgiei (3109)",
+      postes: {
+        soudeur: "Sudor",
+        chaudronnier: "Tinichigiu",
+        tuyauteur: "Instalator conducte",
+        tourneur: "Strungar",
+        fraiseur: "Frezor",
+        usineur: "Operator mașini-unelte",
+        mecanicien_industriel: "Mecanic industrial",
+        monteur: "Montator",
+        controleur_qualite: "Inspector calitate",
+        ajusteur: "Ajustor mecanic",
+        chef_equipe_metallurgie: "Șef echipă",
+      },
+      classifications: {
+        niveau_1: "Nivel I",
+        niveau_2: "Nivel II",
+        niveau_3: "Nivel III",
+        niveau_4: "Nivel IV",
+        niveau_5: "Nivel V",
+      },
+    },
+    tp: {
+      label: "Lucrări Publice",
+      convention: "Convenție colectivă națională a lucrărilor publice (3005)",
+      postes: {
+        conducteur_engins: "Operator utilaje",
+        terrassier: "Muncitor terasamente",
+        canalisateur: "Canalizator",
+        constructeur_routes: "Constructor drumuri",
+        coffreur_bancheur: "Cofreur beton",
+        macon_vrd: "Zidar VRD",
+        chef_equipe_tp: "Șef echipă LP",
+        manoeuvre_tp: "Muncitor necalificat LP",
+      },
+      classifications: {
+        n1: "N1",
+        n2: "N2",
+        n3: "N3",
+        n4: "N4",
+      },
+    },
+    hotellerie: {
+      label: "Hotelărie",
+      convention: "Convenție colectivă a hotelăriei-restaurației (3292)",
+      postes: {
+        receptionniste: "Recepționer",
+        femme_chambre: "Cameristă",
+        agent_entretien: "Agent întreținere",
+        bagagiste: "Bagajist",
+        concierge: "Concierge",
+        night_audit: "Night audit",
+        gouvernante: "Guvernantă",
+        chef_reception: "Șef recepție",
+      },
+      classifications: {
+        niveau_1: "Nivel I",
+        niveau_2: "Nivel II",
+        niveau_3: "Nivel III",
+        niveau_4: "Nivel IV",
+        niveau_5: "Nivel V",
+      },
+    },
+    restauration: {
+      label: "Restaurație",
+      convention: "Convenție colectivă a hotelăriei-restaurației (3292)",
+      postes: {
+        cuisinier: "Bucătar",
+        commis_cuisine: "Ajutor bucătar",
+        chef_partie: "Șef de partidă",
+        serveur: "Ospătar",
+        barman: "Barman",
+        plongeur: "Spălător vase",
+        chef_rang: "Șef de rang",
+        maitre_hotel: "Maitre d'hotel",
+        second_cuisine: "Sous-chef",
+        chef_cuisine: "Șef bucătar",
+      },
+      classifications: {
+        niveau_1: "Nivel I",
+        niveau_2: "Nivel II",
+        niveau_3: "Nivel III",
+        niveau_4: "Nivel IV",
+        niveau_5: "Nivel V",
+      },
+    },
+    plasturgie: {
+      label: "Industria Materialelor Plastice",
+      convention: "Convenție colectivă a industriei materialelor plastice (0292)",
+      postes: {
+        operateur_injection: "Operator injecție",
+        operateur_extrusion: "Operator extrudare",
+        regleur: "Reglor",
+        operateur_thermoformage: "Operator termoformare",
+        controleur_qualite_plasturgie: "Inspector calitate",
+        technicien_maintenance: "Tehnician întreținere",
+        chef_equipe_plasturgie: "Șef echipă",
+      },
+      classifications: {
+        niveau_1: "Nivel I",
+        niveau_2: "Nivel II",
+        niveau_3: "Nivel III",
+        niveau_4: "Nivel IV",
+      },
+    },
+    automobile_carrosserie: {
+      label: "Caroserie Auto",
+      convention: "Convenție colectivă a reparațiilor auto (1090)",
+      postes: {
+        carrossier: "Carosier",
+        peintre_automobile: "Vopsitor auto",
+        mecanicien_auto: "Mecanic auto",
+        electricien_auto: "Electrician auto",
+        chef_atelier: "Șef atelier",
+        controleur_technique: "Inspector tehnic",
+      },
+      classifications: {
+        niveau_1: "Nivel I",
+        niveau_2: "Nivel II",
+        niveau_3: "Nivel III",
+        niveau_4: "Nivel IV",
+      },
+    },
+    sylviculture: {
+      label: "Silvicultură",
+      convention: "Convenție colectivă a agriculturii (7501)",
+      postes: {
+        bucheron: "Tăietor de lemne",
+        elagueur: "Arborist",
+        conducteur_engins_forestiers: "Operator utilaje forestiere",
+        chef_equipe_sylviculture: "Șef echipă silvicultură",
+      },
+      classifications: {
+        niveau_1: "Nivel I",
+        niveau_2: "Nivel II",
+        niveau_3: "Nivel III",
+        niveau_4: "Nivel IV",
+      },
+    },
+    cartonnerie: {
+      label: "Industria Cartonului",
+      convention: "Convenție colectivă a industriei de transformare (3107)",
+      postes: {
+        operateur_production: "Operator producție",
+        conducteur_ligne: "Operator linie",
+        regleur_cartonnerie: "Reglor",
+        chef_equipe_cartonnerie: "Șef echipă",
+      },
+      classifications: {
+        niveau_1: "Nivel I",
+        niveau_2: "Nivel II",
+        niveau_3: "Nivel III",
+        niveau_4: "Nivel IV",
+      },
+    },
+    autre: {
+      label: "Altele",
+      convention: "De definit în funcție de activitate",
+      postes: {
+        autre_poste: "Alte posturi (de specificat)",
+      },
+      classifications: {
+        a_definir: "De definit",
+      },
+    },
   },
 };

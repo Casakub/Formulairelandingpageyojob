@@ -4,7 +4,6 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '.
 import { Textarea } from '../ui/textarea';
 import { Switch } from '../ui/switch';
 import { RadioGroup, RadioGroupItem } from '../ui/radio-group';
-import { MOTIFS_RECOURS, PERIODES_ESSAI, DELAIS_PAIEMENT } from '../../data/devis-data';
 import { getPanierRepasByPays } from '../../data/devis-data-pays';
 import { formaterMontant } from '../../utils/devis-calculations';
 import { useState } from 'react';
@@ -41,6 +40,35 @@ interface Step4ConditionsProps {
 export function Step4Conditions({ data, pays, region, onChange, lang = 'fr' }: Step4ConditionsProps) {
   const { t, isLoading: isLoadingTranslations } = useDevisTranslationStatic(lang);
   const [dateError, setDateError] = useState('');
+
+  // 🆕 Helper functions pour afficher les valeurs traduites
+  const getPeriodeEssaiLabel = (value: string) => {
+    if (!value) return t.step4.fields.periodeEssai.placeholder;
+    return t.step4.fields.periodeEssai.options[value as '2' | '3' | '5' | '15'] || value;
+  };
+
+  const getMotifRecoursLabel = (value: string) => {
+    if (!value) return t.step4.fields.motifRecours.placeholder;
+    const labels: Record<string, string> = {
+      accroissement: t.step4.fields.motifRecours.options.accroissement,
+      remplacement: t.step4.fields.motifRecours.options.remplacement,
+      saisonnier: t.step4.fields.motifRecours.options.saisonnier,
+      exportation: t.step4.fields.motifRecours.options.exportation,
+      autre: t.step4.fields.motifRecours.options.autre,
+    };
+    return labels[value] || value;
+  };
+
+  const getDelaiPaiementLabel = (value: string) => {
+    if (!value) return t.step4.fields.delaiPaiement.placeholder;
+    const labels: Record<string, string> = {
+      reception: t.step4.fields.delaiPaiement.options.reception,
+      j30: t.step4.fields.delaiPaiement.options.j30,
+      j45: t.step4.fields.delaiPaiement.options.j45,
+      j60: t.step4.fields.delaiPaiement.options.j60,
+    };
+    return labels[value] || value;
+  };
 
   const handleChange = (field: string, value: any) => {
     // 🆕 Valider la date de fin si on change la date de fin
@@ -131,16 +159,25 @@ export function Step4Conditions({ data, pays, region, onChange, lang = 'fr' }: S
           <Label className="text-white mb-2 block">
             {t.step4.fields.periodeEssai.label}
           </Label>
-          <Select value={data.periodeEssai} onValueChange={(value) => handleChange('periodeEssai', value)}>
+          <Select key={`periodeEssai-${lang}`} value={data.periodeEssai} onValueChange={(value) => handleChange('periodeEssai', value)}>
             <SelectTrigger className="bg-white/10 border-white/20 text-white">
-              <SelectValue />
+              <SelectValue>
+                {getPeriodeEssaiLabel(data.periodeEssai)}
+              </SelectValue>
             </SelectTrigger>
             <SelectContent className="bg-gray-900 border-white/20">
-              {PERIODES_ESSAI.map((periode) => (
-                <SelectItem key={periode.value} value={periode.value} className="text-white hover:bg-white/10">
-                  {periode.label}
-                </SelectItem>
-              ))}
+              <SelectItem value="2" className="text-white hover:bg-white/10">
+                {t.step4.fields.periodeEssai.options['2']}
+              </SelectItem>
+              <SelectItem value="3" className="text-white hover:bg-white/10">
+                {t.step4.fields.periodeEssai.options['3']}
+              </SelectItem>
+              <SelectItem value="5" className="text-white hover:bg-white/10">
+                {t.step4.fields.periodeEssai.options['5']}
+              </SelectItem>
+              <SelectItem value="15" className="text-white hover:bg-white/10">
+                {t.step4.fields.periodeEssai.options['15']}
+              </SelectItem>
             </SelectContent>
           </Select>
         </div>
@@ -181,16 +218,28 @@ export function Step4Conditions({ data, pays, region, onChange, lang = 'fr' }: S
           <Label className="text-white mb-2 block">
             {t.step4.fields.motifRecours.label}
           </Label>
-          <Select value={data.motifRecours} onValueChange={(value) => handleChange('motifRecours', value)}>
+          <Select key={`motifRecours-${lang}`} value={data.motifRecours} onValueChange={(value) => handleChange('motifRecours', value)}>
             <SelectTrigger className="bg-white/10 border-white/20 text-white">
-              <SelectValue placeholder={t.step4.fields.motifRecours.placeholder} />
+              <SelectValue>
+                {getMotifRecoursLabel(data.motifRecours)}
+              </SelectValue>
             </SelectTrigger>
             <SelectContent className="bg-gray-900 border-white/20">
-              {MOTIFS_RECOURS.map((motif) => (
-                <SelectItem key={motif} value={motif} className="text-white hover:bg-white/10">
-                  {motif}
-                </SelectItem>
-              ))}
+              <SelectItem value="accroissement" className="text-white hover:bg-white/10">
+                {t.step4.fields.motifRecours.options.accroissement}
+              </SelectItem>
+              <SelectItem value="remplacement" className="text-white hover:bg-white/10">
+                {t.step4.fields.motifRecours.options.remplacement}
+              </SelectItem>
+              <SelectItem value="saisonnier" className="text-white hover:bg-white/10">
+                {t.step4.fields.motifRecours.options.saisonnier}
+              </SelectItem>
+              <SelectItem value="exportation" className="text-white hover:bg-white/10">
+                {t.step4.fields.motifRecours.options.exportation}
+              </SelectItem>
+              <SelectItem value="autre" className="text-white hover:bg-white/10">
+                {t.step4.fields.motifRecours.options.autre}
+              </SelectItem>
             </SelectContent>
           </Select>
         </div>
@@ -200,16 +249,25 @@ export function Step4Conditions({ data, pays, region, onChange, lang = 'fr' }: S
           <Label className="text-white mb-2 block">
             {t.step4.fields.delaiPaiement.label}
           </Label>
-          <Select value={data.delaiPaiement} onValueChange={(value) => handleChange('delaiPaiement', value)}>
+          <Select key={`delaiPaiement-${lang}`} value={data.delaiPaiement} onValueChange={(value) => handleChange('delaiPaiement', value)}>
             <SelectTrigger className="bg-white/10 border-white/20 text-white">
-              <SelectValue placeholder={t.step4.fields.delaiPaiement.placeholder} />
+              <SelectValue>
+                {getDelaiPaiementLabel(data.delaiPaiement)}
+              </SelectValue>
             </SelectTrigger>
             <SelectContent className="bg-gray-900 border-white/20">
-              {DELAIS_PAIEMENT.map((delai) => (
-                <SelectItem key={delai} value={delai} className="text-white hover:bg-white/10">
-                  {delai}
-                </SelectItem>
-              ))}
+              <SelectItem value="reception" className="text-white hover:bg-white/10">
+                {t.step4.fields.delaiPaiement.options.reception}
+              </SelectItem>
+              <SelectItem value="j30" className="text-white hover:bg-white/10">
+                {t.step4.fields.delaiPaiement.options.j30}
+              </SelectItem>
+              <SelectItem value="j45" className="text-white hover:bg-white/10">
+                {t.step4.fields.delaiPaiement.options.j45}
+              </SelectItem>
+              <SelectItem value="j60" className="text-white hover:bg-white/10">
+                {t.step4.fields.delaiPaiement.options.j60}
+              </SelectItem>
             </SelectContent>
           </Select>
         </div>
@@ -303,10 +361,10 @@ export function Step4Conditions({ data, pays, region, onChange, lang = 'fr' }: S
           </div>
         </RadioGroup>
 
-        {data.repas.type === 'panier' && region && (
+        {data.repas.type === 'panier' && (
           <div className="bg-green-500/10 border border-green-500/30 rounded-lg p-4 mt-4">
             <p className="text-green-200/80 text-sm mt-1">
-              {getPanierRepasByPays(pays, region) > 0
+              {region && getPanierRepasByPays(pays, region) > 0
                 ? t.step4.repas.montantInfo.replace('{montant}', formaterMontant(getPanierRepasByPays(pays, region)))
                 : t.step4.repas.montantNonDefini}
             </p>
