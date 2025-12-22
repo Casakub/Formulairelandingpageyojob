@@ -2732,6 +2732,10 @@
     border-top-color: var(--color-white);
   }
 
+  .bg-\[\#2d1b69\] {
+    background-color: #2d1b69;
+  }
+
   .bg-\[\#2d1b69\]\/95 {
     background-color: oklab(30.036% .0362765 -.122503 / .95);
   }

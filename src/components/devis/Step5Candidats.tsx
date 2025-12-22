@@ -89,13 +89,13 @@ export function Step5Candidats({ data, onChange, lang = 'fr' }: Step5CandidatsPr
 
       {/* Section Expérience & Compétences */}
       <div className="border border-white/10 rounded-lg p-6 bg-white/5">
-        <h3 className="text-white text-lg mb-4">{t.step5.experience.title}</h3>
+        <h3 className="text-white text-lg mb-4">{t.step5.sections.experience.title}</h3>
         
         <div className="space-y-4">
           {/* Expérience */}
           <div className="space-y-3">
             <div className="flex items-center justify-between">
-              <Label className="text-white">{t.step5.experience.obligatoire.label}</Label>
+              <Label className="text-white">{t.step5.sections.experience.obligatoire.label}</Label>
               <Switch
                 checked={data.experience.obligatoire}
                 onCheckedChange={(checked) => handleNestedChange('experience', 'obligatoire', checked)}
@@ -105,16 +105,16 @@ export function Step5Candidats({ data, onChange, lang = 'fr' }: Step5CandidatsPr
             {data.experience.obligatoire && (
               <div>
                 <Label htmlFor="anneesExp" className="text-white mb-2 block">
-                  {t.step5.experience.annees.label}
+                  {t.step5.sections.experience.annees.label}
                 </Label>
                 <Input
                   id="anneesExp"
                   type="number"
                   value={data.experience.annees || ''}
-                  onChange={(e) => handleNestedChange('experience', 'annees', parseInt(e.target.value))}
-                  className="bg-white/10 border-white/20 text-white"
+                  onChange={(e) => handleNestedChange('experience', 'annees', Number(e.target.value))}
+                  className="bg-white/10 border-white/20 text-white placeholder:text-white/40"
                   min={0}
-                  placeholder={t.step5.experience.annees.placeholder}
+                  placeholder={t.step5.sections.experience.annees.placeholder}
                 />
               </div>
             )}
@@ -123,7 +123,7 @@ export function Step5Candidats({ data, onChange, lang = 'fr' }: Step5CandidatsPr
           {/* Formation */}
           <div className="space-y-3">
             <div className="flex items-center justify-between">
-              <Label className="text-white">{t.step5.formation.obligatoire.label}</Label>
+              <Label className="text-white">{t.step5.sections.formation.obligatoire.label}</Label>
               <Switch
                 checked={data.formation.obligatoire}
                 onCheckedChange={(checked) => handleNestedChange('formation', 'obligatoire', checked)}
@@ -133,14 +133,14 @@ export function Step5Candidats({ data, onChange, lang = 'fr' }: Step5CandidatsPr
             {data.formation.obligatoire && (
               <div>
                 <Label htmlFor="typeFormation" className="text-white mb-2 block">
-                  {t.step5.formation.type.label}
+                  {t.step5.sections.formation.type.label}
                 </Label>
                 <Input
                   id="typeFormation"
                   value={data.formation.type || ''}
                   onChange={(e) => handleNestedChange('formation', 'type', e.target.value)}
                   className="bg-white/10 border-white/20 text-white placeholder:text-white/40"
-                  placeholder={t.step5.formation.type.placeholder}
+                  placeholder={t.step5.sections.formation.type.placeholder}
                 />
               </div>
             )}
@@ -149,7 +149,7 @@ export function Step5Candidats({ data, onChange, lang = 'fr' }: Step5CandidatsPr
           {/* Travail à risque */}
           <div className="space-y-3">
             <div className="flex items-center justify-between">
-              <Label className="text-white">{t.step5.travailRisque.active.label}</Label>
+              <Label className="text-white">{t.step5.sections.travailRisque.active.label}</Label>
               <Switch
                 checked={data.travailRisque.active}
                 onCheckedChange={(checked) => handleNestedChange('travailRisque', 'active', checked)}
@@ -159,14 +159,14 @@ export function Step5Candidats({ data, onChange, lang = 'fr' }: Step5CandidatsPr
             {data.travailRisque.active && (
               <div>
                 <Label htmlFor="precisionsRisque" className="text-white mb-2 block">
-                  {t.step5.travailRisque.precisions.label}
+                  {t.step5.sections.travailRisque.precisions.label}
                 </Label>
                 <Input
                   id="precisionsRisque"
                   value={data.travailRisque.precisions || ''}
                   onChange={(e) => handleNestedChange('travailRisque', 'precisions', e.target.value)}
                   className="bg-white/10 border-white/20 text-white placeholder:text-white/40"
-                  placeholder={t.step5.travailRisque.precisions.placeholder}
+                  placeholder={t.step5.sections.travailRisque.precisions.placeholder}
                 />
               </div>
             )}
@@ -176,7 +176,7 @@ export function Step5Candidats({ data, onChange, lang = 'fr' }: Step5CandidatsPr
 
       {/* Section Langues */}
       <div className="border border-white/10 rounded-lg p-6 bg-white/5">
-        <h3 className="text-white text-lg mb-4">{t.step5.langues.title}</h3>
+        <h3 className="text-white text-lg mb-4">{t.step5.sections.langues.title}</h3>
         <div className="space-y-3">
           {LANGUES.map((langue) => (
             <div key={langue} className="grid grid-cols-2 gap-4 items-center">
@@ -203,13 +203,13 @@ export function Step5Candidats({ data, onChange, lang = 'fr' }: Step5CandidatsPr
 
       {/* Section Permis & Équipements */}
       <div className="border border-white/10 rounded-lg p-6 bg-white/5">
-        <h3 className="text-white text-lg mb-4">{t.step5.permis.title}</h3>
+        <h3 className="text-white text-lg mb-4">{t.step5.sections.permis.title}</h3>
         
         <div className="space-y-4">
           {/* Permis de conduire */}
           <div className="space-y-3">
             <div className="flex items-center justify-between">
-              <Label className="text-white">{t.step5.permis.requis.label}</Label>
+              <Label className="text-white">{t.step5.sections.permis.requis.label}</Label>
               <Switch
                 checked={data.permis.requis}
                 onCheckedChange={(checked) => handleNestedChange('permis', 'requis', checked)}
@@ -219,14 +219,14 @@ export function Step5Candidats({ data, onChange, lang = 'fr' }: Step5CandidatsPr
             {data.permis.requis && (
               <div>
                 <Label htmlFor="categoriePermis" className="text-white mb-2 block">
-                  {t.step5.permis.categorie.label}
+                  {t.step5.sections.permis.categorie.label}
                 </Label>
                 <Input
                   id="categoriePermis"
                   value={data.permis.categorie || ''}
                   onChange={(e) => handleNestedChange('permis', 'categorie', e.target.value)}
                   className="bg-white/10 border-white/20 text-white placeholder:text-white/40"
-                  placeholder={t.step5.permis.categorie.placeholder}
+                  placeholder={t.step5.sections.permis.categorie.placeholder}
                 />
               </div>
             )}
@@ -235,7 +235,7 @@ export function Step5Candidats({ data, onChange, lang = 'fr' }: Step5CandidatsPr
           {/* Petit outillage */}
           <div className="space-y-3">
             <div className="flex items-center justify-between">
-              <Label className="text-white">{t.step5.outillage.requis.label}</Label>
+              <Label className="text-white">{t.step5.sections.outillage.requis.label}</Label>
               <Switch
                 checked={data.outillage.requis}
                 onCheckedChange={(checked) => handleNestedChange('outillage', 'requis', checked)}
@@ -245,14 +245,14 @@ export function Step5Candidats({ data, onChange, lang = 'fr' }: Step5CandidatsPr
             {data.outillage.requis && (
               <div>
                 <Label htmlFor="typeOutillage" className="text-white mb-2 block">
-                  {t.step5.outillage.type.label}
+                  {t.step5.sections.outillage.type.label}
                 </Label>
                 <Input
                   id="typeOutillage"
                   value={data.outillage.type || ''}
                   onChange={(e) => handleNestedChange('outillage', 'type', e.target.value)}
                   className="bg-white/10 border-white/20 text-white placeholder:text-white/40"
-                  placeholder={t.step5.outillage.type.placeholder}
+                  placeholder={t.step5.sections.outillage.type.placeholder}
                 />
               </div>
             )}
@@ -262,11 +262,11 @@ export function Step5Candidats({ data, onChange, lang = 'fr' }: Step5CandidatsPr
 
       {/* Section EPI */}
       <div className="border border-white/10 rounded-lg p-6 bg-white/5">
-        <h3 className="text-white text-lg mb-4">{t.step5.epi.title}</h3>
+        <h3 className="text-white text-lg mb-4">{t.step5.sections.epi.title}</h3>
         
         <div className="bg-blue-500/10 border border-blue-500/30 rounded-lg p-4 mb-4">
           <p className="text-blue-200 text-sm">
-            {t.step5.epi.infoLegale}
+            {t.step5.sections.epi.infoLegale}
           </p>
         </div>
 
@@ -289,7 +289,7 @@ export function Step5Candidats({ data, onChange, lang = 'fr' }: Step5CandidatsPr
         {data.epis.length > 0 && (
           <div className="mt-4 p-3 bg-green-500/10 border border-green-500/30 rounded-lg">
             <p className="text-green-200 text-sm">
-              {t.step5.epi.selectionCount.replace('{count}', data.epis.length.toString())}
+              {t.step5.sections.epi.selectionCount.replace('{count}', data.epis.length.toString())}
             </p>
           </div>
         )}

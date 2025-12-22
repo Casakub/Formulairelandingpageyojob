@@ -371,11 +371,14 @@ export const fr: DevisTranslations = {
     sections: {
       experience: {
         title: "Expérience professionnelle",
+        obligatoire: {
+          label: "Expérience obligatoire",
+        },
         annees: {
           label: "Années d'expérience minimales",
-          placeholder: "Sélectionnez un niveau",
+          placeholder: "Ex: 3",
           options: {
-            '0-1': "Débutant (0-1 an)",
+            '0-1': "Début (0-1 an)",
             '1-3': "Intermédiaire (1-3 ans)",
             '3-5': "Confirmé (3-5 ans)",
             '5+': "Expert (5 ans et plus)",
@@ -384,6 +387,26 @@ export const fr: DevisTranslations = {
         competences: {
           label: "Compétences techniques requises",
           placeholder: "Ex: Maçonnerie, coffrage, lecture de plans, soudure TIG...",
+        },
+      },
+      formation: {
+        title: "Formation",
+        obligatoire: {
+          label: "Formation obligatoire",
+        },
+        type: {
+          label: "Type de formation",
+          placeholder: "Ex: CAP Maçonnerie, CACES R489...",
+        },
+      },
+      travailRisque: {
+        title: "Travail à risque",
+        active: {
+          label: "Travail à risque spécifique",
+        },
+        precisions: {
+          label: "Précisions sur les risques",
+          placeholder: "Ex: Travail en hauteur, manipulation de charges lourdes...",
         },
       },
       langues: {
@@ -418,9 +441,25 @@ export const fr: DevisTranslations = {
             d: "Permis D (transport de personnes)",
           },
         },
+        categorie: {
+          label: "Catégorie de permis",
+          placeholder: "Ex: B, C, CE...",
+        },
+      },
+      outillage: {
+        title: "Petit outillage",
+        requis: {
+          label: "Outillage personnel requis",
+        },
+        type: {
+          label: "Type d'outillage",
+          placeholder: "Ex: Marteau, niveau, mètre, truelle...",
+        },
       },
       epi: {
         title: "Équipements de protection individuelle (EPI)",
+        infoLegale: "ℹ️ Selon la réglementation, l'employeur doit fournir les EPI adaptés aux risques du poste.",
+        selectionCount: "✓ {count} EPI sélectionné(s)",
         fournis: {
           label: "EPI fournis par l'entreprise",
           helper: "Casque, chaussures de sécurité, gants, etc.",

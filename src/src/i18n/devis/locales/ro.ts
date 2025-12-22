@@ -370,11 +370,14 @@ export const ro: DevisTranslations = {
     sections: {
       experience: {
         title: "Experiență Profesională",
+        obligatoire: {
+          label: "Experiență obligatorie",
+        },
         annees: {
           label: "Ani Minimi de Experiență",
-          placeholder: "Selectați un nivel",
+          placeholder: "ex. 3",
           options: {
-            '0-1': "Începător (0-1 an)",
+            '0-1': "Început (0-1 an)",
             '1-3': "Intermediar (1-3 ani)",
             '3-5': "Experimentat (3-5 ani)",
             '5+': "Expert (5+ ani)",
@@ -383,6 +386,26 @@ export const ro: DevisTranslations = {
         competences: {
           label: "Abilități Tehnice Necesare",
           placeholder: "ex. Zidărie, cofrare, citire planuri, sudură TIG...",
+        },
+      },
+      formation: {
+        title: "Formare",
+        obligatoire: {
+          label: "Formare obligatorie",
+        },
+        type: {
+          label: "Tipul formării",
+          placeholder: "ex. Certificat zidărie, CACES R489...",
+        },
+      },
+      travailRisque: {
+        title: "Lucru periculos",
+        active: {
+          label: "Lucru periculos specific",
+        },
+        precisions: {
+          label: "Detalii despre riscuri",
+          placeholder: "ex. Lucru la înălțime, manipularea sarcinilor grele...",
         },
       },
       langues: {
@@ -417,9 +440,25 @@ export const ro: DevisTranslations = {
             d: "Permis D (transport pasageri)",
           },
         },
+        categorie: {
+          label: "Categoria permisului",
+          placeholder: "ex. B, C, CE...",
+        },
+      },
+      outillage: {
+        title: "Unelte de lucru",
+        requis: {
+          label: "Unelte personale necesare",
+        },
+        type: {
+          label: "Tip de unelte",
+          placeholder: "ex. Ciocan, nivel, metru, mistrie...",
+        },
       },
       epi: {
         title: "Echipament Individual de Protecție (EIP)",
+        infoLegale: "ℹ️ Conform reglementărilor, angajatorul trebuie să furnizeze EIP-urile adaptate riscurilor postului.",
+        selectionCount: "✓ {count} EIP selectat(e)",
         fournis: {
           label: "EIP asigurat de companie",
           helper: "Cască, încălțăminte de protecție, mănuși etc.",
