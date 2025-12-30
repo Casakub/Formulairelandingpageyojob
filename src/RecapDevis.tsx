@@ -886,8 +886,14 @@ export default function RecapDevis() {
               </div>
             </DialogHeader>
             
-            {/* Contenu du devis optimisé pour l'impression */}
-            <div className="mt-6 space-y-6 px-6 print:px-8" id="printable-content">
+            {/* Vérification des données avant rendu */}
+            {!devisData ? (
+              <div className="flex items-center justify-center p-12">
+                <Loader2 className="w-8 h-8 text-cyan-400 animate-spin" />
+              </div>
+            ) : (
+              /* Contenu du devis optimisé pour l'impression */
+              <div className="mt-6 space-y-6 px-6 print:px-8" id="printable-content">
               {/* En-tête avec logo premium */}
               <div className="bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl p-8 print:bg-white print:border-gray-300 print:backdrop-blur-none print:px-6 print:py-6">
                 <div className="flex items-start justify-between">
@@ -1189,6 +1195,7 @@ export default function RecapDevis() {
                 </div>
               </div>
             </div>
+            )}
           </DialogContent>
         </Dialog>
 
