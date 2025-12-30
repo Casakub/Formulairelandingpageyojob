@@ -24,7 +24,7 @@ import { Badge } from './components/ui/badge';
 import { DashboardOverview } from './components/dashboard/DashboardOverview';
 import { DynamicResultsOverview } from './components/dashboard/DynamicResultsOverview';
 import { QuestionManagerV2 } from './components/dashboard/QuestionManagerV2';
-import { TranslationProvider } from './context/TranslationContext';
+import { TranslationProvider } from './contexts/TranslationContext';
 import { UnifiedTranslationManager } from './components/dashboard/UnifiedTranslationManager';
 import { ExportImportManager } from './components/dashboard/ExportImportManager';
 import { IntegrationManager } from './components/dashboard/IntegrationManager';
