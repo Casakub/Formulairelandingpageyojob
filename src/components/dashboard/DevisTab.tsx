@@ -10,7 +10,9 @@ import {
   CheckCircle,
   AlertCircle,
   Download,
-  PenTool
+  PenTool,
+  Send,
+  Link2
 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '../ui/card';
 import { Button } from '../ui/button';
@@ -19,6 +21,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '.
 import { Badge } from '../ui/badge';
 import { projectId, publicAnonKey } from '../../utils/supabase/info';
 import { DevisDetailModal } from './DevisDetailModal';
+import { toast } from 'sonner';
 
 interface Devis {
   id: string;
@@ -43,6 +46,8 @@ interface Devis {
   statut: string;
   createdAt: string;
   updatedAt: string;
+  signatureToken?: string;
+  signatureLinkGeneratedAt?: string;
 }
 
 interface DevisStats {
@@ -160,6 +165,52 @@ export function DevisTab() {
       }
     } catch (error) {
       console.error('Erreur changement statut:', error);
+    }
+  };
+
+  // 🆕 Fonction pour générer et envoyer le lien de signature
+  const envoyerLienSignature = async (devisId: string, email: string, numero: string) => {
+    try {
+      toast.info('Génération du lien de signature...');
+      
+      const response = await fetch(
+        `https://${projectId}.supabase.co/functions/v1/make-server-10092a63/devis/generer-lien-signature`,
+        {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${publicAnonKey}`,
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ devisId })
+        }
+      );
+
+      const data = await response.json();
+
+      if (data.success) {
+        // Copier le lien dans le presse-papier
+        await navigator.clipboard.writeText(data.signatureUrl);
+        
+        toast.success(
+          `✅ Lien de signature généré et copié !`,
+          {
+            description: `Le lien a été copié dans votre presse-papier. Vous pouvez l'envoyer à ${email}`,
+            duration: 5000
+          }
+        );
+        
+        // TODO: Envoyer automatiquement par email via workflow
+        console.log('🔗 Lien signature:', data.signatureUrl);
+        console.log('📧 À envoyer à:', email);
+        
+        // Recharger les données pour afficher le token
+        chargerDonnees();
+      } else {
+        toast.error(data.error || 'Erreur lors de la génération du lien');
+      }
+    } catch (error) {
+      console.error('Erreur génération lien:', error);
+      toast.error('Impossible de générer le lien de signature');
     }
   };
 
@@ -459,6 +510,18 @@ export function DevisTab() {
                             <SelectItem value="perdu" className="text-xs">Perdu</SelectItem>
                           </SelectContent>
                         </Select>
+
+                        {/* 🆕 Bouton pour générer et envoyer le lien de signature */}
+                        {devis.statut === 'devisEnvoye' && !devis.signatureToken && (
+                          <Button
+                            onClick={() => envoyerLienSignature(devis.id, devis.contact.email, devis.numero)}
+                            className="bg-gradient-to-r from-violet-500 to-indigo-500 hover:from-violet-600 hover:to-indigo-600 text-white"
+                            size="sm"
+                          >
+                            <Link2 className="w-4 h-4 mr-2" />
+                            Générer lien signature
+                          </Button>
+                        )}
                       </div>
                     </div>
                   </CardContent>

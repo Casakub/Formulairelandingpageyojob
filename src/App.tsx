@@ -12,6 +12,7 @@ import ServiceDetachementPersonnel from './ServiceDetachementPersonnel';
 import DemandeDevis from './DemandeDevis';
 import ConfirmationDevis from './ConfirmationDevis';
 import RecapDevis from './RecapDevis';
+import { SignatureOnline } from './components/SignatureOnline';
 import { Toaster } from './components/ui/sonner';
 
 export default function App() {
@@ -174,6 +175,17 @@ export default function App() {
     return (
       <>
         <RecapDevis />
+        <Toaster position="top-right" />
+      </>
+    );
+  }
+
+  // 🆕 Route dynamique pour /signer/:token (signature en ligne)
+  if (currentPath.startsWith('/signer/')) {
+    const token = currentPath.split('/signer/')[1];
+    return (
+      <>
+        <SignatureOnline token={token} />
         <Toaster position="top-right" />
       </>
     );

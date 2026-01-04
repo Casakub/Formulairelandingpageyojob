@@ -1,6 +1,6 @@
 import { Hono } from "npm:hono@4";
 import { createClient } from "npm:@supabase/supabase-js@2.39.3";
-import { MOCK_WORKFLOWS, MOCK_EMAIL_TEMPLATES, MOCK_AUTOMATION_RUNS, MOCK_AUTOMATION_LOGS } from "./automations-data.ts";
+import { MOCK_WORKFLOWS, MOCK_EMAIL_TEMPLATES, MOCK_AUTOMATION_RUNS, MOCK_AUTOMATION_LOGS, detectProspectLanguage } from "./automations-data.ts";
 import type { AutomationWorkflow } from "../../types/automations.ts";
 
 const app = new Hono();
@@ -12,6 +12,7 @@ const app = new Hono();
  * - Récupère les données des prospects depuis la table Supabase
  * - Évalue les conditions
  * - Exécute les actions (envoyer email, créer tâche, etc.)
+ * - 🌍 Support multilingue automatique (27 pays, 22 langues)
  */
 
 // Helper pour obtenir le client Supabase avec permissions admin
@@ -27,13 +28,108 @@ function getSupabaseClient() {
 }
 
 /**
+ * 🌍 Trouve le template d'email dans la langue du prospect
+ * @param templateId - ID du template de base (ex: 'tpl-waitlist-welcome')
+ * @param prospect - Données du prospect
+ * @returns Template dans la bonne langue ou fallback FR/EN
+ */
+function getLocalizedTemplate(templateId: string, prospect: any): any {
+  // 1. Détecter la langue du prospect
+  const prospectLang = detectProspectLanguage(prospect);
+  console.log(`🌍 Langue détectée pour ${prospect.email || 'prospect'}: ${prospectLang} (pays: ${prospect.country || 'N/A'})`);
+  
+  // 2. Retirer le suffixe de langue si présent (tpl-xxx-fr → tpl-xxx)
+  const baseTemplateId = templateId.replace(/-[a-z]{2}$/, '');
+  
+  // 3. Construire l'ID du template localisé
+  const localizedTemplateId = `${baseTemplateId}-${prospectLang}`;
+  
+  // 4. Chercher le template localisé
+  let template = MOCK_EMAIL_TEMPLATES.find(t => t.id === localizedTemplateId);
+  
+  if (template) {
+    console.log(`✅ Template localisé trouvé: ${localizedTemplateId}`);
+    return template;
+  }
+  
+  // 5. Fallback 1: Template français (langue par défaut)
+  const frenchTemplateId = `${baseTemplateId}-fr`;
+  template = MOCK_EMAIL_TEMPLATES.find(t => t.id === frenchTemplateId);
+  
+  if (template) {
+    console.log(`⚠️ Template ${localizedTemplateId} non trouvé, fallback sur ${frenchTemplateId}`);
+    return template;
+  }
+  
+  // 6. Fallback 2: Template de base sans suffixe
+  template = MOCK_EMAIL_TEMPLATES.find(t => t.id === baseTemplateId);
+  
+  if (template) {
+    console.log(`⚠️ Template FR non trouvé, fallback sur template de base ${baseTemplateId}`);
+    return template;
+  }
+  
+  // 7. Fallback 3: Template avec l'ID original (peut avoir un suffixe)
+  template = MOCK_EMAIL_TEMPLATES.find(t => t.id === templateId);
+  
+  if (template) {
+    console.log(`⚠️ Utilisation du template original ${templateId}`);
+    return template;
+  }
+  
+  // 8. Aucun template trouvé
+  console.error(`❌ Aucun template trouvé pour ${templateId} (langue: ${prospectLang})`);
+  return null;
+}
+
+/**
  * Remplace les variables dans un texte avec les données du prospect
  */
 function replaceVariables(text: string, prospectData: any): string {
   let result = text;
   
+  // Calculer deadline_time (maintenant + 4h)
+  const deadline4h = new Date();
+  deadline4h.setHours(deadline4h.getHours() + 4);
+  const deadlineTime = deadline4h.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
+  const deadline4hStr = deadline4h.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
+  
   // Variables disponibles
   const variables: Record<string, string> = {
+    // Variables prospect de base
+    '{{name}}': prospectData.name || prospectData.contact_name || 'Client',
+    '{{email}}': prospectData.email || '',
+    '{{company}}': prospectData.company_name || prospectData.company || '',
+    '{{phone}}': prospectData.phone || '',
+    '{{country}}': prospectData.country || '',
+    '{{status}}': prospectData.status || '',
+    
+    // Variables projet
+    '{{industry}}': prospectData.industry_sector || prospectData.industry || '',
+    '{{workers_count}}': String(prospectData.workers_count || ''),
+    '{{project_description}}': prospectData.project_description || '',
+    '{{classification}}': prospectData.classification || 'Standard',
+    '{{duration}}': prospectData.duration || '6 mois',
+    '{{quote_amount}}': prospectData.quote_amount ? `${prospectData.quote_amount}` : 'Sur devis',
+    
+    // Variables technique
+    '{{prospect_id}}': prospectData.id || '',
+    '{{quote_id}}': prospectData.quote_id || `q-${prospectData.id || Math.random().toString(36).substr(2, 9)}`,
+    
+    // Variables temporelles
+    '{{deadline_time}}': deadlineTime,
+    '{{deadline_4h}}': deadline4hStr,
+    '{{today}}': new Date().toLocaleDateString('fr-FR'),
+    
+    // Variables sender/company
+    '{{sender_name}}': 'L\'équipe YOJOB',
+    '{{sender_phone}}': '+33 1 23 45 67 89',
+    '{{sender_email}}': 'contact@yojob.com',
+    '{{company_name}}': 'YOJOB',
+    '{{company_email}}': 'contact@yojob.com',
+    '{{company_phone}}': '+33 1 23 45 67 89',
+    
+    // Rétrocompatibilité avec prospect. prefix
     '{{prospect.name}}': prospectData.name || prospectData.contact_name || '',
     '{{prospect.email}}': prospectData.email || '',
     '{{prospect.company}}': prospectData.company_name || '',
@@ -43,10 +139,6 @@ function replaceVariables(text: string, prospectData: any): string {
     '{{prospect.industry}}': prospectData.industry_sector || '',
     '{{prospect.workers_count}}': String(prospectData.workers_count || ''),
     '{{prospect.project_description}}': prospectData.project_description || '',
-    '{{today}}': new Date().toLocaleDateString('fr-FR'),
-    '{{company_name}}': 'YOJOB',
-    '{{company_email}}': 'contact@yojob.com',
-    '{{company_phone}}': '+33 1 23 45 67 89',
   };
 
   // Remplacer toutes les variables
@@ -111,7 +203,7 @@ async function executeStep(step: any, prospect: any, workflow: AutomationWorkflo
     switch (step.type) {
       case 'send_email': {
         // Récupérer le template
-        const template = MOCK_EMAIL_TEMPLATES.find(t => t.id === step.config.template_id);
+        const template = getLocalizedTemplate(step.config.template_id, prospect);
         if (!template) {
           throw new Error(`Template email non trouvé: ${step.config.template_id}`);
         }

@@ -574,4 +574,427 @@ devis.post('/signer-devis', async (c) => {
   }
 });
 
+/**
+ * 🆕 POST /make-server-10092a63/devis/generer-lien-signature
+ * Génère un lien de signature unique pour un devis
+ */
+devis.post('/generer-lien-signature', async (c) => {
+  try {
+    const { devisId } = await c.req.json();
+    
+    console.log(`🔗 Génération lien signature pour devis: ${devisId}`);
+    
+    // Récupérer le devis
+    const prospect = await kv.get(`prospects:${devisId}`);
+    
+    if (!prospect) {
+      return c.json(
+        {
+          success: false,
+          error: 'Devis non trouvé'
+        },
+        404
+      );
+    }
+    
+    // Vérifier qu'il n'est pas déjà signé
+    if (prospect.statut === 'signe') {
+      return c.json(
+        {
+          success: false,
+          error: 'Ce devis a déjà été signé'
+        },
+        400
+      );
+    }
+    
+    // Générer un token unique et sécurisé
+    const tokenBytes = new Uint8Array(32);
+    crypto.getRandomValues(tokenBytes);
+    const token = Array.from(tokenBytes)
+      .map(b => b.toString(16).padStart(2, '0'))
+      .join('');
+    
+    const timestamp = new Date().toISOString();
+    const expirationDate = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000); // 30 jours
+    
+    // Sauvegarder le token
+    const tokenData = {
+      token,
+      devisId,
+      prospectEmail: prospect.contact.email,
+      createdAt: timestamp,
+      expiresAt: expirationDate.toISOString(),
+      used: false
+    };
+    
+    await kv.set(`signature-token:${token}`, tokenData);
+    
+    // Mettre à jour le devis avec le token
+    const prospectMisAJour = {
+      ...prospect,
+      signatureToken: token,
+      signatureLinkGeneratedAt: timestamp,
+      signatureLinkExpiresAt: expirationDate.toISOString(),
+      updatedAt: timestamp
+    };
+    
+    await kv.set(`prospects:${devisId}`, prospectMisAJour);
+    
+    // Générer l'URL complète (à adapter selon votre domaine)
+    const signatureUrl = `${c.req.url.split('/functions')[0]}/signer/${token}`;
+    
+    console.log(`✅ Lien signature généré: ${token.substring(0, 16)}...`);
+    console.log(`🔗 URL: ${signatureUrl}`);
+    
+    // 🆕 ENVOI AUTOMATIQUE D'EMAIL AVEC LE LIEN
+    try {
+      const { SIGNATURE_EMAIL_TEMPLATES } = await import('./signature-email-templates.ts');
+      const template = SIGNATURE_EMAIL_TEMPLATES.find(t => t.id === 'tpl-signature-link');
+      
+      if (template && prospectMisAJour) {
+        // Calculer candidats totaux
+        const totalCandidats = prospectMisAJour.postes.reduce((sum, p) => sum + p.quantite, 0);
+        
+        // Remplacer les variables dans le template
+        let emailBody = template.body_html;
+        let emailSubject = template.subject;
+        
+        const variables = {
+          contact_firstname: prospectMisAJour.contact.prenom || '',
+          contact_lastname: prospectMisAJour.contact.nom || '',
+          company: prospectMisAJour.entreprise.raisonSociale || '',
+          quote_number: prospectMisAJour.numero || '',
+          signature_url: signatureUrl,
+          positions_count: String(prospectMisAJour.postes.length),
+          candidates_count: String(totalCandidats),
+          sector: prospectMisAJour.postes[0]?.secteur || 'Non spécifié'
+        };
+        
+        // Remplacer les variables
+        Object.entries(variables).forEach(([key, value]) => {
+          const placeholder = `{{${key}}}`;
+          emailBody = emailBody.replaceAll(placeholder, value);
+          emailSubject = emailSubject.replaceAll(placeholder, value);
+        });
+        
+        // TODO: Configurer votre service SMTP et envoyer l'email
+        // Exemple avec Deno.env pour les credentials SMTP
+        console.log('📧 Email automatique prêt à envoyer :');
+        console.log('To:', prospectMisAJour.contact.email);
+        console.log('Subject:', emailSubject);
+        console.log('📄 Template HTML chargé et personnalisé');
+        
+        // OPTION 1: Utiliser un service externe (SendGrid, Mailgun, etc.)
+        // await fetch('https://api.sendgrid.com/v3/mail/send', { ... });
+        
+        // OPTION 2: Utiliser SMTP direct avec Deno
+        // const smtpConfig = {
+        //   host: Deno.env.get('SMTP_HOST'),
+        //   port: Number(Deno.env.get('SMTP_PORT')),
+        //   username: Deno.env.get('SMTP_USER'),
+        //   password: Deno.env.get('SMTP_PASS')
+        // };
+        // await sendEmailViaSMTP(smtpConfig, prospectMisAJour.contact.email, emailSubject, emailBody);
+        
+        console.log('✅ Email de signature configuré (à activer avec SMTP)');
+      }
+    } catch (emailError) {
+      // Ne pas bloquer si l'email échoue (non-bloquant)
+      console.error('⚠️ Erreur envoi email (non-bloquant):', emailError);
+    }
+    
+    return c.json({
+      success: true,
+      token,
+      signatureUrl,
+      expiresAt: expirationDate.toISOString(),
+      message: 'Lien de signature généré avec succès'
+    });
+    
+  } catch (error) {
+    console.error('❌ Erreur génération lien signature:', error);
+    return c.json(
+      {
+        success: false,
+        error: 'Erreur lors de la génération du lien',
+        details: error.message
+      },
+      500
+    );
+  }
+});
+
+/**
+ * 🆕 POST /make-server-10092a63/devis/verifier-token-signature
+ * Vérifie la validité d'un token de signature et retourne le devis
+ */
+devis.post('/verifier-token-signature', async (c) => {
+  try {
+    const { token } = await c.req.json();
+    
+    console.log(`🔍 Vérification token: ${token.substring(0, 16)}...`);
+    
+    // Récupérer les données du token
+    const tokenData = await kv.get(`signature-token:${token}`);
+    
+    if (!tokenData) {
+      return c.json(
+        {
+          success: false,
+          error: 'Lien invalide ou expiré'
+        },
+        404
+      );
+    }
+    
+    // Vérifier l'expiration
+    const now = new Date();
+    const expirationDate = new Date(tokenData.expiresAt);
+    
+    if (now > expirationDate) {
+      return c.json(
+        {
+          success: false,
+          error: 'Ce lien a expiré'
+        },
+        400
+      );
+    }
+    
+    // Récupérer le devis
+    const prospect = await kv.get(`prospects:${tokenData.devisId}`);
+    
+    if (!prospect) {
+      return c.json(
+        {
+          success: false,
+          error: 'Devis non trouvé'
+        },
+        404
+      );
+    }
+    
+    console.log(`✅ Token valide pour devis: ${prospect.numero}`);
+    
+    return c.json({
+      success: true,
+      devis: prospect,
+      tokenData: {
+        createdAt: tokenData.createdAt,
+        expiresAt: tokenData.expiresAt
+      }
+    });
+    
+  } catch (error) {
+    console.error('❌ Erreur vérification token:', error);
+    return c.json(
+      {
+        success: false,
+        error: 'Erreur lors de la vérification du lien',
+        details: error.message
+      },
+      500
+    );
+  }
+});
+
+/**
+ * 🆕 POST /make-server-10092a63/devis/signer-avec-token
+ * Signer un devis avec un token de signature
+ */
+devis.post('/signer-avec-token', async (c) => {
+  try {
+    const { token, signatureBase64, accepteCGV } = await c.req.json();
+    
+    if (!accepteCGV) {
+      return c.json(
+        {
+          success: false,
+          error: 'Vous devez accepter les CGV'
+        },
+        400
+      );
+    }
+    
+    console.log(`✍️ Signature avec token: ${token.substring(0, 16)}...`);
+    
+    // Vérifier le token
+    const tokenData = await kv.get(`signature-token:${token}`);
+    
+    if (!tokenData) {
+      return c.json(
+        {
+          success: false,
+          error: 'Lien invalide ou expiré'
+        },
+        404
+      );
+    }
+    
+    // Vérifier l'expiration
+    const now = new Date();
+    const expirationDate = new Date(tokenData.expiresAt);
+    
+    if (now > expirationDate) {
+      return c.json(
+        {
+          success: false,
+          error: 'Ce lien a expiré'
+        },
+        400
+      );
+    }
+    
+    // Vérifier si déjà utilisé
+    if (tokenData.used) {
+      return c.json(
+        {
+          success: false,
+          error: 'Ce lien a déjà été utilisé'
+        },
+        400
+      );
+    }
+    
+    // Récupérer le devis
+    const devisId = tokenData.devisId;
+    const prospect = await kv.get(`prospects:${devisId}`);
+    
+    if (!prospect) {
+      return c.json(
+        {
+          success: false,
+          error: 'Devis non trouvé'
+        },
+        404
+      );
+    }
+    
+    // Vérifier qu'il n'est pas déjà signé
+    if (prospect.statut === 'signe') {
+      return c.json(
+        {
+          success: false,
+          error: 'Ce devis a déjà été signé'
+        },
+        400
+      );
+    }
+    
+    // Générer le hash d'intégrité
+    const devisContent = JSON.stringify({
+      numero: prospect.numero,
+      entreprise: prospect.entreprise,
+      contact: prospect.contact,
+      postes: prospect.postes,
+      conditions: prospect.conditions
+    });
+    
+    const encoder = new TextEncoder();
+    const data = encoder.encode(devisContent);
+    const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+    const hashArray = Array.from(new Uint8Array(hashBuffer));
+    const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+    
+    // Métadonnées
+    const ipAddress = c.req.header('x-forwarded-for') || 
+                      c.req.header('x-real-ip') || 
+                      c.req.header('cf-connecting-ip') || 
+                      'unknown';
+    const userAgent = c.req.header('user-agent') || 'unknown';
+    const timestamp = new Date().toISOString();
+    
+    // Créer le certificat de signature
+    const certificatSignature = {
+      image: signatureBase64,
+      signataire: {
+        nom: prospect.contact.nom,
+        prenom: prospect.contact.prenom,
+        email: prospect.contact.email,
+        fonction: prospect.contact.fonction,
+        entreprise: prospect.entreprise.raisonSociale,
+        siret: prospect.entreprise.siret
+      },
+      metadata: {
+        ipAddress,
+        userAgent,
+        timestamp,
+        timestampReadable: new Date(timestamp).toLocaleString('fr-FR', {
+          dateStyle: 'full',
+          timeStyle: 'long',
+          timeZone: 'Europe/Paris'
+        }),
+        signatureMethod: 'online_link'
+      },
+      integrite: {
+        hashAlgorithm: 'SHA-256',
+        documentHash: hashHex,
+        devisNumero: prospect.numero,
+        devisId: devisId
+      },
+      consentement: {
+        accepteCGV: true,
+        dateAcceptation: timestamp,
+        mentions: 'Le signataire certifie avoir lu et accepté les Conditions Générales de Vente et que les informations fournies sont exactes. Cette signature électronique a la même valeur légale qu\'une signature manuscrite conformément au règlement eIDAS (UE) n°910/2014.'
+      }
+    };
+    
+    // Mettre à jour le devis
+    const prospectMisAJour = {
+      ...prospect,
+      statut: 'signe',
+      signature: certificatSignature,
+      signedViaToken: true,
+      signatureTokenUsed: token,
+      updatedAt: timestamp
+    };
+    
+    await kv.set(`prospects:${devisId}`, prospectMisAJour);
+    
+    // Marquer le token comme utilisé
+    const tokenDataUpdated = {
+      ...tokenData,
+      used: true,
+      usedAt: timestamp
+    };
+    await kv.set(`signature-token:${token}`, tokenDataUpdated);
+    
+    // Mettre à jour les stats
+    const stats = await kv.get('prospects:stats') || {};
+    if (stats[prospect.statut]) stats[prospect.statut] -= 1;
+    if (stats['signe']) {
+      stats['signe'] += 1;
+    } else {
+      stats['signe'] = 1;
+    }
+    await kv.set('prospects:stats', stats);
+    
+    console.log(`✅ Devis signé via lien: ${prospect.numero}`);
+    console.log(`📍 IP: ${ipAddress}`);
+    console.log(`🔐 Hash: ${hashHex.substring(0, 16)}...`);
+    
+    // TODO: Envoyer email de confirmation
+    // TODO: Déclencher workflow "Devis signé"
+    
+    return c.json({
+      success: true,
+      message: 'Devis signé avec succès',
+      data: prospectMisAJour,
+      certificat: certificatSignature
+    });
+    
+  } catch (error) {
+    console.error('❌ Erreur signature avec token:', error);
+    return c.json(
+      {
+        success: false,
+        error: 'Erreur lors de la signature du devis',
+        details: error.message
+      },
+      500
+    );
+  }
+});
+
 export default devis;
