@@ -1341,6 +1341,10 @@
     max-height: calc(90vh - 200px);
   }
 
+  .max-h-\[calc\(90vh-280px\)\] {
+    max-height: calc(90vh - 280px);
+  }
+
   .max-h-\[calc\(92vh-280px\)\] {
     max-height: calc(92vh - 280px);
   }
@@ -7591,6 +7595,12 @@
   }
 
   @media (hover: hover) {
+    .hover\:border-purple-400:hover {
+      border-color: var(--color-purple-400);
+    }
+  }
+
+  @media (hover: hover) {
     .hover\:border-purple-500:hover {
       border-color: var(--color-purple-500);
     }
@@ -9111,6 +9121,10 @@
     background-color: var(--card);
   }
 
+  .data-\[state\=active\]\:bg-purple-100[data-state="active"] {
+    background-color: var(--color-purple-100);
+  }
+
   .data-\[state\=active\]\:bg-white[data-state="active"] {
     background-color: var(--color-white);
   }
@@ -9181,6 +9195,10 @@
 
   .data-\[state\=active\]\:text-cyan-600[data-state="active"] {
     color: var(--color-cyan-600);
+  }
+
+  .data-\[state\=active\]\:text-purple-700[data-state="active"] {
+    color: var(--color-purple-700);
   }
 
   .data-\[state\=active\]\:text-violet-600[data-state="active"] {

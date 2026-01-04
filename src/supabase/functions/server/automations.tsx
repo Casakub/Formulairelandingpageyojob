@@ -8,6 +8,7 @@ import {
   MOCK_SMTP_SETTINGS 
 } from "./automations-data.ts";
 import { emailService, sendTemplateEmail, addUnsubscribeLink } from "./email-service.tsx";
+import { getApiKey, getSelectedModel } from "./settings.tsx";
 
 const app = new Hono();
 
@@ -604,7 +605,7 @@ app.get("/stats", (c) => {
 
 // Helper function to extract variables from template
 function extractVariables(html: string): string[] {
-  const regex = /\{\{([^}]+)\}\}/g;
+  const regex = /\\{\\{([^}]+)\\}\\}/g;
   const variables: string[] = [];
   let match;
 
@@ -617,5 +618,334 @@ function extractVariables(html: string): string[] {
 
   return variables;
 }
+
+/**
+ * 🌍 WORKFLOW TRANSLATION ROUTES
+ * Routes pour la traduction automatique des workflows via Claude AI
+ */
+
+// Les 21 langues supportées (hors français qui est la langue source)
+const SUPPORTED_LANGUAGES = [
+  { code: 'en', name: 'English' },
+  { code: 'de', name: 'German' },
+  { code: 'es', name: 'Spanish' },
+  { code: 'it', name: 'Italian' },
+  { code: 'pt', name: 'Portuguese' },
+  { code: 'nl', name: 'Dutch' },
+  { code: 'pl', name: 'Polish' },
+  { code: 'ro', name: 'Romanian' },
+  { code: 'bg', name: 'Bulgarian' },
+  { code: 'hu', name: 'Hungarian' },
+  { code: 'cz', name: 'Czech' },
+  { code: 'sk', name: 'Slovak' },
+  { code: 'hr', name: 'Croatian' },
+  { code: 'sl', name: 'Slovenian' },
+  { code: 'lt', name: 'Lithuanian' },
+  { code: 'lv', name: 'Latvian' },
+  { code: 'ee', name: 'Estonian' },
+  { code: 'el', name: 'Greek' },
+  { code: 'sv', name: 'Swedish' },
+  { code: 'da', name: 'Danish' },
+  { code: 'fi', name: 'Finnish' },
+];
+
+/**
+ * POST /auto-translate-workflow
+ * Traduire un workflow vers une langue spécifique avec Claude AI
+ */
+app.post("/auto-translate-workflow", async (c) => {
+  try {
+    const body = await c.req.json();
+    const { sourceLang, targetLang, workflow, steps } = body;
+
+    // Vérifier la clé API
+    const apiKey = await getApiKey();
+    if (!apiKey) {
+      return c.json({
+        success: false,
+        error: "Clé API Anthropic non configurée. Veuillez l'ajouter dans les Paramètres.",
+      }, 400);
+    }
+
+    const targetLangInfo = SUPPORTED_LANGUAGES.find(l => l.code === targetLang);
+    if (!targetLangInfo) {
+      return c.json({
+        success: false,
+        error: `Langue cible non supportée: ${targetLang}`,
+      }, 400);
+    }
+
+    console.log(`🌍 Traduction workflow vers ${targetLangInfo.name}...`);
+
+    // Créer le prompt pour Claude
+    const prompt = `Tu es un traducteur professionnel spécialisé dans les workflows d'automatisation marketing.
+
+**CONTEXTE:**
+- Application: YOJOB (courtage en recrutement européen)
+- Langue source: Français
+- Langue cible: ${targetLangInfo.name}
+
+**WORKFLOW À TRADUIRE:**
+
+Nom: ${workflow.name}
+Description: ${workflow.description}
+
+**ÉTAPES DU WORKFLOW:**
+${steps.map((step: any, idx: number) => `
+Étape ${idx + 1}:
+- Nom: ${step.name}
+- Description: ${step.description}
+`).join('\n')}
+
+**INSTRUCTIONS:**
+1. Traduis de manière professionnelle et contextualisée
+2. Préserve le ton professionnel adapté au recrutement européen
+3. Garde la même structure et longueur approximative
+4. Respecte la terminologie métier du recrutement
+5. Retourne UNIQUEMENT un JSON valide sans markdown
+
+**FORMAT DE RÉPONSE (JSON strict):**
+{
+  "workflow": {
+    "name": "...",
+    "description": "..."
+  },
+  "steps": [
+    {
+      "name": "...",
+      "description": "..."
+    }
+  ]
+}`;
+
+    // Appeler Claude
+    const response = await fetch("https://api.anthropic.com/v1/messages", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "x-api-key": apiKey,
+        "anthropic-version": "2023-06-01"
+      },
+      body: JSON.stringify({
+        model: await getSelectedModel(),
+        max_tokens: 4000,
+        temperature: 0.3, // Plus déterministe pour les traductions
+        messages: [{
+          role: "user",
+          content: prompt
+        }]
+      })
+    });
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error('❌ Erreur API Anthropic:', errorText);
+      throw new Error(`Anthropic API error: ${response.status} - ${errorText}`);
+    }
+
+    const data = await response.json();
+    const rawContent = data.content[0].text;
+    
+    console.log('📝 Réponse brute Claude:', rawContent);
+
+    // Parser la réponse JSON
+    let translation;
+    try {
+      // Nettoyer le markdown si présent
+      const cleanedContent = rawContent
+        .replace(/```json\n?/g, '')
+        .replace(/```\n?/g, '')
+        .trim();
+      
+      translation = JSON.parse(cleanedContent);
+    } catch (parseError) {
+      console.error('❌ Erreur parsing JSON:', parseError);
+      throw new Error(`Impossible de parser la réponse de Claude: ${parseError.message}`);
+    }
+
+    console.log(`✅ Traduction ${targetLangInfo.name} réussie !`);
+
+    return c.json({
+      success: true,
+      translation,
+      targetLang,
+      targetLangName: targetLangInfo.name,
+    });
+
+  } catch (error: any) {
+    console.error("❌ Erreur lors de la traduction automatique:", error);
+    return c.json({ 
+      success: false, 
+      error: error.message || 'Erreur lors de la traduction automatique'
+    }, 500);
+  }
+});
+
+/**
+ * POST /auto-translate-workflow-all
+ * Traduire un workflow vers TOUTES les 21 langues en parallèle
+ */
+app.post("/auto-translate-workflow-all", async (c) => {
+  try {
+    const body = await c.req.json();
+    const { workflow, steps } = body;
+
+    // Vérifier la clé API
+    const apiKey = await getApiKey();
+    if (!apiKey) {
+      return c.json({
+        success: false,
+        error: "Clé API Anthropic non configurée. Veuillez l'ajouter dans les Paramètres.",
+      }, 400);
+    }
+
+    console.log('🌍 Traduction automatique vers 21 langues en parallèle...');
+
+    // Fonction pour traduire vers une langue
+    const translateToLanguage = async (targetLang: string, langName: string) => {
+      const prompt = `Tu es un traducteur professionnel spécialisé dans les workflows d'automatisation marketing.
+
+**CONTEXTE:**
+- Application: YOJOB (courtage en recrutement européen)
+- Langue source: Français
+- Langue cible: ${langName}
+
+**WORKFLOW À TRADUIRE:**
+
+Nom: ${workflow.name}
+Description: ${workflow.description}
+
+**ÉTAPES DU WORKFLOW:**
+${steps.map((step: any, idx: number) => `
+Étape ${idx + 1}:
+- Nom: ${step.name}
+- Description: ${step.description}
+`).join('\n')}
+
+**INSTRUCTIONS:**
+1. Traduis de manière professionnelle et contextualisée
+2. Préserve le ton professionnel adapté au recrutement européen
+3. Garde la même structure et longueur approximative
+4. Respecte la terminologie métier du recrutement
+5. Retourne UNIQUEMENT un JSON valide sans markdown
+
+**FORMAT DE RÉPONSE (JSON strict):**
+{
+  "workflow": {
+    "name": "...",
+    "description": "..."
+  },
+  "steps": [
+    {
+      "name": "...",
+      "description": "..."
+    }
+  ]
+}`;
+
+      try {
+        const response = await fetch("https://api.anthropic.com/v1/messages", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "x-api-key": apiKey,
+            "anthropic-version": "2023-06-01"
+          },
+          body: JSON.stringify({
+            model: await getSelectedModel(),
+            max_tokens: 4000,
+            temperature: 0.3,
+            messages: [{
+              role: "user",
+              content: prompt
+            }]
+          })
+        });
+
+        if (!response.ok) {
+          throw new Error(`API error for ${langName}: ${response.status}`);
+        }
+
+        const data = await response.json();
+        const rawContent = data.content[0].text;
+        
+        // Parser la réponse
+        const cleanedContent = rawContent
+          .replace(/```json\n?/g, '')
+          .replace(/```\n?/g, '')
+          .trim();
+        
+        const translation = JSON.parse(cleanedContent);
+        
+        console.log(`✅ ${langName} traduit avec succès`);
+        
+        return {
+          lang: targetLang,
+          success: true,
+          translation,
+        };
+
+      } catch (error: any) {
+        console.error(`❌ Erreur traduction ${langName}:`, error.message);
+        return {
+          lang: targetLang,
+          success: false,
+          error: error.message,
+        };
+      }
+    };
+
+    // Lancer toutes les traductions en parallèle
+    const translationPromises = SUPPORTED_LANGUAGES.map(lang => 
+      translateToLanguage(lang.code, lang.name)
+    );
+
+    const results = await Promise.all(translationPromises);
+
+    // Agréger les résultats
+    const translations: any = {};
+    let successCount = 0;
+    let failureCount = 0;
+
+    results.forEach(result => {
+      if (result.success) {
+        translations[result.lang] = result.translation;
+        successCount++;
+      } else {
+        failureCount++;
+        // Créer une traduction par défaut en cas d'échec
+        translations[result.lang] = {
+          workflow: {
+            name: workflow.name,
+            description: workflow.description,
+          },
+          steps: steps.map((s: any) => ({
+            name: s.name,
+            description: s.description,
+          })),
+        };
+      }
+    });
+
+    console.log(`✅ Traduction terminée: ${successCount} succès, ${failureCount} échecs`);
+
+    return c.json({
+      success: true,
+      translations,
+      stats: {
+        total: SUPPORTED_LANGUAGES.length,
+        success: successCount,
+        failed: failureCount,
+      },
+    });
+
+  } catch (error: any) {
+    console.error("❌ Erreur lors de la traduction automatique globale:", error);
+    return c.json({ 
+      success: false, 
+      error: error.message || 'Erreur lors de la traduction automatique globale'
+    }, 500);
+  }
+});
 
 export default app;

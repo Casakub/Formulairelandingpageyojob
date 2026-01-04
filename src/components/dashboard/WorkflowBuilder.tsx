@@ -17,6 +17,7 @@ import {
   Play,
   Workflow,
   CheckCircle2,
+  Languages,
 } from 'lucide-react';
 import { Button } from '../ui/button';
 import { Input } from '../ui/input';
@@ -26,6 +27,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '../ui/card';
 import { Badge } from '../ui/badge';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '../ui/dialog';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select';
+import { WorkflowTranslationEditor } from './WorkflowTranslationEditor';
 import type { AutomationWorkflow, AutomationStep, AutomationTrigger, AutomationCondition } from '../../types/automations';
 
 interface WorkflowBuilderProps {
@@ -71,6 +73,10 @@ export function WorkflowBuilder({ open, onClose, onSave, editingWorkflow }: Work
   const [conditions, setConditions] = useState<AutomationCondition[]>([]);
   
   const [steps, setSteps] = useState<AutomationStep[]>([]);
+
+  // États pour la gestion des traductions
+  const [translationsEditorOpen, setTranslationsEditorOpen] = useState(false);
+  const [workflowTranslations, setWorkflowTranslations] = useState<any>({});
 
   // Synchroniser les états avec editingWorkflow quand il change
   useEffect(() => {
@@ -269,6 +275,24 @@ export function WorkflowBuilder({ open, onClose, onSave, editingWorkflow }: Work
                     className="mt-1"
                     rows={4}
                   />
+                </div>
+                <div>
+                  <Label>Traductions (22 langues)</Label>
+                  <Button
+                    variant="outline"
+                    onClick={() => setTranslationsEditorOpen(true)}
+                    className="w-full mt-1 justify-start gap-2 border-dashed border-2 hover:border-purple-400 hover:bg-purple-50"
+                    type="button"
+                  >
+                    <Languages className="w-4 h-4 text-purple-600" />
+                    <span>Gérer les traductions multilingues</span>
+                    <Badge variant="outline" className="ml-auto bg-purple-100 text-purple-700">
+                      {Object.keys(workflowTranslations).length} / 21
+                    </Badge>
+                  </Button>
+                  <p className="text-xs text-slate-500 mt-1">
+                    Ajoutez les traductions pour adapter ce workflow aux 22 langues supportées
+                  </p>
                 </div>
               </motion.div>
             )}
@@ -626,6 +650,23 @@ export function WorkflowBuilder({ open, onClose, onSave, editingWorkflow }: Work
           </div>
         </div>
       </DialogContent>
+
+      {/* Workflow Translation Editor Dialog */}
+      <WorkflowTranslationEditor
+        open={translationsEditorOpen}
+        onClose={() => setTranslationsEditorOpen(false)}
+        workflowName={workflowName}
+        workflowDescription={workflowDescription}
+        steps={steps.map(s => ({
+          name: s.config.subject || s.config.task_title || s.config.tag_name || `Action ${s.type}`,
+          description: s.config.body || `Étape de type ${s.type}`,
+        }))}
+        existingTranslations={workflowTranslations}
+        onSave={(translations) => {
+          setWorkflowTranslations(translations);
+          setTranslationsEditorOpen(false);
+        }}
+      />
     </Dialog>
   );
 }
