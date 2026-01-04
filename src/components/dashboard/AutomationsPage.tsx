@@ -18,12 +18,17 @@ import {
   BarChart3,
   FileText,
   AlertTriangle,
+  Copy,
+  History,
+  Sparkles,
 } from 'lucide-react';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '../ui/tabs';
 import { Card, CardContent, CardHeader, CardTitle } from '../ui/card';
 import { Button } from '../ui/button';
 import { Badge } from '../ui/badge';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '../ui/tabs';
 import { WorkflowBuilder } from './WorkflowBuilder';
+import { EmailTemplateEditor } from './EmailTemplateEditor';
+import { AIWorkflowAdvisor } from './AIWorkflowAdvisor';
 import { projectId, publicAnonKey } from '../../utils/supabase/info';
 import type { AutomationWorkflow, AutomationRun, EmailTemplate, WorkflowTemplate } from '../../types/automations';
 
@@ -64,6 +69,9 @@ export function AutomationsPage() {
   const [filterStatus, setFilterStatus] = useState<string>('all');
   const [workflowBuilderOpen, setWorkflowBuilderOpen] = useState(false);
   const [editingWorkflow, setEditingWorkflow] = useState<AutomationWorkflow | null>(null);
+  const [emailTemplateEditorOpen, setEmailTemplateEditorOpen] = useState(false);
+  const [editingTemplate, setEditingTemplate] = useState<EmailTemplate | null>(null);
+  const [aiAdvisorOpen, setAiAdvisorOpen] = useState(false);
 
   // Charger les données
   const loadData = async () => {
@@ -184,6 +192,93 @@ export function AutomationsPage() {
 
   const handleSaveWorkflow = async (workflow: Partial<AutomationWorkflow>) => {
     try {
+      // Déterminer si c'est une création ou une mise à jour
+      const isEditing = !!(workflow as any).id;
+      const url = isEditing
+        ? `https://${projectId}.supabase.co/functions/v1/make-server-10092a63/automations/workflows/${(workflow as any).id}`
+        : `https://${projectId}.supabase.co/functions/v1/make-server-10092a63/automations/workflows`;
+
+      const response = await fetch(url, {
+        method: isEditing ? 'PATCH' : 'POST',
+        headers: {
+          Authorization: `Bearer ${publicAnonKey}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(workflow),
+      });
+
+      const data = await response.json();
+      if (data.success) {
+        loadData();
+        setWorkflowBuilderOpen(false);
+        setEditingWorkflow(null); // Réinitialiser le workflow en édition
+        setActiveTab('workflows');
+      }
+    } catch (error) {
+      console.error('Erreur sauvegarde workflow:', error);
+    }
+  };
+
+  const handleSaveTemplate = async (template: Partial<EmailTemplate>) => {
+    try {
+      const isEditing = !!(template as any).id;
+      const url = isEditing
+        ? `https://${projectId}.supabase.co/functions/v1/make-server-10092a63/automations/templates/${(template as any).id}`
+        : `https://${projectId}.supabase.co/functions/v1/make-server-10092a63/automations/templates`;
+
+      const response = await fetch(url, {
+        method: isEditing ? 'PATCH' : 'POST',
+        headers: {
+          Authorization: `Bearer ${publicAnonKey}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(template),
+      });
+
+      const data = await response.json();
+      if (data.success) {
+        loadData();
+        setEmailTemplateEditorOpen(false);
+        setEditingTemplate(null);
+        setActiveTab('templates');
+      }
+    } catch (error) {
+      console.error('Erreur sauvegarde template:', error);
+    }
+  };
+
+  const handleDeleteTemplate = async (templateId: string) => {
+    if (!confirm('Supprimer ce template ? Cette action est irréversible.')) return;
+
+    try {
+      const response = await fetch(
+        `https://${projectId}.supabase.co/functions/v1/make-server-10092a63/automations/templates/${templateId}`,
+        {
+          method: 'DELETE',
+          headers: { Authorization: `Bearer ${publicAnonKey}` },
+        }
+      );
+
+      const data = await response.json();
+      if (data.success) {
+        loadData();
+      }
+    } catch (error) {
+      console.error('Erreur suppression template:', error);
+    }
+  };
+
+  const handleDuplicateWorkflow = async (workflow: AutomationWorkflow) => {
+    try {
+      const duplicatedWorkflow = {
+        name: `${workflow.name} (copie)`,
+        description: workflow.description,
+        trigger: workflow.trigger,
+        conditions: workflow.conditions,
+        steps: workflow.steps,
+        status: 'draft' as const,
+      };
+
       const response = await fetch(
         `https://${projectId}.supabase.co/functions/v1/make-server-10092a63/automations/workflows`,
         {
@@ -192,18 +287,17 @@ export function AutomationsPage() {
             Authorization: `Bearer ${publicAnonKey}`,
             'Content-Type': 'application/json',
           },
-          body: JSON.stringify(workflow),
+          body: JSON.stringify(duplicatedWorkflow),
         }
       );
 
       const data = await response.json();
       if (data.success) {
         loadData();
-        setWorkflowBuilderOpen(false);
         setActiveTab('workflows');
       }
     } catch (error) {
-      console.error('Erreur sauvegarde workflow:', error);
+      console.error('Erreur duplication workflow:', error);
     }
   };
 
@@ -247,7 +341,7 @@ export function AutomationsPage() {
   ];
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 px-4 md:px-6 lg:px-8">
       {/* Header */}
       <motion.div
         initial={{ opacity: 0, y: -20 }}
@@ -265,6 +359,13 @@ export function AutomationsPage() {
             <Button variant="outline" size="sm" className="gap-2" onClick={loadData}>
               <RefreshCw className="w-4 h-4" />
               Actualiser
+            </Button>
+            <Button 
+              onClick={() => setAiAdvisorOpen(true)}
+              className="bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white shadow-md gap-2"
+            >
+              <Sparkles className="w-4 h-4" />
+              IA Conseiller
             </Button>
             <Button 
               className="bg-gradient-to-r from-blue-500 to-cyan-500 hover:from-blue-600 hover:to-cyan-600 text-white shadow-md gap-2"
@@ -399,9 +500,16 @@ export function AutomationsPage() {
                       <CardHeader className="pb-3">
                         <div className="flex items-start justify-between">
                           <div className="flex-1">
-                            <CardTitle className="text-slate-900 text-lg mb-1">
-                              {workflow.name}
-                            </CardTitle>
+                            <div className="flex items-center gap-2 mb-1">
+                              <CardTitle className="text-slate-900 text-lg">
+                                {workflow.name}
+                              </CardTitle>
+                              {workflow.version && (
+                                <Badge variant="outline" className="text-xs">
+                                  v{workflow.version}
+                                </Badge>
+                              )}
+                            </div>
                             <p className="text-slate-600 text-sm">
                               {workflow.description}
                             </p>
@@ -433,7 +541,7 @@ export function AutomationsPage() {
                         </div>
 
                         {/* Actions */}
-                        <div className="flex items-center gap-2">
+                        <div className="flex items-center gap-2 mb-2">
                           <Button
                             variant="outline"
                             size="sm"
@@ -452,9 +560,24 @@ export function AutomationsPage() {
                               </>
                             )}
                           </Button>
-                          <Button variant="outline" size="sm" className="gap-2">
+                          <Button 
+                            variant="outline" 
+                            size="sm" 
+                            className="gap-2"
+                            onClick={() => {
+                              setEditingWorkflow(workflow);
+                              setWorkflowBuilderOpen(true);
+                            }}
+                          >
                             <Settings className="w-4 h-4" />
-                            Modifier
+                          </Button>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => handleDuplicateWorkflow(workflow)}
+                            title="Dupliquer"
+                          >
+                            <Copy className="w-4 h-4" />
                           </Button>
                           <Button
                             variant="ghost"
@@ -464,6 +587,14 @@ export function AutomationsPage() {
                             <Trash2 className="w-4 h-4 text-red-600" />
                           </Button>
                         </div>
+
+                        {/* Version history link */}
+                        {workflow.version_history && workflow.version_history.length > 0 && (
+                          <div className="flex items-center justify-center mt-2 text-xs text-slate-600">
+                            <History className="w-3 h-3 mr-1" />
+                            {workflow.version_history.length} version{workflow.version_history.length > 1 ? 's' : ''} précédente{workflow.version_history.length > 1 ? 's' : ''}
+                          </div>
+                        )}
                       </CardContent>
                     </Card>
                   </motion.div>
@@ -475,6 +606,20 @@ export function AutomationsPage() {
 
         {/* Tab: Templates Email */}
         <TabsContent value="templates" className="space-y-4">
+          {/* Header with button */}
+          <div className="flex items-center justify-between">
+            <p className="text-slate-600 text-sm">
+              Gérez vos templates d'emails réutilisables
+            </p>
+            <Button
+              className="bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 text-white shadow-md gap-2"
+              onClick={() => setEmailTemplateEditorOpen(true)}
+            >
+              <Plus className="w-4 h-4" />
+              Nouveau template
+            </Button>
+          </div>
+
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
             {templates.map((template, idx) => (
               <motion.div
@@ -519,8 +664,21 @@ export function AutomationsPage() {
                     <div className="flex items-center justify-between text-xs text-slate-600">
                       <span>Utilisé {template.usage_count} fois</span>
                       <div className="flex gap-2">
-                        <Button variant="outline" size="sm">Modifier</Button>
-                        <Button variant="ghost" size="sm">
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => {
+                            setEditingTemplate(template);
+                            setEmailTemplateEditorOpen(true);
+                          }}
+                        >
+                          Modifier
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => handleDeleteTemplate(template.id)}
+                        >
                           <Trash2 className="w-4 h-4 text-red-600" />
                         </Button>
                       </div>
@@ -662,6 +820,27 @@ export function AutomationsPage() {
         }}
         onSave={handleSaveWorkflow}
         editingWorkflow={editingWorkflow}
+      />
+
+      {/* Email Template Editor Dialog */}
+      <EmailTemplateEditor
+        open={emailTemplateEditorOpen}
+        onClose={() => {
+          setEmailTemplateEditorOpen(false);
+          setEditingTemplate(null);
+        }}
+        onSave={handleSaveTemplate}
+        editingTemplate={editingTemplate}
+      />
+
+      {/* AI Workflow Advisor Dialog */}
+      <AIWorkflowAdvisor
+        open={aiAdvisorOpen}
+        onClose={() => setAiAdvisorOpen(false)}
+        onImplement={() => {
+          loadData(); // Recharger les données après implémentation
+          setActiveTab('workflows'); // Aller sur l'onglet workflows
+        }}
       />
     </div>
   );

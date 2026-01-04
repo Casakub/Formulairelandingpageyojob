@@ -99,6 +99,21 @@ export interface AutomationWorkflow {
   created_at: string;
   updated_at: string;
   created_by: string;
+  // Versioning
+  version?: number;
+  version_history?: WorkflowVersion[];
+}
+
+export interface WorkflowVersion {
+  version: number;
+  name: string;
+  description: string;
+  trigger: AutomationTrigger;
+  conditions: AutomationCondition[];
+  steps: AutomationStep[];
+  created_at: string;
+  created_by: string;
+  change_note?: string;
 }
 
 export interface AutomationRun {

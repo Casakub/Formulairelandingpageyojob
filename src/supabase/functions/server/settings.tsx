@@ -2,6 +2,318 @@ import * as kv from "./kv_store.tsx";
 
 const ANTHROPIC_API_KEY_ENV = Deno.env.get("ANTHROPIC_API_KEY") || "";
 
+// Modèles Claude disponibles avec leurs caractéristiques
+export const CLAUDE_MODELS = {
+  // Claude 4.5 (Latest models - 2025)
+  'claude-sonnet-4-5-20250929': {
+    name: 'Claude Sonnet 4.5',
+    alias: 'claude-sonnet-4-5',
+    description: 'Our smart model for complex agents and coding',
+    tier: 'balanced',
+    speed: 'fast',
+    intelligence: 'high',
+    costTier: 'standard',
+    pricing: {
+      input: 3, // $ per MTok
+      output: 15, // $ per MTok
+    },
+    inputTokensPerMin: 30000,
+    outputTokensPerMin: 8000,
+    requestsPerMin: 50,
+    contextWindow: 200000,
+    contextWindowBeta: 1000000, // 1M tokens in beta
+    maxOutput: 64000,
+    extendedThinking: true,
+    priorityTier: true,
+    knowledgeCutoff: 'Jan 2025',
+    trainingDataCutoff: 'Jul 2025',
+  },
+  'claude-haiku-4-5-20251001': {
+    name: 'Claude Haiku 4.5',
+    alias: 'claude-haiku-4-5',
+    description: 'Our fastest model with near-frontier intelligence',
+    tier: 'fast',
+    speed: 'fastest',
+    intelligence: 'medium-high',
+    costTier: 'economy',
+    pricing: {
+      input: 1, // $ per MTok
+      output: 5, // $ per MTok
+    },
+    inputTokensPerMin: 50000,
+    outputTokensPerMin: 10000,
+    requestsPerMin: 50,
+    contextWindow: 200000,
+    maxOutput: 64000,
+    extendedThinking: true,
+    priorityTier: true,
+    knowledgeCutoff: 'Feb 2025',
+    trainingDataCutoff: 'Jul 2025',
+  },
+  'claude-opus-4-5-20251101': {
+    name: 'Claude Opus 4.5',
+    alias: 'claude-opus-4-5',
+    description: 'Premium model combining maximum intelligence with practical performance',
+    tier: 'flagship',
+    speed: 'moderate',
+    intelligence: 'highest',
+    costTier: 'premium',
+    pricing: {
+      input: 5, // $ per MTok
+      output: 25, // $ per MTok
+    },
+    inputTokensPerMin: 30000,
+    outputTokensPerMin: 8000,
+    requestsPerMin: 50,
+    contextWindow: 200000,
+    maxOutput: 64000,
+    extendedThinking: true,
+    priorityTier: true,
+    knowledgeCutoff: 'May 2025',
+    trainingDataCutoff: 'Aug 2025',
+  },
+  
+  // Claude 3.x (Previous generation - Still available)
+  'claude-3-5-sonnet-20240620': {
+    name: 'Claude 3.5 Sonnet',
+    alias: 'claude-3-5-sonnet',
+    description: 'Previous generation balanced model',
+    tier: 'balanced',
+    speed: 'medium',
+    intelligence: 'high',
+    costTier: 'standard',
+    pricing: {
+      input: 3,
+      output: 15,
+    },
+    inputTokensPerMin: 30000,
+    outputTokensPerMin: 8000,
+    requestsPerMin: 50,
+    contextWindow: 200000,
+    maxOutput: 8192,
+    extendedThinking: false,
+    priorityTier: true,
+    knowledgeCutoff: 'Apr 2024',
+    trainingDataCutoff: 'Apr 2024',
+  },
+  'claude-3-5-haiku-20241022': {
+    name: 'Claude 3.5 Haiku',
+    alias: 'claude-3-5-haiku',
+    description: 'Previous generation fast model',
+    tier: 'fast',
+    speed: 'fastest',
+    intelligence: 'medium',
+    costTier: 'economy',
+    pricing: {
+      input: 1,
+      output: 5,
+    },
+    inputTokensPerMin: 50000,
+    outputTokensPerMin: 10000,
+    requestsPerMin: 50,
+    contextWindow: 200000,
+    maxOutput: 8192,
+    extendedThinking: false,
+    priorityTier: true,
+    knowledgeCutoff: 'Jul 2024',
+    trainingDataCutoff: 'Jul 2024',
+  },
+  'claude-3-opus-20240229': {
+    name: 'Claude 3 Opus',
+    alias: 'claude-3-opus',
+    description: 'Previous generation flagship model',
+    tier: 'flagship',
+    speed: 'slow',
+    intelligence: 'highest',
+    costTier: 'premium',
+    pricing: {
+      input: 15,
+      output: 75,
+    },
+    inputTokensPerMin: 20000,
+    outputTokensPerMin: 4000,
+    requestsPerMin: 50,
+    contextWindow: 200000,
+    maxOutput: 4096,
+    extendedThinking: false,
+    priorityTier: true,
+    knowledgeCutoff: 'Aug 2023',
+    trainingDataCutoff: 'Aug 2023',
+  },
+  'claude-3-haiku-20240307': {
+    name: 'Claude 3 Haiku',
+    alias: 'claude-3-haiku',
+    description: 'Previous generation economy model',
+    tier: 'fast',
+    speed: 'fastest',
+    intelligence: 'medium',
+    costTier: 'economy',
+    pricing: {
+      input: 0.25,
+      output: 1.25,
+    },
+    inputTokensPerMin: 50000,
+    outputTokensPerMin: 10000,
+    requestsPerMin: 50,
+    contextWindow: 200000,
+    maxOutput: 4096,
+    extendedThinking: false,
+    priorityTier: true,
+    knowledgeCutoff: 'Aug 2023',
+    trainingDataCutoff: 'Aug 2023',
+  },
+};
+
+export const DEFAULT_MODEL = 'claude-sonnet-4-5-20250929'; // Latest Sonnet 4.5
+
+/**
+ * Get selected Claude model from KV store
+ */
+export async function getSelectedModel(): Promise<string> {
+  try {
+    const model = await kv.get("settings:claude_model");
+    return (model as string) || DEFAULT_MODEL;
+  } catch (error) {
+    console.error("Error getting selected model:", error);
+    return DEFAULT_MODEL;
+  }
+}
+
+/**
+ * Save selected Claude model
+ */
+export async function saveSelectedModel(c: any) {
+  try {
+    const { model } = await c.req.json();
+
+    if (!model || !CLAUDE_MODELS[model]) {
+      return c.json({
+        success: false,
+        error: "Invalid model. Please select a valid Claude model.",
+      }, 400);
+    }
+
+    await kv.set("settings:claude_model", model);
+
+    return c.json({
+      success: true,
+      message: "Model saved successfully",
+      model,
+      modelInfo: CLAUDE_MODELS[model],
+    });
+  } catch (error: any) {
+    console.error("Error saving model:", error);
+    return c.json({
+      success: false,
+      error: error.message,
+    }, 500);
+  }
+}
+
+/**
+ * Get available Claude models
+ */
+export async function getAvailableModels(c: any) {
+  try {
+    const selectedModel = await getSelectedModel();
+
+    return c.json({
+      success: true,
+      models: CLAUDE_MODELS,
+      selectedModel,
+      defaultModel: DEFAULT_MODEL,
+    });
+  } catch (error: any) {
+    console.error("Error getting available models:", error);
+    return c.json({
+      success: false,
+      error: error.message,
+    }, 500);
+  }
+}
+
+/**
+ * Detect available models via Anthropic API
+ * Note: Anthropic doesn't have a public models endpoint yet,
+ * so we test each model with a minimal request
+ */
+export async function detectAvailableModels(c: any) {
+  try {
+    const apiKey = await getApiKey();
+    
+    if (!apiKey) {
+      return c.json({
+        success: false,
+        error: "No API key configured",
+      }, 400);
+    }
+
+    console.log("🔍 Detecting available Claude models...");
+
+    const availableModels: Record<string, any> = {};
+    const testPromises: Promise<any>[] = [];
+
+    // Test each model with a minimal request
+    for (const [modelId, modelInfo] of Object.entries(CLAUDE_MODELS)) {
+      testPromises.push(
+        fetch("https://api.anthropic.com/v1/messages", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "x-api-key": apiKey,
+            "anthropic-version": "2023-06-01",
+          },
+          body: JSON.stringify({
+            model: modelId,
+            max_tokens: 10,
+            messages: [{ role: "user", content: "Hi" }]
+          }),
+        })
+          .then(async (response) => {
+            if (response.ok || response.status === 529) { // 529 = overloaded but model exists
+              availableModels[modelId] = {
+                ...modelInfo,
+                available: response.ok,
+                status: response.ok ? 'active' : 'overloaded',
+              };
+              return { modelId, success: true };
+            }
+            return { modelId, success: false };
+          })
+          .catch(() => ({ modelId, success: false }))
+      );
+    }
+
+    // Wait for all tests (with timeout)
+    await Promise.race([
+      Promise.all(testPromises),
+      new Promise((_, reject) => 
+        setTimeout(() => reject(new Error("Detection timeout")), 15000)
+      )
+    ]).catch(() => {
+      console.log("⚠️ Model detection timed out");
+    });
+
+    console.log(`✅ Found ${Object.keys(availableModels).length} available models`);
+
+    return c.json({
+      success: true,
+      availableModels,
+      totalTested: Object.keys(CLAUDE_MODELS).length,
+      totalAvailable: Object.keys(availableModels).length,
+    });
+
+  } catch (error: any) {
+    console.error("Error detecting models:", error);
+    return c.json({
+      success: false,
+      error: error.message,
+      // Fallback to all models
+      availableModels: CLAUDE_MODELS,
+    }, 500);
+  }
+}
+
 /**
  * Get API key from KV store or environment
  */

@@ -3,7 +3,7 @@ import { cors } from "npm:hono/cors";
 import { logger } from "npm:hono/logger";
 import * as kv from "./kv_store.tsx";
 import { analyzeWithClaude } from "./ai-analysis.tsx";
-import { getApiKeyStatus, saveApiKey, deleteApiKey, testApiKey, getOverridesDebug, deleteAllOverrides } from "./settings.tsx";
+import { getApiKeyStatus, saveApiKey, deleteApiKey, testApiKey, getOverridesDebug, deleteAllOverrides, getAvailableModels, saveSelectedModel, detectAvailableModels } from "./settings.tsx";
 import i18nRoutes from "./i18n.tsx";
 // Alternative KV store pour i18n (fallback si problème de cache)
 // import i18nRoutes from "./i18n-kv.tsx";
@@ -20,6 +20,8 @@ import tasksRoutes from "./tasks.tsx";
 import eventsRoutes from "./events.tsx";
 import automationsRoutes from "./automations.tsx";
 import smtpSettingsRoutes from "./smtp-settings.tsx";
+import workflowEngineRoutes from "./workflow-engine.tsx";
+import workflowAiAdvisorRoutes from "./workflow-ai-advisor.tsx";
 import { syncSurveyToProspect, batchSyncSurveysToProspects } from "./survey-to-prospect.tsx";
 import questionsRoutes from "./questions.tsx";
 import migrateTranslationsRoutes from "./migrate-translations.tsx";
@@ -119,6 +121,9 @@ app.delete("/make-server-10092a63/settings/anthropic-key", deleteApiKey);
 app.post("/make-server-10092a63/settings/test-anthropic", testApiKey);
 app.get("/make-server-10092a63/settings/overrides-debug", getOverridesDebug);
 app.delete("/make-server-10092a63/settings/delete-all-overrides", deleteAllOverrides);
+app.get("/make-server-10092a63/settings/available-models", getAvailableModels);
+app.post("/make-server-10092a63/settings/save-selected-model", saveSelectedModel);
+app.post("/make-server-10092a63/settings/detect-available-models", detectAvailableModels);
 
 // i18n endpoints
 app.route("/make-server-10092a63/i18n", i18nRoutes);
@@ -204,6 +209,12 @@ app.route("/make-server-10092a63/automations", automationsRoutes);
 
 // SMTP & Compliance settings endpoints
 app.route("/make-server-10092a63/settings", smtpSettingsRoutes);
+
+// Workflow engine endpoints
+app.route("/make-server-10092a63/workflow-engine", workflowEngineRoutes);
+
+// Workflow AI Advisor endpoints
+app.route("/make-server-10092a63/workflow-ai-advisor", workflowAiAdvisorRoutes);
 
 // Survey to Prospect sync endpoints
 app.post("/make-server-10092a63/survey/sync-to-prospect", async (c) => {

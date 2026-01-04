@@ -38,6 +38,7 @@ import { Switch } from '../ui/switch';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../ui/tabs';
 import { MigrateLandingToSupabase } from './MigrateLandingToSupabase';
 import { QuickDiagnostic } from './QuickDiagnostic';
+import { ClaudeModelSelector } from './ClaudeModelSelector';
 
 interface SMTPConfig {
   host: string;
@@ -682,10 +683,14 @@ export function SettingsPanel() {
 
       {/* Tabs Navigation */}
       <Tabs defaultValue="api" className="w-full">
-        <TabsList className="grid w-full grid-cols-4 h-auto p-1 bg-slate-100 rounded-xl">
+        <TabsList className="grid w-full grid-cols-5 h-auto p-1 bg-slate-100 rounded-xl">
           <TabsTrigger value="api" className="flex items-center gap-2 data-[state=active]:bg-white data-[state=active]:shadow-sm">
             <Key className="w-4 h-4" />
             <span className="hidden sm:inline">API</span>
+          </TabsTrigger>
+          <TabsTrigger value="models" className="flex items-center gap-2 data-[state=active]:bg-white data-[state=active]:shadow-sm">
+            <Sparkles className="w-4 h-4" />
+            <span className="hidden sm:inline">Modèles IA</span>
           </TabsTrigger>
           <TabsTrigger value="smtp" className="flex items-center gap-2 data-[state=active]:bg-white data-[state=active]:shadow-sm">
             <Mail className="w-4 h-4" />
@@ -893,6 +898,11 @@ export function SettingsPanel() {
               </CardContent>
             </Card>
           </motion.div>
+        </TabsContent>
+
+        {/* Tab: Modèles IA */}
+        <TabsContent value="models" className="space-y-6 mt-6">
+          <ClaudeModelSelector />
         </TabsContent>
 
         {/* Tab: SMTP */}

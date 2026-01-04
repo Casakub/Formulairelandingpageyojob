@@ -124,6 +124,26 @@ app.post("/submit", async (c) => {
       user_name: "Système",
     });
 
+    // 🔥 NOUVEAU : Déclencher automatiquement les workflows
+    try {
+      console.log('🚀 Déclenchement automatique des workflows pour prospect:', prospectId);
+      
+      // Appeler l'endpoint de trigger (sans attendre la réponse pour ne pas ralentir)
+      fetch(`${Deno.env.get("SUPABASE_URL")}/functions/v1/make-server-10092a63/workflow-engine/trigger/prospect_created`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${Deno.env.get("SUPABASE_ANON_KEY")}`,
+        },
+        body: JSON.stringify({ prospect_id: prospectId }),
+      }).catch(err => {
+        console.error('⚠️ Erreur trigger workflows (non-bloquant):', err);
+      });
+    } catch (error: any) {
+      console.error('⚠️ Erreur déclenchement workflows:', error);
+      // Ne pas bloquer la création du prospect si les workflows échouent
+    }
+
     return c.json({
       success: true,
       message: "Prospect created successfully",

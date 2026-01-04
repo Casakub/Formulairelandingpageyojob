@@ -209,10 +209,23 @@ export function SelectContent({ children, className = '' }: SelectContentProps) 
         top: `${position.top}px`,
         left: `${position.left}px`,
         width: `${position.width}px`,
-        zIndex: 99999
+        zIndex: 100000,
+        animation: 'fadeInDown 0.15s ease-out'
       }}
-      className={`max-h-60 overflow-y-auto rounded-md shadow-lg ${className}`}
+      className={`max-h-60 overflow-y-auto rounded-md border border-slate-200 bg-white shadow-xl ${className}`}
     >
+      <style>{`
+        @keyframes fadeInDown {
+          from {
+            opacity: 0;
+            transform: translateY(-8px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+      `}</style>
       {children}
     </div>,
     document.body
@@ -248,8 +261,8 @@ export function SelectItem({ value, children, className = '' }: SelectItemProps)
     <button
       type="button"
       onClick={handleClick}
-      className={`w-full text-left px-3 py-2 text-sm cursor-pointer ${
-        isSelected ? 'font-medium' : ''
+      className={`w-full text-left px-3 py-2 text-sm cursor-pointer hover:bg-slate-100 transition-colors ${
+        isSelected ? 'bg-blue-50 text-blue-700 font-medium' : 'text-slate-900'
       } ${className}`}
     >
       {children}

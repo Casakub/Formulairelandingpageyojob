@@ -86,6 +86,8 @@ app.post("/workflows", async (c) => {
       created_at: new Date().toISOString(),
       updated_at: new Date().toISOString(),
       created_by: 'admin',
+      version: 1,
+      version_history: [],
     };
 
     MOCK_WORKFLOWS.push(newWorkflow);
@@ -151,6 +153,66 @@ app.delete("/workflows/:id", (c) => {
     });
   } catch (error: any) {
     console.error("Error deleting workflow:", error);
+    return c.json({ success: false, error: error.message }, 500);
+  }
+});
+
+/**
+ * PATCH /workflows/:id
+ * Mettre à jour un workflow complet
+ */
+app.patch("/workflows/:id", async (c) => {
+  try {
+    const { id } = c.req.param();
+    const body = await c.req.json();
+    const { name, description, trigger, conditions, steps, status, change_note } = body;
+
+    const workflow = MOCK_WORKFLOWS.find(w => w.id === id);
+    if (!workflow) {
+      return c.json({ success: false, error: "Workflow not found" }, 404);
+    }
+
+    // Créer une nouvelle version dans l'historique
+    const currentVersion = workflow.version || 1;
+    const newVersion = currentVersion + 1;
+    
+    const previousVersion = {
+      version: currentVersion,
+      name: workflow.name,
+      description: workflow.description,
+      trigger: workflow.trigger,
+      conditions: workflow.conditions,
+      steps: workflow.steps,
+      created_at: new Date().toISOString(),
+      created_by: 'admin',
+      change_note: change_note || 'Mise à jour du workflow',
+    };
+
+    // Initialiser version_history si nécessaire
+    if (!workflow.version_history) {
+      workflow.version_history = [];
+    }
+
+    // Ajouter la version précédente à l'historique
+    workflow.version_history.push(previousVersion);
+
+    // Update workflow fields
+    if (name !== undefined) workflow.name = name;
+    if (description !== undefined) workflow.description = description;
+    if (trigger !== undefined) workflow.trigger = trigger;
+    if (conditions !== undefined) workflow.conditions = conditions;
+    if (steps !== undefined) workflow.steps = steps;
+    if (status !== undefined) workflow.status = status;
+    workflow.version = newVersion;
+    workflow.updated_at = new Date().toISOString();
+
+    return c.json({
+      success: true,
+      message: `Workflow mis à jour avec succès (v${newVersion})`,
+      workflow,
+    });
+  } catch (error: any) {
+    console.error("Error updating workflow:", error);
     return c.json({ success: false, error: error.message }, 500);
   }
 });
