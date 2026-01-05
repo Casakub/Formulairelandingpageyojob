@@ -1,51 +1,68 @@
 # =============================================================================
 # DOCKER COMPOSE - YoJob Landing Page
-# =============================================================================
-# Usage:
-#   Build & Run:     docker-compose up --build -d
-#   Stop:            docker-compose down
-#   Voir les logs:   docker-compose logs -f
-#   Rebuild:         docker-compose build --no-cache
+# Configuration pour déploiement Hostinger
 # =============================================================================
 
 services:
+  # ---------------------------------------------------------------------------
+  # Service principal : Application web
+  # ---------------------------------------------------------------------------
   yojob-landing:
+    # Nom du container
+    container_name: yojob-landing-page
+
+    # Build configuration
     build:
       context: .
       dockerfile: Dockerfile
+      # Arguments passés au Dockerfile pour le build Vite
       args:
-        # Variables d'environnement injectées au build-time
-        # Ces valeurs seront lues depuis le fichier .env ou passées en ligne de commande
-        VITE_SUPABASE_URL: ${VITE_SUPABASE_URL:-}
-        VITE_SUPABASE_ANON_KEY: ${VITE_SUPABASE_ANON_KEY:-}
-        VITE_APP_ENV: ${VITE_APP_ENV:-production}
+        - VITE_SUPABASE_URL=${VITE_SUPABASE_URL}
+        - VITE_SUPABASE_ANON_KEY=${VITE_SUPABASE_ANON_KEY}
+        - VITE_APP_ENV=${VITE_APP_ENV:-production}
 
-    container_name: yojob-landing-page
-
+    # Port mapping : port_hote:port_container
+    # Hostinger utilise un reverse proxy, utiliser un port non-standard
     ports:
-      - "${PORT:-3000}:80"
+      - "3000:80"
 
+    # Variables d'environnement runtime (pour nginx si besoin)
+    environment:
+      - NODE_ENV=production
+      - TZ=Europe/Paris
+
+    # Politique de redémarrage
     restart: unless-stopped
 
-    # Healthcheck hérite du Dockerfile
+    # Limites de ressources (adapter selon l'offre Hostinger)
+    deploy:
+      resources:
+        limits:
+          cpus: '1.0'
+          memory: 512M
+        reservations:
+          cpus: '0.25'
+          memory: 128M
+
+    # Healthcheck
     healthcheck:
       test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:80/"]
       interval: 30s
-      timeout: 3s
+      timeout: 10s
       retries: 3
       start_period: 10s
 
-    # Labels pour la documentation
-    labels:
-      - "app.name=yojob-landing"
-      - "app.description=YoJob Landing Page - Formulaire de contact"
-      - "app.version=1.0.0"
+    # Logging
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
 
 # =============================================================================
-# EXEMPLE DE FICHIER .env (à créer à la racine du projet)
+# NETWORKS (optionnel, pour projets multi-services)
 # =============================================================================
-# VITE_SUPABASE_URL=https://your-project.supabase.co
-# VITE_SUPABASE_ANON_KEY=your-anon-key-here
-# VITE_APP_ENV=production
-# PORT=3000
-# =============================================================================
+networks:
+  default:
+    name: yojob-network
+    driver: bridge

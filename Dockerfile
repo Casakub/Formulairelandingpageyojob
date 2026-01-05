@@ -26,8 +26,6 @@ COPY . .
 
 # Variables d'environnement pour le build (Vite les injecte au build-time)
 # Ces valeurs seront remplacées par docker-compose via args
-# IMPORTANT: Ne JAMAIS passer de clés sensibles (SERVICE_ROLE_KEY) ici !
-# Les variables VITE_* sont exposées publiquement dans le bundle client.
 ARG VITE_SUPABASE_URL
 ARG VITE_SUPABASE_ANON_KEY
 ARG VITE_APP_ENV=production
