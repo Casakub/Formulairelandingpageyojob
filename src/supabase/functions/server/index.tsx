@@ -39,24 +39,24 @@ const app = new Hono();
 // Enable logger
 app.use('*', logger(console.log));
 
-// Middleware pour capturer les "broken pipe" et autres erreurs réseau silencieusement
+// Middleware pour capturer et SILENCER les erreurs "broken pipe" AVANT qu'elles ne soient loggées
 app.use('*', async (c, next) => {
   try {
     await next();
   } catch (err: any) {
-    // Les erreurs réseau sont normales pendant le développement (hot reload)
-    // et quand le client ferme la connexion avant la réponse
+    // Les erreurs réseau sont normales (hot reload, client ferme la connexion)
     const isNetworkError = 
       err?.code === 'EPIPE' || 
       err?.code === 'ECONNRESET' ||
       err?.name === 'Http' ||
       err?.message?.includes('broken pipe') ||
-      err?.message?.includes('connection reset');
+      err?.message?.includes('connection reset') ||
+      err?.message?.includes('body to connection');
     
     if (isNetworkError) {
-      // Ne pas logger ces erreurs car elles sont attendues
-      // Retourner 499 (Client Closed Request) sans erreur
-      return c.text('', 499);
+      // Silencieux : ne rien logger, ne rien retourner
+      // La connexion est déjà fermée, toute tentative de réponse échouera
+      return;
     }
     
     // Re-throw les autres erreurs pour qu'elles soient gérées par onError
@@ -72,11 +72,12 @@ app.onError((err: any, c) => {
     err?.code === 'ECONNRESET' ||
     err?.name === 'Http' ||
     err?.message?.includes('broken pipe') ||
-    err?.message?.includes('connection reset');
+    err?.message?.includes('connection reset') ||
+    err?.message?.includes('body to connection');
   
   if (isNetworkError) {
-    // Retourner une réponse vide avec code 499
-    return c.text('', 499);
+    // Silencieux : ne rien logger
+    return;
   }
   
   // Log des vraies erreurs seulement
@@ -84,7 +85,7 @@ app.onError((err: any, c) => {
     message: err.message,
     name: err.name,
     code: err.code,
-    stack: err.stack?.split('\n').slice(0, 3).join('\n')
+    stack: err.stack?.split('\\n').slice(0, 3).join('\\n')
   });
   
   // Pour les autres erreurs, retourner une réponse JSON
