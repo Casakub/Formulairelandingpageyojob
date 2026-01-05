@@ -789,12 +789,12 @@ export default function AppLanding() {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.7 }}
-                className="flex flex-col sm:flex-row gap-2.5 lg:gap-4 mb-5 lg:mb-0"
+                className="flex flex-col gap-3 mb-5 lg:mb-0 lg:flex-row lg:gap-4"
               >
-                <a href="/devis">
+                <a href="/devis" className="w-full lg:w-auto">
                   <Button
                     size="lg"
-                    className="relative overflow-hidden group rounded-full bg-white text-blue-900 hover:bg-cyan-50 shadow-2xl hover:shadow-white/70 transition-all duration-300 hover:scale-105"
+                    className="w-full relative overflow-hidden group rounded-full bg-white text-blue-900 hover:bg-cyan-50 shadow-2xl hover:shadow-white/70 transition-all duration-300 hover:scale-105 py-6 lg:py-3"
                   >
                     <span className="relative z-10 flex items-center justify-center">
                       {content.hero?.ctaPrimaryLabel || 'Trouver du personnel'}
@@ -807,7 +807,7 @@ export default function AppLanding() {
                   onClick={scrollToServices}
                   size="lg"
                   variant="outline"
-                  className="rounded-full border-2 border-white/30 text-white bg-transparent hover:bg-white/10 backdrop-blur-sm transition-all duration-300 hover:scale-105 hover:border-white/50"
+                  className="w-full lg:w-auto rounded-full border-2 border-white/30 text-white bg-transparent hover:bg-white/10 backdrop-blur-sm transition-all duration-300 hover:scale-105 hover:border-white/50 py-6 lg:py-3"
                 >
                   {content.hero?.ctaSecondaryLabel || 'Découvrir nos services'}
                 </Button>
@@ -889,7 +889,7 @@ export default function AppLanding() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.5 }}
-              className="lg:hidden space-y-2.5"
+              className="hidden lg:hidden space-y-2.5"
             >
               {/* Card 1: 27 pays */}
               <motion.div

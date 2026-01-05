@@ -1843,10 +1843,6 @@
     gap: calc(var(--spacing) * 2);
   }
 
-  .gap-2\.5 {
-    gap: calc(var(--spacing) * 2.5);
-  }
-
   .gap-3 {
     gap: calc(var(--spacing) * 3);
   }
@@ -9700,6 +9696,12 @@
   }
 
   @media (width >= 64rem) {
+    .lg\:w-auto {
+      width: auto;
+    }
+  }
+
+  @media (width >= 64rem) {
     .lg\:grid-cols-1 {
       grid-template-columns: repeat(1, minmax(0, 1fr));
     }
@@ -9732,6 +9734,12 @@
   @media (width >= 64rem) {
     .lg\:grid-cols-6 {
       grid-template-columns: repeat(6, minmax(0, 1fr));
+    }
+  }
+
+  @media (width >= 64rem) {
+    .lg\:flex-row {
+      flex-direction: row;
     }
   }
 
@@ -9826,6 +9834,12 @@
   @media (width >= 64rem) {
     .lg\:px-8 {
       padding-inline: calc(var(--spacing) * 8);
+    }
+  }
+
+  @media (width >= 64rem) {
+    .lg\:py-3 {
+      padding-block: calc(var(--spacing) * 3);
     }
   }
 
