@@ -1833,7 +1833,7 @@ export default function AppLanding() {
                   aria-label="YOJOB"
                 />
               </motion.div>
-              <p className="text-sm text-white/80 mb-6 leading-relaxed max-w-xs">
+              <p className="text-white/80 mb-[24px] leading-relaxed max-w-xs text-[13px] mt-[-46px] mr-[0px] ml-[0px]">
                 {content.footer?.logo?.tagline || 'Leader du recrutement européen. 500+ agences partenaires dans 27 pays pour connecter les talents aux opportunités.'}
               </p>
               <div className="flex gap-3">
