@@ -1,7 +1,7 @@
 #!/bin/bash
 # =============================================================================
 # SCRIPT DE MISE À JOUR - YoJob Landing Page
-# Exécuter depuis le serveur Hostinger pour mettre à jour l'application
+# Récupère UNIQUEMENT le code src depuis Figma/main (sans écraser Docker config)
 # =============================================================================
 # Usage: ./update.sh
 # =============================================================================
@@ -24,6 +24,7 @@ log_error() { echo -e "${RED}[ERREUR]${NC} $1"; }
 echo ""
 echo "=============================================="
 echo "   MISE À JOUR - YoJob Landing Page"
+echo "   (Récupère src depuis Figma, garde Docker)"
 echo "=============================================="
 echo ""
 
@@ -50,41 +51,71 @@ if [ ! -f ".env" ]; then
     fi
 fi
 
-# Étape 1: Récupérer les dernières modifications
-log_info "Récupération des dernières modifications..."
-git fetch origin
-git pull origin main
-log_success "Code mis à jour depuis GitHub"
+# =============================================================================
+# ÉTAPE 1: Récupérer UNIQUEMENT le dossier src depuis main (Figma)
+# =============================================================================
+log_info "Récupération du code source depuis Figma/main..."
+git fetch origin main
 
-# Étape 2: Arrêter le container existant (si présent)
+# Récupérer SEULEMENT les fichiers qui viennent de Figma (src, index.html, etc.)
+# SANS toucher aux fichiers Docker locaux
+log_info "Mise à jour du dossier src..."
+git checkout origin/main -- src/
+
+log_info "Mise à jour des fichiers de config Vite..."
+git checkout origin/main -- index.html package.json vite.config.ts .npmrc 2>/dev/null || true
+
+log_success "Code source mis à jour (Docker config préservée)"
+
+# =============================================================================
+# ÉTAPE 2: Arrêter le container existant
+# =============================================================================
 log_info "Arrêt du container existant..."
 docker-compose down 2>/dev/null || true
 log_success "Container arrêté"
 
-# Étape 3: Reconstruire l'image
+# =============================================================================
+# ÉTAPE 3: Reconstruire l'image avec le nouveau code
+# =============================================================================
 log_info "Reconstruction de l'image Docker..."
 docker-compose build --no-cache
 log_success "Image reconstruite"
 
-# Étape 4: Démarrer le nouveau container
+# =============================================================================
+# ÉTAPE 4: Démarrer le nouveau container
+# =============================================================================
 log_info "Démarrage du nouveau container..."
 docker-compose up -d
 log_success "Container démarré"
 
-# Étape 5: Nettoyer les anciennes images
+# =============================================================================
+# ÉTAPE 5: Nettoyage
+# =============================================================================
 log_info "Nettoyage des images inutilisées..."
 docker image prune -f 2>/dev/null || true
 log_success "Nettoyage terminé"
 
-# Afficher le statut
+# =============================================================================
+# RÉSUMÉ
+# =============================================================================
 echo ""
 echo "=============================================="
 log_success "MISE À JOUR TERMINÉE !"
 echo "=============================================="
 echo ""
+log_info "Fichiers mis à jour depuis Figma:"
+echo "  - src/ (code source)"
+echo "  - index.html, package.json, vite.config.ts"
+echo ""
+log_info "Fichiers Docker préservés:"
+echo "  - Dockerfile"
+echo "  - docker-compose.yml"
+echo "  - nginx/nginx.conf"
+echo "  - .env, .env.example"
+echo ""
 log_info "Statut du container:"
 docker-compose ps
 echo ""
-log_info "L'application est accessible sur: http://localhost:3000"
+log_info "Application: http://localhost:3000"
 log_info "Logs: docker-compose logs -f"
 echo ""
