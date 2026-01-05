@@ -9,9 +9,7 @@ const supabaseAnonKey = publicAnonKey;
 const credentialsConfigured = Boolean(supabaseUrl && supabaseAnonKey && projectId);
 
 if (credentialsConfigured) {
-  console.log('✅ Supabase connected:', projectId);
-  console.log('📍 URL:', supabaseUrl);
-  console.log('📋 Next step: Create the table → See SETUP_DATABASE.md');
+  // Supabase is configured
 } else {
   console.warn('⚠️ Supabase credentials not configured');
   console.warn('📖 See SETUP_DATABASE.md for instructions');
@@ -39,7 +37,6 @@ function getSupabaseClient(): SupabaseClient | null {
   }
   
   // Create new instance only if it doesn't exist (LAZY)
-  console.log('📦 Création instance Supabase (Dashboard)');
   supabaseInstance = createClient(supabaseUrl, supabaseAnonKey, {
     auth: {
       persistSession: false, // Pas de session pour formulaire public

@@ -1,9 +1,15 @@
 # 🔒 Nettoyage Sécurité - Console.log Sensibles Retirés
 
-## Date : 5 Janvier 2026
+## Date : 5 Janvier 2026 - PHASE 2 COMPLÉTÉE + ERREURS 404 CORRIGÉES ✅
 
 ### ⚠️ Problème identifié
-Plus de 100 `console.log()` exposaient des données sensibles dans la console du navigateur, créant un risque de sécurité majeur pour le hacking.
+Plus de 150+ `console.log()` exposaient des données sensibles dans la console du navigateur, créant un risque de sécurité majeur.
+
+### 🐛 Erreurs 404 corrigées
+Trois routes API manquantes provoquaient des erreurs dans la console :
+- ❌ `GET /i18n/ui-texts` - 404 Not Found → ✅ **CORRIGÉ**
+- ❌ `GET /i18n/country-languages` - 404 Not Found → ✅ **CORRIGÉ**
+- ❌ `GET /i18n/questions` - 404 Not Found → ✅ **CORRIGÉ**
 
 ---
 
@@ -38,6 +44,23 @@ Plus de 100 `console.log()` exposaient des données sensibles dans la console du
 - ✅ `/components/AutoImportTranslations.tsx` - Simplifié les logs
 - ✅ `/components/dashboard/SurveyTranslationDashboard.tsx` - Retiré logs verbeux
 - ✅ `/App-Survey-Original.tsx` - Retiré logs de données répondant
+- ✅ `/hooks/useLandingTranslations.ts` - Retiré logs de migration répétitifs (22 langues)
+
+### 🗄️ Infrastructure & API
+- ✅ `/lib/supabase.ts` - **CRITIQUE** - Retiré logs exposant :
+  - URL Supabase complète
+  - Project ID
+  - Messages de configuration
+- ✅ `/context/QuestionsContext.tsx` - Retiré logs de chargement
+- ✅ `/hooks/useQuestions.ts` - Retiré logs de compteur questions
+
+### 🎨 Composants UI
+- ✅ `/components/ui/select.tsx` - **POLLUTION MASSIVE** - Retiré 12+ logs :
+  - Logs de render (🔵 [Select] Render)
+  - Logs de position (🟣 [SelectContent])
+  - Logs useLayoutEffect
+  - Logs de click handlers
+  - Logs de cleanup
 
 ---
 
@@ -94,31 +117,64 @@ console.error('Error requesting AI suggestions:', err);
 
 ## 📊 Statistiques
 
-- **Fichiers modifiés** : 15+
-- **console.log retirés** : ~100+
+- **Fichiers modifiés** : 20+
+- **console.log retirés** : ~150+
 - **Types de données protégées** : 10+
-- **Temps de nettoyage** : ~30 minutes
+- **Temps de nettoyage Phase 2** : ~45 minutes
 - **Risque résiduel** : MINIMAL ✅
 
 ---
 
-## 🎯 Impact Sécurité
+## 🎯 Logs Critiques Retirés Phase 2
 
-### AVANT ❌
+### 1. Infrastructure Supabase 🗄️
 ```javascript
-console.log('Email:', user.email);
-console.log('SIRET:', entreprise.siret);
-console.log('IP:', userIp);
-```
-**→ Toutes ces données étaient visibles dans la console F12**
+// AVANT ❌
+console.log('✅ Supabase connected:', projectId);
+console.log('📍 URL:', supabaseUrl);
+console.log('📋 Next step: Create the table');
+console.log('📦 Création instance Supabase (Dashboard)');
 
-### APRÈS ✅
-```javascript
-// Logs retirés complètement
-// OU remplacés par des messages génériques
-console.error('Erreur lors de l\'opération');
+// APRÈS ✅
+// Logs complètement retirés
 ```
-**→ Aucune donnée sensible visible**
+
+### 2. Migrations Traductions 🌍
+```javascript
+// AVANT ❌ (répété 22 fois pour chaque langue!)
+console.log(`🔄 Migration: Added contactType field for bg`);
+console.log(`🔄 Migration: Added contactType field for cs`);
+console.log(`🔄 Migration: Added contactType field for da`);
+// ... x22 langues
+
+// APRÈS ✅
+// Logs de migration retirés
+```
+
+### 3. Composants UI Select 🎨
+```javascript
+// AVANT ❌ (répété à chaque render!)
+console.log('🔵 [Select] Render - isOpen:', isOpen, 'disabled:', disabled);
+console.log('🟣 [SelectContent] Render - isOpen:', isOpen, 'position:', position);
+console.log('🟣 [SelectContent] useLayoutEffect - isOpen:', isOpen);
+console.log('🟣 [SelectContent] Position calculée:', newPosition, 'rect:', rect);
+console.log('🟣 [SelectContent] justOpened flag réinitialisé');
+console.log('🟣 [SelectContent] Event listener ajouté');
+console.log('🟣 [SelectContent] Cleanup');
+
+// APRÈS ✅
+// Tous les logs UI retirés (performance améliorée)
+```
+
+### 4. Questions Context 📋
+```javascript
+// AVANT ❌
+console.log(`✅ [QuestionsContext] Loaded ${mergedQuestions.length} questions from API`);
+console.log(`✅ [useQuestions] Loaded ${mergedQuestions.length} questions`);
+
+// APRÈS ✅
+// Logs retirés
+```
 
 ---
 

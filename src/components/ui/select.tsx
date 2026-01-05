@@ -52,8 +52,6 @@ export function Select({ value = '', onValueChange, children, disabled = false }
   const [valueLabel, setValueLabel] = React.useState('');
   const triggerRef = React.useRef<HTMLButtonElement>(null);
 
-  console.log('🔵 [Select] Render - isOpen:', isOpen, 'disabled:', disabled);
-
   return (
     <SelectContext.Provider
       value={{
@@ -77,11 +75,9 @@ export function SelectTrigger({ className = '', children }: SelectTriggerProps) 
   const { isOpen, setIsOpen, triggerRef } = React.useContext(SelectContext);
 
   const handleClick = (e: React.MouseEvent) => {
-    console.log('🟢 [SelectTrigger] Click détecté! isOpen avant:', isOpen);
     e.preventDefault();
     e.stopPropagation();
     setIsOpen(!isOpen);
-    console.log('🟢 [SelectTrigger] setIsOpen appelé avec:', !isOpen);
   };
 
   return (
@@ -113,10 +109,7 @@ export function SelectContent({ children, className = '' }: SelectContentProps) 
   const [position, setPosition] = React.useState({ top: 0, left: 0, width: 0 });
   const justOpenedRef = React.useRef(false);
 
-  console.log('🟣 [SelectContent] Render - isOpen:', isOpen, 'position:', position);
-
   React.useLayoutEffect(() => {
-    console.log('🟣 [SelectContent] useLayoutEffect - isOpen:', isOpen);
     if (!isOpen) return;
 
     // Marquer que le dropdown vient de s'ouvrir
@@ -132,10 +125,7 @@ export function SelectContent({ children, className = '' }: SelectContentProps) 
           left: rect.left,      // Position fixed : pas besoin de window.scrollX
           width: rect.width
         };
-        console.log('🟣 [SelectContent] Position calculée:', newPosition, 'rect:', rect);
         setPosition(newPosition);
-      } else {
-        console.log('⚠️ [SelectContent] Trigger ref non disponible!');
       }
     };
 
@@ -150,7 +140,6 @@ export function SelectContent({ children, className = '' }: SelectContentProps) 
     const handleClickOutside = (event: MouseEvent) => {
       // Ignorer si le dropdown vient juste de s'ouvrir
       if (justOpenedRef.current) {
-        console.log('🟣 [SelectContent] Click ignoré (justOpened)');
         return;
       }
 
@@ -161,7 +150,6 @@ export function SelectContent({ children, className = '' }: SelectContentProps) 
         ref.current && !ref.current.contains(target) &&
         triggerRef.current && !triggerRef.current.contains(target)
       ) {
-        console.log('🟣 [SelectContent] Fermeture (click outside)');
         setIsOpen(false);
       }
     };
@@ -169,18 +157,15 @@ export function SelectContent({ children, className = '' }: SelectContentProps) 
     // Réinitialiser le flag après un délai
     const flagTimeout = setTimeout(() => {
       justOpenedRef.current = false;
-      console.log('🟣 [SelectContent] justOpened flag réinitialisé');
     }, 100);
 
     // Ajouter l'event listener après un délai
     const listenerTimeout = setTimeout(() => {
-      console.log('🟣 [SelectContent] Event listener ajouté');
       document.addEventListener('mousedown', handleClickOutside);
     }, 100);
 
     // Cleanup function
     return () => {
-      console.log('🟣 [SelectContent] Cleanup');
       clearTimeout(flagTimeout);
       clearTimeout(listenerTimeout);
       document.removeEventListener('mousedown', handleClickOutside);
@@ -190,15 +175,12 @@ export function SelectContent({ children, className = '' }: SelectContentProps) 
   }, [isOpen, setIsOpen, triggerRef]);
 
   if (!isOpen) {
-    console.log('🟣 [SelectContent] Pas de render (isOpen=false)');
     return null;
   }
 
   const handleContentClick = (e: React.MouseEvent) => {
     e.stopPropagation();
   };
-
-  console.log('🟣 [SelectContent] RENDER du dropdown!');
 
   return createPortal(
     <div

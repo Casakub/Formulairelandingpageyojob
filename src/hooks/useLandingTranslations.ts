@@ -41,7 +41,6 @@ export function useLandingTranslations(
     if (!savedLang && initialLanguage !== 'fr') {
       try {
         localStorage.setItem('yojob_preferred_language', initialLanguage);
-        console.log('✅ Langue auto-détectée sauvegardée:', initialLanguage);
       } catch (e) {
         console.warn('Failed to save auto-detected language:', e);
       }
@@ -107,7 +106,6 @@ export function useLandingTranslations(
             
             migratedTranslations[lang].ctaForm.form.fields.contactType = defaultContactType;
             hasMigrations = true;
-            console.log(`🔄 Migration: Added contactType field for ${lang}`);
           }
         });
         
@@ -188,7 +186,6 @@ export function useLandingTranslations(
                     },
                   };
                   oldTranslations[lang].ctaForm.form.fields.contactType = defaultContactType;
-                  console.log(`🔄 Old System Migration: Added contactType field for ${lang}`);
                 }
               });
               
@@ -283,7 +280,6 @@ export function useLandingTranslations(
       // Sauvegarder la préférence MANUELLE (priorité absolue sur auto-détection)
       try {
         localStorage.setItem('yojob_preferred_language', lang);
-        console.log('✅ Langue changée manuellement et sauvegardée:', lang);
       } catch (e) {
         console.warn('Failed to save language preference:', e);
       }

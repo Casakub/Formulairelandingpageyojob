@@ -101,6 +101,242 @@ app.get("/available-languages", async (c) => {
 });
 
 /**
+ * GET /questions
+ * Get all question translations across all languages
+ */
+app.get("/questions", async (c) => {
+  try {
+    const supabase = getSupabaseClient();
+
+    // Get all question translations
+    const { data: translations, error } = await supabase
+      .from('translations_10092a63')
+      .select('key, value, language, context, section')
+      .like('key', 'questions.%');
+
+    if (error) {
+      console.error('❌ Error fetching questions:', error);
+      return c.json({
+        success: false,
+        error: 'Failed to fetch questions',
+      }, 500);
+    }
+
+    // Group by language
+    const questionsByLanguage: Record<string, any> = {};
+
+    translations?.forEach((t: any) => {
+      if (!questionsByLanguage[t.language]) {
+        questionsByLanguage[t.language] = {};
+      }
+
+      const key = t.key;
+      const value = t.value;
+      const parts = key.split('.');
+
+      // Handle both profile-specific and generic questions
+      const isProfileSpecific = ['agency', 'client', 'worker'].includes(parts[1]);
+      const questionId = isProfileSpecific ? parts[2] : parts[1];
+      const field = isProfileSpecific ? parts[3] : parts[2];
+
+      if (!questionsByLanguage[t.language][questionId]) {
+        questionsByLanguage[t.language][questionId] = {
+          label: '',
+          placeholder: '',
+          options: {},
+          status: 'validated'
+        };
+      }
+
+      if (parts.includes('options')) {
+        const optionIndex = isProfileSpecific ? 4 : 3;
+        const optionValue = parts[optionIndex];
+        if (optionValue) {
+          questionsByLanguage[t.language][questionId].options[optionValue] = value;
+        }
+      } else if (field === 'label') {
+        questionsByLanguage[t.language][questionId].label = value;
+      } else if (field === 'placeholder') {
+        questionsByLanguage[t.language][questionId].placeholder = value;
+      } else if (field === 'description') {
+        questionsByLanguage[t.language][questionId].description = value;
+      }
+    });
+
+    return c.json({
+      success: true,
+      questions: questionsByLanguage,
+      count: translations?.length || 0,
+    });
+
+  } catch (error: any) {
+    console.error('❌ Questions error:', error);
+    return c.json({
+      success: false,
+      error: 'Internal server error',
+      details: error.message,
+    }, 500);
+  }
+});
+
+/**
+ * GET /ui-texts
+ * Get all UI text translations across all languages
+ */
+app.get("/ui-texts", async (c) => {
+  try {
+    const supabase = getSupabaseClient();
+
+    // Get all non-question translations (UI texts)
+    const { data: translations, error } = await supabase
+      .from('translations_10092a63')
+      .select('key, value, language, context, section')
+      .not('key', 'like', 'questions.%');
+
+    if (error) {
+      console.error('❌ Error fetching UI texts:', error);
+      return c.json({
+        success: false,
+        error: 'Failed to fetch UI texts',
+      }, 500);
+    }
+
+    // Group by language
+    const uiTextsByLanguage: Record<string, Record<string, string>> = {};
+
+    translations?.forEach((t: any) => {
+      if (!uiTextsByLanguage[t.language]) {
+        uiTextsByLanguage[t.language] = {};
+      }
+      uiTextsByLanguage[t.language][t.key] = t.value;
+    });
+
+    return c.json({
+      success: true,
+      uiTexts: uiTextsByLanguage,
+      count: translations?.length || 0,
+    });
+
+  } catch (error: any) {
+    console.error('❌ UI texts error:', error);
+    return c.json({
+      success: false,
+      error: 'Internal server error',
+      details: error.message,
+    }, 500);
+  }
+});
+
+/**
+ * POST /ui-texts/bulk
+ * Bulk import UI texts
+ */
+app.post("/ui-texts/bulk", async (c) => {
+  try {
+    const body = await c.req.json();
+    const { texts, language } = body;
+
+    if (!texts || !language) {
+      return c.json({
+        success: false,
+        error: 'Missing required fields: texts, language',
+      }, 400);
+    }
+
+    const supabase = getSupabaseClient();
+
+    // Prepare bulk insert data
+    const insertData = Object.entries(texts).map(([key, value]) => ({
+      key,
+      value,
+      language,
+      context: 'ui',
+      section: key.split('.')[0] || 'general',
+    }));
+
+    const { error } = await supabase
+      .from('translations_10092a63')
+      .upsert(insertData, {
+        onConflict: 'key,language',
+      });
+
+    if (error) {
+      console.error('❌ Error bulk inserting UI texts:', error);
+      return c.json({
+        success: false,
+        error: 'Failed to insert UI texts',
+      }, 500);
+    }
+
+    return c.json({
+      success: true,
+      inserted: insertData.length,
+    });
+
+  } catch (error: any) {
+    console.error('❌ UI texts bulk error:', error);
+    return c.json({
+      success: false,
+      error: 'Internal server error',
+      details: error.message,
+    }, 500);
+  }
+});
+
+/**
+ * GET /country-languages
+ * Get country to language mappings for all European countries
+ */
+app.get("/country-languages", async (c) => {
+  try {
+    // Return static mapping of European countries to their languages
+    // This is based on the EUROPEAN_LANGUAGES constant
+    const countryLanguages: Record<string, string[]> = {
+      'FR': ['fr'],
+      'DE': ['de'],
+      'ES': ['es'],
+      'IT': ['it'],
+      'PT': ['pt'],
+      'NL': ['nl'],
+      'PL': ['pl'],
+      'RO': ['ro'],
+      'EL': ['el'],
+      'HU': ['hu'],
+      'CZ': ['cs'],
+      'SE': ['sv'],
+      'BE': ['fr', 'nl'],
+      'GR': ['el'],
+      'AT': ['de'],
+      'BG': ['bg'],
+      'DK': ['da'],
+      'FI': ['fi'],
+      'SK': ['sk'],
+      'NO': ['no'],
+      'HR': ['hr'],
+      'LT': ['lt'],
+      'SI': ['sl'],
+      'LV': ['lv'],
+      'EE': ['et'],
+      'LU': ['fr', 'de'],
+      'MT': ['en'],
+    };
+
+    return c.json({
+      success: true,
+      countryLanguages,
+    });
+
+  } catch (error: any) {
+    console.error('❌ Country languages error:', error);
+    return c.json({
+      success: false,
+      error: 'Internal server error',
+      details: error.message,
+    }, 500);
+  }
+});
+
+/**
  * GET /translations/:language
  * Get all translations for a specific language
  */
