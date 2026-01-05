@@ -2,65 +2,20 @@ import * as kv from "./kv_store.tsx";
 
 const ANTHROPIC_API_KEY_ENV = Deno.env.get("ANTHROPIC_API_KEY") || "";
 
-// Modèles Claude disponibles avec leurs caractéristiques
-export const CLAUDE_MODELS = {
-  // Claude 4.5 (Latest models - 2025)
+// Available Claude Models Configuration
+export const CLAUDE_MODELS: Record<string, ModelInfo> = {
+  // Claude 4.5 (Latest generation - January 2025)
   'claude-sonnet-4-5-20250929': {
     name: 'Claude Sonnet 4.5',
     alias: 'claude-sonnet-4-5',
-    description: 'Our smart model for complex agents and coding',
+    description: 'Notre modèle intelligent pour les tâches complexes et le codage',
     tier: 'balanced',
     speed: 'fast',
-    intelligence: 'high',
+    intelligence: 'very-high',
     costTier: 'standard',
     pricing: {
-      input: 3, // $ per MTok
-      output: 15, // $ per MTok
-    },
-    inputTokensPerMin: 30000,
-    outputTokensPerMin: 8000,
-    requestsPerMin: 50,
-    contextWindow: 200000,
-    contextWindowBeta: 1000000, // 1M tokens in beta
-    maxOutput: 64000,
-    extendedThinking: true,
-    priorityTier: true,
-    knowledgeCutoff: 'Jan 2025',
-    trainingDataCutoff: 'Jul 2025',
-  },
-  'claude-haiku-4-5-20251001': {
-    name: 'Claude Haiku 4.5',
-    alias: 'claude-haiku-4-5',
-    description: 'Our fastest model with near-frontier intelligence',
-    tier: 'fast',
-    speed: 'fastest',
-    intelligence: 'medium-high',
-    costTier: 'economy',
-    pricing: {
-      input: 1, // $ per MTok
-      output: 5, // $ per MTok
-    },
-    inputTokensPerMin: 50000,
-    outputTokensPerMin: 10000,
-    requestsPerMin: 50,
-    contextWindow: 200000,
-    maxOutput: 64000,
-    extendedThinking: true,
-    priorityTier: true,
-    knowledgeCutoff: 'Feb 2025',
-    trainingDataCutoff: 'Jul 2025',
-  },
-  'claude-opus-4-5-20251101': {
-    name: 'Claude Opus 4.5',
-    alias: 'claude-opus-4-5',
-    description: 'Premium model combining maximum intelligence with practical performance',
-    tier: 'flagship',
-    speed: 'moderate',
-    intelligence: 'highest',
-    costTier: 'premium',
-    pricing: {
-      input: 5, // $ per MTok
-      output: 25, // $ per MTok
+      input: 3,
+      output: 15,
     },
     inputTokensPerMin: 30000,
     outputTokensPerMin: 8000,
@@ -73,8 +28,54 @@ export const CLAUDE_MODELS = {
     trainingDataCutoff: 'Aug 2025',
   },
   
-  // Claude 3.x (Previous generation - Still available)
-  'claude-3-5-sonnet-20240620': {
+  'claude-haiku-4-5-20251001': {
+    name: 'Claude Haiku 4.5',
+    alias: 'claude-haiku-4-5',
+    description: 'Notre modèle le plus rapide avec une intelligence quasi-frontière',
+    tier: 'fast',
+    speed: 'fastest',
+    intelligence: 'high',
+    costTier: 'economy',
+    pricing: {
+      input: 1,
+      output: 5,
+    },
+    inputTokensPerMin: 50000,
+    outputTokensPerMin: 10000,
+    requestsPerMin: 100,
+    contextWindow: 200000,
+    maxOutput: 64000,
+    extendedThinking: false,
+    priorityTier: true,
+    knowledgeCutoff: 'Fév 2025',
+    trainingDataCutoff: 'Juil 2025',
+  },
+  
+  'claude-opus-4-5-20251101': {
+    name: 'Claude Opus 4.5',
+    alias: 'claude-opus-4-5',
+    description: 'Modèle premium combinant intelligence maximale avec des performances pratiques',
+    tier: 'premium',
+    speed: 'moderate',
+    intelligence: 'maximum',
+    costTier: 'premium',
+    pricing: {
+      input: 5,
+      output: 25,
+    },
+    inputTokensPerMin: 20000,
+    outputTokensPerMin: 5000,
+    requestsPerMin: 50,
+    contextWindow: 200000,
+    maxOutput: 64000,
+    extendedThinking: true,
+    priorityTier: true,
+    knowledgeCutoff: 'Mai 2025',
+    trainingDataCutoff: 'Août 2025',
+  },
+  
+  // Claude 3.5 Sonnet (October 2024 - Previous stable version)
+  'claude-3-5-sonnet-20241022': {
     name: 'Claude 3.5 Sonnet',
     alias: 'claude-3-5-sonnet',
     description: 'Previous generation balanced model',
@@ -95,72 +96,6 @@ export const CLAUDE_MODELS = {
     priorityTier: true,
     knowledgeCutoff: 'Apr 2024',
     trainingDataCutoff: 'Apr 2024',
-  },
-  'claude-3-5-haiku-20241022': {
-    name: 'Claude 3.5 Haiku',
-    alias: 'claude-3-5-haiku',
-    description: 'Previous generation fast model',
-    tier: 'fast',
-    speed: 'fastest',
-    intelligence: 'medium',
-    costTier: 'economy',
-    pricing: {
-      input: 1,
-      output: 5,
-    },
-    inputTokensPerMin: 50000,
-    outputTokensPerMin: 10000,
-    requestsPerMin: 50,
-    contextWindow: 200000,
-    maxOutput: 8192,
-    extendedThinking: false,
-    priorityTier: true,
-    knowledgeCutoff: 'Jul 2024',
-    trainingDataCutoff: 'Jul 2024',
-  },
-  'claude-3-opus-20240229': {
-    name: 'Claude 3 Opus',
-    alias: 'claude-3-opus',
-    description: 'Previous generation flagship model',
-    tier: 'flagship',
-    speed: 'slow',
-    intelligence: 'highest',
-    costTier: 'premium',
-    pricing: {
-      input: 15,
-      output: 75,
-    },
-    inputTokensPerMin: 20000,
-    outputTokensPerMin: 4000,
-    requestsPerMin: 50,
-    contextWindow: 200000,
-    maxOutput: 4096,
-    extendedThinking: false,
-    priorityTier: true,
-    knowledgeCutoff: 'Aug 2023',
-    trainingDataCutoff: 'Aug 2023',
-  },
-  'claude-3-haiku-20240307': {
-    name: 'Claude 3 Haiku',
-    alias: 'claude-3-haiku',
-    description: 'Previous generation economy model',
-    tier: 'fast',
-    speed: 'fastest',
-    intelligence: 'medium',
-    costTier: 'economy',
-    pricing: {
-      input: 0.25,
-      output: 1.25,
-    },
-    inputTokensPerMin: 50000,
-    outputTokensPerMin: 10000,
-    requestsPerMin: 50,
-    contextWindow: 200000,
-    maxOutput: 4096,
-    extendedThinking: false,
-    priorityTier: true,
-    knowledgeCutoff: 'Aug 2023',
-    trainingDataCutoff: 'Aug 2023',
   },
 };
 
@@ -434,7 +369,7 @@ export async function testApiKey(c: any) {
         "anthropic-version": "2023-06-01",
       },
       body: JSON.stringify({
-        model: "claude-3-5-sonnet-20240620",
+        model: "claude-sonnet-4-5-20250929",
         max_tokens: 50,
         messages: [
           {
@@ -483,7 +418,7 @@ export async function testApiKey(c: any) {
     return c.json({
       success: true,
       message: "Connexion à Claude réussie !",
-      model: "claude-3-5-sonnet-20240620",
+      model: "claude-sonnet-4-5-20250929",
       response: data.content?.[0]?.text || "OK",
     });
 
