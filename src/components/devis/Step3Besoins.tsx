@@ -12,6 +12,7 @@ import { calculerTauxHoraireBrut, calculerTauxETTAvecPays, formaterMontant, calc
 import { useDevisConfig } from '../../hooks/useDevisConfig';
 import { useDevisTranslationStatic } from '../../hooks/useDevisTranslation';
 import { translatePays } from '../../utils/recapitulatif-translations';
+import { generateUUID } from '../../utils/uuid';
 import type { DevisLanguage } from '../../src/i18n/devis/types';
 
 // 🔑 Mapping entre clés techniques et labels français pour compatibilité
@@ -78,7 +79,7 @@ export function Step3Besoins({ data, pays, region, onChange, lang = 'fr' }: Step
 
   const handleAddPoste = () => {
     const newPoste: Poste = {
-      id: crypto.randomUUID(),
+      id: generateUUID(),
       secteur: '',
       convention: '',
       nationalite: 'RO',  // 🆕 Roumanie par défaut

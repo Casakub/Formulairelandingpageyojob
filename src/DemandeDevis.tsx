@@ -21,6 +21,7 @@ import { Progress } from './components/ui/progress';
 import { LogoSvg } from './imports/YojobLogoComplete';
 import { toast } from 'sonner@2.0.3';
 import { projectId, publicAnonKey } from './utils/supabase/info';
+import { generateUUID } from './utils/uuid';
 
 // Import des composants d'étapes (à créer)
 import { Step1Entreprise } from './components/devis/Step1Entreprise';
@@ -178,7 +179,7 @@ export default function DemandeDevis() {
     },
     postes: [
       {
-        id: crypto.randomUUID(),
+        id: generateUUID(),
         secteur: '',
         convention: '',
         nationalite: '',  // 🆕 Code pays (RO, PL, PT, etc.)
