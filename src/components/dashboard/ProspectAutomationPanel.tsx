@@ -11,9 +11,10 @@ interface ProspectAutomationPanelProps {
   prospectId: string;
   prospectEmail: string;
   prospectType: string;
+  onNavigateToAutomations?: () => void;
 }
 
-export function ProspectAutomationPanel({ prospectId, prospectEmail, prospectType }: ProspectAutomationPanelProps) {
+export function ProspectAutomationPanel({ prospectId, prospectEmail, prospectType, onNavigateToAutomations }: ProspectAutomationPanelProps) {
   const [activeWorkflows, setActiveWorkflows] = useState<AutomationWorkflow[]>([]);
   const [currentRuns, setCurrentRuns] = useState<AutomationRun[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -234,7 +235,7 @@ export function ProspectAutomationPanel({ prospectId, prospectEmail, prospectTyp
         variant="outline"
         size="sm"
         className="w-full gap-2"
-        onClick={() => window.location.href = '/dashboard?tab=automations'}
+        onClick={() => onNavigateToAutomations ? onNavigateToAutomations() : window.location.href = '/dashboard?tab=automations'}
       >
         <ExternalLink className="w-4 h-4" />
         Gérer les automatisations

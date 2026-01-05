@@ -1,8 +1,9 @@
 import { useState } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../ui/tabs';
 import { ProspectsPage } from './ProspectsPage';
+import { LandingProspectsPage } from './LandingProspectsPage';
 import { DevisTab } from './DevisTab';
-import { BarChart3, FileText, Users } from 'lucide-react';
+import { BarChart3, FileText, Users, Mail } from 'lucide-react';
 
 export function ProspectsPageWithTabs() {
   const [activeTab, setActiveTab] = useState('overview');
@@ -11,7 +12,7 @@ export function ProspectsPageWithTabs() {
     <div className="space-y-6">
       {/* Tabs Navigation */}
       <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-        <TabsList className="grid w-full max-w-md grid-cols-3 bg-white/50 border border-slate-200">
+        <TabsList className="grid w-full max-w-2xl grid-cols-4 bg-white/50 border border-slate-200">
           <TabsTrigger 
             value="overview"
             className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-500 data-[state=active]:to-cyan-500 data-[state=active]:text-white gap-2"
@@ -25,6 +26,13 @@ export function ProspectsPageWithTabs() {
           >
             <Users className="w-4 h-4" />
             Étude marché
+          </TabsTrigger>
+          <TabsTrigger 
+            value="landing"
+            className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-indigo-500 data-[state=active]:to-blue-500 data-[state=active]:text-white gap-2"
+          >
+            <Mail className="w-4 h-4" />
+            Demandes contact
           </TabsTrigger>
           <TabsTrigger 
             value="devis"
@@ -44,7 +52,7 @@ export function ProspectsPageWithTabs() {
                 Centralisez tous vos prospects et demandes de devis en un seul endroit.
               </p>
               
-              <div className="grid md:grid-cols-2 gap-6">
+              <div className="grid md:grid-cols-3 gap-6">
                 <div 
                   onClick={() => setActiveTab('survey')}
                   className="border-2 border-violet-200 rounded-lg p-6 hover:border-violet-400 hover:shadow-lg transition-all cursor-pointer group"
@@ -60,6 +68,26 @@ export function ProspectsPageWithTabs() {
                       </p>
                       <div className="text-violet-600 text-sm">
                         Gérer les prospects →
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div 
+                  onClick={() => setActiveTab('landing')}
+                  className="border-2 border-indigo-200 rounded-lg p-6 hover:border-indigo-400 hover:shadow-lg transition-all cursor-pointer group"
+                >
+                  <div className="flex items-start gap-4">
+                    <div className="p-3 rounded-lg bg-gradient-to-br from-indigo-500 to-blue-500 group-hover:scale-110 transition-transform">
+                      <Mail className="w-6 h-6 text-white" />
+                    </div>
+                    <div className="flex-1">
+                      <h3 className="text-slate-900 mb-2">Demandes Contact</h3>
+                      <p className="text-slate-600 text-sm mb-4">
+                        Prospects issus de la landing page (formulaire contact + waitlist marketplace).
+                      </p>
+                      <div className="text-indigo-600 text-sm">
+                        Gérer les contacts →
                       </div>
                     </div>
                   </div>
@@ -94,6 +122,11 @@ export function ProspectsPageWithTabs() {
         {/* Tab Survey Prospects */}
         <TabsContent value="survey" className="mt-6">
           <ProspectsPage />
+        </TabsContent>
+
+        {/* Tab Landing Prospects */}
+        <TabsContent value="landing" className="mt-6">
+          <LandingProspectsPage />
         </TabsContent>
 
         {/* Tab Devis */}

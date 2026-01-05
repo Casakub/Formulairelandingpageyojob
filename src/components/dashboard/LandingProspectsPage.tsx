@@ -1,22 +1,18 @@
 import { ProspectSheet } from './ProspectSheet';
 import { NewProspectDialog } from './NewProspectDialog';
 import { ProspectsExport } from './ProspectsExport';
-import { ProspectsSetupBanner } from './ProspectsSetupBanner';
-import { DevisTab } from './DevisTab';
 import { projectId, publicAnonKey } from '../../utils/supabase/info';
 import { useState, useEffect } from 'react';
-import { motion, AnimatePresence } from 'motion/react';
+import { motion } from 'motion/react';
 import { 
   Users, 
   Building2, 
-  Briefcase, 
   UserCheck, 
   Search, 
   Plus, 
   RefreshCw, 
   ClipboardList,
   Rocket,
-  Trash2,
   Archive,
   ArchiveX,
   MoreVertical,
@@ -25,16 +21,13 @@ import {
   AlertCircle,
   Phone,
   XCircle,
-  FileText,
-  BarChart3,
+  Mail,
+  MessageSquare,
 } from 'lucide-react';
 import { Card, CardContent, CardHeader } from '../ui/card';
 import { Button } from '../ui/button';
 import { Input } from '../ui/input';
-import { Badge } from '../ui/badge';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '../ui/tabs';
 
-type ProspectType = 'all' | 'client' | 'agency' | 'interim' | 'waitlist' | 'contact';
 type ProspectStatus = 'new' | 'contacted' | 'qualified' | 'converted' | 'lost' | 'archived';
 
 interface Prospect {
@@ -59,24 +52,18 @@ interface Prospect {
   custom_fields: any;
 }
 
-interface ProspectStats {
-  total_active: number;
-  total_clients: number;
-  total_agencies: number;
-  total_interims: number;
+interface LandingStats {
+  total_contact: number;
   total_waitlist: number;
   total_new: number;
+  total_contacted: number;
   total_qualified: number;
-  total_won: number;
   total_this_month: number;
 }
 
-const TYPE_BADGES = {
-  client: { bg: '#dbeafe', text: '#1d4ed8', icon: Building2, label: 'CLIENT' },
-  agency: { bg: '#ffedd5', text: '#c2410c', icon: Briefcase, label: 'AGENCE' },
-  interim: { bg: '#dcfce7', text: '#15803d', icon: UserCheck, label: 'INTÉRIMAIRE' },
-  waitlist: { bg: '#fef3c7', text: '#b45309', icon: Rocket, label: 'WAITLIST' },
-  contact: { bg: '#e0e7ff', text: '#4f46e5', icon: Users, label: 'CONTACT' },
+const SOURCE_BADGES = {
+  landing_contact: { bg: '#e0e7ff', text: '#4f46e5', icon: MessageSquare, label: 'CONTACT' },
+  landing_waitlist: { bg: '#fef3c7', text: '#b45309', icon: Rocket, label: 'WAITLIST' },
 };
 
 const STATUS_BADGES = {
@@ -86,10 +73,6 @@ const STATUS_BADGES = {
   converted: { bg: '#d1fae5', text: '#047857', label: 'Converti' },
   lost: { bg: '#fee2e2', text: '#b91c1c', label: 'Perdu' },
   archived: { bg: '#f3f4f6', text: '#6b7280', label: 'Archivé' },
-  // Anciens statuts pour compatibilité
-  'follow-up': { bg: '#fef3c7', text: '#b45309', label: 'Relance planifiée' },
-  'proposal': { bg: '#ede9fe', text: '#6d28d9', label: 'Proposition envoyée' },
-  'won': { bg: '#d1fae5', text: '#047857', label: 'Gagné' },
 };
 
 const COUNTRY_FLAGS: Record<string, string> = {
@@ -108,21 +91,18 @@ const AVATAR_COLORS = [
   'from-indigo-500 to-blue-500',
 ];
 
-export function ProspectsPage() {
-  const [activeFilter, setActiveFilter] = useState<ProspectType>('all');
+export function LandingProspectsPage() {
+  const [activeSourceFilter, setActiveSourceFilter] = useState<string>('all');
   const [activeStatusFilter, setActiveStatusFilter] = useState<string>('all');
-  const [showArchived, setShowArchived] = useState(false);
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedProspect, setSelectedProspect] = useState<Prospect | null>(null);
   const [prospects, setProspects] = useState<Prospect[]>([]);
-  const [stats, setStats] = useState<ProspectStats | null>(null);
+  const [stats, setStats] = useState<LandingStats | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [newProspectDialogOpen, setNewProspectDialogOpen] = useState(false);
-  const [isScoringBatch, setIsScoringBatch] = useState(false);
-  const [needsSetup, setNeedsSetup] = useState(false);
   const [isPerformingBulkAction, setIsPerformingBulkAction] = useState(false);
 
   // Charger les statistiques
@@ -140,34 +120,34 @@ export function ProspectsPage() {
 
       const data = await response.json();
       if (data.success && data.stats) {
-        setStats(data.stats);
-        setNeedsSetup(false);
-      } else if (data.error && data.error.includes('prospects')) {
-        setNeedsSetup(true);
+        // Extraire uniquement les stats landing
+        setStats({
+          total_contact: data.stats.total_contact || 0,
+          total_waitlist: data.stats.total_waitlist || 0,
+          total_new: data.stats.total_new || 0,
+          total_contacted: data.stats.total_contacted || 0,
+          total_qualified: data.stats.total_qualified || 0,
+          total_this_month: data.stats.total_this_month || 0,
+        });
       }
     } catch (error) {
-      console.error('Error loading stats:', error);
-      setNeedsSetup(true);
+      console.error('Error loading landing stats:', error);
     }
   };
 
-  // Charger les prospects
+  // Charger les prospects (filtrer uniquement landing_contact et landing_waitlist)
   const loadProspects = async () => {
     setIsLoading(true);
     try {
       const params = new URLSearchParams({
         page: currentPage.toString(),
         limit: '10',
+        // Filtrer uniquement les sources landing
+        source: activeSourceFilter === 'all' ? 'landing' : activeSourceFilter,
       });
 
-      if (activeFilter !== 'all') {
-        params.append('type', activeFilter);
-      }
       if (activeStatusFilter !== 'all') {
         params.append('status', activeStatusFilter);
-      }
-      if (showArchived) {
-        params.append('archived', 'true');
       }
       if (searchQuery) {
         params.append('search', searchQuery);
@@ -185,30 +165,27 @@ export function ProspectsPage() {
 
       const data = await response.json();
       if (data.success) {
-        // Filtrer côté client pour ne garder que les prospects survey (étude de marché)
-        const surveyProspects = data.prospects.filter((p: Prospect) => 
-          p.source === 'survey_client' || 
-          p.source === 'survey_agency' || 
-          p.source === 'survey_interim'
+        // Filtrer côté client pour ne garder que landing_contact et landing_waitlist
+        const landingProspects = data.prospects.filter((p: Prospect) => 
+          p.source === 'landing_contact' || p.source === 'landing_waitlist'
         );
-        setProspects(surveyProspects);
+        setProspects(landingProspects);
         setTotalPages(data.totalPages || 1);
       }
     } catch (error) {
-      console.error('Error loading prospects:', error);
+      console.error('Error loading landing prospects:', error);
     } finally {
       setIsLoading(false);
     }
   };
 
-  // Charger au montage et quand les filtres changent
   useEffect(() => {
     loadStats();
   }, []);
 
   useEffect(() => {
     loadProspects();
-  }, [activeFilter, activeStatusFilter, showArchived, searchQuery, currentPage]);
+  }, [activeSourceFilter, activeStatusFilter, searchQuery, currentPage]);
 
   const handleRefresh = () => {
     loadStats();
@@ -368,45 +345,43 @@ export function ProspectsPage() {
 
   const KPI_CARDS = [
     {
-      icon: Users,
-      gradient: 'from-blue-500 to-cyan-500',
-      value: stats?.total_active || 0,
-      label: 'Prospects totaux',
-      sublabel: `+${stats?.total_this_month || 0} ce mois`,
-      progress: 68,
+      icon: MessageSquare,
+      gradient: 'from-blue-500 to-indigo-500',
+      value: stats?.total_contact || 0,
+      label: 'Formulaire contact',
+      sublabel: `Demandes landing page`,
+      progress: 65,
     },
     {
-      icon: Building2,
-      gradient: 'from-violet-500 to-purple-500',
-      value: stats?.total_clients || 0,
-      label: 'Clients',
-      sublabel: `${Math.round(((stats?.total_clients || 0) / (stats?.total_active || 1)) * 100)}% du total`,
-      progress: Math.round(((stats?.total_clients || 0) / (stats?.total_active || 1)) * 100),
+      icon: Rocket,
+      gradient: 'from-yellow-500 to-orange-500',
+      value: stats?.total_waitlist || 0,
+      label: 'Liste d\'attente',
+      sublabel: `Marketplace future`,
+      progress: 45,
     },
     {
-      icon: Briefcase,
-      gradient: 'from-orange-500 to-amber-500',
-      value: stats?.total_agencies || 0,
-      label: 'Agences ETT',
-      sublabel: `${Math.round(((stats?.total_agencies || 0) / (stats?.total_active || 1)) * 100)}% du total`,
-      progress: Math.round(((stats?.total_agencies || 0) / (stats?.total_active || 1)) * 100),
+      icon: AlertCircle,
+      gradient: 'from-cyan-500 to-blue-500',
+      value: stats?.total_new || 0,
+      label: 'Nouveaux',
+      sublabel: `À traiter`,
+      progress: Math.round(((stats?.total_new || 0) / ((stats?.total_contact || 1) + (stats?.total_waitlist || 1))) * 100),
     },
     {
       icon: UserCheck,
       gradient: 'from-green-500 to-emerald-500',
-      value: stats?.total_interims || 0,
-      label: 'Intérimaires',
-      sublabel: `${Math.round(((stats?.total_interims || 0) / (stats?.total_active || 1)) * 100)}% du total`,
-      progress: Math.round(((stats?.total_interims || 0) / (stats?.total_active || 1)) * 100),
+      value: stats?.total_qualified || 0,
+      label: 'Qualifiés',
+      sublabel: `Prospects chauds`,
+      progress: Math.round(((stats?.total_qualified || 0) / ((stats?.total_contact || 1) + (stats?.total_waitlist || 1))) * 100),
     },
   ];
 
-  const TYPE_CHIPS = [
-    { id: 'all' as ProspectType, label: 'Tous', count: stats?.total_active || 0 },
-    { id: 'client' as ProspectType, label: 'Clients', count: stats?.total_clients || 0 },
-    { id: 'agency' as ProspectType, label: 'Agences', count: stats?.total_agencies || 0 },
-    { id: 'interim' as ProspectType, label: 'Intérimaires', count: stats?.total_interims || 0 },
-    { id: 'waitlist' as ProspectType, label: 'Waitlist', count: stats?.total_waitlist || 0 },
+  const SOURCE_CHIPS = [
+    { id: 'all', label: 'Tous', count: (stats?.total_contact || 0) + (stats?.total_waitlist || 0) },
+    { id: 'landing_contact', label: 'Contact', count: stats?.total_contact || 0 },
+    { id: 'landing_waitlist', label: 'Waitlist', count: stats?.total_waitlist || 0 },
   ];
 
   const STATUS_CHIPS = [
@@ -421,9 +396,6 @@ export function ProspectsPage() {
 
   return (
     <div className="space-y-6">
-      {/* Setup Banner (if tables don't exist) */}
-      {needsSetup && <ProspectsSetupBanner />}
-
       {/* Header */}
       <motion.div
         initial={{ opacity: 0, y: -20 }}
@@ -432,9 +404,9 @@ export function ProspectsPage() {
       >
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-slate-900">🔬 Prospects Étude de Marché</h1>
+            <h1 className="text-slate-900">📬 Demandes Landing Page</h1>
             <p className="text-slate-600 text-sm mt-1">
-              Gérez vos prospects collectés depuis le formulaire d'étude de marché (clients, agences ETT, intérimaires).
+              Prospects issus du formulaire de contact et de la liste d'attente marketplace.
             </p>
           </div>
           <Button variant="outline" size="sm" className="gap-2" onClick={handleRefresh}>
@@ -444,7 +416,7 @@ export function ProspectsPage() {
         </div>
       </motion.div>
 
-      {/* KPI Cards - Compact version */}
+      {/* KPI Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         {KPI_CARDS.map((kpi, index) => (
           <motion.div
@@ -480,14 +452,14 @@ export function ProspectsPage() {
         transition={{ delay: 0.2, duration: 0.3 }}
         className="space-y-3"
       >
-        {/* Type filters */}
+        {/* Source filters */}
         <div className="flex flex-wrap items-center gap-2">
-          {TYPE_CHIPS.map((chip) => (
+          {SOURCE_CHIPS.map((chip) => (
             <button
               key={chip.id}
-              onClick={() => setActiveFilter(chip.id)}
+              onClick={() => setActiveSourceFilter(chip.id)}
               className={`px-3 py-1.5 rounded-lg text-sm transition-all ${
-                activeFilter === chip.id
+                activeSourceFilter === chip.id
                   ? 'bg-blue-500 text-white shadow-md'
                   : 'bg-white text-slate-700 hover:bg-slate-50 border border-slate-200'
               }`}
@@ -504,17 +476,7 @@ export function ProspectsPage() {
             return (
               <button
                 key={chip.id}
-                onClick={() => {
-                  setActiveStatusFilter(chip.id);
-                  // Si on clique sur "Archivés", activer showArchived automatiquement
-                  if (chip.id === 'archived') {
-                    setShowArchived(true);
-                  }
-                  // Si on clique sur un autre statut, désactiver showArchived
-                  if (chip.id !== 'archived' && chip.id !== 'all') {
-                    setShowArchived(false);
-                  }
-                }}
+                onClick={() => setActiveStatusFilter(chip.id)}
                 className={`px-3 py-1.5 rounded-lg text-sm flex items-center gap-1.5 transition-all ${
                   activeStatusFilter === chip.id
                     ? 'bg-blue-500 text-white shadow-md'
@@ -528,7 +490,7 @@ export function ProspectsPage() {
           })}
         </div>
 
-        {/* Search & New */}
+        {/* Search */}
         <div className="flex flex-col sm:flex-row gap-3">
           <div className="relative flex-1 max-w-md">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
@@ -540,10 +502,21 @@ export function ProspectsPage() {
             />
           </div>
 
-          <Button className="bg-gradient-to-r from-blue-500 to-cyan-500 hover:from-blue-600 hover:to-cyan-600 text-white shadow-md gap-2" onClick={() => setNewProspectDialogOpen(true)}>
-            <Plus className="w-4 h-4" />
-            Nouveau prospect
-          </Button>
+          {/* Bulk Actions */}
+          {selectedIds.size > 0 && (
+            <div className="flex gap-2">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={handleBulkArchive}
+                disabled={isPerformingBulkAction}
+                className="gap-2"
+              >
+                <Archive className="w-4 h-4" />
+                Archiver ({selectedIds.size})
+              </Button>
+            </div>
+          )}
         </div>
       </motion.div>
 
@@ -558,10 +531,10 @@ export function ProspectsPage() {
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <ClipboardList className="w-5 h-5 text-cyan-600" />
-                <h3 className="text-slate-900">Liste des prospects</h3>
+                <h3 className="text-slate-900">Prospects Landing Page</h3>
               </div>
               <p className="text-sm text-slate-600">
-                Total : {stats?.total_active || 0}
+                Total : {(stats?.total_contact || 0) + (stats?.total_waitlist || 0)}
               </p>
             </div>
           </CardHeader>
@@ -595,7 +568,7 @@ export function ProspectsPage() {
                             )}
                           </button>
                         </th>
-                        <th className="px-4 py-3 text-left text-sm text-slate-600 w-32">Type/Source</th>
+                        <th className="px-4 py-3 text-left text-sm text-slate-600 w-32">Source</th>
                         <th className="px-4 py-3 text-left text-sm text-slate-600 min-w-[200px]">Contact</th>
                         <th className="px-4 py-3 text-left text-sm text-slate-600 w-32">Entreprise</th>
                         <th className="px-4 py-3 text-left text-sm text-slate-600 w-24">Pays</th>
@@ -607,17 +580,15 @@ export function ProspectsPage() {
                     </thead>
                     <tbody>
                       {prospects.map((prospect, idx) => {
-                        const typeBadge = TYPE_BADGES[prospect.type as keyof typeof TYPE_BADGES] || TYPE_BADGES.contact;
+                        const sourceBadge = SOURCE_BADGES[prospect.source as keyof typeof SOURCE_BADGES] || SOURCE_BADGES.landing_contact;
                         const statusBadge = STATUS_BADGES[prospect.status as keyof typeof STATUS_BADGES] || { bg: '#e5e7eb', text: '#374151', label: prospect.status };
-                        const TypeIcon = typeBadge.icon;
+                        const SourceIcon = sourceBadge.icon;
                         const countryFlag = COUNTRY_FLAGS[prospect.country_code || ''] || '🌍';
-                        const avatarColor = AVATAR_COLORS[idx % AVATAR_COLORS.length];
                         const isSelected = selectedIds.has(prospect.id);
 
                         return (
                           <tr
                             key={prospect.id}
-                            data-prospect-id={prospect.id}
                             className={`border-b border-slate-100 hover:bg-slate-50 transition-colors ${
                               isSelected ? 'bg-cyan-50/50' : ''
                             }`}
@@ -638,16 +609,13 @@ export function ProspectsPage() {
                               </button>
                             </td>
                             <td className="px-4 py-4" onClick={() => setSelectedProspect(prospect)}>
-                              <div className="space-y-1 cursor-pointer">
-                                <span
-                                  className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs"
-                                  style={{ backgroundColor: typeBadge.bg, color: typeBadge.text }}
-                                >
-                                  <TypeIcon className="w-3.5 h-3.5" />
-                                  {typeBadge.label}
-                                </span>
-                                <p className="text-xs text-slate-500">{prospect.source}</p>
-                              </div>
+                              <span
+                                className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs cursor-pointer"
+                                style={{ backgroundColor: sourceBadge.bg, color: sourceBadge.text }}
+                              >
+                                <SourceIcon className="w-3.5 h-3.5" />
+                                {sourceBadge.label}
+                              </span>
                             </td>
                             <td className="px-4 py-4 cursor-pointer" onClick={() => setSelectedProspect(prospect)}>
                               <div>
@@ -685,7 +653,6 @@ export function ProspectsPage() {
                                   <MoreVertical className="w-4 h-4 text-slate-400" />
                                 </Button>
                                 
-                                {/* Menu déroulant */}
                                 <div className="absolute right-0 top-full mt-1 w-48 bg-white border border-slate-200 rounded-lg shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-50">
                                   {prospect.status === 'archived' ? (
                                     <button
@@ -693,7 +660,7 @@ export function ProspectsPage() {
                                         e.stopPropagation();
                                         handleUnarchiveProspect(prospect.id);
                                       }}
-                                      className="w-full flex items-center gap-2 px-4 py-2.5 text-sm text-left hover:bg-slate-50 transition-colors text-green-600"
+                                      className="w-full flex items-center gap-2 px-4 py-2 hover:bg-slate-50 text-sm text-slate-700"
                                     >
                                       <ArchiveX className="w-4 h-4" />
                                       Désarchiver
@@ -704,22 +671,12 @@ export function ProspectsPage() {
                                         e.stopPropagation();
                                         handleArchiveProspect(prospect.id);
                                       }}
-                                      className="w-full flex items-center gap-2 px-4 py-2.5 text-sm text-left hover:bg-slate-50 transition-colors text-slate-700"
+                                      className="w-full flex items-center gap-2 px-4 py-2 hover:bg-slate-50 text-sm text-slate-700"
                                     >
                                       <Archive className="w-4 h-4" />
                                       Archiver
                                     </button>
                                   )}
-                                  <button
-                                    onClick={(e) => {
-                                      e.stopPropagation();
-                                      handleDeleteProspect(prospect.id);
-                                    }}
-                                    className="w-full flex items-center gap-2 px-4 py-2.5 text-sm text-left hover:bg-red-50 transition-colors text-red-600 border-t border-slate-100"
-                                  >
-                                    <Trash2 className="w-4 h-4" />
-                                    Supprimer définitivement
-                                  </button>
                                 </div>
                               </div>
                             </td>
@@ -731,29 +688,29 @@ export function ProspectsPage() {
                 </div>
 
                 {/* Pagination */}
-                <div className="px-6 py-4 border-t border-slate-200 flex items-center justify-between">
-                  <p className="text-sm text-slate-600">
-                    Page {currentPage} sur {totalPages}
-                  </p>
-                  <div className="flex items-center gap-2">
+                {totalPages > 1 && (
+                  <div className="flex items-center justify-center gap-2 p-4 border-t border-slate-200">
                     <Button
                       variant="outline"
                       size="sm"
-                      onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+                      onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
                       disabled={currentPage === 1}
                     >
                       Précédent
                     </Button>
+                    <span className="text-sm text-slate-600">
+                      Page {currentPage} / {totalPages}
+                    </span>
                     <Button
                       variant="outline"
                       size="sm"
-                      onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
+                      onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
                       disabled={currentPage === totalPages}
                     >
                       Suivant
                     </Button>
                   </div>
-                </div>
+                )}
               </>
             )}
           </CardContent>
@@ -765,80 +722,15 @@ export function ProspectsPage() {
         prospect={selectedProspect}
         open={!!selectedProspect}
         onClose={() => setSelectedProspect(null)}
-        onUpdate={() => {
-          loadStats();
-          loadProspects();
-        }}
+        onUpdate={handleRefresh}
       />
 
       {/* New Prospect Dialog */}
       <NewProspectDialog
         open={newProspectDialogOpen}
         onClose={() => setNewProspectDialogOpen(false)}
-        onSuccess={() => {
-          handleRefresh();
-          setNewProspectDialogOpen(false);
-        }}
+        onSuccess={handleRefresh}
       />
-
-      {/* Barre d'actions groupées flottante */}
-      <AnimatePresence>
-        {selectedIds.size > 0 && (
-          <motion.div
-            initial={{ opacity: 0, y: 100 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: 100 }}
-            transition={{ type: 'spring', damping: 25, stiffness: 300 }}
-            className="fixed bottom-8 left-1/2 -translate-x-1/2 z-50"
-          >
-            <div className="bg-gradient-to-r from-blue-600 to-cyan-600 text-white px-8 py-4 rounded-2xl shadow-2xl border border-white/20 backdrop-blur-lg">
-              <div className="flex items-center gap-6">
-                <div className="flex items-center gap-2">
-                  <CheckSquare className="w-5 h-5" />
-                  <span className="text-sm">{selectedIds.size} prospect{selectedIds.size > 1 ? 's' : ''} sélectionné{selectedIds.size > 1 ? 's' : ''}</span>
-                </div>
-                
-                <div className="w-px h-8 bg-white/30" />
-                
-                <div className="flex items-center gap-3">
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={handleBulkArchive}
-                    disabled={isPerformingBulkAction}
-                    className="text-white hover:bg-white/20 backdrop-blur-sm gap-2"
-                  >
-                    <Archive className="w-4 h-4" />
-                    Archiver
-                  </Button>
-                  
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={handleBulkDelete}
-                    disabled={isPerformingBulkAction}
-                    className="text-white hover:bg-red-500/50 backdrop-blur-sm gap-2"
-                  >
-                    <Trash2 className="w-4 h-4" />
-                    Supprimer
-                  </Button>
-                  
-                  <div className="w-px h-8 bg-white/30" />
-                  
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => setSelectedIds(new Set())}
-                    className="text-white hover:bg-white/20 backdrop-blur-sm"
-                  >
-                    <XCircle className="w-4 h-4" />
-                  </Button>
-                </div>
-              </div>
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
     </div>
   );
 }

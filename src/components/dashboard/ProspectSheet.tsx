@@ -32,6 +32,7 @@ import { TasksSection } from './TasksSection';
 import { EventsSection } from './EventsSection';
 import { ProspectAutomationPanel } from './ProspectAutomationPanel';
 import { projectId, publicAnonKey } from '../../utils/supabase/info';
+import { useDashboard } from '../../contexts/DashboardContext';
 
 interface ProspectSheetProps {
   prospect: {
@@ -125,6 +126,7 @@ const SOURCE_LABELS: Record<string, string> = {
 };
 
 export function ProspectSheet({ prospect, open, onClose, onUpdate }: ProspectSheetProps) {
+  const { setActiveTab } = useDashboard();
   const [surveyData, setSurveyData] = useState<SurveyData | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [newNote, setNewNote] = useState('');
@@ -931,6 +933,10 @@ export function ProspectSheet({ prospect, open, onClose, onUpdate }: ProspectShe
                   prospectId={prospect.id}
                   prospectEmail={prospect.email}
                   prospectType={prospect.type}
+                  onNavigateToAutomations={() => {
+                    onClose(); // Fermer le sheet d'abord
+                    setActiveTab('automations'); // Naviguer vers automations
+                  }}
                 />
               </div>
             </div>
