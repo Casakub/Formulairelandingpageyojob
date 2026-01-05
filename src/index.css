@@ -5983,6 +5983,10 @@
     white-space: pre-wrap;
   }
 
+  .\!text-slate-900 {
+    color: var(--color-slate-900) !important;
+  }
+
   .text-\[\#1E3A8A\] {
     color: #1e3a8a;
   }
@@ -8926,6 +8930,10 @@
     background-color: oklab(54.1337% .0963843 -.226968 / .2);
   }
 
+  .focus\:bg-slate-100:focus {
+    background-color: var(--color-slate-100);
+  }
+
   .focus\:bg-white\/10:focus {
     background-color: #ffffff1a;
   }
@@ -10303,6 +10311,16 @@
       --tw-backdrop-blur: ;
       -webkit-backdrop-filter: var(--tw-backdrop-blur, ) var(--tw-backdrop-brightness, ) var(--tw-backdrop-contrast, ) var(--tw-backdrop-grayscale, ) var(--tw-backdrop-hue-rotate, ) var(--tw-backdrop-invert, ) var(--tw-backdrop-opacity, ) var(--tw-backdrop-saturate, ) var(--tw-backdrop-sepia, );
       backdrop-filter: var(--tw-backdrop-blur, ) var(--tw-backdrop-brightness, ) var(--tw-backdrop-contrast, ) var(--tw-backdrop-grayscale, ) var(--tw-backdrop-hue-rotate, ) var(--tw-backdrop-invert, ) var(--tw-backdrop-opacity, ) var(--tw-backdrop-saturate, ) var(--tw-backdrop-sepia, );
+    }
+  }
+
+  .\[\&_button\]\:\!text-slate-900 button {
+    color: var(--color-slate-900) !important;
+  }
+
+  @media (hover: hover) {
+    .\[\&_button\]\:hover\:bg-slate-100 button:hover {
+      background-color: var(--color-slate-100);
     }
   }
 

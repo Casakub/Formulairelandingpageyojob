@@ -49,7 +49,7 @@ export function LanguageSelector({
           <SelectValue placeholder="Sélectionner une langue" />
         </SelectTrigger>
         
-        <SelectContent className="bg-[#2d1b69] backdrop-blur-xl border border-white/30 text-white max-h-[400px] overflow-y-auto z-[9999] shadow-xl">
+        <SelectContent className="bg-white backdrop-blur-xl border border-slate-200 max-h-[400px] overflow-y-auto z-[9999] shadow-xl [&_button]:!text-slate-900 [&_button]:hover:bg-slate-100">
           {availableLanguages.map((lang) => {
             const isSuggested = suggestedLang === lang.code;
             
@@ -57,7 +57,7 @@ export function LanguageSelector({
               <SelectItem 
                 key={lang.code} 
                 value={lang.code}
-                className="hover:bg-white/10 focus:bg-white/10 text-white cursor-pointer py-2 px-3"
+                className="!text-slate-900 hover:bg-slate-100 focus:bg-slate-100 cursor-pointer py-2 px-3"
               >
                 {lang.flag} {lang.label}
               </SelectItem>
