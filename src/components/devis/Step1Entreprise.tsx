@@ -73,12 +73,12 @@ export function Step1Entreprise({ data, onChange, lang = 'fr' }: Step1Entreprise
             <SelectTrigger className="bg-white/10 border-white/20 text-white [&>span]:text-white/60">
               <SelectValue placeholder={t.step1.fields.pays.placeholder} />
             </SelectTrigger>
-            <SelectContent className="bg-[#2d1b69]/95 backdrop-blur-xl border border-white/20 text-white z-[9999] p-[0px] overflow-hidden">
+            <SelectContent className="bg-white/95 backdrop-blur-xl border border-[#2d1b69]/20 z-[9999] p-0 overflow-hidden">
               {PAYS_EUROPEENS.map((pays) => (
                 <SelectItem 
                   key={pays} 
                   value={pays}
-                  className="hover:bg-white/10 focus:bg-white/10 text-white"
+                  className="text-[rgb(78,10,85)] hover:bg-[#7C3AED]/20 focus:bg-[#7C3AED]/20 focus:text-[rgb(78,10,85)] data-[highlighted]:bg-[#7C3AED]/20 data-[highlighted]:text-[rgb(78,10,85)] cursor-pointer"
                 >
                   {translatePays(pays, lang)}
                 </SelectItem>
@@ -204,12 +204,12 @@ export function Step1Entreprise({ data, onChange, lang = 'fr' }: Step1Entreprise
               <SelectTrigger className="bg-white/10 border-white/20 text-white [&>span]:text-white/60">
                 <SelectValue placeholder={t.step1.fields.region.placeholder} />
               </SelectTrigger>
-              <SelectContent className="bg-[#2d1b69]/95 backdrop-blur-xl border border-white/20 text-white z-[9999] p-[0px] overflow-hidden">
+              <SelectContent className="bg-[#2d1b69]/95 backdrop-blur-xl border border-white/20 z-[9999] p-0 overflow-hidden">
                 {REGIONS.map((region) => (
                   <SelectItem 
                     key={region} 
                     value={region}
-                    className="hover:bg-white/10 focus:bg-white/10 text-white"
+                    className="text-white hover:bg-white/20 focus:bg-white/20 focus:text-white data-[highlighted]:bg-white/20 data-[highlighted]:text-white cursor-pointer"
                   >
                     {region}
                   </SelectItem>

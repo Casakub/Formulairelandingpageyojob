@@ -423,12 +423,12 @@ export default function DemandeDevis() {
       <div className="min-h-screen bg-gradient-to-br from-blue-900 via-violet-900 to-cyan-900">
         {/* Header */}
         <header className="relative z-10 border-b border-white/10 bg-white/5 backdrop-blur-md sticky top-0">
-          <div className="container mx-auto px-4 py-4">
-            <div className="flex items-center justify-between">
-              <a href="/" className="flex items-center gap-3 group">
-                <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-[#1E3A8A] via-[#06B6D4] to-[#7C3AED] p-0.5 shadow-lg shadow-cyan-500/30 group-hover:shadow-cyan-500/50 transition-all duration-300">
+          <div className="container mx-auto px-2 sm:px-4 py-4">
+            <div className="flex items-center justify-between gap-2">
+              <a href="/" className="flex items-center gap-2 sm:gap-3 group">
+                <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-gradient-to-br from-[#1E3A8A] via-[#06B6D4] to-[#7C3AED] p-0.5 shadow-lg shadow-cyan-500/30 group-hover:shadow-cyan-500/50 transition-all duration-300">
                   <div className="w-full h-full rounded-[10px] bg-white/95 backdrop-blur-sm flex items-center justify-center">
-                    <LogoSvg className="w-8 h-8" />
+                    <LogoSvg className="w-6 h-6 sm:w-8 sm:h-8" />
                   </div>
                 </div>
                 <span className="text-white text-xl hidden sm:block group-hover:text-cyan-400 transition-colors">
@@ -437,7 +437,7 @@ export default function DemandeDevis() {
               </a>
 
               {/* Language Selector */}
-              <div className="flex items-center gap-4">
+              <div className="flex items-center gap-2 sm:gap-4">
                 <LanguageSelector 
                   value={lang} 
                   onChange={handleLanguageChange}
@@ -445,11 +445,11 @@ export default function DemandeDevis() {
                   showMVPOnly={true}
                 />
                 <Button
-                  className="relative overflow-hidden group rounded-full bg-white/10 backdrop-blur-md text-white border border-white/20 hover:bg-white/20 hover:border-cyan-400/50 shadow-lg hover:shadow-cyan-500/30 transition-all duration-300"
+                  className="relative overflow-hidden group rounded-full bg-white/10 backdrop-blur-md text-white border border-white/20 hover:bg-white/20 hover:border-cyan-400/50 shadow-lg hover:shadow-cyan-500/30 transition-all duration-300 px-3 sm:px-4"
                   onClick={() => window.history.back()}
                 >
-                  <ArrowLeft className="w-4 h-4 mr-2" />
-                  {t.navigation.back}
+                  <ArrowLeft className="w-4 h-4 sm:mr-2" />
+                  <span className="hidden sm:inline">{t.navigation.back}</span>
                 </Button>
               </div>
             </div>
