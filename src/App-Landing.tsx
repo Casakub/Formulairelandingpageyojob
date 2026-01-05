@@ -637,11 +637,32 @@ export default function AppLanding() {
                   {content.header?.nav.services || 'Services'}
                 </a>
                 <a
-                  href="#network"
+                  href="/notre-reseau"
                   className="text-white hover:text-cyan-300 transition-all py-3 px-4 rounded-xl hover:bg-white/10 backdrop-blur-sm border border-transparent hover:border-white/20"
                   onClick={() => setIsMenuOpen(false)}
                 >
                   {content.header?.nav.network || 'Notre réseau'}
+                </a>
+                <a
+                  href="/nos-secteurs"
+                  className="text-white hover:text-cyan-300 transition-all py-3 px-4 rounded-xl hover:bg-white/10 backdrop-blur-sm border border-transparent hover:border-white/20"
+                  onClick={() => setIsMenuOpen(false)}
+                >
+                  Nos secteurs
+                </a>
+                <a
+                  href="/temoignages"
+                  className="text-white hover:text-cyan-300 transition-all py-3 px-4 rounded-xl hover:bg-white/10 backdrop-blur-sm border border-transparent hover:border-white/20"
+                  onClick={() => setIsMenuOpen(false)}
+                >
+                  Témoignages
+                </a>
+                <a
+                  href="/a-propos"
+                  className="text-white hover:text-cyan-300 transition-all py-3 px-4 rounded-xl hover:bg-white/10 backdrop-blur-sm border border-transparent hover:border-white/20"
+                  onClick={() => setIsMenuOpen(false)}
+                >
+                  À propos
                 </a>
                 <a
                   href="#contact"
@@ -1896,14 +1917,30 @@ export default function AppLanding() {
                 {content.footer?.columns?.company?.title || 'Entreprise'}
               </h3>
               <ul className="space-y-2.5 text-sm">
-                {(content.footer?.columns?.company?.links || []).map((link, index) => (
-                  <motion.li key={index} whileHover={{ x: 5 }} transition={{ duration: 0.2 }}>
-                    <a href={link.href} className="text-white/80 hover:text-white transition-colors inline-flex items-center gap-2 group">
-                      <ArrowRight className="w-3 h-3 opacity-0 group-hover:opacity-100 transition-opacity" />
-                      {link.label}
-                    </a>
-                  </motion.li>
-                ))}
+                <motion.li whileHover={{ x: 5 }} transition={{ duration: 0.2 }}>
+                  <a href="/a-propos" className="text-white/80 hover:text-white transition-colors inline-flex items-center gap-2 group">
+                    <ArrowRight className="w-3 h-3 opacity-0 group-hover:opacity-100 transition-opacity" />
+                    À propos
+                  </a>
+                </motion.li>
+                <motion.li whileHover={{ x: 5 }} transition={{ duration: 0.2 }}>
+                  <a href="/notre-reseau" className="text-white/80 hover:text-white transition-colors inline-flex items-center gap-2 group">
+                    <ArrowRight className="w-3 h-3 opacity-0 group-hover:opacity-100 transition-opacity" />
+                    Notre réseau
+                  </a>
+                </motion.li>
+                <motion.li whileHover={{ x: 5 }} transition={{ duration: 0.2 }}>
+                  <a href="/nos-secteurs" className="text-white/80 hover:text-white transition-colors inline-flex items-center gap-2 group">
+                    <ArrowRight className="w-3 h-3 opacity-0 group-hover:opacity-100 transition-opacity" />
+                    Nos secteurs
+                  </a>
+                </motion.li>
+                <motion.li whileHover={{ x: 5 }} transition={{ duration: 0.2 }}>
+                  <a href="/temoignages" className="text-white/80 hover:text-white transition-colors inline-flex items-center gap-2 group">
+                    <ArrowRight className="w-3 h-3 opacity-0 group-hover:opacity-100 transition-opacity" />
+                    Témoignages
+                  </a>
+                </motion.li>
               </ul>
             </motion.div>
 

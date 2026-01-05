@@ -1,5 +1,4 @@
 import { useState } from 'react';
-import { Helmet, HelmetProvider } from 'react-helmet-async';
 import { motion, AnimatePresence } from 'motion/react';
 import {
   ArrowLeft,
@@ -34,6 +33,9 @@ import { StepRecapitulatif } from './components/devis/StepRecapitulatif';
 import { LanguageSelector, getSuggestedLanguage } from './src/i18n/devis';
 import type { DevisLanguage } from './src/i18n/devis/types';
 import { useDevisTranslationStatic } from './hooks/useDevisTranslation';
+
+// 🎯 Import du système SEO optimisé
+import { SEOHead } from './components/SEOHead';
 
 // Types pour les données du formulaire
 export interface DevisFormData {
@@ -405,12 +407,12 @@ export default function DemandeDevis() {
 
   return (
     <>
-      <HelmetProvider>
-        <Helmet>
-          <title>{t.meta.pageTitle}</title>
-          <meta name="description" content={t.meta.pageDescription} />
-        </Helmet>
-      </HelmetProvider>
+      {/* 🎯 SEO optimisé avec traduction automatique */}
+      <SEOHead 
+        page="devis-form" 
+        lang={lang}
+        includeServiceSchema={true}
+      />
 
       <div className="min-h-screen bg-gradient-to-br from-blue-900 via-violet-900 to-cyan-900">
         {/* Header */}

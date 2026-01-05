@@ -12,6 +12,10 @@ import ServiceDetachementPersonnel from './ServiceDetachementPersonnel';
 import DemandeDevis from './DemandeDevis';
 import ConfirmationDevis from './ConfirmationDevis';
 import RecapDevis from './RecapDevis';
+import APropos from './APropos';
+import NotreReseau from './NotreReseau';
+import NosSecteurs from './NosSecteurs';
+import Temoignages from './Temoignages';
 import { SignatureOnline } from './components/SignatureOnline';
 import { Toaster } from './components/ui/sonner';
 
@@ -129,6 +133,42 @@ export default function App() {
     return (
       <>
         <ServiceDetachementPersonnel />
+        <Toaster position="top-right" />
+      </>
+    );
+  }
+
+  if (currentPath === '/a-propos') {
+    return (
+      <>
+        <APropos />
+        <Toaster position="top-right" />
+      </>
+    );
+  }
+
+  if (currentPath === '/notre-reseau') {
+    return (
+      <>
+        <NotreReseau />
+        <Toaster position="top-right" />
+      </>
+    );
+  }
+
+  if (currentPath === '/nos-secteurs') {
+    return (
+      <>
+        <NosSecteurs />
+        <Toaster position="top-right" />
+      </>
+    );
+  }
+
+  if (currentPath === '/temoignages') {
+    return (
+      <>
+        <Temoignages />
         <Toaster position="top-right" />
       </>
     );

@@ -1,157 +1,202 @@
-import { Helmet } from 'react-helmet-async';
-import type { LandingPageContent, LandingContentState } from '../types/landing';
+/**
+ * 🎯 COMPOSANT SEO HEAD
+ * 
+ * Injection automatique des métadonnées SEO (Title, Meta, Schema)
+ * Compatible avec le système de traduction i18n
+ * 
+ * @version 2.0.0
+ * @created 2025-01-05
+ */
 
-interface SEOHeadProps {
-  content: LandingPageContent;
+import { useEffect } from 'react';
+import { getPageMetadata, getOrganizationSchema, getServiceSchema, type PageKey } from '../src/i18n/seo/metadata';
+import type { DevisLanguage } from '../src/i18n/devis/types';
+
+// ============================================================================
+// NOUVELLE API (pour formulaire devis et nouvelles pages)
+// ============================================================================
+interface SEOHeadPropsNew {
+  page: PageKey;
+  lang?: DevisLanguage;
+  includeServiceSchema?: boolean;
+  // Marquer les anciennes props comme optionnelles pour compatibilité
+  content?: never;
+  language?: never;
+  allContent?: never;
+}
+
+// ============================================================================
+// ANCIENNE API (pour compatibilité avec App-Landing)
+// ============================================================================
+interface SEOHeadPropsOld {
+  content: any;
   language: string;
-  allContent: LandingContentState;
+  allContent?: any;
+  // Marquer les nouvelles props comme optionnelles
+  page?: never;
+  lang?: never;
+  includeServiceSchema?: never;
+}
+
+type SEOHeadProps = SEOHeadPropsNew | SEOHeadPropsOld;
+
+/**
+ * Composant pour injecter les métadonnées SEO dans le <head>
+ * Support de l'ancienne et nouvelle API pour rétrocompatibilité
+ */
+export function SEOHead(props: SEOHeadProps) {
+  
+  useEffect(() => {
+    // Détecter quelle API est utilisée
+    const isNewAPI = 'page' in props && props.page !== undefined;
+    
+    let metadata: { title: string; description: string; h1: string; keywords?: string[] };
+    let currentLang: DevisLanguage = 'fr';
+    let shouldIncludeServiceSchema = false;
+    
+    if (isNewAPI) {
+      // NOUVELLE API
+      const { page, lang = 'fr', includeServiceSchema = false } = props as SEOHeadPropsNew;
+      metadata = getPageMetadata(page, lang);
+      currentLang = lang;
+      shouldIncludeServiceSchema = includeServiceSchema;
+    } else {
+      // ANCIENNE API (compatibilité App-Landing)
+      const { content, language } = props as SEOHeadPropsOld;
+      metadata = {
+        title: content?.meta?.title || 'YOJOB',
+        description: content?.meta?.description || '',
+        h1: content?.meta?.title || 'YOJOB',
+        keywords: []
+      };
+      currentLang = language as DevisLanguage || 'fr';
+      shouldIncludeServiceSchema = false; // Pas de schéma service pour l'ancienne API
+    }
+    
+    // ========================================================================
+    // TITLE
+    // ========================================================================
+    document.title = metadata.title;
+    
+    // ========================================================================
+    // META DESCRIPTION
+    // ========================================================================
+    let metaDescription = document.querySelector('meta[name="description"]');
+    if (!metaDescription) {
+      metaDescription = document.createElement('meta');
+      metaDescription.setAttribute('name', 'description');
+      document.head.appendChild(metaDescription);
+    }
+    metaDescription.setAttribute('content', metadata.description);
+    
+    // ========================================================================
+    // META KEYWORDS (optionnel)
+    // ========================================================================
+    if (metadata.keywords && metadata.keywords.length > 0) {
+      let metaKeywords = document.querySelector('meta[name="keywords"]');
+      if (!metaKeywords) {
+        metaKeywords = document.createElement('meta');
+        metaKeywords.setAttribute('name', 'keywords');
+        document.head.appendChild(metaKeywords);
+      }
+      metaKeywords.setAttribute('content', metadata.keywords.join(', '));
+    }
+    
+    // ========================================================================
+    // OPEN GRAPH (pour réseaux sociaux)
+    // ========================================================================
+    const ogTitle = document.querySelector('meta[property="og:title"]') || document.createElement('meta');
+    ogTitle.setAttribute('property', 'og:title');
+    ogTitle.setAttribute('content', metadata.title);
+    if (!document.querySelector('meta[property="og:title"]')) {
+      document.head.appendChild(ogTitle);
+    }
+    
+    const ogDescription = document.querySelector('meta[property="og:description"]') || document.createElement('meta');
+    ogDescription.setAttribute('property', 'og:description');
+    ogDescription.setAttribute('content', metadata.description);
+    if (!document.querySelector('meta[property="og:description"]')) {
+      document.head.appendChild(ogDescription);
+    }
+    
+    const ogType = document.querySelector('meta[property="og:type"]') || document.createElement('meta');
+    ogType.setAttribute('property', 'og:type');
+    ogType.setAttribute('content', 'website');
+    if (!document.querySelector('meta[property="og:type"]')) {
+      document.head.appendChild(ogType);
+    }
+    
+    // ========================================================================
+    // TWITTER CARD
+    // ========================================================================
+    const twitterCard = document.querySelector('meta[name="twitter:card"]') || document.createElement('meta');
+    twitterCard.setAttribute('name', 'twitter:card');
+    twitterCard.setAttribute('content', 'summary_large_image');
+    if (!document.querySelector('meta[name="twitter:card"]')) {
+      document.head.appendChild(twitterCard);
+    }
+    
+    const twitterTitle = document.querySelector('meta[name="twitter:title"]') || document.createElement('meta');
+    twitterTitle.setAttribute('name', 'twitter:title');
+    twitterTitle.setAttribute('content', metadata.title);
+    if (!document.querySelector('meta[name="twitter:title"]')) {
+      document.head.appendChild(twitterTitle);
+    }
+    
+    const twitterDescription = document.querySelector('meta[name="twitter:description"]') || document.createElement('meta');
+    twitterDescription.setAttribute('name', 'twitter:description');
+    twitterDescription.setAttribute('content', metadata.description);
+    if (!document.querySelector('meta[name="twitter:description"]')) {
+      document.head.appendChild(twitterDescription);
+    }
+    
+    // ========================================================================
+    // SCHEMA.ORG - ORGANIZATION (toujours présent)
+    // ========================================================================
+    let schemaOrg = document.querySelector('script[type="application/ld+json"][data-schema="organization"]');
+    if (!schemaOrg) {
+      schemaOrg = document.createElement('script');
+      schemaOrg.setAttribute('type', 'application/ld+json');
+      schemaOrg.setAttribute('data-schema', 'organization');
+      document.head.appendChild(schemaOrg);
+    }
+    schemaOrg.textContent = JSON.stringify(getOrganizationSchema(), null, 2);
+    
+    // ========================================================================
+    // SCHEMA.ORG - SERVICE (conditionnel)
+    // ========================================================================
+    if (shouldIncludeServiceSchema) {
+      let schemaService = document.querySelector('script[type="application/ld+json"][data-schema="service"]');
+      if (!schemaService) {
+        schemaService = document.createElement('script');
+        schemaService.setAttribute('type', 'application/ld+json');
+        schemaService.setAttribute('data-schema', 'service');
+        document.head.appendChild(schemaService);
+      }
+      schemaService.textContent = JSON.stringify(getServiceSchema(props.page as PageKey, currentLang), null, 2);
+    } else {
+      // Supprimer le schéma Service s'il existe mais qu'on ne le veut plus
+      const existingServiceSchema = document.querySelector('script[type="application/ld+json"][data-schema="service"]');
+      if (existingServiceSchema) {
+        existingServiceSchema.remove();
+      }
+    }
+    
+    // ========================================================================
+    // LANG ATTRIBUTE sur <html>
+    // ========================================================================
+    document.documentElement.lang = currentLang;
+    
+  }, [props]);
+  
+  // Ce composant n'affiche rien visuellement
+  return null;
 }
 
 /**
- * 🎯 SEO Head Component
- * Gère toutes les balises SEO de la landing page :
- * - Meta tags (title, description, keywords)
- * - Open Graph (Facebook, LinkedIn)
- * - Twitter Cards
- * - Hreflang automatique multilingue
- * - Schema.org JSON-LD (FAQ, Organization)
- * - Google Analytics & Tag Manager
+ * Hook personnalisé pour récupérer le H1 SEO-optimisé
  */
-export function SEOHead({ content, language, allContent }: SEOHeadProps) {
-  return (
-    <>
-      <Helmet>
-        {/* Title & Description */}
-        <title>{content.seo?.title || 'YoJob - Courtage en recrutement européen'}</title>
-        <meta name="description" content={content.seo?.description || 'Accédez à 500+ agences de recrutement dans 27 pays européens'} />
-        <meta name="keywords" content={(content.seo?.keywords || []).join(', ')} />
-        
-        {/* Language */}
-        <html lang={language} />
-        
-        {/* Open Graph (Facebook, LinkedIn) */}
-        <meta property="og:type" content={content.seo?.ogType || 'website'} />
-        <meta property="og:title" content={content.seo?.ogTitle || content.seo?.title || 'YoJob'} />
-        <meta property="og:description" content={content.seo?.ogDescription || content.seo?.description || ''} />
-        <meta property="og:image" content={content.seo?.ogImage || 'https://yojob.fr/og-image.jpg'} />
-        <meta property="og:url" content={content.seo?.ogUrl || content.seo?.canonicalUrl || 'https://yojob.fr'} />
-        
-        {/* Twitter Cards */}
-        <meta name="twitter:card" content={content.seo?.twitterCard || 'summary_large_image'} />
-        <meta name="twitter:title" content={content.seo?.twitterTitle || content.seo?.title || 'YoJob'} />
-        <meta name="twitter:description" content={content.seo?.twitterDescription || content.seo?.description || ''} />
-        <meta name="twitter:image" content={content.seo?.twitterImage || content.seo?.ogImage || 'https://yojob.fr/twitter-image.jpg'} />
-        
-        {/* Canonical */}
-        {content.seo?.canonicalUrl && <link rel="canonical" href={content.seo.canonicalUrl} />}
-        
-        {/* 🌍 Hreflang automatique pour toutes les langues disponibles */}
-        {Object.keys(allContent).map((lang) => {
-          const baseUrl = content.seo?.canonicalUrl || 'https://yojob.fr';
-          const langUrl = lang === 'fr' ? baseUrl : `${baseUrl}/${lang}`;
-          return <link key={lang} rel="alternate" hrefLang={lang} href={langUrl} />;
-        })}
-        <link rel="alternate" hrefLang="x-default" href={content.seo?.canonicalUrl || 'https://yojob.fr'} />
-        
-        {/* Référencement IA */}
-        {content.seo?.aiSummary && (
-          <meta name="ai-summary" content={content.seo.aiSummary} />
-        )}
-        
-        {/* 📋 FAQ Schema.org (JSON-LD) */}
-        {content.seo?.faq && content.seo.faq.length > 0 && (
-          <script type="application/ld+json">
-            {JSON.stringify({
-              '@context': 'https://schema.org',
-              '@type': 'FAQPage',
-              mainEntity: content.seo.faq.map((item) => ({
-                '@type': 'Question',
-                name: item.question,
-                acceptedAnswer: {
-                  '@type': 'Answer',
-                  text: item.answer,
-                },
-              })),
-            })}
-          </script>
-        )}
-        
-        {/* 🏢 Organization Schema.org (JSON-LD) */}
-        <script type="application/ld+json">
-          {JSON.stringify({
-            '@context': 'https://schema.org',
-            '@type': 'Organization',
-            name: 'YoJob',
-            description: content.seo?.description || 'Courtage en recrutement européen',
-            url: content.seo?.canonicalUrl || 'https://yojob.fr',
-            logo: 'https://yojob.fr/logo.png',
-            foundingDate: '2014',
-            numberOfEmployees: {
-              '@type': 'QuantitativeValue',
-              value: '500+',
-            },
-            areaServed: {
-              '@type': 'Place',
-              name: 'Europe',
-            },
-            contactPoint: {
-              '@type': 'ContactPoint',
-              telephone: '+33-1-23-45-67-89',
-              contactType: 'Customer Service',
-              email: 'contact@yojob.fr',
-            },
-          })}
-        </script>
-        
-        {/* 📊 Google Analytics */}
-        {content.seo?.googleAnalyticsId && (
-          <>
-            <script async src={`https://www.googletagmanager.com/gtag/js?id=${content.seo.googleAnalyticsId}`} />
-            <script
-              dangerouslySetInnerHTML={{
-                __html: `
-                  window.dataLayer = window.dataLayer || [];
-                  function gtag(){dataLayer.push(arguments);}
-                  gtag('js', new Date());
-                  gtag('config', '${content.seo.googleAnalyticsId}');
-                `,
-              }}
-            />
-          </>
-        )}
-        
-        {/* 🏷️ Google Tag Manager */}
-        {content.seo?.googleTagManagerId && (
-          <script
-            dangerouslySetInnerHTML={{
-              __html: `
-                (function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
-                new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
-                j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
-                'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
-                })(window,document,'script','dataLayer','${content.seo.googleTagManagerId}');
-              `,
-            }}
-          />
-        )}
-        
-        {/* Mobile */}
-        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <meta name="theme-color" content="#1E3A8A" />
-      </Helmet>
-      
-      {/* 🏷️ Google Tag Manager (noscript) */}
-      {content.seo?.googleTagManagerId && (
-        <noscript>
-          <iframe 
-            src={`https://www.googletagmanager.com/ns.html?id=${content.seo.googleTagManagerId}`}
-            height="0" 
-            width="0" 
-            style={{ display: 'none', visibility: 'hidden' }}
-            title="Google Tag Manager"
-          />
-        </noscript>
-      )}
-    </>
-  );
+export function useSEOH1(page: PageKey, lang: DevisLanguage = 'fr'): string {
+  const metadata = getPageMetadata(page, lang);
+  return metadata.h1;
 }
