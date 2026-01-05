@@ -12,7 +12,8 @@ import {
   Download,
   ChevronRight,
   Brain,
-  Target
+  Target,
+  RefreshCw
 } from 'lucide-react';
 import { Dialog, DialogContent } from '../ui/dialog';
 import { Button } from '../ui/button';
@@ -98,7 +99,6 @@ export function AIWorkflowAdvisor({ open, onClose, onImplement }: AIWorkflowAdvi
       setSuggestions(data.suggestions);
       setAnalysis(data.analysis);
       
-      console.log('✨ IA Suggestions:', data);
     } catch (err: any) {
       console.error('Error requesting AI suggestions:', err);
       setError(err.message || 'Une erreur est survenue');

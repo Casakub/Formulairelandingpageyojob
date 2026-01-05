@@ -21,8 +21,6 @@ export function PasswordResetHelper() {
     setStatus('idle');
 
     try {
-      console.log('🔧 Forcing password reset for:', email);
-
       const response = await fetch(
         `https://${projectId}.supabase.co/functions/v1/make-server-10092a63/auth/force-reset-password`,
         {
@@ -43,7 +41,6 @@ export function PasswordResetHelper() {
       if (response.ok && result.success) {
         setStatus('success');
         setMessage(`✅ ${result.message}`);
-        console.log('✅ Password reset successful');
       } else {
         throw new Error(result.error || 'Erreur lors de la réinitialisation');
       }

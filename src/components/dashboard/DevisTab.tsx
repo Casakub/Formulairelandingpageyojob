@@ -200,8 +200,6 @@ export function DevisTab() {
         );
         
         // TODO: Envoyer automatiquement par email via workflow
-        console.log('🔗 Lien signature:', data.signatureUrl);
-        console.log('📧 À envoyer à:', email);
         
         // Recharger les données pour afficher le token
         chargerDonnees();

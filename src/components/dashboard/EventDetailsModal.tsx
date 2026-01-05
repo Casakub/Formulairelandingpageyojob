@@ -279,8 +279,6 @@ export function EventDetailsModal({ event, onClose, onUpdate, onDelete }: EventD
   const navigateToProspect = () => {
     if (!event) return;
     
-    console.log('🔍 Navigation vers prospect:', event.prospect_id);
-    
     // Fermer la modale immédiatement
     onClose();
     
@@ -289,7 +287,6 @@ export function EventDetailsModal({ event, onClose, onUpdate, onDelete }: EventD
       // Trouver et cliquer sur l'onglet Prospects
       const prospectsTab = document.querySelector('[data-tab="prospects"]') as HTMLElement;
       if (prospectsTab) {
-        console.log('✅ Onglet Prospects trouvé, clic...');
         prospectsTab.click();
         
         // Attendre que l'onglet se charge, puis trouver et cliquer sur le prospect
@@ -298,25 +295,17 @@ export function EventDetailsModal({ event, onClose, onUpdate, onDelete }: EventD
           let prospectRow = document.querySelector(`[data-prospect-id="${event.prospect_id}"]`) as HTMLElement;
           
           if (prospectRow) {
-            console.log('✅ Prospect trouvé dans la liste, ouverture de la fiche...');
             prospectRow.click();
             prospectRow.scrollIntoView({ behavior: 'smooth', block: 'center' });
           } else {
-            console.warn('⚠️ Prospect non trouvé dans la liste (peut-être sur une autre page ou filtré).');
-            console.log('📋 Recherche dans toute la page...');
-            
             // Fallback : réessayer après un délai supplémentaire au cas où le chargement prend du temps
             setTimeout(() => {
               prospectRow = document.querySelector(`[data-prospect-id="${event.prospect_id}"]`) as HTMLElement;
               
               if (prospectRow) {
-                console.log('✅ Prospect trouvé après rechargement, ouverture...');
                 prospectRow.click();
                 prospectRow.scrollIntoView({ behavior: 'smooth', block: 'center' });
               } else {
-                console.error('❌ Prospect introuvable. Il peut être sur une autre page, filtré, ou archivé.');
-                console.log('💡 Astuce : Vérifiez les filtres actifs dans l\'onglet Prospects.');
-                
                 // Afficher un message utilisateur amical
                 alert(`Le prospect lié à cet événement n'est pas visible dans la liste actuelle. Il peut être filtré, archivé, ou sur une autre page. Essayez de modifier les filtres ou la recherche.`);
               }

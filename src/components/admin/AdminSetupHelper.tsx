@@ -35,7 +35,6 @@ export function AdminSetupHelper() {
 
       if (result.success) {
         setCreated(true);
-        console.log('✅ Admin account created:', result.user);
       } else {
         setError(result.error || 'Erreur lors de la création du compte');
       }

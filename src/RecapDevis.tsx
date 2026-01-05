@@ -110,7 +110,6 @@ export default function RecapDevis() {
   useEffect(() => {
     if (devisData?.language) {
       setSelectedLang(devisData.language as DevisLanguage);
-      console.log('🌍 Langue du devis détectée:', devisData.language);
     }
   }, [devisData]);
 
@@ -206,15 +205,6 @@ export default function RecapDevis() {
       setIsSigning(true);
       const signatureData = signatureRef.current.toDataURL();
 
-      console.log('📝 Démarrage signature électronique...');
-      console.log('🔐 Informations de traçabilité:');
-      console.log(`  - Signataire: ${devisData.contact.prenom} ${devisData.contact.nom}`);
-      console.log(`  - Email: ${devisData.contact.email}`);
-      console.log(`  - Entreprise: ${devisData.entreprise.raisonSociale}`);
-      console.log(`  - SIRET: ${devisData.entreprise.siret}`);
-      console.log(`  - Adresse IP: ${userIp}`);
-      console.log(`  - Timestamp: ${new Date().toISOString()}`);
-
       const response = await fetch(
         `https://${projectId}.supabase.co/functions/v1/make-server-10092a63/devis/signer-devis`,
         {
@@ -238,11 +228,6 @@ export default function RecapDevis() {
       }
 
       const result = await response.json();
-      
-      console.log('✅ Signature réussie avec certificat:', result.certificat);
-      console.log('🔒 Hash SHA-256:', result.certificat?.integrite?.documentHash);
-      console.log('📍 IP enregistrée:', result.certificat?.metadata?.ipAddress);
-      console.log('🕐 Timestamp:', result.certificat?.metadata?.timestampReadable);
       
       toast.success(t.pageRecap.toast.signatureSucces);
       

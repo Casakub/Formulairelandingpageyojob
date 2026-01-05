@@ -432,14 +432,10 @@ export default function AppSurveyOriginal() {
         referrer
       };
       
-      console.log('📤 Envoi de la réponse avec type:', respondentType);
-      console.log('🌍 Langue utilisée:', currentLangRef.current);
-      
       // Save to Supabase using PUBLIC client (no session possible)
       const result = await saveResponsePublic(responseData);
       
       if (result.success) {
-        console.log('✅ Réponse sauvegardée avec succès:', responseId);
         toast.success('Merci ! Votre réponse a été enregistrée.', {
           description: 'Vous recevrez une analyse par email si vous avez coché l\'option.'
         });
@@ -481,8 +477,7 @@ export default function AppSurveyOriginal() {
       // Check if it's an RLS error in the caught exception
       const errorString = error?.toString() || '';
       if (errorString.includes('RLS') || errorString.includes('row-level security')) {
-        // Already shown toast above, just log
-        console.log('👉 Solution disponible sur /fix-rls');
+        // Already shown toast above
       } else {
         toast.error('Erreur lors de l\'envoi', {
           description: 'Veuillez réessayer ou contacter le support.'
@@ -615,7 +610,6 @@ function AppContent({
             availableLanguagesCount={translatedLanguages.length}
             onSelect={(type) => {
               setRespondentType(type);
-              console.log('✅ Type de répondant sélectionné:', type);
             }}
           />
         )}

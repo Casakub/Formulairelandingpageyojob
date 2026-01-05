@@ -31,7 +31,6 @@ export function AdminLogin({ onLoginSuccess }: AdminLoginProps) {
       const result = await login(email, password);
 
       if (result.success) {
-        console.log('✅ Login successful:', result.user?.email);
         onLoginSuccess();
       } else {
         // Auto-detect if no account exists and switch to setup

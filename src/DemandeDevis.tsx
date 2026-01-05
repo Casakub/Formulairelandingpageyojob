@@ -133,14 +133,9 @@ export default function DemandeDevis() {
   const [currentStep, setCurrentStep] = useState(1);
   const [lang, setLang] = useState<DevisLanguage>('fr');
   
-  // 🔍 DEBUG: Wrapper pour setLang avec logging
   const handleLanguageChange = (newLang: DevisLanguage) => {
-    console.log('🌐 [DemandeDevis] Changement de langue:', { from: lang, to: newLang });
     setLang(newLang);
   };
-  
-  // 🔍 DEBUG: Log quand lang change
-  console.log('🔄 [DemandeDevis] Re-render avec lang =', lang);
   
   // Charger les traductions pour la langue active
   const { t } = useDevisTranslationStatic(lang);
@@ -305,8 +300,6 @@ export default function DemandeDevis() {
     setIsSubmitting(true);
     
     try {
-      console.log('📤 Envoi du devis au backend...');
-      
       // Envoyer les données au backend
       const response = await fetch(`https://${projectId}.supabase.co/functions/v1/make-server-10092a63/devis`, {
         method: 'POST',
@@ -324,7 +317,6 @@ export default function DemandeDevis() {
       }
 
       const result = await response.json();
-      console.log('✅ Devis créé avec succès:', result);
       
       // Afficher le toast de succès AVANT la redirection
       toast.success('Devis envoyé avec succès ! Redirection en cours...');

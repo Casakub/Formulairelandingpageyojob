@@ -114,12 +114,8 @@ export function AgendaPage() {
     if (!silent) setIsLoading(true);
     setIsRefreshing(true);
     try {
-      console.log('🔄 Chargement des événements et prospects...');
-      
       const eventsUrl = `https://${projectId}.supabase.co/functions/v1/make-server-10092a63/events`;
       const prospectsUrl = `https://${projectId}.supabase.co/functions/v1/make-server-10092a63/prospects/list`;
-      
-      console.log('📍 Events URL:', eventsUrl);
       
       const eventsResponse = await fetch(eventsUrl, {
         headers: {
@@ -135,32 +131,15 @@ export function AgendaPage() {
         },
       });
 
-      console.log('📊 Events Response status:', eventsResponse.status);
-      console.log('📊 Events Response content-type:', eventsResponse.headers.get('content-type'));
-      console.log('📊 Prospects Response status:', prospectsResponse.status);
-      
       // Lire les réponses en tant que texte d'abord
       const eventsText = await eventsResponse.text();
       const prospectsText = await prospectsResponse.text();
-      
-      console.log('📄 Events Response (premiers 200 chars):', eventsText.substring(0, 200));
       
       // Vérifier si c'est du JSON valide
       let eventsData, prospectsData;
       
       try {
         eventsData = JSON.parse(eventsText);
-        console.log('✅ Events parsé avec succès:', eventsData.events?.length || 0, 'événements');
-        // Vérifier que les events ont bien des prospect_id
-        if (eventsData.events && eventsData.events.length > 0) {
-          const eventsWithProspectId = eventsData.events.filter((e: any) => e.prospect_id);
-          console.log(`✅ ${eventsWithProspectId.length}/${eventsData.events.length} événements ont un prospect_id`);
-          if (eventsWithProspectId.length !== eventsData.events.length) {
-            console.warn('⚠️ Certains événements n\'ont pas de prospect_id!', 
-              eventsData.events.filter((e: any) => !e.prospect_id)
-            );
-          }
-        }
       } catch (e) {
         console.error('❌ Erreur parsing events JSON:', e);
         console.error('❌ Réponse complète:', eventsText);
@@ -169,17 +148,14 @@ export function AgendaPage() {
       
       try {
         prospectsData = JSON.parse(prospectsText);
-        console.log('✅ Prospects parsé avec succès:', prospectsData.prospects?.length || 0, 'prospects');
       } catch (e) {
         console.error('❌ Erreur parsing prospects JSON:', e);
         prospectsData = { success: false, prospects: [] };
       }
 
       if (eventsData.success) {
-        console.log('📋 Premier événement:', eventsData.events?.[0]);
         setEvents(eventsData.events || []);
       } else {
-        console.warn('⚠️ Aucun événement retourné par l\'API');
         setEvents([]);
       }
       

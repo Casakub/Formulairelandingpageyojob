@@ -268,7 +268,6 @@ export function ProspectSheet({ prospect, open, onClose, onUpdate }: ProspectShe
         // Mettre à jour les données localement
         Object.assign(prospect, editForm);
         setShowEditModal(false);
-        console.log('✅ Informations mises à jour avec succès');
         
         // Appeler le callback pour rafraîchir la liste
         if (onUpdate) {
@@ -312,7 +311,6 @@ export function ProspectSheet({ prospect, open, onClose, onUpdate }: ProspectShe
         // Ajouter la nouvelle note en tête de liste
         setNotes([data.note, ...notes]);
         setNewNote('');
-        console.log('✅ Note sauvegardée avec succès');
       } else {
         console.error('❌ Erreur sauvegarde note:', data.error);
       }
@@ -343,7 +341,6 @@ export function ProspectSheet({ prospect, open, onClose, onUpdate }: ProspectShe
       if (data.success) {
         // Retirer la note de la liste
         setNotes(notes.filter(note => note.id !== noteId));
-        console.log('✅ Note supprimée avec succès');
       } else {
         console.error('❌ Erreur suppression note:', data.error);
       }
@@ -381,7 +378,6 @@ export function ProspectSheet({ prospect, open, onClose, onUpdate }: ProspectShe
         // Mettre à jour le statut localement
         prospect.status = currentStatus;
         setShowStatusModal(false);
-        console.log('✅ Statut mis à jour avec succès');
         
         // Appeler le callback pour rafraîchir la liste
         if (onUpdate) {

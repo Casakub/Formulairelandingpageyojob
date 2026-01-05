@@ -96,39 +96,24 @@ export function SurveyTranslationDashboard({ onTranslationUpdate }: SurveyTransl
         for (const { code, bundle } of languagesToLoad) {
           try {
             if (!bundle) {
-              console.error(`❌ [SurveyTranslationDashboard] Bundle ${code} est undefined/null`);
+              console.error(`Bundle ${code} est undefined/null`);
               continue;
             }
             bundles[code] = bundle;
-            console.log(`✅ [SurveyTranslationDashboard] Bundle ${code} chargé:`, Object.keys(bundle));
           } catch (error) {
-            console.error(`❌ [SurveyTranslationDashboard] Erreur lors du chargement du bundle ${code}:`, error);
+            console.error(`Erreur lors du chargement du bundle ${code}:`, error);
           }
         }
-
-        console.log('📦 [SurveyTranslationDashboard] Bundles chargés avec succès:', Object.keys(bundles));
         
         if (Object.keys(bundles).length === 0) {
           throw new Error('Aucun bundle de traduction n\'a pu être chargé');
         }
         
         const analysis = await analyzeAllLanguages(bundles);
-        console.log('✅ [SurveyTranslationDashboard] Analyse terminée:', {
-          totalQuestions: analysis.totalQuestions,
-          totalKeys: analysis.totalKeys,
-          languagesCount: analysis.languages.length,
-          averageCompleteness: analysis.averageCompleteness
-        });
         
         setGlobalAnalysis(analysis);
       } catch (error) {
-        console.error('❌ ❌ Error loading translations:', error instanceof Error ? error : new Error(String(error)));
-        console.error('📋 Error details:', {
-          message: error instanceof Error ? error.message : String(error),
-          stack: error instanceof Error ? error.stack : 'No stack trace',
-          name: error instanceof Error ? error.name : typeof error,
-          error: error
-        });
+        console.error('Error loading translations:', error instanceof Error ? error.message : String(error));
       } finally {
         setIsLoading(false);
       }
@@ -141,7 +126,6 @@ export function SurveyTranslationDashboard({ onTranslationUpdate }: SurveyTransl
   const selectedLanguageAnalysis = useMemo(() => {
     if (!selectedLanguage || !globalAnalysis) return null;
     const analysis = globalAnalysis.languages.find(l => l.language === selectedLanguage);
-    console.log('🔍 [SurveyTranslationDashboard] Langue sélectionnée:', selectedLanguage, 'Analysis:', analysis);
     return analysis;
   }, [selectedLanguage, globalAnalysis]);
 

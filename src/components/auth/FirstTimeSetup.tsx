@@ -65,15 +65,11 @@ export function FirstTimeSetup({ onSetupComplete, onBackToLogin }: FirstTimeSetu
     setIsLoading(true);
 
     try {
-      console.log('🔧 Creating account for:', formData.email);
       const result = await signup(formData.email, formData.password, formData.name);
 
       if (result.success) {
-        console.log('✅ Account created successfully');
-        
         // If we got a session, we're already logged in
         if (result.session) {
-          console.log('✅ Already logged in with session');
           setSuccess(true);
           setTimeout(() => {
             onSetupComplete();
@@ -81,7 +77,6 @@ export function FirstTimeSetup({ onSetupComplete, onBackToLogin }: FirstTimeSetu
         } 
         // Otherwise, need to login manually
         else if (result.needsLogin) {
-          console.log('ℹ️ Account created, please login');
           setSuccess(true);
           setTimeout(() => {
             onSetupComplete();
