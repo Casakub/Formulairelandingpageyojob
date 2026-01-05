@@ -1,0 +1,51 @@
+# =============================================================================
+# DOCKER COMPOSE - YoJob Landing Page
+# =============================================================================
+# Usage:
+#   Build & Run:     docker-compose up --build -d
+#   Stop:            docker-compose down
+#   Voir les logs:   docker-compose logs -f
+#   Rebuild:         docker-compose build --no-cache
+# =============================================================================
+
+services:
+  yojob-landing:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        # Variables d'environnement injectées au build-time
+        # Ces valeurs seront lues depuis le fichier .env ou passées en ligne de commande
+        VITE_SUPABASE_URL: ${VITE_SUPABASE_URL:-}
+        VITE_SUPABASE_ANON_KEY: ${VITE_SUPABASE_ANON_KEY:-}
+        VITE_APP_ENV: ${VITE_APP_ENV:-production}
+
+    container_name: yojob-landing-page
+
+    ports:
+      - "${PORT:-3000}:80"
+
+    restart: unless-stopped
+
+    # Healthcheck hérite du Dockerfile
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:80/"]
+      interval: 30s
+      timeout: 3s
+      retries: 3
+      start_period: 10s
+
+    # Labels pour la documentation
+    labels:
+      - "app.name=yojob-landing"
+      - "app.description=YoJob Landing Page - Formulaire de contact"
+      - "app.version=1.0.0"
+
+# =============================================================================
+# EXEMPLE DE FICHIER .env (à créer à la racine du projet)
+# =============================================================================
+# VITE_SUPABASE_URL=https://your-project.supabase.co
+# VITE_SUPABASE_ANON_KEY=your-anon-key-here
+# VITE_APP_ENV=production
+# PORT=3000
+# =============================================================================
