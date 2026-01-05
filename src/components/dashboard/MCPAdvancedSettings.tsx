@@ -29,7 +29,7 @@ interface MCPAdvancedSettingsProps {
 
 export function MCPAdvancedSettings({ onClose }: MCPAdvancedSettingsProps) {
   // États pour les paramètres
-  const [model, setModel] = useState('claude-3-5-sonnet-20240620');
+  const [model, setModel] = useState('claude-sonnet-4-5-20250929');
   const [temperature, setTemperature] = useState(0.3);
   const [maxTokens, setMaxTokens] = useState(1000);
   const [contextWindow, setContextWindow] = useState(5);
@@ -67,7 +67,7 @@ export function MCPAdvancedSettings({ onClose }: MCPAdvancedSettingsProps) {
   };
 
   const resetToDefaults = () => {
-    setModel('claude-3-5-sonnet-20240620');
+    setModel('claude-sonnet-4-5-20250929');
     setTemperature(0.3);
     setMaxTokens(1000);
     setContextWindow(5);
@@ -142,8 +142,8 @@ export function MCPAdvancedSettings({ onClose }: MCPAdvancedSettingsProps) {
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="claude-3-5-sonnet-20240620">
-                    Claude 3.5 Sonnet (Recommandé)
+                  <SelectItem value="claude-sonnet-4-5-20250929">
+                    Claude 4.5 Sonnet (Recommandé)
                   </SelectItem>
                   <SelectItem value="claude-3-opus-20240229">
                     Claude 3 Opus (Plus puissant)

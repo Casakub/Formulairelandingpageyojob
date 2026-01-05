@@ -158,7 +158,7 @@ class AITranslationService {
           'anthropic-version': '2023-06-01',
         },
         body: JSON.stringify({
-          model: this.config.model || 'claude-3-5-sonnet-20240620',
+          model: this.config.model || 'claude-sonnet-4-5-20250929',
           max_tokens: 8192,
           messages: [{
             role: 'user',
@@ -294,7 +294,7 @@ Return ONLY a valid JSON object with the translated content in the same structur
  */
 export const aiTranslationService = new AITranslationService({
   provider: 'claude', // Mode Claude activé par défaut
-  model: 'claude-3-5-sonnet-20240620',
+  model: 'claude-sonnet-4-5-20250929',
 });
 
 /**
