@@ -15,7 +15,6 @@ import {
   CheckCircle,
   Users,
   TrendingUp,
-  ArrowLeft,
   Briefcase,
   Globe
 } from 'lucide-react';
@@ -24,9 +23,11 @@ import { Card, CardContent } from './components/ui/card';
 import { Badge } from './components/ui/badge';
 import { LogoSvg } from './imports/YojobLogoComplete';
 import { SEOHead } from './components/SEOHead';
+import { LanguageSelector } from './components/landing/LanguageSelector';
 
 export default function NosSecteurs() {
   const [isScrolled, setIsScrolled] = useState(false);
+  const [currentLanguage, setCurrentLanguage] = useState('fr');
   const [selectedSector, setSelectedSector] = useState<number | null>(null);
 
   // Header scroll effect
@@ -175,18 +176,11 @@ export default function NosSecteurs() {
 
             {/* CTA */}
             <div className="flex items-center gap-4">
-              <Button
-                onClick={() => window.history.back()}
-                variant="outline"
-                className={`rounded-full ${
-                  isScrolled
-                    ? 'border-[#1E3A8A]/20 text-[#1E3A8A] hover:bg-[#1E3A8A]/5'
-                    : 'border-white/20 text-white hover:bg-white/10'
-                }`}
-              >
-                <ArrowLeft className="w-4 h-4 mr-2" />
-                Retour
-              </Button>
+              <LanguageSelector
+                currentLanguage={currentLanguage}
+                onLanguageChange={setCurrentLanguage}
+                availableLanguages={['fr', 'en']}
+              />
               <Button
                 onClick={() => (window.location.href = '/devis')}
                 className="rounded-full bg-white text-[#1E3A8A] hover:bg-cyan-50 shadow-lg"

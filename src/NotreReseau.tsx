@@ -10,10 +10,14 @@ import {
   Building2,
   Users,
   Star,
-  ArrowLeft,
   Search,
   Filter,
-  TrendingUp
+  TrendingUp,
+  Phone,
+  Mail,
+  Linkedin,
+  Twitter,
+  Facebook
 } from 'lucide-react';
 import { Button } from './components/ui/button';
 import { Card, CardContent } from './components/ui/card';
@@ -21,9 +25,11 @@ import { Badge } from './components/ui/badge';
 import { LogoSvg } from './imports/YojobLogoComplete';
 import { EuropeMap } from './components/landing/EuropeMap';
 import { SEOHead } from './components/SEOHead';
+import { LanguageSelector } from './components/landing/LanguageSelector';
 
 export default function NotreReseau() {
   const [isScrolled, setIsScrolled] = useState(false);
+  const [currentLanguage, setCurrentLanguage] = useState('fr');
 
   // Header scroll effect
   useState(() => {
@@ -34,102 +40,98 @@ export default function NotreReseau() {
     return () => window.removeEventListener('scroll', handleScroll);
   });
 
-  const networkStats = [
+  const topCountries = [
     {
-      number: "27",
-      label: "Pays européens",
-      description: "Couverture complète de l'Union Européenne",
-      icon: <Globe className="w-8 h-8" />,
+      name: "France",
+      flag: "🇫🇷",
+      agencies: 85,
+      specialties: ["BTP", "Industrie", "Hôtellerie"],
       color: "from-blue-500 to-cyan-600"
     },
     {
-      number: "500+",
-      label: "Agences partenaires",
-      description: "Réseau certifié et qualifié",
+      name: "Pologne",
+      flag: "🇵🇱",
+      agencies: 78,
+      specialties: ["BTP", "Transport", "Industrie"],
+      color: "from-red-500 to-rose-600"
+    },
+    {
+      name: "Portugal",
+      flag: "🇵🇹",
+      agencies: 62,
+      specialties: ["BTP", "Hôtellerie", "Agriculture"],
+      color: "from-green-500 to-emerald-600"
+    },
+    {
+      name: "Roumanie",
+      flag: "🇷🇴",
+      agencies: 54,
+      specialties: ["BTP", "Industrie", "Agriculture"],
+      color: "from-yellow-500 to-orange-600"
+    },
+    {
+      name: "Espagne",
+      flag: "🇪🇸",
+      agencies: 48,
+      specialties: ["Hôtellerie", "Agriculture", "Santé"],
+      color: "from-orange-500 to-red-600"
+    },
+    {
+      name: "Italie",
+      flag: "🇮🇹",
+      agencies: 42,
+      specialties: ["BTP", "Industrie", "Hôtellerie"],
+      color: "from-green-500 to-red-600"
+    }
+  ];
+
+  const advantages = [
+    {
+      icon: <Globe className="w-8 h-8" />,
+      title: "27 pays européens",
+      description: "Couverture complète de l'Union Européenne + Royaume-Uni",
+      color: "from-blue-500 to-cyan-600"
+    },
+    {
       icon: <Building2 className="w-8 h-8" />,
+      title: "500+ agences vérifiées",
+      description: "Partenaires sélectionnés et certifiés pour leur sérieux",
       color: "from-violet-500 to-purple-600"
     },
     {
-      number: "10,000+",
-      label: "Professionnels disponibles",
-      description: "Base de talents européens",
       icon: <Users className="w-8 h-8" />,
-      color: "from-cyan-500 to-teal-600"
+      title: "Tous secteurs d'activité",
+      description: "Du BTP à la tech, en passant par l'industrie et l'hôtellerie",
+      color: "from-green-500 to-emerald-600"
     },
     {
-      number: "98%",
-      label: "Taux de satisfaction",
-      description: "Clients satisfaits de nos services",
-      icon: <Star className="w-8 h-8" />,
+      icon: <CheckCircle className="w-8 h-8" />,
+      title: "Conformité garantie",
+      description: "100% de respect des réglementations du détachement européen",
       color: "from-orange-500 to-amber-600"
     }
   ];
 
-  const topCountries = [
+  const marketplaceFeatures = [
     {
-      country: "France",
-      flag: "🇫🇷",
-      agencies: 85,
-      sectors: ["BTP", "Industrie", "Logistique"],
-      color: "from-blue-500 to-blue-600"
+      icon: <Search className="w-6 h-6" />,
+      title: "Recherche multicritères",
+      description: "Trouvez l'agence idéale selon le pays, secteur, métier et délai"
     },
     {
-      country: "Portugal",
-      flag: "🇵🇹",
-      agencies: 65,
-      sectors: ["BTP", "Hôtellerie", "Agriculture"],
-      color: "from-green-500 to-emerald-600"
+      icon: <Star className="w-6 h-6" />,
+      title: "Avis vérifiés",
+      description: "Consultez les retours d'expérience d'autres entreprises"
     },
     {
-      country: "Roumanie",
-      flag: "🇷🇴",
-      agencies: 72,
-      sectors: ["Industrie", "BTP", "Logistique"],
-      color: "from-yellow-500 to-orange-600"
+      icon: <Filter className="w-6 h-6" />,
+      title: "Comparaison instantanée",
+      description: "Comparez prix, délais et profils en un clic"
     },
     {
-      country: "Pologne",
-      flag: "🇵🇱",
-      agencies: 58,
-      sectors: ["Industrie", "Tech", "BTP"],
-      color: "from-red-500 to-rose-600"
-    },
-    {
-      country: "Espagne",
-      flag: "🇪🇸",
-      agencies: 52,
-      sectors: ["Hôtellerie", "Agriculture", "BTP"],
-      color: "from-amber-500 to-orange-600"
-    },
-    {
-      country: "Allemagne",
-      flag: "🇩🇪",
-      agencies: 48,
-      sectors: ["Tech", "Industrie", "Logistique"],
-      color: "from-gray-500 to-slate-600"
-    }
-  ];
-
-  const certifications = [
-    {
-      title: "Agences certifiées",
-      description: "Toutes nos agences partenaires sont certifiées et respectent les normes européennes d'emploi temporaire.",
-      icon: <CheckCircle className="w-6 h-6" />
-    },
-    {
-      title: "Contrôle qualité",
-      description: "Audits réguliers et contrôles de conformité pour garantir l'excellence de nos prestations.",
-      icon: <Star className="w-6 h-6" />
-    },
-    {
-      title: "Support multilingue",
-      description: "Équipes parlant 22 langues européennes pour faciliter les échanges internationaux.",
-      icon: <Globe className="w-6 h-6" />
-    },
-    {
-      title: "Réseau évolutif",
-      description: "Expansion continue avec de nouveaux partenaires qualifiés chaque trimestre.",
-      icon: <TrendingUp className="w-6 h-6" />
+      icon: <Network className="w-6 h-6" />,
+      title: "Mise en relation directe",
+      description: "Échangez directement avec les agences sans intermédiaire"
     }
   ];
 
@@ -143,7 +145,7 @@ export default function NotreReseau() {
         {/* ============================================ */}
         <header
           className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
-            isScrolled ? 'bg-white shadow-md' : 'bg-transparent'
+            isScrolled ? 'bg-white/10 backdrop-blur-md shadow-lg shadow-white/5' : 'bg-transparent'
           }`}
         >
           <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
@@ -152,25 +154,18 @@ export default function NotreReseau() {
               <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#1E3A8A] to-[#06B6D4] flex items-center justify-center shadow-lg group-hover:shadow-cyan-500/50 transition-all">
                 <LogoSvg className="w-6 h-6 text-white" />
               </div>
-              <span className={`transition-colors ${isScrolled ? 'text-[#1E3A8A]' : 'text-white'}`}>
+              <span className="text-white transition-colors">
                 YOJOB
               </span>
             </a>
 
             {/* CTA */}
             <div className="flex items-center gap-4">
-              <Button
-                onClick={() => window.history.back()}
-                variant="outline"
-                className={`rounded-full ${
-                  isScrolled
-                    ? 'border-[#1E3A8A]/20 text-[#1E3A8A] hover:bg-[#1E3A8A]/5'
-                    : 'border-white/20 text-white hover:bg-white/10'
-                }`}
-              >
-                <ArrowLeft className="w-4 h-4 mr-2" />
-                Retour
-              </Button>
+              <LanguageSelector
+                currentLanguage={currentLanguage}
+                onLanguageChange={setCurrentLanguage}
+                availableLanguages={['fr', 'en']}
+              />
               <Button
                 onClick={() => (window.location.href = '/devis')}
                 className="rounded-full bg-white text-[#1E3A8A] hover:bg-cyan-50 shadow-lg"
@@ -183,63 +178,59 @@ export default function NotreReseau() {
         </header>
 
         {/* ============================================ */}
-        {/* HERO SECTION */}
+        {/* HERO + CARTE INTERACTIVE FUSIONNÉS */}
         {/* ============================================ */}
         <section className="relative pt-32 pb-20 overflow-hidden">
           {/* Background decorations */}
           <div className="absolute inset-0 pointer-events-none">
             <div className="absolute top-20 left-10 w-72 h-72 bg-cyan-400/20 rounded-full blur-3xl" />
             <div className="absolute bottom-20 right-10 w-96 h-96 bg-violet-400/20 rounded-full blur-3xl" />
+            <div className="absolute top-0 left-1/4 w-96 h-96 bg-cyan-400/10 rounded-full blur-3xl animate-pulse" />
+            <div className="absolute bottom-0 right-1/4 w-72 h-72 bg-violet-400/10 rounded-full blur-3xl" 
+                 style={{ animationDelay: '1s' }} />
+            {/* Particules décoratives */}
+            <div className="absolute top-10 left-10 w-2 h-2 bg-cyan-300/30 rounded-full animate-ping" />
+            <div className="absolute top-20 right-20 w-1 h-1 bg-violet-300/30 rounded-full animate-ping" 
+                 style={{ animationDelay: '0.5s' }} />
+            <div className="absolute bottom-10 left-1/3 w-1.5 h-1.5 bg-white/20 rounded-full animate-ping" 
+                 style={{ animationDelay: '1.5s' }} />
           </div>
 
-          <div className="max-w-5xl mx-auto px-6 text-center relative z-10">
+          <div className="max-w-7xl mx-auto px-6 relative z-10">
+            {/* Contenu Hero */}
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6 }}
+              className="text-center mb-16"
             >
               <Badge className="mb-6 px-6 py-2 bg-white/10 border-white/20 text-white backdrop-blur-sm">
-                <Network className="w-4 h-4 mr-2" />
+                <Globe className="w-4 h-4 mr-2" />
                 Notre réseau européen
               </Badge>
 
               <h1 className="text-white mb-6 max-w-3xl mx-auto">
-                500+ agences partenaires dans 27 pays européens
+                Le plus grand réseau de recrutement européen : 500+ agences dans 27 pays
               </h1>
 
               <p className="text-white/80 text-xl max-w-2xl mx-auto mb-12">
-                Le plus grand réseau européen d'agences d'emploi temporaire certifiées, à votre service pour vos besoins de recrutement international.
+                Recrutez vos talents qualifiés en 48-72h grâce à nos agences partenaires vérifiées. Intérim, CDI, détachement : une solution 100% conforme et clé en main pour tous vos besoins de main-d'œuvre européenne.
               </p>
 
-              {/* Stats Grid */}
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mt-12">
-                {networkStats.map((stat, index) => (
-                  <motion.div
-                    key={index}
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.2 + index * 0.1 }}
-                    whileHover={{ y: -8 }}
-                  >
-                    <Card className="border border-white/10 bg-white/5 backdrop-blur-sm hover:bg-white/10 hover:border-cyan-400/50 transition-all text-center group">
-                      <CardContent className="p-6">
-                        <div className={`w-14 h-14 rounded-2xl bg-gradient-to-br ${stat.color} flex items-center justify-center mb-4 mx-auto text-white shadow-lg group-hover:scale-110 transition-transform`}>
-                          {stat.icon}
-                        </div>
-                        <div className="text-white mb-2">{stat.number}</div>
-                        <p className="text-white/80 text-sm mb-2">{stat.label}</p>
-                        <p className="text-white/60 text-xs">{stat.description}</p>
-                      </CardContent>
-                    </Card>
-                  </motion.div>
-                ))}
-              </div>
+              <h2 className="text-white mb-4">Une couverture européenne complète en temps réel</h2>
+              <p className="text-white/70 text-lg max-w-2xl mx-auto">
+                27 pays, 500+ agences, des milliers de talents disponibles immédiatement. Explorez notre réseau pays par pays et identifiez les agences spécialisées dans votre secteur d'activité pour cibler votre recrutement avec précision.
+              </p>
             </motion.div>
+
+            <div className="flex justify-center">
+              <EuropeMap variant="network" />
+            </div>
           </div>
         </section>
 
         {/* ============================================ */}
-        {/* CARTE EUROPE INTERACTIVE */}
+        {/* TOP PAYS */}
         {/* ============================================ */}
         <section className="py-20 relative">
           <div className="max-w-6xl mx-auto px-6">
@@ -247,51 +238,15 @@ export default function NotreReseau() {
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              className="text-center mb-16"
+              className="text-center mb-12"
             >
               <Badge className="mb-4 px-6 py-2 bg-white/10 border-white/20 text-white backdrop-blur-sm">
-                <Globe className="w-4 h-4 mr-2" />
-                Couverture géographique
+                <Star className="w-4 h-4 mr-2" />
+                Nos pays phares
               </Badge>
-              <h2 className="text-white mb-4">Une présence dans toute l'Europe</h2>
+              <h2 className="text-white mb-4">Les destinations privilégiées</h2>
               <p className="text-white/70 text-lg max-w-2xl mx-auto">
-                Survolez les pays pour découvrir le nombre d'agences partenaires disponibles dans chaque région.
-              </p>
-            </motion.div>
-
-            {/* Carte Europe */}
-            <motion.div
-              initial={{ opacity: 0, scale: 0.95 }}
-              whileInView={{ opacity: 1, scale: 1 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.8 }}
-              className="mb-12"
-            >
-              <div className="bg-white/5 backdrop-blur-sm border border-white/20 rounded-3xl p-8 md:p-12">
-                <EuropeMap variant="network" />
-              </div>
-            </motion.div>
-          </div>
-        </section>
-
-        {/* ============================================ */}
-        {/* TOP PAYS PARTENAIRES */}
-        {/* ============================================ */}
-        <section className="py-20 relative">
-          <div className="max-w-6xl mx-auto px-6">
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              className="text-center mb-16"
-            >
-              <Badge className="mb-4 px-6 py-2 bg-white/10 border-white/20 text-white backdrop-blur-sm">
-                <MapPin className="w-4 h-4 mr-2" />
-                Pays partenaires
-              </Badge>
-              <h2 className="text-white mb-4">Nos principales destinations</h2>
-              <p className="text-white/70 text-lg max-w-2xl mx-auto">
-                Découvrez les pays où nous disposons du plus grand réseau d'agences certifiées.
+                6 pays concentrent 70% de notre réseau avec une expertise sectorielle reconnue.
               </p>
             </motion.div>
 
@@ -305,24 +260,31 @@ export default function NotreReseau() {
                   transition={{ delay: index * 0.1 }}
                   whileHover={{ y: -8 }}
                 >
-                  <Card className="border border-white/10 bg-white/5 backdrop-blur-sm hover:bg-white/10 hover:border-cyan-400/50 transition-all group">
+                  <Card className="h-full border border-white/10 bg-white/5 backdrop-blur-sm hover:bg-white/10 hover:border-cyan-400/50 transition-all group">
                     <CardContent className="p-6">
-                      <div className="flex items-center gap-4 mb-4">
+                      <div className="flex items-center gap-3 mb-4">
                         <div className="text-4xl">{country.flag}</div>
-                        <div className="flex-1">
-                          <h3 className="text-white mb-1">{country.country}</h3>
+                        <div>
+                          <h3 className="text-white">{country.name}</h3>
                           <p className="text-cyan-400 text-sm">{country.agencies} agences</p>
                         </div>
                       </div>
+                      <p className="text-white/70 text-sm mb-3">Spécialités :</p>
                       <div className="flex flex-wrap gap-2">
-                        {country.sectors.map((sector, idx) => (
+                        {country.specialties.map((specialty, idx) => (
                           <Badge
                             key={idx}
                             className="bg-white/10 border-white/20 text-white/80 text-xs"
                           >
-                            {sector}
+                            {specialty}
                           </Badge>
                         ))}
+                      </div>
+                      <div className="mt-4 pt-4 border-t border-white/10">
+                        <div className="flex items-center justify-between text-xs text-white/60">
+                          <span>Délai moyen</span>
+                          <span className="text-green-400">48-72h</span>
+                        </div>
                       </div>
                     </CardContent>
                   </Card>
@@ -333,7 +295,7 @@ export default function NotreReseau() {
         </section>
 
         {/* ============================================ */}
-        {/* CERTIFICATIONS & QUALITÉ */}
+        {/* AVANTAGES DU RÉSEAU */}
         {/* ============================================ */}
         <section className="py-20 relative">
           <div className="max-w-6xl mx-auto px-6">
@@ -345,16 +307,16 @@ export default function NotreReseau() {
             >
               <Badge className="mb-4 px-6 py-2 bg-white/10 border-white/20 text-white backdrop-blur-sm">
                 <CheckCircle className="w-4 h-4 mr-2" />
-                Garantie qualité
+                Nos garanties
               </Badge>
-              <h2 className="text-white mb-4">Un réseau certifié et contrôlé</h2>
+              <h2 className="text-white mb-4">Pourquoi choisir notre réseau ?</h2>
               <p className="text-white/70 text-lg max-w-2xl mx-auto">
-                Toutes nos agences partenaires respectent nos standards de qualité élevés et les réglementations européennes.
+                Un réseau construit sur la qualité, la fiabilité et la conformité réglementaire.
               </p>
             </motion.div>
 
-            <div className="grid md:grid-cols-2 gap-8">
-              {certifications.map((cert, index) => (
+            <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+              {advantages.map((advantage, index) => (
                 <motion.div
                   key={index}
                   initial={{ opacity: 0, y: 20 }}
@@ -363,17 +325,13 @@ export default function NotreReseau() {
                   transition={{ delay: index * 0.1 }}
                   whileHover={{ y: -8 }}
                 >
-                  <Card className="h-full border border-white/10 bg-white/5 backdrop-blur-sm hover:bg-white/10 hover:border-cyan-400/50 transition-all group">
-                    <CardContent className="p-8">
-                      <div className="flex items-start gap-4">
-                        <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-cyan-400 to-violet-500 flex items-center justify-center flex-shrink-0 text-white group-hover:scale-110 transition-transform">
-                          {cert.icon}
-                        </div>
-                        <div>
-                          <h3 className="text-white mb-2">{cert.title}</h3>
-                          <p className="text-white/70">{cert.description}</p>
-                        </div>
+                  <Card className="h-full border border-white/10 bg-white/5 backdrop-blur-sm hover:bg-white/10 hover:border-cyan-400/50 transition-all text-center group">
+                    <CardContent className="p-6">
+                      <div className={`w-16 h-16 rounded-2xl bg-gradient-to-br ${advantage.color} flex items-center justify-center mb-4 mx-auto text-white shadow-lg group-hover:scale-110 transition-transform`}>
+                        {advantage.icon}
                       </div>
+                      <h3 className="text-white mb-3">{advantage.title}</h3>
+                      <p className="text-white/70 text-sm">{advantage.description}</p>
                     </CardContent>
                   </Card>
                 </motion.div>
@@ -383,45 +341,61 @@ export default function NotreReseau() {
         </section>
 
         {/* ============================================ */}
-        {/* TEASER MARKETPLACE */}
+        {/* MARKETPLACE TEASER */}
         {/* ============================================ */}
         <section className="py-20 relative">
-          <div className="max-w-4xl mx-auto px-6">
+          <div className="max-w-5xl mx-auto px-6">
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              className="bg-gradient-to-br from-white/10 to-white/5 backdrop-blur-sm border border-white/20 rounded-3xl p-12 text-center"
+              className="bg-white/10 backdrop-blur-sm border border-white/20 rounded-3xl p-8 md:p-12"
             >
-              <Badge className="mb-6 px-6 py-2 bg-orange-500/20 border-orange-400/30 text-orange-300">
-                <Star className="w-4 h-4 mr-2" />
-                Bientôt disponible
-              </Badge>
-              <h2 className="text-white mb-4">Marketplace digitale en 2025</h2>
-              <p className="text-white/80 text-lg mb-8 max-w-2xl mx-auto">
-                Accédez directement à notre réseau d'agences européennes via notre plateforme digitale : recherchez, comparez et contractez en quelques clics.
-              </p>
-              <div className="flex flex-wrap gap-4 justify-center mb-8">
-                <Badge className="bg-white/10 border-white/20 text-white px-4 py-2">
-                  <Search className="w-4 h-4 mr-2" />
-                  Recherche multicritères
+              <div className="text-center mb-8">
+                <Badge className="mb-4 px-6 py-2 bg-gradient-to-r from-orange-500 to-amber-500 border-0 text-white">
+                  🚀 Nouveauté 2026
                 </Badge>
-                <Badge className="bg-white/10 border-white/20 text-white px-4 py-2">
-                  <Filter className="w-4 h-4 mr-2" />
-                  Comparaison instantanée
-                </Badge>
-                <Badge className="bg-white/10 border-white/20 text-white px-4 py-2">
-                  <Star className="w-4 h-4 mr-2" />
-                  Avis vérifiés
-                </Badge>
+                <h2 className="text-white mb-4">Marketplace d'agences européennes (à venir)</h2>
+                <p className="text-white/80 text-lg max-w-2xl mx-auto">
+                  Bientôt, accédez directement à toutes nos agences partenaires via une plateforme digitale innovante.
+                </p>
               </div>
-              <Button
-                size="lg"
-                className="rounded-full bg-white text-[#1E3A8A] hover:bg-cyan-50 shadow-2xl"
-              >
-                Rejoindre la liste d'attente
-                <ArrowRight className="ml-2 w-5 h-5" />
-              </Button>
+
+              <div className="grid md:grid-cols-2 gap-6 mb-8">
+                {marketplaceFeatures.map((feature, index) => (
+                  <motion.div
+                    key={index}
+                    initial={{ opacity: 0, x: index % 2 === 0 ? -20 : 20 }}
+                    whileInView={{ opacity: 1, x: 0 }}
+                    viewport={{ once: true }}
+                    transition={{ delay: index * 0.1 }}
+                    className="flex items-start gap-4"
+                  >
+                    <div className="w-10 h-10 rounded-lg bg-white/10 flex items-center justify-center text-cyan-400 flex-shrink-0">
+                      {feature.icon}
+                    </div>
+                    <div>
+                      <h4 className="text-white mb-1">{feature.title}</h4>
+                      <p className="text-white/70 text-sm">{feature.description}</p>
+                    </div>
+                  </motion.div>
+                ))}
+              </div>
+
+              <div className="text-center">
+                <Button
+                  asChild
+                  size="lg"
+                  className="rounded-full bg-white text-[#1E3A8A] hover:bg-cyan-50 shadow-2xl hover:shadow-white/50 transition-all group"
+                >
+                  <a href="/devis">
+                    <span className="relative z-10 flex items-center">
+                      Demander un devis gratuit
+                      <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
+                    </span>
+                  </a>
+                </Button>
+              </div>
             </motion.div>
           </div>
         </section>
@@ -439,38 +413,232 @@ export default function NotreReseau() {
             >
               <h2 className="text-white mb-4">Activez notre réseau européen</h2>
               <p className="text-white/80 text-lg mb-8 max-w-2xl mx-auto">
-                Accédez instantanément à 500+ agences partenaires et trouvez les talents dont vous avez besoin pour vos projets.
+                Décrivez votre besoin et nous mobilisons immédiatement nos agences partenaires dans le pays de votre choix.
               </p>
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
                 <Button
-                  onClick={() => (window.location.href = '/devis')}
+                  asChild
                   size="lg"
                   className="rounded-full bg-white text-[#1E3A8A] hover:bg-cyan-50 shadow-2xl hover:shadow-white/50 transition-all group"
                 >
-                  <span className="relative z-10 flex items-center">
-                    Demander un devis gratuit
-                    <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
-                  </span>
+                  <a href="/devis">
+                    <span className="relative z-10 flex items-center">
+                      Demander un devis gratuit
+                      <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
+                    </span>
+                  </a>
                 </Button>
                 <Button
-                  onClick={() => (window.location.href = '/')}
+                  asChild
                   size="lg"
-                  variant="outline"
-                  className="rounded-full border-white/30 text-white hover:bg-white/10"
+                  className="rounded-full bg-transparent border-2 border-white/30 text-white hover:bg-white/10 hover:border-white/50 shadow-lg transition-all"
                 >
-                  Retour à l'accueil
+                  <a href="/">
+                    Retour à l'accueil
+                  </a>
                 </Button>
               </div>
             </motion.div>
           </div>
         </section>
 
-        {/* Footer minimal */}
-        <footer className="py-8 border-t border-white/10">
-          <div className="max-w-7xl mx-auto px-6 text-center">
-            <p className="text-white/50 text-sm">
-              © 2025 YOJOB. Tous droits réservés.
-            </p>
+        {/* FOOTER */}
+        <footer className="relative overflow-hidden bg-gradient-to-b from-[#0a0e27] to-[#1a1f3a] text-white py-12 lg:py-16">
+          {/* Radial gradients - same as network section */}
+          <div className="absolute inset-0" style={{
+            backgroundImage: 'radial-gradient(circle at 20% 50%, rgba(6, 182, 212, 0.3) 0%, transparent 50%), radial-gradient(circle at 80% 80%, rgba(124, 58, 237, 0.3) 0%, transparent 50%)',
+          }} />
+
+          {/* Grid pattern overlay */}
+          <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGRlZnM+PHBhdHRlcm4gaWQ9ImdyaWQiIHdpZHRoPSI2MCIgaGVpZ2h0PSI2MCIgcGF0dGVyblVuaXRzPSJ1c2VyU3BhY2VPblVzZSI+PHBhdGggZD0iTSAxMCAwIEwgMCAwIDAgMTAiIGZpbGw9Im5vbmUiIHN0cm9rZT0id2hpdGUiIHN0cm9rZS13aWR0aD0iMC41Ii8+PC9wYXR0ZXJuPjwvZGVmcz48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSJ1cmwoI2dyaWQpIi8+PC9zdmc+')] opacity-10" />
+
+          <div className="container mx-auto px-4 relative z-10">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 lg:gap-10 mb-10 lg:mb-12">
+              {/* Column 1: Logo & Description */}
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.6 }}
+              >
+                <motion.div 
+                  className="w-32 h-32 inline-block mb-6"
+                  whileHover={{ scale: 1.05, y: -2 }}
+                  transition={{ duration: 0.3 }}
+                >
+                  <LogoSvg 
+                    className="w-full h-full" 
+                    effects={true}
+                    aria-label="YOJOB"
+                  />
+                </motion.div>
+                <p className="text-white/80 mb-[24px] leading-relaxed max-w-xs text-[13px] mt-[-46px] mr-[0px] ml-[0px]">
+                  Leader du recrutement européen. 500+ agences partenaires dans 27 pays pour connecter les talents aux opportunités.
+                </p>
+                <div className="flex gap-3">
+                  {[
+                    { icon: Linkedin, href: '#', color: 'cyan' },
+                    { icon: Twitter, href: '#', color: 'violet' },
+                    { icon: Facebook, href: '#', color: 'blue' }
+                  ].map((social, index) => (
+                    <motion.a
+                      key={index}
+                      href={social.href}
+                      className="w-10 h-10 bg-white/10 backdrop-blur-md border border-white/20 rounded-full flex items-center justify-center hover:bg-white/20 transition-all duration-300 group"
+                      whileHover={{ scale: 1.1, y: -3 }}
+                      transition={{ duration: 0.3 }}
+                    >
+                      <social.icon className={`w-5 h-5 group-hover:drop-shadow-[0_0_8px_rgba(6,182,212,0.8)] transition-all`} />
+                    </motion.a>
+                  ))}
+                </div>
+              </motion.div>
+
+              {/* Column 2: Services */}
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.6, delay: 0.1 }}
+              >
+                <h3 className="text-white mb-4 text-cyan-300">Services</h3>
+                <ul className="space-y-2.5 text-sm">
+                  <motion.li whileHover={{ x: 5 }} transition={{ duration: 0.2 }}>
+                    <a href="/services/interim-europeen" className="text-white/80 hover:text-white transition-colors inline-flex items-center gap-2 group">
+                      <ArrowRight className="w-3 h-3 opacity-0 group-hover:opacity-100 transition-opacity" />
+                      Intérim européen
+                    </a>
+                  </motion.li>
+                  <motion.li whileHover={{ x: 5 }} transition={{ duration: 0.2 }}>
+                    <a href="/services/recrutement-specialise" className="text-white/80 hover:text-white transition-colors inline-flex items-center gap-2 group">
+                      <ArrowRight className="w-3 h-3 opacity-0 group-hover:opacity-100 transition-opacity" />
+                      Recrutement spécialisé
+                    </a>
+                  </motion.li>
+                  <motion.li whileHover={{ x: 5 }} transition={{ duration: 0.2 }}>
+                    <a href="/services/conseil-conformite" className="text-white/80 hover:text-white transition-colors inline-flex items-center gap-2 group">
+                      <ArrowRight className="w-3 h-3 opacity-0 group-hover:opacity-100 transition-opacity" />
+                      Conseil & Conformité
+                    </a>
+                  </motion.li>
+                  <motion.li whileHover={{ x: 5 }} transition={{ duration: 0.2 }}>
+                    <a href="/services/detachement-personnel" className="text-white/80 hover:text-white transition-colors inline-flex items-center gap-2 group">
+                      <ArrowRight className="w-3 h-3 opacity-0 group-hover:opacity-100 transition-opacity" />
+                      Détachement de personnel
+                    </a>
+                  </motion.li>
+                </ul>
+              </motion.div>
+
+              {/* Column 3: Company */}
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.6, delay: 0.2 }}
+              >
+                <h3 className="text-white mb-4 text-cyan-300">Entreprise</h3>
+                <ul className="space-y-2.5 text-sm">
+                  <motion.li whileHover={{ x: 5 }} transition={{ duration: 0.2 }}>
+                    <a href="/a-propos" className="text-white/80 hover:text-white transition-colors inline-flex items-center gap-2 group">
+                      <ArrowRight className="w-3 h-3 opacity-0 group-hover:opacity-100 transition-opacity" />
+                      À propos
+                    </a>
+                  </motion.li>
+                  <motion.li whileHover={{ x: 5 }} transition={{ duration: 0.2 }}>
+                    <a href="/notre-reseau" className="text-white/80 hover:text-white transition-colors inline-flex items-center gap-2 group">
+                      <ArrowRight className="w-3 h-3 opacity-0 group-hover:opacity-100 transition-opacity" />
+                      Notre réseau
+                    </a>
+                  </motion.li>
+                  <motion.li whileHover={{ x: 5 }} transition={{ duration: 0.2 }}>
+                    <a href="/nos-secteurs" className="text-white/80 hover:text-white transition-colors inline-flex items-center gap-2 group">
+                      <ArrowRight className="w-3 h-3 opacity-0 group-hover:opacity-100 transition-opacity" />
+                      Nos secteurs
+                    </a>
+                  </motion.li>
+                  <motion.li whileHover={{ x: 5 }} transition={{ duration: 0.2 }}>
+                    <a href="/temoignages" className="text-white/80 hover:text-white transition-colors inline-flex items-center gap-2 group">
+                      <ArrowRight className="w-3 h-3 opacity-0 group-hover:opacity-100 transition-opacity" />
+                      Témoignages
+                    </a>
+                  </motion.li>
+                </ul>
+              </motion.div>
+
+              {/* Column 4: Contact */}
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.6, delay: 0.3 }}
+              >
+                <h3 className="text-white mb-4 text-cyan-300">Contact</h3>
+                <ul className="space-y-3 text-sm">
+                  <motion.li 
+                    className="flex items-start gap-3 p-2 rounded-lg bg-white/5 backdrop-blur-sm hover:bg-white/10 transition-all duration-300"
+                    whileHover={{ x: 3 }}
+                  >
+                    <MapPin className="w-5 h-5 text-cyan-400 flex-shrink-0 drop-shadow-[0_0_8px_rgba(6,182,212,0.6)]" />
+                    <span className="text-white/90">Bordeaux, France</span>
+                  </motion.li>
+                  <motion.li 
+                    className="flex items-center gap-3 p-2 rounded-lg bg-white/5 backdrop-blur-sm hover:bg-white/10 transition-all duration-300"
+                    whileHover={{ x: 3 }}
+                  >
+                    <Phone className="w-5 h-5 text-violet-400 drop-shadow-[0_0_8px_rgba(124,58,237,0.6)]" />
+                    <a href="tel:+33650622524" className="text-white/90 hover:text-cyan-400 transition-colors">
+                      +33 6 50 62 25 24
+                    </a>
+                  </motion.li>
+                  <motion.li 
+                    className="flex items-center gap-3 p-2 rounded-lg bg-white/5 backdrop-blur-sm hover:bg-white/10 transition-all duration-300"
+                    whileHover={{ x: 3 }}
+                  >
+                    <Mail className="w-5 h-5 text-cyan-400 drop-shadow-[0_0_8px_rgba(6,182,212,0.6)]" />
+                    <a href="mailto:contact@yojob.fr" className="text-white/90 hover:text-cyan-400 transition-colors">
+                      contact@yojob.fr
+                    </a>
+                  </motion.li>
+                </ul>
+              </motion.div>
+            </div>
+
+            {/* Copyright */}
+            <motion.div 
+              className="border-t border-white/20 pt-6 lg:pt-8 text-center"
+              initial={{ opacity: 0 }}
+              whileInView={{ opacity: 1 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.6, delay: 0.4 }}
+            >
+              <div className="flex flex-col sm:flex-row items-center justify-center gap-2 text-sm text-white/80 mb-3">
+                <p>© 2025 YOJOB. Tous droits réservés.</p>
+              </div>
+              {/* Footer Links */}
+              <div className="flex flex-wrap items-center justify-center gap-4 text-xs text-white/50">
+                <a 
+                  href="/privacy" 
+                  className="hover:text-cyan-400 transition-colors underline decoration-dotted"
+                >
+                  Politique de confidentialité
+                </a>
+                <span className="text-white/30">•</span>
+                <a 
+                  href="/legal" 
+                  className="hover:text-cyan-400 transition-colors underline decoration-dotted"
+                >
+                  Mentions légales
+                </a>
+                <span className="text-white/30">•</span>
+                <a 
+                  href="/cgv" 
+                  className="hover:text-cyan-400 transition-colors underline decoration-dotted"
+                >
+                  CGV
+                </a>
+              </div>
+            </motion.div>
           </div>
         </footer>
       </div>

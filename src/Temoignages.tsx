@@ -8,7 +8,6 @@ import {
   CheckCircle,
   TrendingUp,
   Users,
-  ArrowLeft,
   Building2,
   Factory,
   Briefcase,
@@ -21,9 +20,11 @@ import { Badge } from './components/ui/badge';
 import { LogoSvg } from './imports/YojobLogoComplete';
 import { TestimonialCarousel } from './components/landing/TestimonialCarousel';
 import { SEOHead } from './components/SEOHead';
+import { LanguageSelector } from './components/landing/LanguageSelector';
 
 export default function Temoignages() {
   const [isScrolled, setIsScrolled] = useState(false);
+  const [currentLanguage, setCurrentLanguage] = useState('fr');
 
   // Header scroll effect
   useState(() => {
@@ -48,80 +49,96 @@ export default function Temoignages() {
         "100% de conformité administrative",
         "Renouvellement du partenariat"
       ],
-      quote: "YOJOB a été réactif et professionnel. Grâce à leur réseau européen, nous avons pu tenir nos engagements clients.",
+      testimonial: "YOJOB a été notre sauveur ! En moins de 2 semaines, nous avions toute l'équipe nécessaire sur le chantier. Leur gestion administrative est impeccable.",
       author: "Marc Dubois",
-      role: "Directeur Opérations",
+      role: "Directeur des Ressources Humaines",
       rating: 5
     },
     {
-      company: "Renault Trucks",
-      sector: "Industrie",
+      company: "Lactalis",
+      sector: "Industrie agroalimentaire",
       icon: <Factory className="w-8 h-8" />,
       color: "from-blue-500 to-cyan-600",
-      challenge: "Augmentation temporaire de production nécessitant 30 opérateurs de production qualifiés pour 6 mois.",
-      solution: "Recrutement ciblé en Pologne et République Tchèque via nos agences partenaires. Formation complémentaire assurée sur site.",
+      challenge: "Recrutement de 30 opérateurs de production pour une nouvelle ligne de fabrication avec démarrage sous 3 semaines.",
+      solution: "Activation du réseau en Pologne et Bulgarie. Formation sur site organisée par YOJOB en partenariat avec l'usine.",
       results: [
-        "30 opérateurs recrutés en 2 semaines",
-        "Formation sur mesure réalisée",
-        "Productivité maintenue à 98%",
-        "15 embauches CDI à l'issue"
+        "30 opérateurs recrutés et formés",
+        "Démarrage de la ligne dans les temps",
+        "Taux de rétention à 6 mois : 93%",
+        "Extension du contrat à 50 postes"
       ],
-      quote: "La qualité des profils proposés et l'accompagnement de YOJOB ont dépassé nos attentes. Une vraie valeur ajoutée.",
+      testimonial: "La réactivité et le professionnalisme de YOJOB nous ont permis de tenir notre planning. Les profils étaient parfaitement adaptés à nos besoins.",
       author: "Sophie Martin",
-      role: "RH Manufacturing",
+      role: "Responsable Production",
       rating: 5
     },
     {
-      company: "Groupe Pierre & Vacances",
+      company: "Groupe AccorHotels",
       sector: "Hôtellerie",
       icon: <Briefcase className="w-8 h-8" />,
       color: "from-red-500 to-rose-600",
-      challenge: "Recrutement saisonnier massif pour la haute saison : 80 postes en hôtellerie-restauration sur 12 établissements.",
-      solution: "Activation de notre réseau Espagne, Portugal et Italie. Sélection rigoureuse sur critères linguistiques et expérience client.",
+      challenge: "Renforcement des équipes pour la saison estivale sur 12 établissements : cuisiniers, serveurs, réceptionnistes.",
+      solution: "Recrutement de 85 professionnels via notre réseau en Espagne, Italie et Portugal. Gestion complète du détachement et de l'hébergement.",
       results: [
-        "82 professionnels recrutés",
-        "Couverture de 12 sites en 3 semaines",
-        "Satisfaction client en hausse de 12%",
-        "Fidélisation de 45% des saisonniers"
+        "85 collaborateurs déployés en 15 jours",
+        "12 hôtels couverts simultanément",
+        "Score de satisfaction client : 4.8/5",
+        "Fidélisation pour saison suivante : 78%"
       ],
-      quote: "YOJOB maîtrise parfaitement les enjeux du recrutement saisonnier européen. Leur accompagnement est irréprochable.",
-      author: "Isabelle Renard",
-      role: "Directrice RH",
+      testimonial: "Un partenaire de confiance pour nos pics d'activité. YOJOB comprend parfaitement les enjeux de l'hôtellerie et nous livre des profils expérimentés.",
+      author: "Jean-Pierre Renard",
+      role: "Directeur Régional",
       rating: 5
     }
   ];
 
   const stats = [
-    { label: "Taux de satisfaction", value: "98%", icon: <Star className="w-6 h-6" /> },
-    { label: "Clients réguliers", value: "85%", icon: <Users className="w-6 h-6" /> },
-    { label: "Missions réussies", value: "2000+", icon: <CheckCircle className="w-6 h-6" /> },
-    { label: "Note moyenne", value: "4.9/5", icon: <Award className="w-6 h-6" /> }
+    {
+      icon: <Users className="w-8 h-8" />,
+      value: "98%",
+      label: "Taux de satisfaction client",
+      color: "from-green-500 to-emerald-600"
+    },
+    {
+      icon: <TrendingUp className="w-8 h-8" />,
+      value: "2000+",
+      label: "Missions réussies par an",
+      color: "from-blue-500 to-cyan-600"
+    },
+    {
+      icon: <Award className="w-8 h-8" />,
+      value: "4.9/5",
+      label: "Note moyenne",
+      color: "from-violet-500 to-purple-600"
+    },
+    {
+      icon: <Clock className="w-8 h-8" />,
+      value: "48-72h",
+      label: "Délai moyen de mise à disposition",
+      color: "from-orange-500 to-amber-600"
+    }
   ];
 
   const benefits = [
     {
-      icon: <Clock className="w-8 h-8" />,
-      title: "Réactivité exemplaire",
-      description: "Profils qualifiés disponibles sous 48-72h pour répondre à vos urgences",
-      color: "from-blue-500 to-cyan-600"
-    },
-    {
-      icon: <CheckCircle className="w-8 h-8" />,
+      icon: <CheckCircle className="w-6 h-6" />,
       title: "Conformité garantie",
-      description: "Gestion complète des formalités administratives et légales européennes",
-      color: "from-green-500 to-emerald-600"
+      description: "100% de respect des réglementations européennes"
     },
     {
-      icon: <Users className="w-8 h-8" />,
+      icon: <Users className="w-6 h-6" />,
       title: "Talents qualifiés",
-      description: "Sélection rigoureuse par nos agences partenaires certifiées",
-      color: "from-violet-500 to-purple-600"
+      description: "Sélection rigoureuse et vérification des compétences"
     },
     {
-      icon: <TrendingUp className="w-8 h-8" />,
-      title: "Accompagnement continu",
-      description: "Support dédié tout au long de vos missions de recrutement",
-      color: "from-orange-500 to-amber-600"
+      icon: <Clock className="w-6 h-6" />,
+      title: "Réactivité",
+      description: "Mise à disposition sous 48-72h"
+    },
+    {
+      icon: <Award className="w-6 h-6" />,
+      title: "Suivi personnalisé",
+      description: "Un interlocuteur dédié du début à la fin"
     }
   ];
 
@@ -151,18 +168,11 @@ export default function Temoignages() {
 
             {/* CTA */}
             <div className="flex items-center gap-4">
-              <Button
-                onClick={() => window.history.back()}
-                variant="outline"
-                className={`rounded-full ${
-                  isScrolled
-                    ? 'border-[#1E3A8A]/20 text-[#1E3A8A] hover:bg-[#1E3A8A]/5'
-                    : 'border-white/20 text-white hover:bg-white/10'
-                }`}
-              >
-                <ArrowLeft className="w-4 h-4 mr-2" />
-                Retour
-              </Button>
+              <LanguageSelector
+                currentLanguage={currentLanguage}
+                onLanguageChange={setCurrentLanguage}
+                availableLanguages={['fr', 'en']}
+              />
               <Button
                 onClick={() => (window.location.href = '/devis')}
                 className="rounded-full bg-white text-[#1E3A8A] hover:bg-cyan-50 shadow-lg"
@@ -199,71 +209,48 @@ export default function Temoignages() {
                 Ils nous font confiance pour leur recrutement européen
               </h1>
 
-              <p className="text-white/80 text-xl max-w-2xl mx-auto mb-12">
-                Découvrez les témoignages de nos clients et comment YOJOB les a accompagnés dans leurs projets de recrutement international.
+              <p className="text-white/80 text-xl max-w-2xl mx-auto">
+                Découvrez comment YOJOB accompagne les entreprises françaises dans leurs besoins de recrutement en Europe avec succès et réactivité.
               </p>
+            </motion.div>
+          </div>
+        </section>
 
-              {/* Stats rapides */}
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-12">
-                {stats.map((stat, index) => (
-                  <motion.div
-                    key={index}
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.2 + index * 0.1 }}
-                    className="bg-white/10 backdrop-blur-sm border border-white/20 rounded-2xl p-6 text-center"
-                  >
-                    <div className="flex justify-center mb-3">
-                      <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-cyan-400 to-violet-500 flex items-center justify-center">
+        {/* ============================================ */}
+        {/* STATS */}
+        {/* ============================================ */}
+        <section className="py-20 relative">
+          <div className="max-w-6xl mx-auto px-6">
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-6">
+              {stats.map((stat, index) => (
+                <motion.div
+                  key={index}
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: index * 0.1 }}
+                  whileHover={{ y: -8 }}
+                >
+                  <Card className="border border-white/10 bg-white/5 backdrop-blur-sm hover:bg-white/10 hover:border-cyan-400/50 transition-all text-center group">
+                    <CardContent className="p-8">
+                      <div className={`w-16 h-16 rounded-2xl bg-gradient-to-br ${stat.color} flex items-center justify-center mb-4 mx-auto text-white shadow-lg group-hover:scale-110 transition-transform`}>
                         {stat.icon}
                       </div>
-                    </div>
-                    <div className="text-white mb-1">{stat.value}</div>
-                    <p className="text-white/70 text-sm">{stat.label}</p>
-                  </motion.div>
-                ))}
-              </div>
-            </motion.div>
+                      <div className="text-white mb-2">{stat.value}</div>
+                      <p className="text-white/70 text-sm">{stat.label}</p>
+                    </CardContent>
+                  </Card>
+                </motion.div>
+              ))}
+            </div>
           </div>
         </section>
 
         {/* ============================================ */}
-        {/* CAROUSEL TÉMOIGNAGES */}
+        {/* CAS CLIENTS */}
         {/* ============================================ */}
         <section className="py-20 relative">
-          <div className="max-w-6xl mx-auto px-6">
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              className="text-center mb-16"
-            >
-              <Badge className="mb-4 px-6 py-2 bg-white/10 border-white/20 text-white backdrop-blur-sm">
-                <Quote className="w-4 h-4 mr-2" />
-                Avis clients
-              </Badge>
-              <h2 className="text-white mb-4">Ce que nos clients disent de nous</h2>
-              <p className="text-white/70 text-lg max-w-2xl mx-auto">
-                Plus de 200 entreprises nous font confiance pour leurs besoins de recrutement européen.
-              </p>
-            </motion.div>
-
-            <motion.div
-              initial={{ opacity: 0, scale: 0.95 }}
-              whileInView={{ opacity: 1, scale: 1 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.6 }}
-            >
-              <TestimonialCarousel />
-            </motion.div>
-          </div>
-        </section>
-
-        {/* ============================================ */}
-        {/* ÉTUDES DE CAS */}
-        {/* ============================================ */}
-        <section className="py-20 relative">
-          <div className="max-w-6xl mx-auto px-6">
+          <div className="max-w-7xl mx-auto px-6">
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
@@ -272,11 +259,11 @@ export default function Temoignages() {
             >
               <Badge className="mb-4 px-6 py-2 bg-white/10 border-white/20 text-white backdrop-blur-sm">
                 <Briefcase className="w-4 h-4 mr-2" />
-                Études de cas
+                Cas clients
               </Badge>
-              <h2 className="text-white mb-4">Réussites clients</h2>
+              <h2 className="text-white mb-4">Des succès concrets dans tous les secteurs</h2>
               <p className="text-white/70 text-lg max-w-2xl mx-auto">
-                Des projets de recrutement européen menés avec succès grâce à notre expertise et notre réseau.
+                Découvrez comment nous avons aidé ces entreprises à résoudre leurs défis de recrutement.
               </p>
             </motion.div>
 
@@ -287,71 +274,69 @@ export default function Temoignages() {
                   initial={{ opacity: 0, y: 20 }}
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
-                  transition={{ delay: index * 0.2 }}
+                  transition={{ delay: index * 0.1 }}
                 >
                   <Card className="border border-white/10 bg-white/5 backdrop-blur-sm hover:bg-white/10 hover:border-cyan-400/50 transition-all overflow-hidden">
-                    <CardContent className="p-8 md:p-10">
-                      {/* Header */}
-                      <div className="flex flex-col md:flex-row md:items-start gap-6 mb-8">
-                        <div className={`w-16 h-16 rounded-2xl bg-gradient-to-br ${study.color} flex items-center justify-center flex-shrink-0 text-white shadow-lg`}>
-                          {study.icon}
-                        </div>
-                        <div className="flex-1">
-                          <h3 className="text-white mb-2">{study.company}</h3>
-                          <Badge className="bg-white/10 border-white/20 text-white/80">
-                            {study.sector}
-                          </Badge>
-                        </div>
-                        <div className="flex gap-1">
-                          {[...Array(study.rating)].map((_, i) => (
-                            <Star key={i} className="w-5 h-5 text-yellow-400 fill-yellow-400" />
-                          ))}
-                        </div>
-                      </div>
-
-                      {/* Content Grid */}
-                      <div className="grid md:grid-cols-2 gap-8 mb-8">
-                        {/* Left: Challenge & Solution */}
-                        <div className="space-y-6">
-                          <div>
-                            <h4 className="text-white/80 text-sm uppercase tracking-wide mb-3">
-                              Challenge
-                            </h4>
-                            <p className="text-white/70">{study.challenge}</p>
-                          </div>
-                          <div>
-                            <h4 className="text-white/80 text-sm uppercase tracking-wide mb-3">
-                              Solution YOJOB
-                            </h4>
-                            <p className="text-white/70">{study.solution}</p>
+                    <CardContent className="p-8">
+                      <div className="grid lg:grid-cols-3 gap-8">
+                        {/* Colonne 1 : En-tête */}
+                        <div className="lg:col-span-3">
+                          <div className="flex items-start gap-4 mb-6">
+                            <div className={`w-16 h-16 rounded-2xl bg-gradient-to-br ${study.color} flex items-center justify-center text-white shadow-lg flex-shrink-0`}>
+                              {study.icon}
+                            </div>
+                            <div className="flex-1">
+                              <h3 className="text-white mb-1">{study.company}</h3>
+                              <p className="text-cyan-400 text-sm mb-3">{study.sector}</p>
+                              <div className="flex gap-1">
+                                {[...Array(study.rating)].map((_, i) => (
+                                  <Star key={i} className="w-4 h-4 fill-yellow-400 text-yellow-400" />
+                                ))}
+                              </div>
+                            </div>
                           </div>
                         </div>
 
-                        {/* Right: Results */}
+                        {/* Colonne 2 : Challenge & Solution */}
+                        <div className="lg:col-span-2 space-y-4">
+                          <div>
+                            <h4 className="text-white mb-2 text-sm uppercase tracking-wide">Le défi</h4>
+                            <p className="text-white/70 text-sm">{study.challenge}</p>
+                          </div>
+                          <div>
+                            <h4 className="text-white mb-2 text-sm uppercase tracking-wide">Notre solution</h4>
+                            <p className="text-white/70 text-sm">{study.solution}</p>
+                          </div>
+                          <div className="pt-4 border-t border-white/10">
+                            <div className="flex items-start gap-3 bg-white/5 p-4 rounded-lg">
+                              <Quote className="w-6 h-6 text-cyan-400 flex-shrink-0 mt-1" />
+                              <div>
+                                <p className="text-white/90 text-sm italic mb-3">{study.testimonial}</p>
+                                <div className="flex items-center gap-3">
+                                  <div className="w-10 h-10 rounded-full bg-gradient-to-br from-cyan-400 to-blue-500 flex items-center justify-center text-white">
+                                    {study.author.charAt(0)}
+                                  </div>
+                                  <div>
+                                    <p className="text-white text-sm">{study.author}</p>
+                                    <p className="text-white/60 text-xs">{study.role}</p>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* Colonne 3 : Résultats */}
                         <div>
-                          <h4 className="text-white/80 text-sm uppercase tracking-wide mb-3">
-                            Résultats
-                          </h4>
-                          <ul className="space-y-3">
+                          <h4 className="text-white mb-3 text-sm uppercase tracking-wide">Résultats</h4>
+                          <div className="space-y-3">
                             {study.results.map((result, idx) => (
-                              <li key={idx} className="flex items-start gap-3 text-white/70">
+                              <div key={idx} className="flex items-start gap-2">
                                 <CheckCircle className="w-5 h-5 text-green-400 flex-shrink-0 mt-0.5" />
-                                <span>{result}</span>
-                              </li>
+                                <p className="text-white/80 text-sm">{result}</p>
+                              </div>
                             ))}
-                          </ul>
-                        </div>
-                      </div>
-
-                      {/* Quote */}
-                      <div className="border-t border-white/10 pt-6">
-                        <div className="flex gap-3 mb-4">
-                          <Quote className="w-8 h-8 text-cyan-400 flex-shrink-0" />
-                          <p className="text-white/80 italic text-lg">{study.quote}</p>
-                        </div>
-                        <div className="ml-11">
-                          <p className="text-white">{study.author}</p>
-                          <p className="text-white/60 text-sm">{study.role} • {study.company}</p>
+                          </div>
                         </div>
                       </div>
                     </CardContent>
@@ -359,6 +344,28 @@ export default function Temoignages() {
                 </motion.div>
               ))}
             </div>
+          </div>
+        </section>
+
+        {/* ============================================ */}
+        {/* CAROUSEL TÉMOIGNAGES */}
+        {/* ============================================ */}
+        <section className="py-20 relative">
+          <div className="max-w-7xl mx-auto px-6">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              className="text-center mb-16"
+            >
+              <Badge className="mb-4 px-6 py-2 bg-white/10 border-white/20 text-white backdrop-blur-sm">
+                <Star className="w-4 h-4 mr-2" />
+                Avis clients
+              </Badge>
+              <h2 className="text-white mb-4">Ce que disent nos clients</h2>
+            </motion.div>
+
+            <TestimonialCarousel />
           </div>
         </section>
 
@@ -377,13 +384,13 @@ export default function Temoignages() {
                 <Award className="w-4 h-4 mr-2" />
                 Nos engagements
               </Badge>
-              <h2 className="text-white mb-4">Pourquoi nos clients nous choisissent</h2>
+              <h2 className="text-white mb-4">Pourquoi ils nous font confiance</h2>
               <p className="text-white/70 text-lg max-w-2xl mx-auto">
-                Des garanties solides qui font de YOJOB le partenaire idéal pour votre recrutement européen.
+                4 raisons qui font de YOJOB le partenaire privilégié pour le recrutement européen.
               </p>
             </motion.div>
 
-            <div className="grid md:grid-cols-2 gap-8">
+            <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
               {benefits.map((benefit, index) => (
                 <motion.div
                   key={index}
@@ -393,13 +400,13 @@ export default function Temoignages() {
                   transition={{ delay: index * 0.1 }}
                   whileHover={{ y: -8 }}
                 >
-                  <Card className="h-full border border-white/10 bg-white/5 backdrop-blur-sm hover:bg-white/10 hover:border-cyan-400/50 transition-all group">
-                    <CardContent className="p-8">
-                      <div className={`w-16 h-16 rounded-2xl bg-gradient-to-br ${benefit.color} flex items-center justify-center mb-6 text-white shadow-lg group-hover:scale-110 transition-transform`}>
+                  <Card className="h-full border border-white/10 bg-white/5 backdrop-blur-sm hover:bg-white/10 hover:border-cyan-400/50 transition-all text-center group">
+                    <CardContent className="p-6">
+                      <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-cyan-500 to-blue-600 flex items-center justify-center mb-4 mx-auto text-white shadow-lg group-hover:scale-110 transition-transform">
                         {benefit.icon}
                       </div>
-                      <h3 className="text-white mb-3">{benefit.title}</h3>
-                      <p className="text-white/70">{benefit.description}</p>
+                      <h3 className="text-white mb-3 text-lg">{benefit.title}</h3>
+                      <p className="text-white/70 text-sm">{benefit.description}</p>
                     </CardContent>
                   </Card>
                 </motion.div>
@@ -421,7 +428,7 @@ export default function Temoignages() {
             >
               <h2 className="text-white mb-4">Rejoignez nos clients satisfaits</h2>
               <p className="text-white/80 text-lg mb-8 max-w-2xl mx-auto">
-                Bénéficiez de notre expertise et de notre réseau européen pour vos projets de recrutement. Obtenez un devis personnalisé en quelques minutes.
+                Faites comme eux, confiez-nous vos besoins de recrutement européen et bénéficiez d'un service 5 étoiles.
               </p>
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
                 <Button

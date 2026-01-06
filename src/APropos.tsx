@@ -13,20 +13,28 @@ import {
   ShieldCheck,
   TrendingUp,
   Building2,
-  ArrowLeft,
   Star,
   Handshake,
   Clock,
-  Network
+  Network,
+  Linkedin,
+  Twitter,
+  Facebook,
+  MapPin,
+  Phone,
+  Mail
 } from 'lucide-react';
 import { Button } from './components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from './components/ui/card';
 import { Badge } from './components/ui/badge';
 import { LogoSvg } from './imports/YojobLogoComplete';
 import { SEOHead } from './components/SEOHead';
+import { LanguageSelector } from './components/landing/LanguageSelector';
 
 export default function APropos() {
   const [isScrolled, setIsScrolled] = useState(false);
+  const [language, setLanguage] = useState('fr');
+  const [revealedEmail, setRevealedEmail] = useState(false);
 
   // Header scroll effect
   useState(() => {
@@ -37,92 +45,93 @@ export default function APropos() {
     return () => window.removeEventListener('scroll', handleScroll);
   });
 
+  const handleEmailReveal = () => {
+    setRevealedEmail(!revealedEmail);
+  };
+
   const values = [
     {
       icon: <Heart className="w-8 h-8" />,
-      title: "Excellence & Engagement",
-      description: "Nous nous engageons à fournir un service d'excellence à chaque client, avec une attention particulière portée à la qualité et à la satisfaction.",
-      color: "from-red-500 to-rose-600"
+      title: "Excellence humaine",
+      description: "Placer l'humain au cœur de nos services, avec respect et écoute",
+      color: "from-pink-500 to-rose-600"
     },
     {
       icon: <ShieldCheck className="w-8 h-8" />,
-      title: "Conformité & Transparence",
-      description: "Respect strict des réglementations européennes et transparence totale sur nos processus, tarifs et engagements.",
+      title: "Conformité totale",
+      description: "Garantir 100% de légalité dans le détachement européen",
       color: "from-blue-500 to-cyan-600"
     },
     {
-      icon: <Handshake className="w-8 h-8" />,
-      title: "Partenariat & Confiance",
-      description: "Nous construisons des relations durables basées sur la confiance mutuelle avec nos clients et nos agences partenaires.",
+      icon: <Zap className="w-8 h-8" />,
+      title: "Réactivité",
+      description: "Répondre à vos besoins en moins de 48h chrono",
       color: "from-violet-500 to-purple-600"
     },
     {
-      icon: <Zap className="w-8 h-8" />,
-      title: "Réactivité & Innovation",
-      description: "Une approche innovante et une réactivité exemplaire pour répondre rapidement aux besoins de main-d'œuvre de nos clients.",
-      color: "from-orange-500 to-amber-600"
+      icon: <Handshake className="w-8 h-8" />,
+      title: "Partenariats durables",
+      description: "Construire des relations de confiance sur le long terme",
+      color: "from-green-500 to-emerald-600"
     }
   ];
 
   const timeline = [
     {
-      year: "2014",
+      year: "2013",
       title: "Création de YOJOB",
-      description: "Lancement de notre activité de courtage en recrutement européen avec 3 pays partenaires.",
-      icon: <Building2 className="w-6 h-6" />
+      description: "Lancement de l'activité de courtage en recrutement européen.",
+      icon: <Star className="w-6 h-6" />,
+      color: "from-blue-500 to-cyan-600"
     },
     {
       year: "2017",
       title: "Expansion européenne",
-      description: "Extension à 15 pays de l'Union Européenne et développement de notre réseau d'agences partenaires.",
-      icon: <Globe className="w-6 h-6" />
-    },
-    {
-      year: "2020",
-      title: "500+ agences partenaires",
-      description: "Franchissement du cap des 500 agences certifiées dans 27 pays européens.",
-      icon: <Network className="w-6 h-6" />
+      description: "Développement du réseau de partenaires et expertise en détachement de travailleurs.",
+      icon: <Globe className="w-6 h-6" />,
+      color: "from-violet-500 to-purple-600"
     },
     {
       year: "2025",
-      title: "Marketplace digitale",
-      description: "Lancement de notre plateforme digitale de mise en relation directe avec les agences européennes.",
-      icon: <TrendingUp className="w-6 h-6" />
-    }
-  ];
-
-  const team = [
-    {
-      role: "Direction & Stratégie",
-      description: "Une équipe de direction expérimentée qui pilote la vision stratégique et le développement de YOJOB.",
-      icon: <Target className="w-8 h-8" />,
-      color: "from-blue-500 to-blue-600"
+      title: "Enquête européenne en cours",
+      description: "Étude de marché auprès des agences de travail temporaire pour identifier leurs besoins.",
+      icon: <Network className="w-6 h-6" />,
+      color: "from-cyan-500 to-blue-600"
     },
     {
-      role: "Experts recrutement",
-      description: "Des spécialistes du recrutement européen qui activent notre réseau et sélectionnent les meilleurs profils.",
-      icon: <Users className="w-8 h-8" />,
-      color: "from-cyan-500 to-cyan-600"
-    },
-    {
-      role: "Conformité & Juridique",
-      description: "Une cellule dédiée qui garantit la conformité de toutes nos opérations avec les réglementations européennes.",
-      icon: <ShieldCheck className="w-8 h-8" />,
-      color: "from-violet-500 to-violet-600"
-    },
-    {
-      role: "Support client",
-      description: "Une équipe support disponible pour accompagner nos clients tout au long de leurs missions.",
-      icon: <Heart className="w-8 h-8" />,
-      color: "from-green-500 to-green-600"
+      year: "2026",
+      title: "Développement du logiciel",
+      description: "Création d'une plateforme digitale basée sur les résultats de l'enquête (à venir).",
+      icon: <Zap className="w-6 h-6" />,
+      color: "from-orange-500 to-amber-600"
     }
   ];
 
   const stats = [
-    { label: "Ans d'expertise", value: "10+", icon: <Clock className="w-6 h-6" /> },
-    { label: "Pays couverts", value: "27", icon: <Globe className="w-6 h-6" /> },
-    { label: "Agences partenaires", value: "500+", icon: <Network className="w-6 h-6" /> },
-    { label: "Missions réalisées", value: "2000+", icon: <CheckCircle className="w-6 h-6" /> }
+    {
+      icon: <Users className="w-8 h-8" />,
+      value: "500+",
+      label: "Agences partenaires",
+      color: "from-violet-500 to-purple-600"
+    },
+    {
+      icon: <Globe className="w-8 h-8" />,
+      value: "27",
+      label: "Pays couverts",
+      color: "from-cyan-500 to-blue-600"
+    },
+    {
+      icon: <CheckCircle className="w-8 h-8" />,
+      value: "2000+",
+      label: "Missions réussies/an",
+      color: "from-green-500 to-emerald-600"
+    },
+    {
+      icon: <Clock className="w-8 h-8" />,
+      value: "10+",
+      label: "Années d'expertise",
+      color: "from-orange-500 to-amber-600"
+    }
   ];
 
   return (
@@ -151,25 +160,17 @@ export default function APropos() {
 
             {/* CTA */}
             <div className="flex items-center gap-4">
-              <Button
-                onClick={() => window.history.back()}
-                variant="outline"
-                className={`rounded-full ${
-                  isScrolled
-                    ? 'border-[#1E3A8A]/20 text-[#1E3A8A] hover:bg-[#1E3A8A]/5'
-                    : 'border-white/20 text-white hover:bg-white/10'
-                }`}
-              >
-                <ArrowLeft className="w-4 h-4 mr-2" />
-                Retour
-              </Button>
-              <Button
-                onClick={() => (window.location.href = '/devis')}
-                className="rounded-full bg-white text-[#1E3A8A] hover:bg-cyan-50 shadow-lg"
-              >
-                Demander un devis
-                <ArrowRight className="w-4 h-4 ml-2" />
-              </Button>
+              <LanguageSelector
+                currentLanguage={language}
+                onLanguageChange={setLanguage}
+                availableLanguages={['fr', 'en']}
+              />
+              <a href="/devis">
+                <Button className="rounded-full bg-white text-[#1E3A8A] hover:bg-cyan-50 shadow-lg">
+                  Demander un devis
+                  <ArrowRight className="w-4 h-4 ml-2" />
+                </Button>
+              </a>
             </div>
           </div>
         </header>
@@ -196,34 +197,197 @@ export default function APropos() {
               </Badge>
 
               <h1 className="text-white mb-6 max-w-3xl mx-auto">
-                10 ans d'expertise au service de votre recrutement européen
+                Le courtage en recrutement européen, réinventé
               </h1>
 
               <p className="text-white/80 text-xl max-w-2xl mx-auto mb-8">
-                Leader français du courtage en recrutement européen, YOJOB connecte les entreprises avec un réseau de 500+ agences partenaires dans 27 pays.
+                Depuis 2014, nous connectons les entreprises françaises aux meilleurs talents européens à travers un réseau de 500+ agences partenaires dans 27 pays.
               </p>
 
-              {/* Stats rapides */}
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-12">
-                {stats.map((stat, index) => (
-                  <motion.div
-                    key={index}
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.2 + index * 0.1 }}
-                    className="bg-white/10 backdrop-blur-sm border border-white/20 rounded-2xl p-6 text-center"
+              <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                <a href="/devis">
+                  <Button
+                    size="lg"
+                    className="rounded-full bg-white text-[#1E3A8A] hover:bg-cyan-50 shadow-2xl hover:shadow-white/50 transition-all group"
                   >
-                    <div className="flex justify-center mb-3">
-                      <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-cyan-400 to-violet-500 flex items-center justify-center">
-                        {stat.icon}
-                      </div>
-                    </div>
-                    <div className="text-white mb-1">{stat.value}</div>
-                    <p className="text-white/70 text-sm">{stat.label}</p>
-                  </motion.div>
-                ))}
+                    <span className="relative z-10 flex items-center">
+                      Demander un devis
+                      <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
+                    </span>
+                  </Button>
+                </a>
+                <a href="/">
+                  <Button
+                    size="lg"
+                    variant="outline"
+                    className="rounded-full border-white/40 bg-white/10 backdrop-blur-sm text-white hover:bg-white/20 hover:border-white/60 transition-all"
+                  >
+                    Retour à l'accueil
+                  </Button>
+                </a>
               </div>
             </motion.div>
+          </div>
+        </section>
+
+        {/* ============================================ */}
+        {/* STATS */}
+        {/* ============================================ */}
+        <section className="py-20 relative">
+          <div className="max-w-6xl mx-auto px-6">
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-6">
+              {stats.map((stat, index) => (
+                <motion.div
+                  key={index}
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: index * 0.1 }}
+                  whileHover={{ y: -8 }}
+                >
+                  <Card className="border border-white/10 bg-white/5 backdrop-blur-sm hover:bg-white/10 hover:border-cyan-400/50 transition-all text-center group">
+                    <CardContent className="p-8">
+                      <div className={`w-16 h-16 rounded-2xl bg-gradient-to-br ${stat.color} flex items-center justify-center mb-4 mx-auto text-white shadow-lg group-hover:scale-110 transition-transform`}>
+                        {stat.icon}
+                      </div>
+                      <div className="text-white mb-2">{stat.value}</div>
+                      <p className="text-white/70 text-sm">{stat.label}</p>
+                    </CardContent>
+                  </Card>
+                </motion.div>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* ============================================ */}
+        {/* NOTRE MISSION */}
+        {/* ============================================ */}
+        <section className="py-20 relative">
+          <div className="max-w-5xl mx-auto px-6">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              className="text-center mb-16"
+            >
+              <Badge className="mb-4 px-6 py-2 bg-white/10 border-white/20 text-white backdrop-blur-sm">
+                <Target className="w-4 h-4 mr-2" />
+                Notre mission
+              </Badge>
+              <h2 className="text-white mb-4">Simplifier le recrutement européen</h2>
+              <p className="text-white/70 text-lg max-w-3xl mx-auto">
+                YOJOB est né d'un constat simple : recruter des talents européens est complexe, chronophage et semé d'embûches administratives. Notre mission est de vous offrir un service clé en main, rapide et 100% conforme.
+              </p>
+            </motion.div>
+
+            <div className="grid md:grid-cols-2 gap-8">
+              <motion.div
+                initial={{ opacity: 0, x: -20 }}
+                whileInView={{ opacity: 1, x: 0 }}
+                viewport={{ once: true }}
+              >
+                <Card className="h-full border border-white/10 bg-white/5 backdrop-blur-sm">
+                  <CardContent className="p-8">
+                    <h3 className="text-white mb-4">Le problème que nous résolvons</h3>
+                    <ul className="space-y-3 text-white/70">
+                      <li className="flex items-start gap-3">
+                        <CheckCircle className="w-5 h-5 text-red-400 mt-1 flex-shrink-0" />
+                        <span>Pénurie de main-d'œuvre qualifiée en France</span>
+                      </li>
+                      <li className="flex items-start gap-3">
+                        <CheckCircle className="w-5 h-5 text-red-400 mt-1 flex-shrink-0" />
+                        <span>Complexité du détachement de travailleurs européens</span>
+                      </li>
+                      <li className="flex items-start gap-3">
+                        <CheckCircle className="w-5 h-5 text-red-400 mt-1 flex-shrink-0" />
+                        <span>Risques juridiques et administratifs importants</span>
+                      </li>
+                      <li className="flex items-start gap-3">
+                        <CheckCircle className="w-5 h-5 text-red-400 mt-1 flex-shrink-0" />
+                        <span>Délais de recrutement trop longs</span>
+                      </li>
+                    </ul>
+                  </CardContent>
+                </Card>
+              </motion.div>
+
+              <motion.div
+                initial={{ opacity: 0, x: 20 }}
+                whileInView={{ opacity: 1, x: 0 }}
+                viewport={{ once: true }}
+              >
+                <Card className="h-full border border-white/10 bg-white/5 backdrop-blur-sm">
+                  <CardContent className="p-8">
+                    <h3 className="text-white mb-4">Notre solution</h3>
+                    <ul className="space-y-3 text-white/70">
+                      <li className="flex items-start gap-3">
+                        <CheckCircle className="w-5 h-5 text-green-400 mt-1 flex-shrink-0" />
+                        <span>Accès à 500+ agences dans toute l'Europe</span>
+                      </li>
+                      <li className="flex items-start gap-3">
+                        <CheckCircle className="w-5 h-5 text-green-400 mt-1 flex-shrink-0" />
+                        <span>Conformité juridique garantie à 100%</span>
+                      </li>
+                      <li className="flex items-start gap-3">
+                        <CheckCircle className="w-5 h-5 text-green-400 mt-1 flex-shrink-0" />
+                        <span>Gestion administrative clé en main</span>
+                      </li>
+                      <li className="flex items-start gap-3">
+                        <CheckCircle className="w-5 h-5 text-green-400 mt-1 flex-shrink-0" />
+                        <span>Mise à disposition sous 48-72h</span>
+                      </li>
+                    </ul>
+                  </CardContent>
+                </Card>
+              </motion.div>
+            </div>
+          </div>
+        </section>
+
+        {/* ============================================ */}
+        {/* NOS VALEURS */}
+        {/* ============================================ */}
+        <section className="py-20 relative">
+          <div className="max-w-6xl mx-auto px-6">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              className="text-center mb-16"
+            >
+              <Badge className="mb-4 px-6 py-2 bg-white/10 border-white/20 text-white backdrop-blur-sm">
+                <Heart className="w-4 h-4 mr-2" />
+                Nos valeurs
+              </Badge>
+              <h2 className="text-white mb-4">Ce qui nous anime au quotidien</h2>
+              <p className="text-white/70 text-lg max-w-2xl mx-auto">
+                Quatre piliers guident notre action et nos relations avec nos clients et partenaires.
+              </p>
+            </motion.div>
+
+            <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+              {values.map((value, index) => (
+                <motion.div
+                  key={index}
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: index * 0.1 }}
+                  whileHover={{ y: -8 }}
+                >
+                  <Card className="h-full border border-white/10 bg-white/5 backdrop-blur-sm hover:bg-white/10 hover:border-cyan-400/50 transition-all text-center group">
+                    <CardContent className="p-6">
+                      <div className={`w-16 h-16 rounded-2xl bg-gradient-to-br ${value.color} flex items-center justify-center mb-4 mx-auto text-white shadow-lg group-hover:scale-110 transition-transform`}>
+                        {value.icon}
+                      </div>
+                      <h3 className="text-white mb-3">{value.title}</h3>
+                      <p className="text-white/70 text-sm">{value.description}</p>
+                    </CardContent>
+                  </Card>
+                </motion.div>
+              ))}
+            </div>
           </div>
         </section>
 
@@ -242,145 +406,44 @@ export default function APropos() {
                 <Clock className="w-4 h-4 mr-2" />
                 Notre histoire
               </Badge>
-              <h2 className="text-white mb-4">Une décennie au service du recrutement européen</h2>
-              <p className="text-white/70 text-lg max-w-2xl mx-auto">
-                Depuis 2014, YOJOB accompagne les entreprises françaises dans leurs besoins de main-d'œuvre européenne.
-              </p>
+              <h2 className="text-white mb-4">10 ans d'innovation et de croissance</h2>
             </motion.div>
 
-            {/* Timeline */}
             <div className="relative">
-              {/* Ligne verticale */}
-              <div className="hidden md:block absolute left-1/2 top-0 bottom-0 w-px bg-gradient-to-b from-cyan-400 via-violet-400 to-cyan-400" />
+              {/* Timeline line */}
+              <div className="absolute left-1/2 top-0 bottom-0 w-0.5 bg-gradient-to-b from-cyan-400 via-violet-400 to-orange-400 hidden lg:block" />
 
               <div className="space-y-12">
                 {timeline.map((item, index) => (
                   <motion.div
                     key={index}
-                    initial={{ opacity: 0, x: index % 2 === 0 ? -50 : 50 }}
-                    whileInView={{ opacity: 1, x: 0 }}
+                    initial={{ opacity: 0, y: 20 }}
+                    whileInView={{ opacity: 1, y: 0 }}
                     viewport={{ once: true }}
                     transition={{ delay: index * 0.2 }}
                     className={`flex items-center gap-8 ${
-                      index % 2 === 0 ? 'md:flex-row' : 'md:flex-row-reverse'
+                      index % 2 === 0 ? 'lg:flex-row' : 'lg:flex-row-reverse'
                     }`}
                   >
-                    {/* Content */}
-                    <div className="flex-1">
-                      <Card className="border border-white/10 bg-white/5 backdrop-blur-sm hover:bg-white/10 transition-all">
+                    <div className={`flex-1 ${index % 2 === 0 ? 'lg:text-right' : 'lg:text-left'}`}>
+                      <Card className="border border-white/10 bg-white/5 backdrop-blur-sm hover:bg-white/10 hover:border-cyan-400/50 transition-all">
                         <CardContent className="p-6">
-                          <div className="flex items-center gap-3 mb-3">
-                            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-cyan-400 to-violet-500 flex items-center justify-center">
-                              {item.icon}
-                            </div>
-                            <span className="text-white/50">{item.year}</span>
+                          <div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${item.color} flex items-center justify-center mb-4 text-white shadow-lg ${
+                            index % 2 === 0 ? 'lg:ml-auto' : ''
+                          }`}>
+                            {item.icon}
                           </div>
+                          <div className="text-cyan-400 mb-2">{item.year}</div>
                           <h3 className="text-white mb-2">{item.title}</h3>
-                          <p className="text-white/70">{item.description}</p>
+                          <p className="text-white/70 text-sm">{item.description}</p>
                         </CardContent>
                       </Card>
                     </div>
-
-                    {/* Dot central (desktop only) */}
-                    <div className="hidden md:block w-4 h-4 rounded-full bg-gradient-to-br from-cyan-400 to-violet-500 border-4 border-[#1E3A8A] shadow-lg" />
-
-                    {/* Spacer */}
-                    <div className="hidden md:block flex-1" />
+                    <div className="hidden lg:block w-4 h-4 rounded-full bg-white border-4 border-[#1E3A8A] relative z-10" />
+                    <div className="flex-1" />
                   </motion.div>
                 ))}
               </div>
-            </div>
-          </div>
-        </section>
-
-        {/* ============================================ */}
-        {/* NOS VALEURS */}
-        {/* ============================================ */}
-        <section className="py-20 relative">
-          <div className="max-w-6xl mx-auto px-6">
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              className="text-center mb-16"
-            >
-              <Badge className="mb-4 px-6 py-2 bg-white/10 border-white/20 text-white backdrop-blur-sm">
-                <Star className="w-4 h-4 mr-2" />
-                Nos valeurs
-              </Badge>
-              <h2 className="text-white mb-4">Les piliers de notre engagement</h2>
-              <p className="text-white/70 text-lg max-w-2xl mx-auto">
-                Des valeurs fortes qui guident notre action quotidienne au service de nos clients.
-              </p>
-            </motion.div>
-
-            <div className="grid md:grid-cols-2 gap-8">
-              {values.map((value, index) => (
-                <motion.div
-                  key={index}
-                  initial={{ opacity: 0, y: 20 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ delay: index * 0.1 }}
-                  whileHover={{ y: -8 }}
-                >
-                  <Card className="h-full border border-white/10 bg-white/5 backdrop-blur-sm hover:bg-white/10 hover:border-cyan-400/50 transition-all group">
-                    <CardContent className="p-8">
-                      <div className={`w-16 h-16 rounded-2xl bg-gradient-to-br ${value.color} flex items-center justify-center mb-6 text-white shadow-lg group-hover:scale-110 transition-transform`}>
-                        {value.icon}
-                      </div>
-                      <h3 className="text-white mb-3">{value.title}</h3>
-                      <p className="text-white/70">{value.description}</p>
-                    </CardContent>
-                  </Card>
-                </motion.div>
-              ))}
-            </div>
-          </div>
-        </section>
-
-        {/* ============================================ */}
-        {/* NOTRE ÉQUIPE */}
-        {/* ============================================ */}
-        <section className="py-20 relative">
-          <div className="max-w-6xl mx-auto px-6">
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              className="text-center mb-16"
-            >
-              <Badge className="mb-4 px-6 py-2 bg-white/10 border-white/20 text-white backdrop-blur-sm">
-                <Users className="w-4 h-4 mr-2" />
-                Notre équipe
-              </Badge>
-              <h2 className="text-white mb-4">Des experts à votre service</h2>
-              <p className="text-white/70 text-lg max-w-2xl mx-auto">
-                Une équipe pluridisciplinaire dédiée à la réussite de vos projets de recrutement européen.
-              </p>
-            </motion.div>
-
-            <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-              {team.map((member, index) => (
-                <motion.div
-                  key={index}
-                  initial={{ opacity: 0, y: 20 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ delay: index * 0.1 }}
-                  whileHover={{ y: -8 }}
-                >
-                  <Card className="h-full border border-white/10 bg-white/5 backdrop-blur-sm hover:bg-white/10 hover:border-cyan-400/50 transition-all text-center group">
-                    <CardContent className="p-6">
-                      <div className={`w-16 h-16 rounded-2xl bg-gradient-to-br ${member.color} flex items-center justify-center mb-4 text-white shadow-lg mx-auto group-hover:scale-110 transition-transform`}>
-                        {member.icon}
-                      </div>
-                      <h3 className="text-white mb-3 text-lg">{member.role}</h3>
-                      <p className="text-white/70 text-sm">{member.description}</p>
-                    </CardContent>
-                  </Card>
-                </motion.div>
-              ))}
             </div>
           </div>
         </section>
@@ -396,9 +459,9 @@ export default function APropos() {
               viewport={{ once: true }}
               className="bg-white/10 backdrop-blur-sm border border-white/20 rounded-3xl p-12"
             >
-              <h2 className="text-white mb-4">Prêt à travailler avec nous ?</h2>
+              <h2 className="text-white mb-4">Prêt à recruter vos talents européens ?</h2>
               <p className="text-white/80 text-lg mb-8 max-w-2xl mx-auto">
-                Découvrez comment YOJOB peut vous accompagner dans vos besoins de recrutement européen. Obtenez un devis personnalisé en quelques minutes.
+                Rejoignez les centaines d'entreprises qui nous font confiance pour leur recrutement européen.
               </p>
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
                 <Button
@@ -415,7 +478,7 @@ export default function APropos() {
                   onClick={() => (window.location.href = '/')}
                   size="lg"
                   variant="outline"
-                  className="rounded-full border-white/30 text-white hover:bg-white/10"
+                  className="rounded-full border-white/40 bg-white/10 backdrop-blur-sm text-white hover:bg-white/20 hover:border-white/60 transition-all"
                 >
                   Retour à l'accueil
                 </Button>
@@ -424,12 +487,205 @@ export default function APropos() {
           </div>
         </section>
 
-        {/* Footer minimal */}
-        <footer className="py-8 border-t border-white/10">
-          <div className="max-w-7xl mx-auto px-6 text-center">
-            <p className="text-white/50 text-sm">
-              © 2025 YOJOB. Tous droits réservés.
-            </p>
+        {/* FOOTER */}
+        <footer className="relative overflow-hidden bg-gradient-to-b from-[#0a0e27] to-[#1a1f3a] text-white py-12 lg:py-16">
+          {/* Radial gradients - same as network section */}
+          <div className="absolute inset-0" style={{
+            backgroundImage: 'radial-gradient(circle at 20% 50%, rgba(6, 182, 212, 0.3) 0%, transparent 50%), radial-gradient(circle at 80% 80%, rgba(124, 58, 237, 0.3) 0%, transparent 50%)',
+          }} />
+
+          {/* Grid pattern overlay */}
+          <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGRlZnM+PHBhdHRlcm4gaWQ9ImdyaWQiIHdpZHRoPSI2MCIgaGVpZ2h0PSI2MCIgcGF0dGVyblVuaXRzPSJ1c2VyU3BhY2VPblVzZSI+PHBhdGggZD0iTSAxMCAwIEwgMCAwIDAgMTAiIGZpbGw9Im5vbmUiIHN0cm9rZT0id2hpdGUiIHN0cm9rZS13aWR0aD0iMC41Ii8+PC9wYXR0ZXJuPjwvZGVmcz48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSJ1cmwoI2dyaWQpIi8+PC9zdmc+')] opacity-10" />
+
+          <div className="container mx-auto px-4 relative z-10">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 lg:gap-10 mb-10 lg:mb-12">
+              {/* Column 1: Logo & Description */}
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.6 }}
+              >
+                <motion.div 
+                  className="w-32 h-32 inline-block mb-6"
+                  whileHover={{ scale: 1.05, y: -2 }}
+                  transition={{ duration: 0.3 }}
+                >
+                  <LogoSvg 
+                    className="w-full h-full" 
+                    effects={true}
+                    aria-label="YOJOB"
+                  />
+                </motion.div>
+                <p className="text-white/80 mb-[24px] leading-relaxed max-w-xs text-[13px] mt-[-46px] mr-[0px] ml-[0px]">
+                  Leader du recrutement européen. 500+ agences partenaires dans 27 pays pour connecter les talents aux opportunités.
+                </p>
+                <div className="flex gap-3">
+                  {[
+                    { icon: Linkedin, href: '#', color: 'cyan' },
+                    { icon: Twitter, href: '#', color: 'violet' },
+                    { icon: Facebook, href: '#', color: 'blue' }
+                  ].map((social, index) => (
+                    <motion.a
+                      key={index}
+                      href={social.href}
+                      className="w-10 h-10 bg-white/10 backdrop-blur-md border border-white/20 rounded-full flex items-center justify-center hover:bg-white/20 transition-all duration-300 group"
+                      whileHover={{ scale: 1.1, y: -3 }}
+                      transition={{ duration: 0.3 }}
+                    >
+                      <social.icon className={`w-5 h-5 group-hover:drop-shadow-[0_0_8px_rgba(6,182,212,0.8)] transition-all`} />
+                    </motion.a>
+                  ))}
+                </div>
+              </motion.div>
+
+              {/* Column 2: Services */}
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.6, delay: 0.1 }}
+              >
+                <h3 className="text-white mb-4 text-cyan-300">
+                  Services
+                </h3>
+                <ul className="space-y-2.5 text-sm">
+                  {[
+                    { label: 'Intérim européen', href: '/services/interim-europeen' },
+                    { label: 'Recrutement spécialisé', href: '/services/recrutement-specialise' },
+                    { label: 'Conseil & Conformité', href: '/services/conseil-conformite' },
+                    { label: 'Détachement de personnel', href: '/services/detachement-personnel' }
+                  ].map((link, index) => (
+                    <motion.li key={index} whileHover={{ x: 5 }} transition={{ duration: 0.2 }}>
+                      <a href={link.href} className="text-white/80 hover:text-white transition-colors inline-flex items-center gap-2 group">
+                        <ArrowRight className="w-3 h-3 opacity-0 group-hover:opacity-100 transition-opacity" />
+                        {link.label}
+                      </a>
+                    </motion.li>
+                  ))}
+                </ul>
+              </motion.div>
+
+              {/* Column 3: Company */}
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.6, delay: 0.2 }}
+              >
+                <h3 className="text-white mb-4 text-cyan-300">
+                  Entreprise
+                </h3>
+                <ul className="space-y-2.5 text-sm">
+                  <motion.li whileHover={{ x: 5 }} transition={{ duration: 0.2 }}>
+                    <a href="/a-propos" className="text-white/80 hover:text-white transition-colors inline-flex items-center gap-2 group">
+                      <ArrowRight className="w-3 h-3 opacity-0 group-hover:opacity-100 transition-opacity" />
+                      À propos
+                    </a>
+                  </motion.li>
+                  <motion.li whileHover={{ x: 5 }} transition={{ duration: 0.2 }}>
+                    <a href="/notre-reseau" className="text-white/80 hover:text-white transition-colors inline-flex items-center gap-2 group">
+                      <ArrowRight className="w-3 h-3 opacity-0 group-hover:opacity-100 transition-opacity" />
+                      Notre réseau
+                    </a>
+                  </motion.li>
+                  <motion.li whileHover={{ x: 5 }} transition={{ duration: 0.2 }}>
+                    <a href="/nos-secteurs" className="text-white/80 hover:text-white transition-colors inline-flex items-center gap-2 group">
+                      <ArrowRight className="w-3 h-3 opacity-0 group-hover:opacity-100 transition-opacity" />
+                      Nos secteurs
+                    </a>
+                  </motion.li>
+                  <motion.li whileHover={{ x: 5 }} transition={{ duration: 0.2 }}>
+                    <a href="/temoignages" className="text-white/80 hover:text-white transition-colors inline-flex items-center gap-2 group">
+                      <ArrowRight className="w-3 h-3 opacity-0 group-hover:opacity-100 transition-opacity" />
+                      Témoignages
+                    </a>
+                  </motion.li>
+                </ul>
+              </motion.div>
+
+              {/* Column 4: Contact */}
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.6, delay: 0.3 }}
+              >
+                <h3 className="text-white mb-4 text-cyan-300">
+                  Contact
+                </h3>
+                <ul className="space-y-3 text-sm">
+                  <motion.li 
+                    className="flex items-start gap-3 p-2 rounded-lg bg-white/5 backdrop-blur-sm hover:bg-white/10 transition-all duration-300"
+                    whileHover={{ x: 3 }}
+                  >
+                    <MapPin className="w-5 h-5 text-cyan-400 flex-shrink-0 drop-shadow-[0_0_8px_rgba(6,182,212,0.6)]" />
+                    <span className="text-white/90">Bordeaux, France</span>
+                  </motion.li>
+                  <motion.li 
+                    className="flex items-center gap-3 p-2 rounded-lg bg-white/5 backdrop-blur-sm hover:bg-white/10 transition-all duration-300"
+                    whileHover={{ x: 3 }}
+                  >
+                    <Phone className="w-5 h-5 text-violet-400 drop-shadow-[0_0_8px_rgba(124,58,237,0.6)]" />
+                    <a href="tel:+33650622524" className="text-white/90 hover:text-cyan-400 transition-colors">
+                      +33 6 50 62 25 24
+                    </a>
+                  </motion.li>
+                  <motion.li 
+                    className="flex items-center gap-3 p-2 rounded-lg bg-white/5 backdrop-blur-sm hover:bg-white/10 transition-all duration-300"
+                    whileHover={{ x: 3 }}
+                  >
+                    <Mail className="w-5 h-5 text-cyan-400 drop-shadow-[0_0_8px_rgba(6,182,212,0.6)]" />
+                    <button
+                      onClick={handleEmailReveal}
+                      className="text-white/90 hover:text-cyan-400 transition-colors cursor-pointer bg-transparent border-0 p-0"
+                      aria-label="Envoyer un email"
+                    >
+                      {revealedEmail 
+                        ? 'contact@yojob.fr'
+                        : 'contact@yojob.fr'
+                      }
+                    </button>
+                  </motion.li>
+                </ul>
+              </motion.div>
+            </div>
+
+            {/* Copyright */}
+            <motion.div 
+              className="border-t border-white/20 pt-6 lg:pt-8 text-center"
+              initial={{ opacity: 0 }}
+              whileInView={{ opacity: 1 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.6, delay: 0.4 }}
+            >
+              <div className="flex flex-col sm:flex-row items-center justify-center gap-2 text-sm text-white/80 mb-3">
+                <p>© 2025 YOJOB. Tous droits réservés.</p>
+              </div>
+              {/* Footer Links */}
+              <div className="flex flex-wrap items-center justify-center gap-4 text-xs text-white/50">
+                <a 
+                  href="/privacy" 
+                  className="hover:text-cyan-400 transition-colors underline decoration-dotted"
+                >
+                  Politique de confidentialité
+                </a>
+                <span className="text-white/30">•</span>
+                <a 
+                  href="/legal" 
+                  className="hover:text-cyan-400 transition-colors underline decoration-dotted"
+                >
+                  Mentions légales
+                </a>
+                <span className="text-white/30">•</span>
+                <a 
+                  href="/cgv" 
+                  className="hover:text-cyan-400 transition-colors underline decoration-dotted"
+                >
+                  CGV
+                </a>
+              </div>
+            </motion.div>
           </div>
         </footer>
       </div>

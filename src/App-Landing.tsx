@@ -769,7 +769,7 @@ export default function AppLanding() {
                 transition={{ delay: 0.2 }}
                 className="text-white mb-2 lg:mb-6 text-4xl lg:text-5xl xl:text-6xl font-extrabold leading-tight"
               >
-                {content.hero?.title || 'Recrutez les meilleurs talents européens'}
+                {content.hero?.title || 'Le plus grand réseau de recrutement européen : 500+ agences dans 27 pays'}
               </motion.h1>
               
               <motion.p
@@ -778,7 +778,7 @@ export default function AppLanding() {
                 transition={{ delay: 0.4 }}
                 className="text-white/95 text-lg lg:text-xl mb-4 lg:mb-8 leading-relaxed"
               >
-                {content.hero?.subtitle || "Un interlocuteur unique pour accéder à 500+ agences d'emploi certifiées dans 27 pays"}
+                {content.hero?.subtitle || "Recrutez vos talents qualifiés en 48-72h grâce à nos agences partenaires vérifiées. Intérim, CDI, détachement : une solution 100% conforme et clé en main pour tous vos besoins de main-d'œuvre européenne."}
               </motion.p>
 
               {/* Stats in glassmorphism cards - Desktop only */}
