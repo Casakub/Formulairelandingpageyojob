@@ -164,10 +164,12 @@ export default function Temoignages() {
           <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
             {/* Logo */}
             <a href="/" className="flex items-center gap-3 group">
-              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#1E3A8A] to-[#06B6D4] flex items-center justify-center shadow-lg group-hover:shadow-cyan-500/50 transition-all">
-                <LogoSvg className="w-6 h-6 text-white" />
+              <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-[#1E3A8A] via-[#06B6D4] to-[#7C3AED] p-0.5 shadow-lg shadow-cyan-500/30 group-hover:shadow-cyan-500/50 transition-all duration-300">
+                <div className="w-full h-full rounded-[10px] bg-white/95 backdrop-blur-sm flex items-center justify-center">
+                  <LogoSvg className="w-8 h-8" />
+                </div>
               </div>
-              <span className="text-white transition-colors">
+              <span className="text-white text-xl hidden sm:block group-hover:text-cyan-400 transition-colors">
                 YOJOB
               </span>
             </a>

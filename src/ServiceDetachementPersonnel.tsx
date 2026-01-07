@@ -3,15 +3,16 @@ import { Helmet, HelmetProvider } from 'react-helmet-async';
 import { motion } from 'motion/react';
 import {
   Plane,
-  Handshake,
-  Home,
+  Users,
+  Globe,
+  ShieldCheck,
+  FileText,
   CheckCircle,
   ArrowRight,
   Building2,
   Target,
+  Clock,
   Euro,
-  Phone,
-  FileText,
   Network,
   UserCheck,
   ChevronDown,
@@ -24,9 +25,11 @@ import {
   Trees,
   Package,
   Star,
-  Shield,
-  MapPin,
+  Award,
+  Briefcase,
+  Phone,
   Mail,
+  MapPin,
   Linkedin,
   Twitter,
   Facebook
@@ -35,6 +38,7 @@ import { Button } from './components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from './components/ui/card';
 import { Badge } from './components/ui/badge';
 import { LogoSvg } from './imports/YojobLogoComplete';
+import { LanguageSelector } from './components/landing/LanguageSelector';
 
 interface FAQItemProps {
   question: string;
@@ -78,6 +82,8 @@ function FAQItem({ question, answer }: FAQItemProps) {
 }
 
 export default function ServiceDetachementPersonnel() {
+  const [language, setLanguage] = useState('fr');
+
   const faqs = [
     {
       question: "Qui est l'employeur du travailleur détaché ?",
@@ -103,13 +109,13 @@ export default function ServiceDetachementPersonnel() {
 
   const advantages = [
     {
-      icon: <Handshake className="w-8 h-8" />,
+      icon: <Users className="w-8 h-8" />,
       title: "Coordination complète",
       description: "Interface unique entre vous et l'ETT européen",
       color: "from-blue-500 to-blue-600"
     },
     {
-      icon: <Home className="w-8 h-8" />,
+      icon: <Building2 className="w-8 h-8" />,
       title: "Solutions logistiques",
       description: "Hébergement et transport organisés si besoin",
       color: "from-cyan-500 to-cyan-600"
@@ -191,29 +197,36 @@ export default function ServiceDetachementPersonnel() {
 
       <div className="min-h-screen bg-gradient-to-br from-blue-900 via-violet-900 to-cyan-900">
         {/* Header */}
-        <header className="relative z-10 border-b border-white/10 bg-white/5 backdrop-blur-md">
-          <div className="container mx-auto px-4 py-4">
-            <div className="flex items-center justify-between">
-              <a href="/" className="flex items-center gap-3 group">
-                <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-[#1E3A8A] via-[#06B6D4] to-[#7C3AED] p-0.5 shadow-lg shadow-cyan-500/30 group-hover:shadow-cyan-500/50 transition-all duration-300">
-                  <div className="w-full h-full rounded-[10px] bg-white/95 backdrop-blur-sm flex items-center justify-center">
-                    <LogoSvg className="w-8 h-8" />
-                  </div>
+        <header className="relative z-50 border-b border-white/10 bg-white/5 backdrop-blur-md">
+          <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
+            {/* Logo */}
+            <a href="/" className="flex items-center gap-3 group">
+              <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-[#1E3A8A] via-[#06B6D4] to-[#7C3AED] p-0.5 shadow-lg shadow-cyan-500/30 group-hover:shadow-cyan-500/50 transition-all duration-300">
+                <div className="w-full h-full rounded-[10px] bg-white/95 backdrop-blur-sm flex items-center justify-center">
+                  <LogoSvg className="w-8 h-8" />
                 </div>
-                <span className="text-white text-xl hidden sm:block group-hover:text-cyan-400 transition-colors">
-                  YOJOB
+              </div>
+              <span className="text-white text-xl hidden sm:block group-hover:text-cyan-400 transition-colors">
+                YOJOB
+              </span>
+            </a>
+
+            {/* CTA */}
+            <div className="flex items-center gap-4">
+              <LanguageSelector
+                currentLanguage={language}
+                onLanguageChange={setLanguage}
+                availableLanguages={['fr', 'en']}
+              />
+              <a 
+                href="/devis"
+                className="relative overflow-hidden group rounded-full bg-white text-[#1E3A8A] hover:bg-cyan-50 shadow-2xl hover:shadow-white/70 transition-all duration-300 hover:scale-105 px-6 py-2.5 inline-flex items-center justify-center"
+              >
+                <span className="relative z-10 flex items-center">
+                  Demander un devis
+                  <ArrowRight className="ml-2 w-4 h-4" />
                 </span>
-              </a>
-              <a href="/devis">
-                <Button
-                  className="relative overflow-hidden group rounded-full bg-gradient-to-r from-cyan-500 to-green-500 hover:from-cyan-600 hover:to-green-600 text-white shadow-lg hover:shadow-cyan-500/50 transition-all duration-300 px-6 py-2.5"
-                >
-                  <span className="relative z-10 flex items-center gap-2">
-                    <FileText className="w-4 h-4" />
-                    Devis gratuit
-                  </span>
-                  <div className="absolute inset-0 -translate-x-full group-hover:translate-x-full transition-transform duration-700 bg-gradient-to-r from-transparent via-white/40 to-transparent" />
-                </Button>
+                <div className="absolute inset-0 -translate-x-full group-hover:translate-x-full transition-transform duration-700 bg-gradient-to-r from-transparent via-white/40 to-transparent" />
               </a>
             </div>
           </div>

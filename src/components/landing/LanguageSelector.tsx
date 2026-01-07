@@ -95,7 +95,7 @@ export function LanguageSelector({
 
   // Desktop variant
   return (
-    <div className={`relative ${className}`} ref={dropdownRef}>
+    <div className={`relative z-50 ${className}`} ref={dropdownRef}>
       <button
         onClick={() => setIsOpen(!isOpen)}
         className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-violet-600 via-purple-600 to-cyan-600 hover:from-violet-500 hover:via-purple-500 hover:to-cyan-500 backdrop-blur-md rounded-full text-white border border-white/30 shadow-lg hover:shadow-xl transition-all group"
@@ -113,7 +113,7 @@ export function LanguageSelector({
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.95, y: -10 }}
             transition={{ duration: 0.2 }}
-            className="absolute top-full right-0 mt-2 w-72 bg-white/95 backdrop-blur-xl rounded-2xl shadow-2xl border border-slate-200 overflow-hidden z-50"
+            className="absolute top-full right-0 mt-2 w-72 bg-white/95 backdrop-blur-xl rounded-2xl shadow-2xl border border-slate-200 overflow-hidden z-[9999]"
           >
             {/* Header */}
             <div className="px-4 py-3 bg-gradient-to-r from-violet-500 to-cyan-500 text-white">
