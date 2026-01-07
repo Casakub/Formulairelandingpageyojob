@@ -25,7 +25,11 @@ import {
   Package,
   Star,
   Shield,
-  MapPin
+  MapPin,
+  Mail,
+  Linkedin,
+  Twitter,
+  Facebook
 } from 'lucide-react';
 import { Button } from './components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from './components/ui/card';
@@ -200,16 +204,17 @@ export default function ServiceDetachementPersonnel() {
                   YOJOB
                 </span>
               </a>
-              <Button
-                className="relative overflow-hidden group rounded-full bg-gradient-to-r from-cyan-500 to-green-500 hover:from-cyan-600 hover:to-green-600 text-white shadow-lg hover:shadow-cyan-500/50 transition-all duration-300 px-6 py-2.5"
-                onClick={() => document.getElementById('contact')?.scrollIntoView({ behavior: 'smooth' })}
-              >
-                <span className="relative z-10 flex items-center gap-2">
-                  <FileText className="w-4 h-4" />
-                  Devis gratuit
-                </span>
-                <div className="absolute inset-0 -translate-x-full group-hover:translate-x-full transition-transform duration-700 bg-gradient-to-r from-transparent via-white/40 to-transparent" />
-              </Button>
+              <a href="/devis">
+                <Button
+                  className="relative overflow-hidden group rounded-full bg-gradient-to-r from-cyan-500 to-green-500 hover:from-cyan-600 hover:to-green-600 text-white shadow-lg hover:shadow-cyan-500/50 transition-all duration-300 px-6 py-2.5"
+                >
+                  <span className="relative z-10 flex items-center gap-2">
+                    <FileText className="w-4 h-4" />
+                    Devis gratuit
+                  </span>
+                  <div className="absolute inset-0 -translate-x-full group-hover:translate-x-full transition-transform duration-700 bg-gradient-to-r from-transparent via-white/40 to-transparent" />
+                </Button>
+              </a>
             </div>
           </div>
         </header>
@@ -231,10 +236,10 @@ export default function ServiceDetachementPersonnel() {
                 <Badge className="mb-6 px-6 py-2 bg-gradient-to-r from-blue-500/20 to-green-500/20 border border-blue-400/30 text-blue-200 backdrop-blur-sm">
                   ✈️ Détachement de Personnel
                 </Badge>
-                <h1 className="text-white mb-6 max-w-3xl mx-auto">
+                <h1 className="text-white mb-6 max-w-3xl mx-auto text-[20px]">
                   Le détachement de personnel européen simplifié
                 </h1>
-                <p className="text-xl text-white/80 mb-8 max-w-2xl mx-auto leading-relaxed">
+                <p className="text-white/80 mb-8 max-w-2xl mx-auto leading-relaxed text-[16px]">
                   De la sélection des candidats à leur intégration sur site, nous coordonnons l'ensemble du processus de détachement avec nos ETT partenaires.
                 </p>
                 <div className="flex flex-col sm:flex-row gap-4 justify-center">
@@ -273,7 +278,7 @@ export default function ServiceDetachementPersonnel() {
               <Badge className="mb-4 px-6 py-2 bg-gradient-to-r from-violet-500/20 to-cyan-500/20 border border-violet-400/30 text-violet-200 backdrop-blur-sm">
                 🎯 Pour qui ?
               </Badge>
-              <h2 className="text-white mb-4">Ce service est fait pour vous</h2>
+              <h2 className="text-white mb-4 text-[20px]">Ce service est fait pour vous</h2>
             </motion.div>
 
             <div className="grid md:grid-cols-2 gap-8 max-w-5xl mx-auto">
@@ -287,7 +292,7 @@ export default function ServiceDetachementPersonnel() {
                     <div className="w-16 h-16 bg-gradient-to-br from-blue-500 to-blue-600 rounded-2xl flex items-center justify-center mb-4">
                       <Building2 className="w-8 h-8 text-white" />
                     </div>
-                    <CardTitle className="text-white">Entreprises Utilisatrices</CardTitle>
+                    <CardTitle className="text-white text-[20px]">Entreprises Utilisatrices</CardTitle>
                   </CardHeader>
                   <CardContent>
                     <p className="text-white/70 leading-relaxed">
@@ -307,7 +312,7 @@ export default function ServiceDetachementPersonnel() {
                     <div className="w-16 h-16 bg-gradient-to-br from-cyan-500 to-cyan-600 rounded-2xl flex items-center justify-center mb-4">
                       <Target className="w-8 h-8 text-white" />
                     </div>
-                    <CardTitle className="text-white">Vous êtes concerné si...</CardTitle>
+                    <CardTitle className="text-white text-[20px]">Vous êtes concerné si...</CardTitle>
                   </CardHeader>
                   <CardContent>
                     <ul className="space-y-3">
@@ -343,7 +348,7 @@ export default function ServiceDetachementPersonnel() {
               <Badge className="mb-4 px-6 py-2 bg-gradient-to-r from-green-500/20 to-cyan-500/20 border border-green-400/30 text-green-200 backdrop-blur-sm">
                 ✨ Vos avantages
               </Badge>
-              <h2 className="text-white">Pourquoi choisir notre service de détachement</h2>
+              <h2 className="text-white text-[20px]">Pourquoi choisir notre service de détachement</h2>
             </motion.div>
 
             <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -383,7 +388,7 @@ export default function ServiceDetachementPersonnel() {
               <Badge className="mb-4 px-6 py-2 bg-gradient-to-r from-blue-500/20 to-violet-500/20 border border-blue-400/30 text-blue-200 backdrop-blur-sm">
                 📦 Ce qui est inclus
               </Badge>
-              <h2 className="text-white">Notre offre complète de détachement</h2>
+              <h2 className="text-white text-[20px]">Notre offre complète de détachement</h2>
             </motion.div>
 
             <motion.div
@@ -427,7 +432,7 @@ export default function ServiceDetachementPersonnel() {
               <Badge className="mb-4 px-6 py-2 bg-gradient-to-r from-violet-500/20 to-cyan-500/20 border border-violet-400/30 text-violet-200 backdrop-blur-sm">
                 🎯 Comment ça marche
               </Badge>
-              <h2 className="text-white">Le processus en 4 étapes</h2>
+              <h2 className="text-white text-[20px]">Le processus en 4 étapes</h2>
             </motion.div>
 
             <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 relative">
@@ -472,7 +477,7 @@ export default function ServiceDetachementPersonnel() {
               <Badge className="mb-4 px-6 py-2 bg-gradient-to-r from-orange-500/20 to-red-500/20 border border-orange-400/30 text-orange-200 backdrop-blur-sm">
                 🏭 Secteurs d'activité
               </Badge>
-              <h2 className="text-white">Secteurs utilisant le détachement</h2>
+              <h2 className="text-white text-[20px]">Secteurs utilisant le détachement</h2>
             </motion.div>
 
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
@@ -557,7 +562,7 @@ export default function ServiceDetachementPersonnel() {
               <Badge className="mb-4 px-6 py-2 bg-gradient-to-r from-violet-500/20 to-pink-500/20 border border-violet-400/30 text-violet-200 backdrop-blur-sm">
                 ❓ Questions fréquentes
               </Badge>
-              <h2 className="text-white">Vos questions sur le détachement</h2>
+              <h2 className="text-white text-[20px]">Vos questions sur le détachement</h2>
             </motion.div>
 
             <div className="max-w-3xl mx-auto space-y-4">
@@ -583,14 +588,14 @@ export default function ServiceDetachementPersonnel() {
               viewport={{ once: true }}
               className="text-center max-w-3xl mx-auto"
             >
-              <h2 className="text-white mb-6">
+              <h2 className="text-white mb-6 text-[20px]">
                 Prêt à simplifier vos détachements ?
               </h2>
-              <p className="text-xl text-white/80 mb-8 leading-relaxed">
+              <p className="text-white/80 mb-8 leading-relaxed text-[16px]">
                 Confiez-nous la coordination complète de vos détachements européens
               </p>
               <a href="/devis">
-                <Button className="relative overflow-hidden group rounded-full bg-gradient-to-r from-cyan-500 to-violet-600 hover:from-cyan-600 hover:to-violet-700 text-white shadow-2xl hover:shadow-cyan-500/50 transition-all px-12 py-6 text-lg">
+                <Button className="relative overflow-hidden group rounded-full bg-gradient-to-r from-cyan-500 to-violet-600 hover:from-cyan-600 hover:to-violet-700 text-white shadow-2xl hover:shadow-cyan-500/50 transition-all px-8 py-6 text-lg w-full sm:w-auto">
                   <span className="relative z-10 flex items-center">
                     Demander un devis
                     <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
@@ -606,18 +611,207 @@ export default function ServiceDetachementPersonnel() {
         </section>
 
         {/* Footer */}
-        <footer className="py-12 px-4 bg-black/20 border-t border-white/10">
-          <div className="container mx-auto">
-            <div className="text-center text-white/60 text-sm">
-              <p>© 2026 YOJOB. Tous droits réservés.</p>
-              <div className="flex gap-4 justify-center mt-4">
-                <a href="/legal" className="hover:text-white transition-colors">Mentions légales</a>
-                <span>•</span>
-                <a href="/privacy" className="hover:text-white transition-colors">Politique de confidentialité</a>
-                <span>•</span>
-                <a href="/cgv" className="hover:text-white transition-colors">CGV</a>
-              </div>
+        <footer className="relative overflow-hidden bg-gradient-to-b from-[#0a0e27] to-[#1a1f3a] text-white py-12 lg:py-16">
+          {/* Radial gradients - same as network section */}
+          <div className="absolute inset-0" style={{
+            backgroundImage: 'radial-gradient(circle at 20% 50%, rgba(6, 182, 212, 0.3) 0%, transparent 50%), radial-gradient(circle at 80% 80%, rgba(124, 58, 237, 0.3) 0%, transparent 50%)',
+          }} />
+
+          <div className="container mx-auto px-4 relative z-10">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 lg:gap-10 mb-10 lg:mb-12">
+              {/* Column 1: Logo & Description */}
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.6 }}
+              >
+                <motion.div 
+                  className="w-32 h-32 inline-block mb-6"
+                  whileHover={{ scale: 1.05, y: -2 }}
+                  transition={{ duration: 0.3 }}
+                >
+                  <LogoSvg 
+                    className="w-full h-full" 
+                    aria-label="YOJOB"
+                  />
+                </motion.div>
+                <p className="text-white/80 mb-[24px] leading-relaxed max-w-xs text-[13px] mt-[-46px] mr-[0px] ml-[0px]">
+                  Leader du recrutement européen. 500+ agences partenaires dans 27 pays pour connecter les talents aux opportunités.
+                </p>
+                <div className="flex gap-3">
+                  {[
+                    { icon: Linkedin, href: '#', color: 'cyan' },
+                    { icon: Twitter, href: '#', color: 'violet' },
+                    { icon: Facebook, href: '#', color: 'blue' }
+                  ].map((social, index) => (
+                    <motion.a
+                      key={index}
+                      href={social.href}
+                      className="w-10 h-10 bg-white/10 backdrop-blur-md border border-white/20 rounded-full flex items-center justify-center hover:bg-white/20 transition-all duration-300 group"
+                      whileHover={{ scale: 1.1, y: -3 }}
+                      transition={{ duration: 0.3 }}
+                    >
+                      <social.icon className={`w-5 h-5 group-hover:drop-shadow-[0_0_8px_rgba(6,182,212,0.8)] transition-all`} />
+                    </motion.a>
+                  ))}
+                </div>
+              </motion.div>
+
+              {/* Column 2: Services */}
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.6, delay: 0.1 }}
+              >
+                <h3 className="text-white mb-4 text-cyan-300">
+                  Services
+                </h3>
+                <ul className="space-y-2.5 text-sm">
+                  <motion.li whileHover={{ x: 5 }} transition={{ duration: 0.2 }}>
+                    <a href="/services/interim-europeen" className="text-white/80 hover:text-white transition-colors inline-flex items-center gap-2 group">
+                      <ArrowRight className="w-3 h-3 opacity-0 group-hover:opacity-100 transition-opacity" />
+                      Intérim européen
+                    </a>
+                  </motion.li>
+                  <motion.li whileHover={{ x: 5 }} transition={{ duration: 0.2 }}>
+                    <a href="/services/recrutement-specialise" className="text-white/80 hover:text-white transition-colors inline-flex items-center gap-2 group">
+                      <ArrowRight className="w-3 h-3 opacity-0 group-hover:opacity-100 transition-opacity" />
+                      Recrutement spécialisé
+                    </a>
+                  </motion.li>
+                  <motion.li whileHover={{ x: 5 }} transition={{ duration: 0.2 }}>
+                    <a href="/services/conseil-conformite" className="text-white/80 hover:text-white transition-colors inline-flex items-center gap-2 group">
+                      <ArrowRight className="w-3 h-3 opacity-0 group-hover:opacity-100 transition-opacity" />
+                      Conseil & Conformité
+                    </a>
+                  </motion.li>
+                  <motion.li whileHover={{ x: 5 }} transition={{ duration: 0.2 }}>
+                    <a href="/services/detachement-personnel" className="text-white/80 hover:text-white transition-colors inline-flex items-center gap-2 group">
+                      <ArrowRight className="w-3 h-3 opacity-0 group-hover:opacity-100 transition-opacity" />
+                      Détachement de personnel
+                    </a>
+                  </motion.li>
+                </ul>
+              </motion.div>
+
+              {/* Column 3: Company */}
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.6, delay: 0.2 }}
+              >
+                <h3 className="text-white mb-4 text-cyan-300">
+                  Entreprise
+                </h3>
+                <ul className="space-y-2.5 text-sm">
+                  <motion.li whileHover={{ x: 5 }} transition={{ duration: 0.2 }}>
+                    <a href="/a-propos" className="text-white/80 hover:text-white transition-colors inline-flex items-center gap-2 group">
+                      <ArrowRight className="w-3 h-3 opacity-0 group-hover:opacity-100 transition-opacity" />
+                      À propos
+                    </a>
+                  </motion.li>
+                  <motion.li whileHover={{ x: 5 }} transition={{ duration: 0.2 }}>
+                    <a href="/notre-reseau" className="text-white/80 hover:text-white transition-colors inline-flex items-center gap-2 group">
+                      <ArrowRight className="w-3 h-3 opacity-0 group-hover:opacity-100 transition-opacity" />
+                      Notre réseau
+                    </a>
+                  </motion.li>
+                  <motion.li whileHover={{ x: 5 }} transition={{ duration: 0.2 }}>
+                    <a href="/nos-secteurs" className="text-white/80 hover:text-white transition-colors inline-flex items-center gap-2 group">
+                      <ArrowRight className="w-3 h-3 opacity-0 group-hover:opacity-100 transition-opacity" />
+                      Nos secteurs
+                    </a>
+                  </motion.li>
+                  <motion.li whileHover={{ x: 5 }} transition={{ duration: 0.2 }}>
+                    <a href="/temoignages" className="text-white/80 hover:text-white transition-colors inline-flex items-center gap-2 group">
+                      <ArrowRight className="w-3 h-3 opacity-0 group-hover:opacity-100 transition-opacity" />
+                      Témoignages
+                    </a>
+                  </motion.li>
+                </ul>
+              </motion.div>
+
+              {/* Column 4: Contact */}
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.6, delay: 0.3 }}
+              >
+                <h3 className="text-white mb-4 text-cyan-300">
+                  Contact
+                </h3>
+                <ul className="space-y-3 text-sm">
+                  <motion.li 
+                    className="flex items-start gap-3 p-2 rounded-lg bg-white/5 backdrop-blur-sm hover:bg-white/10 transition-all duration-300"
+                    whileHover={{ x: 3 }}
+                  >
+                    <MapPin className="w-5 h-5 text-cyan-400 flex-shrink-0 drop-shadow-[0_0_8px_rgba(6,182,212,0.6)]" />
+                    <span className="text-white/90">Bordeaux, France</span>
+                  </motion.li>
+                  <motion.li 
+                    className="flex items-center gap-3 p-2 rounded-lg bg-white/5 backdrop-blur-sm hover:bg-white/10 transition-all duration-300"
+                    whileHover={{ x: 3 }}
+                  >
+                    <Phone className="w-5 h-5 text-violet-400 drop-shadow-[0_0_8px_rgba(124,58,237,0.6)]" />
+                    <a href="tel:+33650622524" className="text-white/90 hover:text-cyan-400 transition-colors">
+                      +33 6 50 62 25 24
+                    </a>
+                  </motion.li>
+                  <motion.li 
+                    className="flex items-center gap-3 p-2 rounded-lg bg-white/5 backdrop-blur-sm hover:bg-white/10 transition-all duration-300"
+                    whileHover={{ x: 3 }}
+                  >
+                    <Mail className="w-5 h-5 text-cyan-400 drop-shadow-[0_0_8px_rgba(6,182,212,0.6)]" />
+                    <a 
+                      href="mailto:contact@yojob.fr"
+                      className="text-white/90 hover:text-cyan-400 transition-colors"
+                    >
+                      contact@yojob.fr
+                    </a>
+                  </motion.li>
+                </ul>
+              </motion.div>
             </div>
+
+            {/* Copyright */}
+            <motion.div 
+              className="border-t border-white/20 pt-6 lg:pt-8 text-center"
+              initial={{ opacity: 0 }}
+              whileInView={{ opacity: 1 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.6, delay: 0.4 }}
+            >
+              <div className="flex flex-col sm:flex-row items-center justify-center gap-2 text-sm text-white/80 mb-3">
+                <p>© 2026 YOJOB. Tous droits réservés.</p>
+              </div>
+              {/* Footer Links */}
+              <div className="flex flex-wrap items-center justify-center gap-4 text-xs text-white/50">
+                <a 
+                  href="/privacy" 
+                  className="hover:text-cyan-400 transition-colors underline decoration-dotted"
+                >
+                  Politique de confidentialité
+                </a>
+                <span className="text-white/30">•</span>
+                <a 
+                  href="/legal" 
+                  className="hover:text-cyan-400 transition-colors underline decoration-dotted"
+                >
+                  Mentions légales
+                </a>
+                <span className="text-white/30">•</span>
+                <a 
+                  href="/cgv" 
+                  className="hover:text-cyan-400 transition-colors underline decoration-dotted"
+                >
+                  CGV
+                </a>
+              </div>
+            </motion.div>
           </div>
         </footer>
       </div>
