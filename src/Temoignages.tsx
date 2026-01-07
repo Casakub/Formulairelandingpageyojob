@@ -231,11 +231,11 @@ export default function Temoignages() {
                   Témoignages clients
                 </Badge>
 
-                <h1 className="text-white mb-6 max-w-3xl mx-auto">
+                <h1 className="text-white mb-6 max-w-3xl mx-auto text-[20px]">
                   Ils nous font confiance pour leur recrutement européen
                 </h1>
 
-                <p className="text-white/80 text-xl max-w-2xl mx-auto mb-12">
+                <p className="text-white/80 text-xl max-w-2xl mx-auto mb-12 text-[16px]">
                   Découvrez comment YOJOB accompagne les entreprises françaises dans leurs besoins de recrutement en Europe avec succès et réactivité.
                 </p>
               </motion.div>
@@ -251,9 +251,10 @@ export default function Temoignages() {
                   viewport={{ once: true }}
                   transition={{ delay: index * 0.1 }}
                   whileHover={{ y: -8 }}
+                  className="h-full"
                 >
-                  <Card className="border border-white/10 bg-white/5 backdrop-blur-sm hover:bg-white/10 hover:border-cyan-400/50 transition-all text-center group">
-                    <CardContent className="p-8">
+                  <Card className="h-full border border-white/10 bg-white/5 backdrop-blur-sm hover:bg-white/10 hover:border-cyan-400/50 transition-all text-center group">
+                    <CardContent className="p-8 flex flex-col items-center justify-center h-full">
                       <div className={`w-16 h-16 rounded-2xl bg-gradient-to-br ${stat.color} flex items-center justify-center mb-4 mx-auto text-white shadow-lg group-hover:scale-110 transition-transform`}>
                         {stat.icon}
                       </div>
@@ -282,8 +283,8 @@ export default function Temoignages() {
                 <Briefcase className="w-4 h-4 mr-2" />
                 Cas clients
               </Badge>
-              <h2 className="text-white mb-4">Des succès concrets dans tous les secteurs</h2>
-              <p className="text-white/70 text-lg max-w-2xl mx-auto">
+              <h2 className="text-white mb-4 text-[20px]">Des succès concrets dans tous les secteurs</h2>
+              <p className="text-white/70 text-lg max-w-2xl mx-auto text-[16px]">
                 Découvrez comment nous avons aidé ces entreprises à résoudre leurs défis de recrutement.
               </p>
             </motion.div>
@@ -405,8 +406,8 @@ export default function Temoignages() {
                 <Award className="w-4 h-4 mr-2" />
                 Nos engagements
               </Badge>
-              <h2 className="text-white mb-4">Pourquoi ils nous font confiance</h2>
-              <p className="text-white/70 text-lg max-w-2xl mx-auto">
+              <h2 className="text-white mb-4 text-[20px]">Pourquoi ils nous font confiance</h2>
+              <p className="text-white/70 text-lg max-w-2xl mx-auto text-[16px]">
                 4 raisons qui font de YOJOB le partenaire privilégié pour le recrutement européen.
               </p>
             </motion.div>
@@ -420,13 +421,14 @@ export default function Temoignages() {
                   viewport={{ once: true }}
                   transition={{ delay: index * 0.1 }}
                   whileHover={{ y: -8 }}
+                  className="h-full"
                 >
                   <Card className="h-full border border-white/10 bg-white/5 backdrop-blur-sm hover:bg-white/10 hover:border-cyan-400/50 transition-all text-center group">
-                    <CardContent className="p-6">
+                    <CardContent className="p-6 flex flex-col items-center justify-center h-full">
                       <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-cyan-500 to-blue-600 flex items-center justify-center mb-4 mx-auto text-white shadow-lg group-hover:scale-110 transition-transform">
                         {benefit.icon}
                       </div>
-                      <h3 className="text-white mb-3 text-lg">{benefit.title}</h3>
+                      <h3 className="text-white mb-3 text-[20px]">{benefit.title}</h3>
                       <p className="text-white/70 text-sm">{benefit.description}</p>
                     </CardContent>
                   </Card>
@@ -447,8 +449,8 @@ export default function Temoignages() {
               viewport={{ once: true }}
               className="bg-white/10 backdrop-blur-sm border border-white/20 rounded-3xl p-12"
             >
-              <h2 className="text-white mb-4">Rejoignez nos clients satisfaits</h2>
-              <p className="text-white/80 text-lg mb-8 max-w-2xl mx-auto">
+              <h2 className="text-white mb-4 text-[20px]">Rejoignez nos clients satisfaits</h2>
+              <p className="text-white/80 text-lg mb-8 max-w-2xl mx-auto text-[16px]">
                 Faites comme eux, confiez-nous vos besoins de recrutement européen et bénéficiez d'un service 5 étoiles.
               </p>
               <div className="flex flex-col sm:flex-row gap-4 justify-center">

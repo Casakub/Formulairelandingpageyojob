@@ -231,16 +231,16 @@ export default function NosSecteurs() {
                 Nos secteurs d'activité
               </Badge>
 
-              <h1 className="text-white mb-6 max-w-3xl mx-auto">
+              <h1 className="text-white mb-6 max-w-3xl mx-auto text-[20px]">
                 Des talents européens pour tous vos secteurs d'activité
               </h1>
 
-              <p className="text-white/80 text-xl max-w-2xl mx-auto mb-12">
+              <p className="text-white/80 text-xl max-w-2xl mx-auto mb-12 text-[16px]">
                 Du BTP à la tech, de l'industrie à l'hôtellerie : trouvez les professionnels qualifiés dont vous avez besoin dans 9 secteurs clés.
               </p>
 
-              <h2 className="text-white mb-4">9 secteurs d'expertise pour répondre à tous vos besoins</h2>
-              <p className="text-white/70 text-lg max-w-2xl mx-auto">
+              <h2 className="text-white mb-4 text-[20px]">9 secteurs d'expertise pour répondre à tous vos besoins</h2>
+              <p className="text-white/70 text-lg max-w-2xl mx-auto text-[16px]">
                 De la construction à la santé, du transport à la tech : découvrez notre expertise sectorielle et les métiers couverts par notre réseau de 500+ agences européennes.
               </p>
             </motion.div>
@@ -262,19 +262,19 @@ export default function NosSecteurs() {
                   transition={{ delay: index * 0.05 }}
                   whileHover={{ y: -8 }}
                   onClick={() => setSelectedSector(selectedSector === index ? null : index)}
-                  className="cursor-pointer"
+                  className="cursor-pointer h-full"
                 >
                   <Card className={`h-full border transition-all group ${
                     selectedSector === index
                       ? 'border-cyan-400 bg-white/15 shadow-2xl shadow-cyan-500/30'
                       : 'border-white/10 bg-white/5 hover:bg-white/10 hover:border-cyan-400/50'
                   } backdrop-blur-sm`}>
-                    <CardContent className="p-8">
+                    <CardContent className="p-8 flex flex-col h-full">
                       {/* Icône + Nom */}
                       <div className={`w-16 h-16 rounded-2xl bg-gradient-to-br ${sector.color} flex items-center justify-center mb-6 text-white shadow-lg group-hover:scale-110 transition-transform`}>
                         {sector.icon}
                       </div>
-                      <h3 className="text-white mb-3">{sector.name}</h3>
+                      <h3 className="text-white mb-3 text-[20px]">{sector.name}</h3>
                       <p className="text-white/70 text-sm mb-4">{sector.shortDesc}</p>
 
                       {/* Stats rapides */}
@@ -310,8 +310,8 @@ export default function NosSecteurs() {
                         </motion.div>
                       )}
 
-                      {/* CTA expandable */}
-                      <div className="mt-4 flex items-center text-cyan-400 text-sm group-hover:text-cyan-300 transition-colors">
+                      {/* CTA expandable - Poussé en bas avec flex-grow */}
+                      <div className="mt-auto pt-4 flex items-center text-cyan-400 text-sm group-hover:text-cyan-300 transition-colors">
                         {selectedSector === index ? 'Voir moins' : 'Voir plus'}
                         <ArrowRight className={`ml-2 w-4 h-4 transition-transform ${
                           selectedSector === index ? 'rotate-90' : ''
@@ -340,8 +340,8 @@ export default function NosSecteurs() {
                 <CheckCircle className="w-4 h-4 mr-2" />
                 Nos garanties
               </Badge>
-              <h2 className="text-white mb-4">Une expertise reconnue dans chaque secteur</h2>
-              <p className="text-white/70 text-lg max-w-2xl mx-auto">
+              <h2 className="text-white mb-4 text-[20px]">Une expertise reconnue dans chaque secteur</h2>
+              <p className="text-white/70 text-lg max-w-2xl mx-auto text-[16px]">
                 Quel que soit votre domaine d'activité, bénéficiez de notre connaissance approfondie des métiers et des talents européens.
               </p>
             </motion.div>
@@ -355,13 +355,14 @@ export default function NosSecteurs() {
                   viewport={{ once: true }}
                   transition={{ delay: index * 0.1 }}
                   whileHover={{ y: -8 }}
+                  className="h-full"
                 >
                   <Card className="h-full border border-white/10 bg-white/5 backdrop-blur-sm hover:bg-white/10 hover:border-cyan-400/50 transition-all text-center group">
-                    <CardContent className="p-6">
+                    <CardContent className="p-6 flex flex-col items-center justify-center h-full">
                       <div className={`w-14 h-14 rounded-2xl bg-gradient-to-br ${advantage.color} flex items-center justify-center mb-4 mx-auto text-white shadow-lg group-hover:scale-110 transition-transform`}>
                         {advantage.icon}
                       </div>
-                      <h3 className="text-white mb-3 text-lg">{advantage.title}</h3>
+                      <h3 className="text-white mb-3 text-[20px]">{advantage.title}</h3>
                       <p className="text-white/70 text-sm">{advantage.description}</p>
                     </CardContent>
                   </Card>
@@ -382,8 +383,8 @@ export default function NosSecteurs() {
               viewport={{ once: true }}
               className="bg-white/10 backdrop-blur-sm border border-white/20 rounded-3xl p-12"
             >
-              <h2 className="text-white mb-4">Trouvez les talents pour votre secteur</h2>
-              <p className="text-white/80 text-lg mb-8 max-w-2xl mx-auto">
+              <h2 className="text-white mb-4 text-[20px]">Trouvez les talents pour votre secteur</h2>
+              <p className="text-white/80 text-lg mb-8 max-w-2xl mx-auto text-[16px]">
                 Décrivez-nous vos besoins et accédez immédiatement aux meilleurs professionnels européens de votre secteur d'activité.
               </p>
               <div className="flex flex-col sm:flex-row gap-4 justify-center">

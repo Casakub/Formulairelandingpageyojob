@@ -236,16 +236,16 @@ export default function NotreReseau() {
                 Notre réseau européen
               </Badge>
 
-              <h1 className="text-white mb-6 max-w-3xl mx-auto">
+              <h1 className="text-white mb-6 max-w-3xl mx-auto text-[20px]">
                 Le plus grand réseau de recrutement européen : 500+ agences dans 27 pays
               </h1>
 
-              <p className="text-white/80 text-xl max-w-2xl mx-auto mb-12">
+              <p className="text-white/80 text-xl max-w-2xl mx-auto mb-12 text-[16px]">
                 Recrutez vos talents qualifiés en 48-72h grâce à nos agences partenaires vérifiées. Intérim, CDI, détachement : une solution 100% conforme et clé en main pour tous vos besoins de main-d'œuvre européenne.
               </p>
 
-              <h2 className="text-white mb-4">Une couverture européenne complète en temps réel</h2>
-              <p className="text-white/70 text-lg max-w-2xl mx-auto">
+              <h2 className="text-white mb-4 text-[20px]">Une couverture européenne complète en temps réel</h2>
+              <p className="text-white/70 text-lg max-w-2xl mx-auto text-[16px]">
                 27 pays, 500+ agences, des milliers de talents disponibles immédiatement. Explorez notre réseau pays par pays et identifiez les agences spécialisées dans votre secteur d'activité pour cibler votre recrutement avec précision.
               </p>
             </motion.div>
@@ -271,8 +271,8 @@ export default function NotreReseau() {
                 <Star className="w-4 h-4 mr-2" />
                 Nos pays phares
               </Badge>
-              <h2 className="text-white mb-4">Les destinations privilégiées</h2>
-              <p className="text-white/70 text-lg max-w-2xl mx-auto">
+              <h2 className="text-white mb-4 text-[20px]">Les destinations privilégiées</h2>
+              <p className="text-white/70 text-lg max-w-2xl mx-auto text-[16px]">
                 6 pays concentrent 70% de notre réseau avec une expertise sectorielle reconnue.
               </p>
             </motion.div>
@@ -336,8 +336,8 @@ export default function NotreReseau() {
                 <Globe className="w-4 h-4 mr-2" />
                 Nos autres pays
               </Badge>
-              <h2 className="text-white mb-4">Découvrez notre réseau complet</h2>
-              <p className="text-white/70 text-lg max-w-2xl mx-auto">
+              <h2 className="text-white mb-4 text-[20px]">Découvrez notre réseau complet</h2>
+              <p className="text-white/70 text-lg max-w-2xl mx-auto text-[16px]">
                 21 pays supplémentaires avec des agences spécialisées dans divers secteurs.
               </p>
             </motion.div>
@@ -390,8 +390,8 @@ export default function NotreReseau() {
                 <CheckCircle className="w-4 h-4 mr-2" />
                 Nos garanties
               </Badge>
-              <h2 className="text-white mb-4">Pourquoi choisir notre réseau ?</h2>
-              <p className="text-white/70 text-lg max-w-2xl mx-auto">
+              <h2 className="text-white mb-4 text-[20px]">Pourquoi choisir notre réseau ?</h2>
+              <p className="text-white/70 text-lg max-w-2xl mx-auto text-[16px]">
                 Un réseau construit sur la qualité, la fiabilité et la conformité réglementaire.
               </p>
             </motion.div>
@@ -411,7 +411,7 @@ export default function NotreReseau() {
                       <div className={`w-16 h-16 rounded-2xl bg-gradient-to-br ${advantage.color} flex items-center justify-center mb-4 mx-auto text-white shadow-lg group-hover:scale-110 transition-transform`}>
                         {advantage.icon}
                       </div>
-                      <h3 className="text-white mb-3">{advantage.title}</h3>
+                      <h3 className="text-white mb-3 text-[20px]">{advantage.title}</h3>
                       <p className="text-white/70 text-sm">{advantage.description}</p>
                     </CardContent>
                   </Card>
@@ -436,8 +436,8 @@ export default function NotreReseau() {
                 <Badge className="mb-4 px-6 py-2 bg-gradient-to-r from-orange-500 to-amber-500 border-0 text-white">
                   🚀 Nouveauté 2026
                 </Badge>
-                <h2 className="text-white mb-4">Marketplace d'agences européennes (à venir)</h2>
-                <p className="text-white/80 text-lg max-w-2xl mx-auto">
+                <h2 className="text-white mb-4 text-[20px]">Marketplace d'agences européennes (à venir)</h2>
+                <p className="text-white/80 text-lg max-w-2xl mx-auto text-[16px]">
                   Bientôt, accédez directement à toutes nos agences partenaires via une plateforme digitale innovante.
                 </p>
               </div>
@@ -492,8 +492,8 @@ export default function NotreReseau() {
               viewport={{ once: true }}
               className="bg-white/10 backdrop-blur-sm border border-white/20 rounded-3xl p-12"
             >
-              <h2 className="text-white mb-4">Activez notre réseau européen</h2>
-              <p className="text-white/80 text-lg mb-8 max-w-2xl mx-auto">
+              <h2 className="text-white mb-4 text-[20px]">Activez notre réseau européen</h2>
+              <p className="text-white/80 text-lg mb-8 max-w-2xl mx-auto text-[16px]">
                 Décrivez votre besoin et nous mobilisons immédiatement nos agences partenaires dans le pays de votre choix.
               </p>
               <div className="flex flex-col sm:flex-row gap-4 justify-center">

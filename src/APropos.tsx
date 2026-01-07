@@ -144,7 +144,7 @@ export default function APropos() {
         {/* ============================================ */}
         <header
           className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
-            isScrolled ? 'bg-white shadow-md' : 'bg-transparent'
+            isScrolled ? 'bg-white/10 backdrop-blur-md shadow-lg shadow-white/5' : 'bg-transparent'
           }`}
         >
           <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
@@ -153,7 +153,7 @@ export default function APropos() {
               <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#1E3A8A] to-[#06B6D4] flex items-center justify-center shadow-lg group-hover:shadow-cyan-500/50 transition-all">
                 <LogoSvg className="w-6 h-6 text-white" />
               </div>
-              <span className={`transition-colors ${isScrolled ? 'text-[#1E3A8A]' : 'text-white'}`}>
+              <span className="text-white transition-colors">
                 YOJOB
               </span>
             </a>
