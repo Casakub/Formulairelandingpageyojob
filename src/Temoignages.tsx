@@ -12,7 +12,13 @@ import {
   Factory,
   Briefcase,
   Clock,
-  Award
+  Award,
+  MapPin,
+  Phone,
+  Mail,
+  Linkedin,
+  Twitter,
+  Facebook
 } from 'lucide-react';
 import { Button } from './components/ui/button';
 import { Card, CardContent } from './components/ui/card';
@@ -152,7 +158,7 @@ export default function Temoignages() {
         {/* ============================================ */}
         <header
           className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
-            isScrolled ? 'bg-white shadow-md' : 'bg-transparent'
+            isScrolled ? 'bg-white/10 backdrop-blur-md shadow-lg shadow-white/5' : 'bg-transparent'
           }`}
         >
           <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
@@ -161,7 +167,7 @@ export default function Temoignages() {
               <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#1E3A8A] to-[#06B6D4] flex items-center justify-center shadow-lg group-hover:shadow-cyan-500/50 transition-all">
                 <LogoSvg className="w-6 h-6 text-white" />
               </div>
-              <span className={`transition-colors ${isScrolled ? 'text-[#1E3A8A]' : 'text-white'}`}>
+              <span className="text-white transition-colors">
                 YOJOB
               </span>
             </a>
@@ -173,54 +179,69 @@ export default function Temoignages() {
                 onLanguageChange={setCurrentLanguage}
                 availableLanguages={['fr', 'en']}
               />
-              <Button
-                onClick={() => (window.location.href = '/devis')}
-                className="rounded-full bg-white text-[#1E3A8A] hover:bg-cyan-50 shadow-lg"
+              <a 
+                href="/devis"
+                className="relative overflow-hidden group rounded-full bg-white text-[#1E3A8A] hover:bg-cyan-50 shadow-2xl hover:shadow-white/70 transition-all duration-300 hover:scale-105 px-6 py-2.5 inline-flex items-center justify-center"
               >
-                Demander un devis
-                <ArrowRight className="w-4 h-4 ml-2" />
-              </Button>
+                <span className="relative z-10 flex items-center">
+                  Demander un devis
+                  <ArrowRight className="ml-2 w-4 h-4" />
+                </span>
+                <div className="absolute inset-0 -translate-x-full group-hover:translate-x-full transition-transform duration-700 bg-gradient-to-r from-transparent via-white/40 to-transparent" />
+              </a>
             </div>
           </div>
         </header>
 
         {/* ============================================ */}
-        {/* HERO SECTION */}
+        {/* HERO SECTION - Background décoratif */}
         {/* ============================================ */}
-        <section className="relative pt-32 pb-20 overflow-hidden">
+        <section className="relative pt-20 pb-0 overflow-hidden">
           {/* Background decorations */}
           <div className="absolute inset-0 pointer-events-none">
             <div className="absolute top-20 left-10 w-72 h-72 bg-cyan-400/20 rounded-full blur-3xl" />
             <div className="absolute bottom-20 right-10 w-96 h-96 bg-violet-400/20 rounded-full blur-3xl" />
-          </div>
-
-          <div className="max-w-5xl mx-auto px-6 text-center relative z-10">
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6 }}
-            >
-              <Badge className="mb-6 px-6 py-2 bg-white/10 border-white/20 text-white backdrop-blur-sm">
-                <Star className="w-4 h-4 mr-2" />
-                Témoignages clients
-              </Badge>
-
-              <h1 className="text-white mb-6 max-w-3xl mx-auto">
-                Ils nous font confiance pour leur recrutement européen
-              </h1>
-
-              <p className="text-white/80 text-xl max-w-2xl mx-auto">
-                Découvrez comment YOJOB accompagne les entreprises françaises dans leurs besoins de recrutement en Europe avec succès et réactivité.
-              </p>
-            </motion.div>
+            <div className="absolute top-0 left-1/4 w-96 h-96 bg-cyan-400/10 rounded-full blur-3xl animate-pulse" />
+            <div className="absolute bottom-0 right-1/4 w-72 h-72 bg-violet-400/10 rounded-full blur-3xl" 
+                 style={{ animationDelay: '1s' }} />
+            {/* Particules décoratives */}
+            <div className="absolute top-10 left-10 w-2 h-2 bg-cyan-300/30 rounded-full animate-ping" />
+            <div className="absolute top-20 right-20 w-1 h-1 bg-violet-300/30 rounded-full animate-ping" 
+                 style={{ animationDelay: '0.5s' }} />
+            <div className="absolute bottom-10 left-1/3 w-1.5 h-1.5 bg-white/20 rounded-full animate-ping" 
+                 style={{ animationDelay: '1.5s' }} />
           </div>
         </section>
 
         {/* ============================================ */}
-        {/* STATS */}
+        {/* STATS + INTRO */}
         {/* ============================================ */}
         <section className="py-20 relative">
           <div className="max-w-6xl mx-auto px-6">
+            {/* Intro Section */}
+            <div className="max-w-5xl mx-auto text-center mb-16 relative z-10">
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.6 }}
+              >
+                <Badge className="mb-6 px-6 py-2 bg-white/10 border-white/20 text-white backdrop-blur-sm">
+                  <Star className="w-4 h-4 mr-2" />
+                  Témoignages clients
+                </Badge>
+
+                <h1 className="text-white mb-6 max-w-3xl mx-auto">
+                  Ils nous font confiance pour leur recrutement européen
+                </h1>
+
+                <p className="text-white/80 text-xl max-w-2xl mx-auto mb-12">
+                  Découvrez comment YOJOB accompagne les entreprises françaises dans leurs besoins de recrutement en Europe avec succès et réactivité.
+                </p>
+              </motion.div>
+            </div>
+
+            {/* Stats Grid */}
             <div className="grid grid-cols-2 lg:grid-cols-4 gap-6">
               {stats.map((stat, index) => (
                 <motion.div
@@ -431,35 +452,222 @@ export default function Temoignages() {
                 Faites comme eux, confiez-nous vos besoins de recrutement européen et bénéficiez d'un service 5 étoiles.
               </p>
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                <Button
-                  onClick={() => (window.location.href = '/devis')}
-                  size="lg"
-                  className="rounded-full bg-white text-[#1E3A8A] hover:bg-cyan-50 shadow-2xl hover:shadow-white/50 transition-all group"
+                <a 
+                  href="/devis"
+                  className="relative overflow-hidden group rounded-full bg-white text-[#1E3A8A] hover:bg-cyan-50 shadow-2xl hover:shadow-white/70 transition-all duration-300 hover:scale-105 px-8 py-3 inline-flex items-center justify-center"
                 >
                   <span className="relative z-10 flex items-center">
                     Demander un devis gratuit
-                    <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
+                    <ArrowRight className="ml-2 w-5 h-5" />
                   </span>
-                </Button>
-                <Button
-                  onClick={() => (window.location.href = '/')}
-                  size="lg"
-                  variant="outline"
-                  className="rounded-full border-white/30 text-white hover:bg-white/10"
+                  <div className="absolute inset-0 -translate-x-full group-hover:translate-x-full transition-transform duration-700 bg-gradient-to-r from-transparent via-white/40 to-transparent" />
+                </a>
+                <a
+                  href="/"
+                  className="rounded-full border border-white/30 bg-white/10 backdrop-blur-sm text-white hover:bg-white/20 hover:border-white/60 transition-all px-8 py-3 inline-flex items-center justify-center"
                 >
                   Retour à l'accueil
-                </Button>
+                </a>
               </div>
             </motion.div>
           </div>
         </section>
 
-        {/* Footer minimal */}
-        <footer className="py-8 border-t border-white/10">
-          <div className="max-w-7xl mx-auto px-6 text-center">
-            <p className="text-white/50 text-sm">
-              © 2025 YOJOB. Tous droits réservés.
-            </p>
+        {/* Footer complet */}
+        <footer className="relative overflow-hidden bg-gradient-to-b from-[#0a0e27] to-[#1a1f3a] text-white py-12 lg:py-16">
+          {/* Radial gradients */}
+          <div className="absolute inset-0" style={{
+            backgroundImage: 'radial-gradient(circle at 20% 50%, rgba(6, 182, 212, 0.3) 0%, transparent 50%), radial-gradient(circle at 80% 80%, rgba(124, 58, 237, 0.3) 0%, transparent 50%)',
+          }} />
+
+          {/* Grid pattern overlay */}
+          <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGRlZnM+PHBhdHRlcm4gaWQ9ImdyaWQiIHdpZHRoPSI2MCIgaGVpZ2h0PSI2MCIgcGF0dGVyblVuaXRzPSJ1c2VyU3BhY2VPblVzZSI+PHBhdGggZD0iTSAxMCAwIEwgMCAwIDAgMTAiIGZpbGw9Im5vbmUiIHN0cm9rZT0id2hpdGUiIHN0cm9rZS13aWR0aD0iMC41Ii8+PC9wYXR0ZXJuPjwvZGVmcz48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSJ1cmwoI2dyaWQpIi8+PC9zdmc+')] opacity-10" />
+
+          <div className="container mx-auto px-4 relative z-10">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 lg:gap-10 mb-10 lg:mb-12">
+              {/* Column 1: Logo & Description */}
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.6 }}
+              >
+                <motion.div 
+                  className="w-32 h-32 inline-block mb-6"
+                  whileHover={{ scale: 1.05, y: -2 }}
+                  transition={{ duration: 0.3 }}
+                >
+                  <LogoSvg 
+                    className="w-full h-full" 
+                    effects={true}
+                    aria-label="YOJOB"
+                  />
+                </motion.div>
+                <p className="text-white/80 mb-[24px] leading-relaxed max-w-xs text-[13px] mt-[-46px] mr-[0px] ml-[0px]">
+                  Leader du recrutement européen. 500+ agences partenaires dans 27 pays pour connecter les talents aux opportunités.
+                </p>
+                <div className="flex gap-3">
+                  {[
+                    { icon: Linkedin, href: '#', color: 'cyan' },
+                    { icon: Twitter, href: '#', color: 'violet' },
+                    { icon: Facebook, href: '#', color: 'blue' }
+                  ].map((social, index) => (
+                    <motion.a
+                      key={index}
+                      href={social.href}
+                      className="w-10 h-10 bg-white/10 backdrop-blur-md border border-white/20 rounded-full flex items-center justify-center hover:bg-white/20 transition-all duration-300 group"
+                      whileHover={{ scale: 1.1, y: -3 }}
+                      transition={{ duration: 0.3 }}
+                    >
+                      <social.icon className={`w-5 h-5 group-hover:drop-shadow-[0_0_8px_rgba(6,182,212,0.8)] transition-all`} />
+                    </motion.a>
+                  ))}
+                </div>
+              </motion.div>
+
+              {/* Column 2: Services */}
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.6, delay: 0.1 }}
+              >
+                <h3 className="text-white mb-4 text-cyan-300">
+                  Services
+                </h3>
+                <ul className="space-y-2.5 text-sm">
+                  {[
+                    { label: 'Intérim européen', href: '/services/interim-europeen' },
+                    { label: 'Recrutement spécialisé', href: '/services/recrutement-specialise' },
+                    { label: 'Conseil & Conformité', href: '/services/conseil-conformite' },
+                    { label: 'Détachement de personnel', href: '/services/detachement-personnel' }
+                  ].map((link, index) => (
+                    <motion.li key={index} whileHover={{ x: 5 }} transition={{ duration: 0.2 }}>
+                      <a href={link.href} className="text-white/80 hover:text-white transition-colors inline-flex items-center gap-2 group">
+                        <ArrowRight className="w-3 h-3 opacity-0 group-hover:opacity-100 transition-opacity" />
+                        {link.label}
+                      </a>
+                    </motion.li>
+                  ))}
+                </ul>
+              </motion.div>
+
+              {/* Column 3: Company */}
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.6, delay: 0.2 }}
+              >
+                <h3 className="text-white mb-4 text-cyan-300">
+                  Entreprise
+                </h3>
+                <ul className="space-y-2.5 text-sm">
+                  <motion.li whileHover={{ x: 5 }} transition={{ duration: 0.2 }}>
+                    <a href="/a-propos" className="text-white/80 hover:text-white transition-colors inline-flex items-center gap-2 group">
+                      <ArrowRight className="w-3 h-3 opacity-0 group-hover:opacity-100 transition-opacity" />
+                      À propos
+                    </a>
+                  </motion.li>
+                  <motion.li whileHover={{ x: 5 }} transition={{ duration: 0.2 }}>
+                    <a href="/notre-reseau" className="text-white/80 hover:text-white transition-colors inline-flex items-center gap-2 group">
+                      <ArrowRight className="w-3 h-3 opacity-0 group-hover:opacity-100 transition-opacity" />
+                      Notre réseau
+                    </a>
+                  </motion.li>
+                  <motion.li whileHover={{ x: 5 }} transition={{ duration: 0.2 }}>
+                    <a href="/nos-secteurs" className="text-white/80 hover:text-white transition-colors inline-flex items-center gap-2 group">
+                      <ArrowRight className="w-3 h-3 opacity-0 group-hover:opacity-100 transition-opacity" />
+                      Nos secteurs
+                    </a>
+                  </motion.li>
+                  <motion.li whileHover={{ x: 5 }} transition={{ duration: 0.2 }}>
+                    <a href="/temoignages" className="text-white/80 hover:text-white transition-colors inline-flex items-center gap-2 group">
+                      <ArrowRight className="w-3 h-3 opacity-0 group-hover:opacity-100 transition-opacity" />
+                      Témoignages
+                    </a>
+                  </motion.li>
+                </ul>
+              </motion.div>
+
+              {/* Column 4: Contact */}
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.6, delay: 0.3 }}
+              >
+                <h3 className="text-white mb-4 text-cyan-300">
+                  Contact
+                </h3>
+                <ul className="space-y-3 text-sm">
+                  <motion.li 
+                    className="flex items-start gap-3 p-2 rounded-lg bg-white/5 backdrop-blur-sm hover:bg-white/10 transition-all duration-300"
+                    whileHover={{ x: 3 }}
+                  >
+                    <MapPin className="w-5 h-5 text-cyan-400 flex-shrink-0 drop-shadow-[0_0_8px_rgba(6,182,212,0.6)]" />
+                    <span className="text-white/90">Bordeaux, France</span>
+                  </motion.li>
+                  <motion.li 
+                    className="flex items-center gap-3 p-2 rounded-lg bg-white/5 backdrop-blur-sm hover:bg-white/10 transition-all duration-300"
+                    whileHover={{ x: 3 }}
+                  >
+                    <Phone className="w-5 h-5 text-violet-400 drop-shadow-[0_0_8px_rgba(124,58,237,0.6)]" />
+                    <a href="tel:+33650622524" className="text-white/90 hover:text-cyan-400 transition-colors">
+                      +33 6 50 62 25 24
+                    </a>
+                  </motion.li>
+                  <motion.li 
+                    className="flex items-center gap-3 p-2 rounded-lg bg-white/5 backdrop-blur-sm hover:bg-white/10 transition-all duration-300"
+                    whileHover={{ x: 3 }}
+                  >
+                    <Mail className="w-5 h-5 text-cyan-400 drop-shadow-[0_0_8px_rgba(6,182,212,0.6)]" />
+                    <a
+                      href="mailto:contact@yojob.fr"
+                      className="text-white/90 hover:text-cyan-400 transition-colors"
+                    >
+                      contact@yojob.fr
+                    </a>
+                  </motion.li>
+                </ul>
+              </motion.div>
+            </div>
+
+            {/* Copyright */}
+            <motion.div 
+              className="border-t border-white/20 pt-6 lg:pt-8 text-center"
+              initial={{ opacity: 0 }}
+              whileInView={{ opacity: 1 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.6, delay: 0.4 }}
+            >
+              <div className="flex flex-col sm:flex-row items-center justify-center gap-2 text-sm text-white/80 mb-3">
+                <p>© 2025 YOJOB. Tous droits réservés.</p>
+              </div>
+              {/* Footer Links */}
+              <div className="flex flex-wrap items-center justify-center gap-4 text-xs text-white/50">
+                <a 
+                  href="/privacy" 
+                  className="hover:text-cyan-400 transition-colors underline decoration-dotted"
+                >
+                  Politique de confidentialité
+                </a>
+                <span className="text-white/30">•</span>
+                <a 
+                  href="/legal" 
+                  className="hover:text-cyan-400 transition-colors underline decoration-dotted"
+                >
+                  Mentions légales
+                </a>
+                <span className="text-white/30">•</span>
+                <a 
+                  href="/cgv" 
+                  className="hover:text-cyan-400 transition-colors underline decoration-dotted"
+                >
+                  CGV
+                </a>
+              </div>
+            </motion.div>
           </div>
         </footer>
       </div>

@@ -85,6 +85,30 @@ export default function NotreReseau() {
     }
   ];
 
+  const otherCountries = [
+    { name: "Allemagne", flag: "🇩🇪", agencies: 38 },
+    { name: "Pays-Bas", flag: "🇳🇱", agencies: 32 },
+    { name: "Belgique", flag: "🇧🇪", agencies: 28 },
+    { name: "République Tchèque", flag: "🇨🇿", agencies: 24 },
+    { name: "Hongrie", flag: "🇭🇺", agencies: 22 },
+    { name: "Bulgarie", flag: "🇧🇬", agencies: 20 },
+    { name: "Slovaquie", flag: "🇸🇰", agencies: 18 },
+    { name: "Croatie", flag: "🇭🇷", agencies: 16 },
+    { name: "Grèce", flag: "🇬🇷", agencies: 15 },
+    { name: "Autriche", flag: "🇦🇹", agencies: 14 },
+    { name: "Suède", flag: "🇸🇪", agencies: 12 },
+    { name: "Lituanie", flag: "🇱🇹", agencies: 11 },
+    { name: "Lettonie", flag: "🇱🇻", agencies: 10 },
+    { name: "Slovénie", flag: "🇸🇮", agencies: 9 },
+    { name: "Danemark", flag: "🇩🇰", agencies: 8 },
+    { name: "Irlande", flag: "🇮🇪", agencies: 7 },
+    { name: "Finlande", flag: "🇫🇮", agencies: 6 },
+    { name: "Estonie", flag: "🇪🇪", agencies: 5 },
+    { name: "Luxembourg", flag: "🇱🇺", agencies: 4 },
+    { name: "Chypre", flag: "🇨🇾", agencies: 3 },
+    { name: "Malte", flag: "🇲🇹", agencies: 2 }
+  ];
+
   const advantages = [
     {
       icon: <Globe className="w-8 h-8" />,
@@ -166,13 +190,16 @@ export default function NotreReseau() {
                 onLanguageChange={setCurrentLanguage}
                 availableLanguages={['fr', 'en']}
               />
-              <Button
-                onClick={() => (window.location.href = '/devis')}
-                className="rounded-full bg-white text-[#1E3A8A] hover:bg-cyan-50 shadow-lg"
+              <a 
+                href="/devis"
+                className="relative overflow-hidden group rounded-full bg-white text-[#1E3A8A] hover:bg-cyan-50 shadow-2xl hover:shadow-white/70 transition-all duration-300 hover:scale-105 px-6 py-2.5 inline-flex items-center justify-center"
               >
-                Demander un devis
-                <ArrowRight className="w-4 h-4 ml-2" />
-              </Button>
+                <span className="relative z-10 flex items-center">
+                  Demander un devis
+                  <ArrowRight className="ml-2 w-4 h-4" />
+                </span>
+                <div className="absolute inset-0 -translate-x-full group-hover:translate-x-full transition-transform duration-700 bg-gradient-to-r from-transparent via-white/40 to-transparent" />
+              </a>
             </div>
           </div>
         </header>
@@ -279,6 +306,60 @@ export default function NotreReseau() {
                             {specialty}
                           </Badge>
                         ))}
+                      </div>
+                      <div className="mt-4 pt-4 border-t border-white/10">
+                        <div className="flex items-center justify-between text-xs text-white/60">
+                          <span>Délai moyen</span>
+                          <span className="text-green-400">48-72h</span>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                </motion.div>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* ============================================ */}
+        {/* AUTRES PAYS */}
+        {/* ============================================ */}
+        <section className="py-20 relative">
+          <div className="max-w-6xl mx-auto px-6">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              className="text-center mb-12"
+            >
+              <Badge className="mb-4 px-6 py-2 bg-white/10 border-white/20 text-white backdrop-blur-sm">
+                <Globe className="w-4 h-4 mr-2" />
+                Nos autres pays
+              </Badge>
+              <h2 className="text-white mb-4">Découvrez notre réseau complet</h2>
+              <p className="text-white/70 text-lg max-w-2xl mx-auto">
+                21 pays supplémentaires avec des agences spécialisées dans divers secteurs.
+              </p>
+            </motion.div>
+
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {otherCountries.map((country, index) => (
+                <motion.div
+                  key={index}
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: index * 0.1 }}
+                  whileHover={{ y: -8 }}
+                >
+                  <Card className="h-full border border-white/10 bg-white/5 backdrop-blur-sm hover:bg-white/10 hover:border-cyan-400/50 transition-all group">
+                    <CardContent className="p-6">
+                      <div className="flex items-center gap-3 mb-4">
+                        <div className="text-4xl">{country.flag}</div>
+                        <div>
+                          <h3 className="text-white">{country.name}</h3>
+                          <p className="text-cyan-400 text-sm">{country.agencies} agences</p>
+                        </div>
                       </div>
                       <div className="mt-4 pt-4 border-t border-white/10">
                         <div className="flex items-center justify-between text-xs text-white/60">
