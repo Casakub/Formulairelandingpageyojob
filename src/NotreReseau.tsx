@@ -234,7 +234,7 @@ export default function NotreReseau() {
         {/* ============================================ */}
         {/* HERO + CARTE INTERACTIVE FUSIONNÉS */}
         {/* ============================================ */}
-        <section className="relative pt-32 pb-20 overflow-hidden">
+        <section className="relative pt-32 pb-8 overflow-hidden">
           {/* Background decorations */}
           <div className="absolute inset-0 pointer-events-none">
             <div className="absolute top-20 left-10 w-72 h-72 bg-cyan-400/20 rounded-full blur-3xl" />
@@ -271,15 +271,23 @@ export default function NotreReseau() {
                 Recrutez vos talents qualifiés en Europe grâce à nos agences partenaires vérifiées. Intérim, CDI, détachement : une solution 100% conforme et clé en main pour tous vos besoins de main-d'œuvre européenne, avec respect des formalités légales (A1, SIPSI, vérifications).
               </p>
 
-              <h2 className="text-white mb-4 text-[20px]">Une couverture européenne complète en temps réel</h2>
-              <p className="text-white/70 text-lg max-w-2xl mx-auto text-[16px]">
-                27 pays, 500+ agences, des milliers de talents disponibles immédiatement. Explorez notre réseau pays par pays et identifiez les agences spécialisées dans votre secteur d'activité pour cibler votre recrutement avec précision.
-              </p>
-            </motion.div>
+              <div className="flex justify-center mb-12">
+                <EuropeMap variant="network" />
+              </div>
 
-            <div className="flex justify-center">
-              <EuropeMap variant="network" />
-            </div>
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.6 }}
+                className="text-center"
+              >
+                <h2 className="text-white mb-4 text-[20px]">Une couverture européenne complète en temps réel</h2>
+                <p className="text-white/70 text-lg max-w-2xl mx-auto text-[16px]">
+                  27 pays, 500+ agences, des milliers de talents disponibles immédiatement. Explorez notre réseau pays par pays et identifiez les agences spécialisées dans votre secteur d'activité pour cibler votre recrutement avec précision.
+                </p>
+              </motion.div>
+            </motion.div>
           </div>
         </section>
 
