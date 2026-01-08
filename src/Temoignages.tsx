@@ -43,7 +43,7 @@ export default function Temoignages() {
 
   const caseStudies = [
     {
-      company: "Bouygues Construction",
+      company: "Groupe de construction français",
       sector: "BTP",
       icon: <Building2 className="w-8 h-8" />,
       color: "from-orange-500 to-orange-600",
@@ -56,12 +56,12 @@ export default function Temoignages() {
         "Renouvellement du partenariat"
       ],
       testimonial: "YOJOB a été notre sauveur ! En moins de 2 semaines, nous avions toute l'équipe nécessaire sur le chantier. Leur gestion administrative est impeccable.",
-      author: "Marc Dubois",
+      author: "M. Dubois",
       role: "Directeur des Ressources Humaines",
       rating: 5
     },
     {
-      company: "Lactalis",
+      company: "Leader agroalimentaire européen",
       sector: "Industrie agroalimentaire",
       icon: <Factory className="w-8 h-8" />,
       color: "from-blue-500 to-cyan-600",
@@ -74,12 +74,12 @@ export default function Temoignages() {
         "Extension du contrat à 50 postes"
       ],
       testimonial: "La réactivité et le professionnalisme de YOJOB nous ont permis de tenir notre planning. Les profils étaient parfaitement adaptés à nos besoins.",
-      author: "Sophie Martin",
+      author: "Mme Martin",
       role: "Responsable Production",
       rating: 5
     },
     {
-      company: "Groupe AccorHotels",
+      company: "Chaîne hôtelière internationale",
       sector: "Hôtellerie",
       icon: <Briefcase className="w-8 h-8" />,
       color: "from-red-500 to-rose-600",
@@ -92,7 +92,7 @@ export default function Temoignages() {
         "Fidélisation pour saison suivante : 78%"
       ],
       testimonial: "Un partenaire de confiance pour nos pics d'activité. YOJOB comprend parfaitement les enjeux de l'hôtellerie et nous livre des profils expérimentés.",
-      author: "Jean-Pierre Renard",
+      author: "M. Renard",
       role: "Directeur Régional",
       rating: 5
     }

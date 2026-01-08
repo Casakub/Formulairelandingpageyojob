@@ -105,13 +105,8 @@ export function TestimonialCarousel() {
                 <div>
                   <p className="text-white">{currentTestimonial.name}</p>
                   <p className="text-cyan-200 text-sm">
-                    {currentTestimonial.role} - {currentTestimonial.company}
+                    {currentTestimonial.role} - Secteur {currentTestimonial.sector}
                   </p>
-                  {currentTestimonial.sector && (
-                    <p className="text-white/60 text-xs mt-1">
-                      Secteur : {currentTestimonial.sector}
-                    </p>
-                  )}
                 </div>
               </div>
             </div>
