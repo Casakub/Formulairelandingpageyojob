@@ -243,7 +243,7 @@ export default function NotreReseau() {
               </h1>
 
               <p className="text-white/80 text-xl max-w-2xl mx-auto mb-12 text-[16px]">
-                Recrutez vos talents qualifiés en 48-72h grâce à nos agences partenaires vérifiées. Intérim, CDI, détachement : une solution 100% conforme et clé en main pour tous vos besoins de main-d'œuvre européenne.
+                Recrutez vos talents qualifiés en Europe grâce à nos agences partenaires vérifiées. Intérim, CDI, détachement : une solution 100% conforme et clé en main pour tous vos besoins de main-d'œuvre européenne, avec respect des formalités légales (A1, SIPSI, vérifications).
               </p>
 
               <h2 className="text-white mb-4 text-[20px]">Une couverture européenne complète en temps réel</h2>
@@ -312,7 +312,7 @@ export default function NotreReseau() {
                       <div className="mt-4 pt-4 border-t border-white/10">
                         <div className="flex items-center justify-between text-xs text-white/60">
                           <span>Délai moyen</span>
-                          <span className="text-green-400">48-72h</span>
+                          <span className="text-green-400">7-14 jours</span>
                         </div>
                       </div>
                     </CardContent>
@@ -366,7 +366,7 @@ export default function NotreReseau() {
                       <div className="mt-4 pt-4 border-t border-white/10">
                         <div className="flex items-center justify-between text-xs text-white/60">
                           <span>Délai moyen</span>
-                          <span className="text-green-400">48-72h</span>
+                          <span className="text-green-400">7-14 jours</span>
                         </div>
                       </div>
                     </CardContent>

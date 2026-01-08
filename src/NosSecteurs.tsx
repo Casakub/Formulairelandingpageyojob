@@ -151,7 +151,7 @@ export default function NosSecteurs() {
     {
       icon: <TrendingUp className="w-8 h-8" />,
       title: "Disponibilité rapide",
-      description: "Mise à disposition sous 48-72h pour répondre à vos urgences",
+      description: "Personnel qualifié dans les délais conformes au détachement européen",
       color: "from-orange-500 to-amber-600"
     }
   ];

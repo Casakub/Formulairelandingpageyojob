@@ -284,7 +284,7 @@ export function SignatureOnline({ token }: SignatureOnlineProps) {
                   </li>
                   <li className="flex items-start gap-2">
                     <Check className="w-4 h-4 text-green-600 mt-0.5 flex-shrink-0" />
-                    <span>Notre équipe va prendre contact avec vous sous 24-48h</span>
+                    <span>Notre équipe va prendre contact avec vous sous 24h ouvrées</span>
                   </li>
                   <li className="flex items-start gap-2">
                     <Check className="w-4 h-4 text-green-600 mt-0.5 flex-shrink-0" />

@@ -83,7 +83,7 @@ export default function ServiceInterimEuropeen() {
     },
     {
       question: "Quels sont les délais pour recevoir des candidats ?",
-      answer: "En moyenne, nous pouvons vous proposer des profils qualifiés sous 48 à 72 heures après réception de votre demande. Pour des besoins urgents, notre équipe peut activer notre réseau en mode accéléré pour des délais encore plus courts."
+      answer: "Les délais dépendent de plusieurs facteurs : disponibilité des profils, formalités de détachement obligatoires (A1, SIPSI, vérifications), et organisation logistique. Pour du personnel déjà disponible et régulièrement détaché, comptez 7 à 14 jours minimum après vérification de conformité. Si un recrutement est nécessaire, prévoyez 2 à 4 semaines."
     },
     {
       question: "Qui gère les formalités administratives (A1, contrat, paie) ?",
@@ -115,7 +115,7 @@ export default function ServiceInterimEuropeen() {
     {
       icon: <Zap className="w-8 h-8" />,
       title: "Réactivité",
-      description: "Profils qualifiés disponibles sous 48-72h",
+      description: "Personnel qualifié sous 7-14 jours (hors recrutement)",
       color: "from-violet-500 to-violet-600"
     },
     {
@@ -546,7 +546,7 @@ export default function ServiceInterimEuropeen() {
                 Prêt à recruter du personnel temporaire en Europe ?
               </h2>
               <p className="text-white/80 mb-8 leading-relaxed text-[16px]">
-                Décrivez-nous votre besoin et recevez des profils qualifiés sous 48-72h
+                Décrivez-nous votre besoin et recevez des profils qualifiés conformes après vérification des obligations légales
               </p>
               <a href="/devis">
                 <Button className="relative overflow-hidden group rounded-full bg-gradient-to-r from-cyan-500 to-violet-600 hover:from-cyan-600 hover:to-violet-700 text-white shadow-2xl hover:shadow-cyan-500/50 transition-all px-12 py-6 text-lg">

@@ -778,7 +778,7 @@ export default function AppLanding() {
                 transition={{ delay: 0.4 }}
                 className="text-white/95 text-lg lg:text-xl mb-4 lg:mb-8 leading-relaxed"
               >
-                {content.hero?.subtitle || "Recrutez vos talents qualifiés en 48-72h grâce à nos agences partenaires vérifiées. Intérim, CDI, détachement : une solution 100% conforme et clé en main pour tous vos besoins de main-d'œuvre européenne."}
+                {content.hero?.subtitle || "Recrutez vos talents qualifiés en Europe grâce à nos agences partenaires vérifiées. Intérim, CDI, détachement : une solution 100% conforme et clé en main pour tous vos besoins de main-d'œuvre européenne, avec respect des formalités légales (A1, SIPSI, vérifications)."}
               </motion.p>
 
               {/* Stats in glassmorphism cards - Desktop only */}

@@ -341,7 +341,7 @@ export default function APropos() {
                       </li>
                       <li className="flex items-start gap-3">
                         <CheckCircle className="w-5 h-5 text-green-400 mt-1 flex-shrink-0" />
-                        <span>Mise à disposition sous 48-72h</span>
+                        <span>Mise à disposition conforme aux délais légaux de détachement</span>
                       </li>
                     </ul>
                   </CardContent>

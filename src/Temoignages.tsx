@@ -119,7 +119,7 @@ export default function Temoignages() {
     },
     {
       icon: <Clock className="w-8 h-8" />,
-      value: "48-72h",
+      value: "7-14 jours",
       label: "Délai moyen de mise à disposition",
       color: "from-orange-500 to-amber-600"
     }
@@ -139,7 +139,7 @@ export default function Temoignages() {
     {
       icon: <Clock className="w-6 h-6" />,
       title: "Réactivité",
-      description: "Mise à disposition sous 48-72h"
+      description: "Mise à disposition conforme aux délais légaux"
     },
     {
       icon: <Award className="w-6 h-6" />,
