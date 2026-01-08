@@ -998,8 +998,8 @@ export default function AppLanding() {
                 {content.stats?.badge || FRENCH_FALLBACKS.stats.badge}
               </Badge>
             </motion.div>
-            <h2 className="text-gray-900 mb-4">{content.stats?.title || FRENCH_FALLBACKS.stats.title}</h2>
-            <p className="text-gray-600 text-xl max-w-2xl mx-auto">
+            <h2 className="text-gray-900 mb-4 text-[20px]">{content.stats?.title || FRENCH_FALLBACKS.stats.title}</h2>
+            <p className="text-gray-600 text-xl max-w-2xl mx-auto text-[16px]">
               {content.stats?.subtitle || FRENCH_FALLBACKS.stats.subtitle}
             </p>
           </motion.div>
@@ -1138,8 +1138,8 @@ export default function AppLanding() {
               <span className="text-2xl">⚡</span>
               <span className="text-white/90 tracking-wide">{content.services?.badge || '💼 Our Services'}</span>
             </motion.div>
-            <h2 className="text-white mb-6">{content.services?.title || 'Solutions adapted to your needs'}</h2>
-            <p className="text-white/80 text-xl max-w-2xl mx-auto">
+            <h2 className="text-white mb-6 text-[20px]">{content.services?.title || 'Solutions adapted to your needs'}</h2>
+            <p className="text-white/80 text-xl max-w-2xl mx-auto text-[16px]">
               {content.services?.subtitle || 'We support you in all your European recruitment procedures.'}
             </p>
           </motion.div>
@@ -1183,7 +1183,7 @@ export default function AppLanding() {
                       >
                         <IconComponent className="w-10 h-10 text-white" />
                       </div>
-                      <CardTitle className="text-white mb-3 text-center">{service.title}</CardTitle>
+                      <CardTitle className="text-white mb-3 text-center text-[20px]">{service.title}</CardTitle>
                     </CardHeader>
                     <CardContent className="relative">
                       <p className="text-gray-300 text-center text-sm leading-relaxed mb-4">
@@ -1251,8 +1251,8 @@ export default function AppLanding() {
                 {content.network?.badge || '🌍 European Network'}
               </div>
             </motion.div>
-            <h2 className="text-white mb-6">{content.network?.title || 'A network covering all of Europe'}</h2>
-            <p className="text-cyan-100 text-xl max-w-3xl mx-auto">
+            <h2 className="text-white mb-6 text-[20px]">{content.network?.title || 'A network covering all of Europe'}</h2>
+            <p className="text-cyan-100 text-xl max-w-3xl mx-auto text-[16px]">
               {content.network?.subtitle || 'More than 500 partner agencies in 27 countries to meet all your recruitment needs.'}
             </p>
           </motion.div>
@@ -1427,8 +1427,8 @@ export default function AppLanding() {
                 {content.steps?.badge || '🎯 How It Works'}
               </Badge>
             </motion.div>
-            <h2 className="text-gray-900 mb-4">{content.steps?.title || 'A simple and efficient process'}</h2>
-            <p className="text-gray-600 text-xl max-w-2xl mx-auto">
+            <h2 className="text-gray-900 mb-4 text-[20px]">{content.steps?.title || 'A simple and efficient process'}</h2>
+            <p className="text-gray-600 text-xl max-w-2xl mx-auto text-[16px]">
               {content.steps?.subtitle || 'In 4 steps, find the talents you need anywhere in Europe.'}
             </p>
           </motion.div>
@@ -1527,8 +1527,8 @@ export default function AppLanding() {
               <span className="text-2xl">⭐</span>
               <span className="text-white/90 tracking-wide">{content.testimonials?.badge || 'Témoignages clients'}</span>
             </motion.div>
-            <h2 className="text-white mb-6">{content.testimonials?.title || 'Ils nous font confiance'}</h2>
-            <p className="text-white/80 text-xl max-w-2xl mx-auto">
+            <h2 className="text-white mb-6 text-[20px]">{content.testimonials?.title || 'Ils nous font confiance'}</h2>
+            <p className="text-white/80 text-xl max-w-2xl mx-auto text-[16px]">
               {content.testimonials?.subtitle || 'Découvrez les retours d\'expérience de nos clients satisfaits à travers toute l\'Europe'}
             </p>
           </motion.div>
@@ -1555,8 +1555,8 @@ export default function AppLanding() {
               <span className="text-2xl">{content?.sectors?.badge?.split(' ')[0] || '🎯'}</span>
               <span className="text-[#1E3A8A] tracking-wide">{content?.sectors?.badge?.substring(2) || 'Tous secteurs'}</span>
             </motion.div>
-            <h2 className="text-gray-900 mb-4">{content?.sectors?.title || 'Tous secteurs, tous profils'}</h2>
-            <p className="text-gray-600 text-xl max-w-3xl mx-auto">
+            <h2 className="text-gray-900 mb-4 text-[20px]">{content?.sectors?.title || 'Tous secteurs, tous profils'}</h2>
+            <p className="text-gray-600 text-xl max-w-3xl mx-auto text-[16px]">
               {content?.sectors?.subtitle || 'Nous recrutons pour l\'ensemble des secteurs d\'activité à travers toute l\'Europe'}
             </p>
           </motion.div>

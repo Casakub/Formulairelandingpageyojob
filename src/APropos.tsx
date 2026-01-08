@@ -202,11 +202,11 @@ export default function APropos() {
                 À propos de YOJOB
               </Badge>
 
-              <h1 className="text-white mb-6 max-w-3xl mx-auto">
+              <h1 className="text-white mb-6 max-w-3xl mx-auto text-[20px]">
                 Le courtage en recrutement européen, réinventé
               </h1>
 
-              <p className="text-white/80 text-xl max-w-2xl mx-auto mb-8">
+              <p className="text-white/80 text-xl max-w-2xl mx-auto mb-8 text-[16px]">
                 Depuis 2014, nous connectons les entreprises françaises aux meilleurs talents européens à travers un réseau de 500+ agences partenaires dans 27 pays.
               </p>
 
