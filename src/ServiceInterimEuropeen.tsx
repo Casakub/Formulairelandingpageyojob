@@ -1,38 +1,38 @@
 import { useState } from 'react';
-import { Helmet, HelmetProvider } from 'react-helmet-async';
 import { motion } from 'motion/react';
+import { Helmet, HelmetProvider } from 'react-helmet-async';
 import {
-  Users,
-  Globe,
-  FileText,
-  CheckCircle,
-  ArrowRight,
   Building2,
   Target,
+  CheckCircle,
+  Globe,
+  FileText,
   Zap,
   ShieldCheck,
-  Clock,
   Network,
   UserCheck,
-  ChevronDown,
-  ChevronUp,
   Factory,
-  Wrench,
-  UtensilsCrossed,
-  Truck,
+  Apple,
   Car,
+  Truck,
+  UtensilsCrossed,
   Trees,
   Package,
-  ArrowLeft,
-  Star,
   Sparkles,
-  Apple
+  Star,
+  ChevronDown,
+  ChevronUp,
+  ArrowRight
 } from 'lucide-react';
+import { Badge } from './components/ui/badge';
 import { Button } from './components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from './components/ui/card';
-import { Badge } from './components/ui/badge';
 import { LogoSvg } from './imports/YojobLogoComplete';
 import { LanguageSelector } from './components/landing/LanguageSelector';
+import { Footer } from './components/landing/Footer';
+import { useServiceTranslation } from './src/i18n/services/useServiceTranslation';
+import { footerTranslations } from './src/i18n/services/footer';
+import type { SupportedLanguage } from './src/i18n/types';
 
 interface FAQItemProps {
   question: string;
@@ -76,107 +76,92 @@ function FAQItem({ question, answer }: FAQItemProps) {
 }
 
 export default function ServiceInterimEuropeen() {
-  const [language, setLanguage] = useState('fr');
+  const [language, setLanguage] = useState<SupportedLanguage>('fr');
 
-  const faqs = [
-    {
-      question: "Quels pays sont couverts par votre réseau d'intérim ?",
-      answer: "Notre réseau couvre les 27 pays de l'Union Européenne avec plus de 500 agences partenaires certifiées. Nous avons une présence particulièrement forte en Europe de l'Ouest (France, Allemagne, Belgique, Espagne, Portugal) et en Europe de l'Est (Pologne, Roumanie, Bulgarie)."
-    },
-    {
-      question: "Quels sont les délais pour recevoir des candidats ?",
-      answer: "Les délais dépendent de plusieurs facteurs : disponibilité des profils, formalités de détachement obligatoires (A1, SIPSI, vérifications), et organisation logistique. Pour du personnel déjà disponible et régulièrement détaché, comptez 7 à 14 jours minimum après vérification de conformité. Si un recrutement est nécessaire, prévoyez 2 à 4 semaines."
-    },
-    {
-      question: "Qui gère les formalités administratives (A1, contrat, paie) ?",
-      answer: "L'agence d'emploi temporaire (ETT) partenaire du pays d'origine est l'employeur légal et gère l'ensemble des formalités : contrat de travail, bulletin de paie, cotisations sociales, formulaire A1 pour le détachement, et déclaration SIPSI en France."
-    },
-    {
-      question: "Quelle est la durée minimum/maximum d'une mission ?",
-      answer: "Les missions d'intérim peuvent aller de quelques jours à plusieurs mois selon vos besoins. La durée maximale de détachement en France est généralement de 24 mois, conformément à la réglementation européenne."
-    },
-    {
-      question: "Comment sont sélectionnés les intérimaires ?",
-      answer: "Nos agences partenaires sélectionnent les candidats selon vos critères précis : qualifications professionnelles, expérience, certifications requises, niveau de langue. Nous vérifions également leurs documents d'identité, diplômes et références avant de vous les présenter."
-    }
-  ];
+  // Get translations for current language
+  const t = useServiceTranslation('interimEuropeen', language);
 
-  const advantages = [
-    {
-      icon: <Globe className="w-8 h-8" />,
-      title: "Couverture européenne",
-      description: "Accès à 27 pays et 500+ agences certifiées",
-      color: "from-blue-500 to-blue-600"
-    },
-    {
-      icon: <FileText className="w-8 h-8" />,
-      title: "Gestion administrative",
-      description: "Formalités A1, contrats, paie gérés par l'ETT",
-      color: "from-cyan-500 to-cyan-600"
-    },
-    {
-      icon: <Zap className="w-8 h-8" />,
-      title: "Réactivité",
-      description: "Personnel qualifié sous 7-14 jours (hors recrutement)",
-      color: "from-violet-500 to-violet-600"
-    },
-    {
-      icon: <ShieldCheck className="w-8 h-8" />,
-      title: "Conformité garantie",
-      description: "Respect des réglementations européennes",
-      color: "from-green-500 to-green-600"
-    }
-  ];
+  const faqs = t.faq.items;
 
-  const sectors = [
-    { icon: <Building2 className="w-8 h-8 text-white" />, name: "Construction / BTP", color: "from-slate-600 to-slate-700" },
-    { icon: <Factory className="w-8 h-8 text-white" />, name: "Industrie & Métallurgie", color: "from-blue-600 to-indigo-700" },
-    { icon: <Apple className="w-8 h-8 text-white" />, name: "Agroalimentaire", color: "from-emerald-600 to-teal-700" },
-    { icon: <Car className="w-8 h-8 text-white" />, name: "Automobile & Équipementiers", color: "from-blue-700 to-indigo-800" },
-    { icon: <Truck className="w-8 h-8 text-white" />, name: "Logistique & Transport", color: "from-slate-700 to-cyan-800" },
-    { icon: <UtensilsCrossed className="w-8 h-8 text-white" />, name: "Hôtellerie-Restauration", color: "from-rose-600 to-red-700" },
-    { icon: <Trees className="w-8 h-8 text-white" />, name: "Agriculture & Sylviculture", color: "from-green-700 to-emerald-800" },
-    { icon: <Package className="w-8 h-8 text-white" />, name: "Plasturgie & Emballage", color: "from-amber-600 to-orange-700" },
-    { icon: <Sparkles className="w-8 h-8 text-white" />, name: "Nettoyage & Services", color: "from-violet-600 to-indigo-700" }
-  ];
+  const advantages = t.benefits.items.map((item, index) => {
+    const icons = [
+      <Globe className="w-8 h-8" />,
+      <FileText className="w-8 h-8" />,
+      <Zap className="w-8 h-8" />,
+      <ShieldCheck className="w-8 h-8" />
+    ];
+    const colors = [
+      "from-blue-500 to-blue-600",
+      "from-cyan-500 to-cyan-600",
+      "from-violet-500 to-violet-600",
+      "from-green-500 to-green-600"
+    ];
+    return {
+      icon: icons[index],
+      title: item.title,
+      description: item.description,
+      color: colors[index]
+    };
+  });
 
-  const steps = [
-    {
-      number: "1",
-      title: "Décrivez votre besoin",
-      description: "Partagez-nous vos besoins : métier, nombre, durée, qualifications requises",
-      icon: <FileText className="w-8 h-8" />,
-      color: "from-blue-500 to-blue-600"
-    },
-    {
-      number: "2",
-      title: "Nous activons notre réseau",
-      description: "Nos agences partenaires sélectionnent les meilleurs profils disponibles",
-      icon: <Network className="w-8 h-8" />,
-      color: "from-cyan-500 to-cyan-600"
-    },
-    {
-      number: "3",
-      title: "Validez les candidats",
-      description: "Vous recevez les CV et menez les entretiens si souhaité",
-      icon: <UserCheck className="w-8 h-8" />,
-      color: "from-violet-500 to-violet-600"
-    },
-    {
-      number: "4",
-      title: "Accueillez votre équipe",
-      description: "Les intérimaires arrivent sur site, l'ETT gère toutes les formalités",
-      icon: <CheckCircle className="w-8 h-8" />,
-      color: "from-green-500 to-green-600"
-    }
-  ];
+  const sectors = t.sectors.items.map((item, index) => {
+    const icons = [
+      <Building2 className="w-8 h-8 text-white" />,
+      <Factory className="w-8 h-8 text-white" />,
+      <Apple className="w-8 h-8 text-white" />,
+      <Car className="w-8 h-8 text-white" />,
+      <Truck className="w-8 h-8 text-white" />,
+      <UtensilsCrossed className="w-8 h-8 text-white" />,
+      <Trees className="w-8 h-8 text-white" />,
+      <Package className="w-8 h-8 text-white" />,
+      <Sparkles className="w-8 h-8 text-white" />
+    ];
+    const colors = [
+      "from-slate-600 to-slate-700",
+      "from-blue-600 to-indigo-700",
+      "from-emerald-600 to-teal-700",
+      "from-blue-700 to-indigo-800",
+      "from-slate-700 to-cyan-800",
+      "from-rose-600 to-red-700",
+      "from-green-700 to-emerald-800",
+      "from-amber-600 to-orange-700",
+      "from-violet-600 to-indigo-700"
+    ];
+    return {
+      icon: icons[index],
+      name: item.name,
+      color: colors[index]
+    };
+  });
+
+  const steps = t.process.steps.map((step, index) => {
+    const icons = [
+      <FileText className="w-8 h-8" />,
+      <Network className="w-8 h-8" />,
+      <UserCheck className="w-8 h-8" />,
+      <CheckCircle className="w-8 h-8" />
+    ];
+    const colors = [
+      "from-blue-500 to-blue-600",
+      "from-cyan-500 to-cyan-600",
+      "from-violet-500 to-violet-600",
+      "from-green-500 to-green-600"
+    ];
+    return {
+      number: `${index + 1}`,
+      title: step.title,
+      description: step.description,
+      icon: icons[index],
+      color: colors[index]
+    };
+  });
 
   return (
     <>
       <HelmetProvider>
         <Helmet>
-          <title>Intérim Européen | Recrutement temporaire en Europe | YOJOB</title>
-          <meta name="description" content="Accédez à 500+ agences d'intérim dans 27 pays européens. Recrutement de personnel temporaire qualifié avec gestion complète des formalités administratives." />
+          <title>{t.meta.title}</title>
+          <meta name="description" content={t.meta.description} />
         </Helmet>
       </HelmetProvider>
 
@@ -233,19 +218,19 @@ export default function ServiceInterimEuropeen() {
                 transition={{ duration: 0.6 }}
               >
                 <Badge className="mb-6 px-6 py-2 bg-gradient-to-r from-blue-500/20 to-cyan-500/20 border border-blue-400/30 text-blue-200 backdrop-blur-sm">
-                  🇪🇺 Intérim Européen
+                  {t.hero.badge}
                 </Badge>
                 <h1 className="text-white mb-6 max-w-3xl mx-auto text-[20px]">
-                  Recrutez du personnel temporaire partout en Europe
+                  {t.hero.title}
                 </h1>
                 <p className="text-white/80 mb-8 max-w-2xl mx-auto leading-relaxed text-[16px]">
-                  Accédez à notre réseau de 500+ agences partenaires dans 27 pays. Nous gérons toutes les formalités administratives pour vous.
+                  {t.hero.subtitle}
                 </p>
                 <div className="flex flex-col sm:flex-row gap-4 justify-center">
                   <a href="/devis">
                     <Button className="relative overflow-hidden group rounded-full bg-gradient-to-r from-cyan-500 to-violet-600 hover:from-cyan-600 hover:to-violet-700 text-white shadow-2xl hover:shadow-cyan-500/50 transition-all px-8 py-6 text-lg w-full sm:w-auto">
                       <span className="relative z-10 flex items-center">
-                        Demander un devis
+                        {t.hero.cta.primary}
                         <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
                       </span>
                       <div className="absolute inset-0 -translate-x-full group-hover:translate-x-full transition-transform duration-700 bg-gradient-to-r from-transparent via-white/40 to-transparent" />
@@ -256,7 +241,7 @@ export default function ServiceInterimEuropeen() {
                     className="relative overflow-hidden group rounded-full border-white/30 bg-white/10 backdrop-blur-md text-white hover:bg-white/20 hover:border-cyan-400/50 shadow-lg hover:shadow-cyan-500/30 transition-all px-8 py-6 text-lg w-full sm:w-auto"
                     onClick={() => document.getElementById('processus')?.scrollIntoView({ behavior: 'smooth' })}
                   >
-                    <span className="relative z-10">Découvrir le processus</span>
+                    <span className="relative z-10">{t.hero.cta.secondary}</span>
                     <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 bg-gradient-to-r from-cyan-500/10 to-violet-500/10" />
                   </Button>
                 </div>
@@ -275,9 +260,9 @@ export default function ServiceInterimEuropeen() {
               className="text-center mb-12"
             >
               <Badge className="mb-4 px-6 py-2 bg-gradient-to-r from-violet-500/20 to-cyan-500/20 border border-violet-400/30 text-violet-200 backdrop-blur-sm">
-                🎯 Pour qui ?
+                {t.forWho.badge}
               </Badge>
-              <h2 className="text-white mb-4 text-[20px]">Ce service est fait pour vous</h2>
+              <h2 className="text-white mb-4 text-[20px]">{t.forWho.title}</h2>
             </motion.div>
 
             <div className="grid md:grid-cols-2 gap-8 max-w-5xl mx-auto">
@@ -291,11 +276,11 @@ export default function ServiceInterimEuropeen() {
                     <div className="w-16 h-16 bg-gradient-to-br from-blue-500 to-blue-600 rounded-2xl flex items-center justify-center mb-4">
                       <Building2 className="w-8 h-8 text-white" />
                     </div>
-                    <CardTitle className="text-white text-[20px]">Entreprises Utilisatrices</CardTitle>
+                    <CardTitle className="text-white text-[20px]">{t.forWho.userCompanies.title}</CardTitle>
                   </CardHeader>
                   <CardContent>
                     <p className="text-white/70 leading-relaxed">
-                      Entreprises françaises ou européennes ayant besoin de renforcer ponctuellement leurs équipes avec du personnel qualifié venant d'autres pays européens.
+                      {t.forWho.userCompanies.description}
                     </p>
                   </CardContent>
                 </Card>
@@ -311,17 +296,11 @@ export default function ServiceInterimEuropeen() {
                     <div className="w-16 h-16 bg-gradient-to-br from-cyan-500 to-cyan-600 rounded-2xl flex items-center justify-center mb-4">
                       <Target className="w-8 h-8 text-white" />
                     </div>
-                    <CardTitle className="text-white text-[20px]">Vous êtes concerné si...</CardTitle>
+                    <CardTitle className="text-white text-[20px]">{t.forWho.concerns.title}</CardTitle>
                   </CardHeader>
                   <CardContent>
                     <ul className="space-y-3">
-                      {[
-                        "Vous avez un besoin temporaire de main d'œuvre",
-                        "Vous cherchez des profils qualifiés rapidement",
-                        "Vous voulez déléguer les formalités administratives",
-                        "Vous souhaitez tester des profils avant embauche",
-                        "Vous avez des pics d'activité saisonniers"
-                      ].map((item, index) => (
+                      {t.forWho.concerns.items.map((item, index) => (
                         <li key={index} className="flex items-start gap-3 text-white/70">
                           <CheckCircle className="w-5 h-5 text-green-400 flex-shrink-0 mt-0.5" />
                           <span>{item}</span>
@@ -345,9 +324,9 @@ export default function ServiceInterimEuropeen() {
               className="text-center mb-12"
             >
               <Badge className="mb-4 px-6 py-2 bg-gradient-to-r from-green-500/20 to-cyan-500/20 border border-green-400/30 text-green-200 backdrop-blur-sm">
-                ✨ Vos avantages
+                {t.benefits.subtitle}
               </Badge>
-              <h2 className="text-white text-[20px]">Pourquoi choisir notre service d'intérim européen</h2>
+              <h2 className="text-white text-[20px]">{t.benefits.title}</h2>
             </motion.div>
 
             <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -385,9 +364,9 @@ export default function ServiceInterimEuropeen() {
               className="text-center mb-12"
             >
               <Badge className="mb-4 px-6 py-2 bg-gradient-to-r from-violet-500/20 to-cyan-500/20 border border-violet-400/30 text-violet-200 backdrop-blur-sm">
-                🎯 Comment ça marche
+                {t.process.badge}
               </Badge>
-              <h2 className="text-white text-[20px]">Le processus en 4 étapes</h2>
+              <h2 className="text-white text-[20px]">{t.process.title}</h2>
             </motion.div>
 
             <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 relative">
@@ -431,9 +410,9 @@ export default function ServiceInterimEuropeen() {
               className="text-center mb-12"
             >
               <Badge className="mb-4 px-6 py-2 bg-gradient-to-r from-orange-500/20 to-red-500/20 border border-orange-400/30 text-orange-200 backdrop-blur-sm">
-                🏭 Secteurs d'activité
+                {t.sectors.badge}
               </Badge>
-              <h2 className="text-white text-[20px]">Secteurs concernés par l'intérim européen</h2>
+              <h2 className="text-white text-[20px]">{t.sectors.title}</h2>
             </motion.div>
 
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
@@ -471,7 +450,7 @@ export default function ServiceInterimEuropeen() {
               className="text-center mb-12"
             >
               <Badge className="mb-4 px-6 py-2 bg-gradient-to-r from-yellow-500/20 to-orange-500/20 border border-yellow-400/30 text-yellow-200 backdrop-blur-sm">
-                ⭐ Ils nous font confiance
+                {t.testimonial.badge}
               </Badge>
             </motion.div>
 
@@ -489,16 +468,16 @@ export default function ServiceInterimEuropeen() {
                     ))}
                   </div>
                   <p className="text-white/90 text-lg leading-relaxed mb-6 italic">
-                    "YOJOB nous a permis de renforcer nos équipes de chantier en quelques jours avec des ouvriers qualifiés venus de Pologne. La gestion administrative a été totalement prise en charge par leur réseau d'agences partenaires. Un vrai gain de temps !"
+                    "{t.testimonial.quote}"
                   </p>
                   <div className="flex items-center gap-4">
                     <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-cyan-500 rounded-full flex items-center justify-center text-white text-xl">
-                      JD
+                      {t.testimonial.author.name.split('.')[0]}
                     </div>
                     <div>
-                      <p className="text-white">Jean Dupont</p>
-                      <p className="text-white/60 text-sm">Directeur des Opérations - ConstructBat SA</p>
-                      <p className="text-white/40 text-xs mt-1">Secteur : BTP</p>
+                      <p className="text-white">{t.testimonial.author.name}</p>
+                      <p className="text-white/60 text-sm">{t.testimonial.author.role}</p>
+                      <p className="text-white/40 text-xs mt-1">{t.testimonial.author.sector}</p>
                     </div>
                   </div>
                 </CardContent>
@@ -517,9 +496,9 @@ export default function ServiceInterimEuropeen() {
               className="text-center mb-12"
             >
               <Badge className="mb-4 px-6 py-2 bg-gradient-to-r from-violet-500/20 to-pink-500/20 border border-violet-400/30 text-violet-200 backdrop-blur-sm">
-                ❓ Questions fréquentes
+                {t.faq.badge}
               </Badge>
-              <h2 className="text-white text-[20px]">Vos questions sur l'intérim européen</h2>
+              <h2 className="text-white text-[20px]">{t.faq.title}</h2>
             </motion.div>
 
             <div className="max-w-3xl mx-auto space-y-4">
@@ -546,212 +525,29 @@ export default function ServiceInterimEuropeen() {
               className="text-center max-w-3xl mx-auto"
             >
               <h2 className="text-white mb-6 text-[20px]">
-                Prêt à recruter du personnel temporaire en Europe ?
+                {t.ctaFinal.title}
               </h2>
               <p className="text-white/80 mb-8 leading-relaxed text-[16px]">
-                Décrivez-nous votre besoin et recevez des profils qualifiés conformes après vérification des obligations légales
+                {t.ctaFinal.subtitle}
               </p>
               <a href="/devis">
                 <Button className="relative overflow-hidden group rounded-full bg-gradient-to-r from-cyan-500 to-violet-600 hover:from-cyan-600 hover:to-violet-700 text-white shadow-2xl hover:shadow-cyan-500/50 transition-all px-12 py-6 text-lg">
                   <span className="relative z-10 flex items-center">
-                    Demander un devis
+                    {t.ctaFinal.cta}
                     <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
                   </span>
                   <div className="absolute inset-0 -translate-x-full group-hover:translate-x-full transition-transform duration-700 bg-gradient-to-r from-transparent via-white/40 to-transparent" />
                 </Button>
               </a>
               <p className="text-white/60 text-sm mt-6">
-                ✓ Réponse sous 24h • ✓ Sans engagement
+                {t.ctaFinal.features}
               </p>
             </motion.div>
           </div>
         </section>
 
         {/* Footer */}
-        <footer className="relative overflow-hidden bg-gradient-to-b from-[#0a0e27] to-[#1a1f3a] text-white py-12 lg:py-16">
-          {/* Radial gradients - same as network section */}
-          <div className="absolute inset-0" style={{
-            backgroundImage: 'radial-gradient(circle at 20% 50%, rgba(6, 182, 212, 0.3) 0%, transparent 50%), radial-gradient(circle at 80% 80%, rgba(124, 58, 237, 0.3) 0%, transparent 50%)',
-          }} />
-
-          {/* Grid pattern overlay */}
-          <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGRlZnM+PHBhdHRlcm4gaWQ9ImdyaWQiIHdpZHRoPSI2MCIgaGVpZ2h0PSI2MCIgcGF0dGVyblVuaXRzPSJ1c2VyU3BhY2VPblVzZSI+PHBhdGggZD0iTSAxMCAwIEwgMCAwIDAgMTAiIGZpbGw9Im5vbmUiIHN0cm9rZT0id2hpdGUiIHN0cm9rZS13aWR0aD0iMC41Ii8+PC9wYXR0ZXJuPjwvZGVmcz48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSJ1cmwoI2dyaWQpIi8+PC9zdmc+')] opacity-10" />
-
-          <div className="container mx-auto px-4 relative z-10">
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 lg:gap-10 mb-10 lg:mb-12">
-              {/* Column 1: Logo & Description */}
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.6 }}
-              >
-                <motion.div 
-                  className="w-32 h-32 inline-block mb-6"
-                  whileHover={{ scale: 1.05, y: -2 }}
-                  transition={{ duration: 0.3 }}
-                >
-                  <LogoSvg 
-                    className="w-full h-full" 
-                    aria-label="YOJOB"
-                  />
-                </motion.div>
-                <p className="text-white/80 mb-[24px] leading-relaxed max-w-xs text-[13px] mt-[-46px]">
-                  Leader du recrutement européen. 500+ agences partenaires dans 27 pays pour connecter les talents aux opportunités.
-                </p>
-              </motion.div>
-
-              {/* Column 2: Services */}
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.6, delay: 0.1 }}
-              >
-                <h3 className="text-white mb-4 text-cyan-300">
-                  Services
-                </h3>
-                <ul className="space-y-2.5 text-sm">
-                  <motion.li whileHover={{ x: 5 }} transition={{ duration: 0.2 }}>
-                    <a href="/services/interim-europeen" className="text-white/80 hover:text-white transition-colors inline-flex items-center gap-2 group">
-                      <ArrowRight className="w-3 h-3 opacity-0 group-hover:opacity-100 transition-opacity" />
-                      Intérim européen
-                    </a>
-                  </motion.li>
-                  <motion.li whileHover={{ x: 5 }} transition={{ duration: 0.2 }}>
-                    <a href="/services/recrutement-specialise" className="text-white/80 hover:text-white transition-colors inline-flex items-center gap-2 group">
-                      <ArrowRight className="w-3 h-3 opacity-0 group-hover:opacity-100 transition-opacity" />
-                      Recrutement spécialisé
-                    </a>
-                  </motion.li>
-                  <motion.li whileHover={{ x: 5 }} transition={{ duration: 0.2 }}>
-                    <a href="/services/conseil-conformite" className="text-white/80 hover:text-white transition-colors inline-flex items-center gap-2 group">
-                      <ArrowRight className="w-3 h-3 opacity-0 group-hover:opacity-100 transition-opacity" />
-                      Conseil & Conformité
-                    </a>
-                  </motion.li>
-                  <motion.li whileHover={{ x: 5 }} transition={{ duration: 0.2 }}>
-                    <a href="/services/detachement-personnel" className="text-white/80 hover:text-white transition-colors inline-flex items-center gap-2 group">
-                      <ArrowRight className="w-3 h-3 opacity-0 group-hover:opacity-100 transition-opacity" />
-                      Détachement de personnel
-                    </a>
-                  </motion.li>
-                </ul>
-              </motion.div>
-
-              {/* Column 3: Company */}
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.6, delay: 0.2 }}
-              >
-                <h3 className="text-white mb-4 text-cyan-300">
-                  Entreprise
-                </h3>
-                <ul className="space-y-2.5 text-sm">
-                  <motion.li whileHover={{ x: 5 }} transition={{ duration: 0.2 }}>
-                    <a href="/a-propos" className="text-white/80 hover:text-white transition-colors inline-flex items-center gap-2 group">
-                      <ArrowRight className="w-3 h-3 opacity-0 group-hover:opacity-100 transition-opacity" />
-                      À propos
-                    </a>
-                  </motion.li>
-                  <motion.li whileHover={{ x: 5 }} transition={{ duration: 0.2 }}>
-                    <a href="/notre-reseau" className="text-white/80 hover:text-white transition-colors inline-flex items-center gap-2 group">
-                      <ArrowRight className="w-3 h-3 opacity-0 group-hover:opacity-100 transition-opacity" />
-                      Notre réseau
-                    </a>
-                  </motion.li>
-                  <motion.li whileHover={{ x: 5 }} transition={{ duration: 0.2 }}>
-                    <a href="/nos-secteurs" className="text-white/80 hover:text-white transition-colors inline-flex items-center gap-2 group">
-                      <ArrowRight className="w-3 h-3 opacity-0 group-hover:opacity-100 transition-opacity" />
-                      Nos secteurs
-                    </a>
-                  </motion.li>
-                  <motion.li whileHover={{ x: 5 }} transition={{ duration: 0.2 }}>
-                    <a href="/temoignages" className="text-white/80 hover:text-white transition-colors inline-flex items-center gap-2 group">
-                      <ArrowRight className="w-3 h-3 opacity-0 group-hover:opacity-100 transition-opacity" />
-                      Témoignages
-                    </a>
-                  </motion.li>
-                </ul>
-              </motion.div>
-
-              {/* Column 4: Contact */}
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.6, delay: 0.3 }}
-              >
-                <h3 className="text-white mb-4 text-cyan-300">
-                  Contact
-                </h3>
-                <ul className="space-y-3 text-sm">
-                  <motion.li 
-                    className="flex items-start gap-3 text-white/80"
-                    whileHover={{ x: 3 }}
-                  >
-                    <Globe className="w-5 h-5 text-cyan-400 flex-shrink-0" />
-                    <span>Bordeaux, France</span>
-                  </motion.li>
-                  <motion.li 
-                    className="flex items-center gap-3 text-white/80"
-                    whileHover={{ x: 3 }}
-                  >
-                    <FileText className="w-5 h-5 text-violet-400" />
-                    <a href="tel:+33650622524" className="hover:text-white transition-colors">
-                      +33 6 50 62 25 24
-                    </a>
-                  </motion.li>
-                  <motion.li 
-                    className="flex items-center gap-3 text-white/80"
-                    whileHover={{ x: 3 }}
-                  >
-                    <CheckCircle className="w-5 h-5 text-cyan-400" />
-                    <span>contact@yojob.fr</span>
-                  </motion.li>
-                </ul>
-              </motion.div>
-            </div>
-
-            {/* Copyright */}
-            <motion.div 
-              className="border-t border-white/20 pt-6 lg:pt-8 text-center"
-              initial={{ opacity: 0 }}
-              whileInView={{ opacity: 1 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.6, delay: 0.4 }}
-            >
-              <div className="flex flex-col sm:flex-row items-center justify-center gap-2 text-sm text-white/80 mb-3">
-                <p>© 2026 YOJOB. Tous droits réservés.</p>
-              </div>
-              {/* Footer Links */}
-              <div className="flex flex-wrap items-center justify-center gap-4 text-xs text-white/50">
-                <a 
-                  href="/privacy" 
-                  className="hover:text-cyan-400 transition-colors underline decoration-dotted"
-                >
-                  Politique de confidentialité
-                </a>
-                <span className="text-white/30">•</span>
-                <a 
-                  href="/legal" 
-                  className="hover:text-cyan-400 transition-colors underline decoration-dotted"
-                >
-                  Mentions légales
-                </a>
-                <span className="text-white/30">•</span>
-                <a 
-                  href="/cgv" 
-                  className="hover:text-cyan-400 transition-colors underline decoration-dotted"
-                >
-                  CGV
-                </a>
-              </div>
-            </motion.div>
-          </div>
-        </footer>
+        <Footer content={footerTranslations[language]} />
       </div>
     </>
   );
