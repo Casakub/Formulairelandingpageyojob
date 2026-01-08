@@ -17,7 +17,12 @@ import {
   Mail,
   Linkedin,
   Twitter,
-  Facebook
+  Facebook,
+  FileText,
+  Shield,
+  Lock,
+  Clock,
+  BarChart3
 } from 'lucide-react';
 import { Button } from './components/ui/button';
 import { Card, CardContent } from './components/ui/card';
@@ -139,23 +144,43 @@ export default function NotreReseau() {
   const marketplaceFeatures = [
     {
       icon: <Search className="w-6 h-6" />,
-      title: "Recherche multicritères",
-      description: "Trouvez l'agence idéale selon le pays, secteur, métier et délai"
+      title: "Gestion des missions",
+      description: "Dashboard centralisé, suivi corridor pays, statuts et alertes en temps réel"
     },
     {
-      icon: <Star className="w-6 h-6" />,
-      title: "Avis vérifiés",
-      description: "Consultez les retours d'expérience d'autres entreprises"
+      icon: <Shield className="w-6 h-6" />,
+      title: "Conformité automatisée",
+      description: "A1, SIPSI, pré-déclarations, score conformité et actions urgentes"
     },
     {
-      icon: <Filter className="w-6 h-6" />,
-      title: "Comparaison instantanée",
-      description: "Comparez prix, délais et profils en un clic"
+      icon: <Users className="w-6 h-6" />,
+      title: "Base talents européens",
+      description: "Intérimaires multi-pays, documents, certifications et disponibilités"
     },
     {
-      icon: <Network className="w-6 h-6" />,
-      title: "Mise en relation directe",
-      description: "Échangez directement avec les agences sans intermédiaire"
+      icon: <FileText className="w-6 h-6" />,
+      title: "Gestionnaire documentaire",
+      description: "Centralisation A1, certificats médicaux, passeports, contrats et alertes validité"
+    },
+    {
+      icon: <Building2 className="w-6 h-6" />,
+      title: "Portail clients",
+      description: "Multi-sites, score conformité client et historique missions complètes"
+    },
+    {
+      icon: <Clock className="w-6 h-6" />,
+      title: "Pointage heures tri-partite",
+      description: "Validation en cascade : Intérimaire → Client → Agence avec traçabilité"
+    },
+    {
+      icon: <Lock className="w-6 h-6" />,
+      title: "Coffre-fort numérique",
+      description: "Dépôt factures et docs par ETT, archivage sécurisé et traçabilité totale"
+    },
+    {
+      icon: <BarChart3 className="w-6 h-6" />,
+      title: "Analytics & Reports",
+      description: "Exports avancés, Country Packs configurables et connecteurs API"
     }
   ];
 
@@ -438,9 +463,9 @@ export default function NotreReseau() {
                 <Badge className="mb-4 px-6 py-2 bg-gradient-to-r from-orange-500 to-amber-500 border-0 text-white">
                   🚀 Nouveauté 2026
                 </Badge>
-                <h2 className="text-white mb-4 text-[20px]">Marketplace d'agences européennes (à venir)</h2>
+                <h2 className="text-white mb-4 text-[20px]">Logiciel de gestion du détachement</h2>
                 <p className="text-white/80 text-lg max-w-2xl mx-auto text-[16px]">
-                  Bientôt, accédez directement à toutes nos agences partenaires via une plateforme digitale innovante.
+                  Bientôt, gérez l'intégralité de vos opérations de détachement européen via une plateforme tout-en-un : missions, conformité, documents et pointages.
                 </p>
               </div>
 
