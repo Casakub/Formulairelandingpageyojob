@@ -34,7 +34,9 @@ import {
   MapPin,
   Linkedin,
   Twitter,
-  Facebook
+  Facebook,
+  Sparkles,
+  Apple
 } from 'lucide-react';
 import { Button } from './components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from './components/ui/card';
@@ -137,15 +139,15 @@ export default function ServiceConseilConformite() {
   ];
 
   const sectors = [
-    { icon: <Building2 className="w-8 h-8" />, name: "Bâtiment", color: "from-orange-500 to-orange-600" },
-    { icon: <Wrench className="w-8 h-8" />, name: "Métallurgie", color: "from-blue-500 to-blue-600" },
-    { icon: <Truck className="w-8 h-8" />, name: "TP", color: "from-gray-500 to-gray-600" },
-    { icon: <UtensilsCrossed className="w-8 h-8" />, name: "Hôtellerie", color: "from-red-500 to-red-600" },
-    { icon: <UtensilsCrossed className="w-8 h-8" />, name: "Restauration", color: "from-pink-500 to-pink-600" },
-    { icon: <Factory className="w-8 h-8" />, name: "Plasturgie", color: "from-purple-500 to-purple-600" },
-    { icon: <Car className="w-8 h-8" />, name: "Automobile", color: "from-indigo-500 to-indigo-600" },
-    { icon: <Trees className="w-8 h-8" />, name: "Sylviculture", color: "from-green-500 to-green-600" },
-    { icon: <Package className="w-8 h-8" />, name: "Cartonnerie", color: "from-amber-500 to-amber-600" }
+    { icon: <Building2 className="w-8 h-8 text-white" />, name: "Construction / BTP", color: "from-slate-600 to-slate-700" },
+    { icon: <Factory className="w-8 h-8 text-white" />, name: "Industrie & Métallurgie", color: "from-blue-600 to-indigo-700" },
+    { icon: <Apple className="w-8 h-8 text-white" />, name: "Agroalimentaire", color: "from-emerald-600 to-teal-700" },
+    { icon: <Car className="w-8 h-8 text-white" />, name: "Automobile & Équipementiers", color: "from-blue-700 to-indigo-800" },
+    { icon: <Truck className="w-8 h-8 text-white" />, name: "Logistique & Transport", color: "from-slate-700 to-cyan-800" },
+    { icon: <UtensilsCrossed className="w-8 h-8 text-white" />, name: "Hôtellerie-Restauration", color: "from-rose-600 to-red-700" },
+    { icon: <Trees className="w-8 h-8 text-white" />, name: "Agriculture & Sylviculture", color: "from-green-700 to-emerald-800" },
+    { icon: <Package className="w-8 h-8 text-white" />, name: "Plasturgie & Emballage", color: "from-amber-600 to-orange-700" },
+    { icon: <Sparkles className="w-8 h-8 text-white" />, name: "Nettoyage & Services", color: "from-violet-600 to-indigo-700" }
   ];
 
   const steps = [
@@ -451,13 +453,14 @@ export default function ServiceConseilConformite() {
                   viewport={{ once: true }}
                   transition={{ delay: index * 0.05 }}
                   whileHover={{ scale: 1.05, y: -4 }}
+                  className="h-full"
                 >
-                  <Card className="border border-white/10 bg-white/5 backdrop-blur-sm hover:border-cyan-400/50 transition-all duration-300">
-                    <CardContent className="p-6 text-center">
+                  <Card className="border border-white/10 bg-white/5 backdrop-blur-sm hover:border-cyan-400/50 transition-all duration-300 h-full">
+                    <CardContent className="p-6 text-center flex flex-col items-center justify-center h-full">
                       <div className={`w-16 h-16 bg-gradient-to-br ${sector.color} rounded-2xl flex items-center justify-center mx-auto mb-3 shadow-lg`}>
                         {sector.icon}
                       </div>
-                      <p className="text-white">{sector.name}</p>
+                      <p className="text-white text-sm leading-tight">{sector.name}</p>
                     </CardContent>
                   </Card>
                 </motion.div>
