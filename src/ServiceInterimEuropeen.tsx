@@ -31,6 +31,7 @@ import { LogoSvg } from './imports/YojobLogoComplete';
 import { LanguageSelector } from './components/landing/LanguageSelector';
 import { Footer } from './components/landing/Footer';
 import { useServiceTranslation } from './src/i18n/services/useServiceTranslation';
+import { useLanguageManager } from './hooks/useLanguageManager';
 import { footerTranslations } from './src/i18n/services/footer';
 import type { SupportedLanguage } from './src/i18n/types';
 
@@ -76,10 +77,15 @@ function FAQItem({ question, answer }: FAQItemProps) {
 }
 
 export default function ServiceInterimEuropeen() {
-  const [language, setLanguage] = useState<SupportedLanguage>('fr');
+  // 🌍 Hook unifié de gestion de la langue (auto-détection + persistance)
+  const {
+    currentLanguage: globalLanguage,
+    setLanguage: setGlobalLanguage,
+    isReady: languageReady,
+  } = useLanguageManager();
 
   // Get translations for current language
-  const t = useServiceTranslation('interimEuropeen', language);
+  const t = useServiceTranslation('interimEuropeen', globalLanguage as SupportedLanguage);
 
   const faqs = t.faq.items;
 
@@ -184,9 +190,9 @@ export default function ServiceInterimEuropeen() {
             {/* CTA */}
             <div className="flex items-center gap-4">
               <LanguageSelector
-                currentLanguage={language}
-                onLanguageChange={setLanguage}
-                availableLanguages={['fr', 'en']}
+                currentLanguage={globalLanguage}
+                onLanguageChange={setGlobalLanguage}
+                availableLanguages={['fr', 'en', 'de', 'es', 'it', 'nl', 'pt', 'pl', 'cs', 'sk', 'hu', 'ro', 'bg', 'hr', 'sl', 'et', 'lv', 'lt', 'el', 'sv', 'da', 'fi', 'no']}
               />
               <a 
                 href="/devis"
@@ -547,7 +553,7 @@ export default function ServiceInterimEuropeen() {
         </section>
 
         {/* Footer */}
-        <Footer content={footerTranslations[language]} />
+        <Footer content={footerTranslations[globalLanguage as SupportedLanguage]} />
       </div>
     </>
   );

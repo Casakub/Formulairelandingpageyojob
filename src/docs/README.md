@@ -1,253 +1,93 @@
-# 📚 Documentation Système Multilingue YOJOB
+# 📚 Documentation YOJOB
 
-Bienvenue dans la documentation complète du système de traduction multilingue de YOJOB.
-
----
-
-## 📖 Documents disponibles
-
-### 🚀 [Guide de démarrage rapide](./QUICK_START_ADMIN.md)
-**Pour qui** : Administrateurs, traducteurs, utilisateurs finaux
-
-**Contenu** :
-- Accès à l'interface (5 min)
-- Workflow de traduction étape par étape
-- FAQ et troubleshooting
-- Checklist de lancement
-
-**Commencez ici si** : C'est votre première fois ou vous voulez un rappel rapide.
+Bienvenue dans la documentation du projet YOJOB. Cette documentation couvre tous les aspects techniques du site, avec un focus particulier sur le système de gestion multilingue.
 
 ---
 
-### 🌍 [Fonctionnalités du système](./TRANSLATION_FEATURES.md)
-**Pour qui** : Chefs de projet, product owners, développeurs
+## 🌍 Système de langue unifié
 
-**Contenu** :
-- Vue d'ensemble des composants (16 modules)
-- Fonctionnalités détaillées
-- Outils de productivité (raccourcis, export, stats)
-- Design system et architecture
-- Roadmap des améliorations
+Le site YOJOB dispose d'un système de gestion de langue avancé avec auto-détection, persistance et synchronisation.
 
-**Lisez ceci si** : Vous voulez comprendre en profondeur le système et ses capacités.
+### 📖 Documents disponibles
 
----
-
-### 📝 [Récapitulatif d'implémentation](./IMPLEMENTATION_SUMMARY.md)
-**Pour qui** : Développeurs, tech leads, architectes
-
-**Contenu** :
-- Architecture technique complète
-- 10 routes API documentées
-- Structure des données
-- Workflow backend/frontend
-- Métriques de performance
-- Tests recommandés
-
-**Référez-vous à ce doc si** : Vous développez, maintenez ou étendez le système.
+| Document | Description | Pour qui ? |
+|----------|-------------|------------|
+| [**LANGUAGE_SYSTEM.md**](./LANGUAGE_SYSTEM.md) | Guide complet du système de langue | Tous |
+| [**MIGRATION_GUIDE_LANGUAGE.md**](./MIGRATION_GUIDE_LANGUAGE.md) | Guide de migration pour nouvelles pages | Développeurs |
+| [**CHANGELOG_LANGUAGE_SYSTEM.md**](./CHANGELOG_LANGUAGE_SYSTEM.md) | Historique des modifications | Tous |
+| [**TESTING_CHECKLIST_LANGUAGE.md**](./TESTING_CHECKLIST_LANGUAGE.md) | Checklist de tests | QA / Développeurs |
 
 ---
 
-## 🎯 Navigation rapide
+## 🚀 Pages déjà migrées
 
-### Par rôle
+- ✅ Landing Page (`/App-Landing.tsx`)
+- ✅ Service Intérim Européen (`/ServiceInterimEuropeen.tsx`)
+- ✅ Formulaire de devis multi-étapes (`/DemandeDevis.tsx`)
 
-**🔰 Je suis administrateur**
-```
-1. Lisez : Quick Start Admin
-2. Puis : Translation Features (section Interface)
-3. Enfin : FAQ dans Quick Start
+## 📋 Pages à migrer
+
+- ⬜ Autres pages services (Recrutement Spécialisé, Conseil & Conformité, etc.)
+- ⬜ Formulaire multi-étapes
+- ⬜ Pages admin
+
+---
+
+## 🎯 Fonctionnalités principales
+
+### ✨ Auto-détection
+La langue du navigateur est détectée automatiquement au premier chargement.
+
+```javascript
+// Priorités de détection
+1. localStorage (choix précédent)
+2. URL parameter (?lang=pl)
+3. Navigateur (navigator.language)
+4. Fallback (en → fr)
 ```
 
-**👨‍💻 Je suis développeur**
-```
-1. Lisez : Implementation Summary
-2. Puis : Translation Features (section Architecture)
-3. Consultez : Le code source avec les docs en référence
+### 💾 Persistance
+Le choix de langue est sauvegardé et persiste entre les sessions.
+
+```javascript
+localStorage.getItem('yojob_preferred_language') // ex: 'pl'
 ```
 
-**📊 Je suis chef de projet**
-```
-1. Lisez : Translation Features (Vue d'ensemble)
-2. Puis : Implementation Summary (Métriques)
-3. Consultez : Roadmap dans Translation Features
-```
+### 🔄 Synchronisation
+Toutes les pages partagent la même langue automatiquement.
 
-**🎨 Je suis designer**
 ```
-1. Lisez : /Guidelines.md (Design system YOJOB)
-2. Puis : Translation Features (section Design)
-3. Référez : Palette de couleurs et effets visuels
+Landing → Service → Admin
+   ↓         ↓        ↓
+ [Polish] [Polish] [Polish]
 ```
 
 ---
 
-## 📋 Par besoin
+## 🛠️ Pour les développeurs
 
-### "Je veux traduire les questions maintenant"
-→ [Quick Start Admin - Section 3](./QUICK_START_ADMIN.md#3-traduire-les-questions)
+### Hook principal
 
-### "Je veux comprendre les raccourcis clavier"
-→ [Quick Start Admin - Section 7](./QUICK_START_ADMIN.md#7-raccourcis-clavier)
-
-### "Je veux exporter les traductions"
-→ [Quick Start Admin - Section 6](./QUICK_START_ADMIN.md#6-exporter-les-traductions)
-
-### "Je veux voir les statistiques"
-→ [Translation Features - Statistiques](./TRANSLATION_FEATURES.md#statistiques-et-rapports)
-
-### "Je veux ajouter une nouvelle langue"
-→ [Translation Features - Contribution](./TRANSLATION_FEATURES.md#contribution)
-
-### "Je veux intégrer l'API"
-→ [Implementation Summary - Routes API](./IMPLEMENTATION_SUMMARY.md#routes-api-supabase-10-routes)
-
-### "Je veux comprendre le design system"
-→ [Translation Features - Design System](./TRANSLATION_FEATURES.md#design-system-appliqué)
-
----
-
-## 🗺️ Plan du système
-
-### Vue d'ensemble architecture
-
-```
-┌─────────────────────────────────────────────────────────┐
-│                    FRONTEND (React)                      │
-├───────────────┬───────────────┬──────────────────────────┤
-│ 16 Composants │  Hook useI18n │  Context Questions       │
-│ Dashboard     │  LocalStorage │  State Management        │
-└───────┬───────┴───────┬───────┴──────────┬───────────────┘
-        │               │                  │
-        ▼               ▼                  ▼
-┌────────────────────────────────────────────────────────┐
-│              API SUPABASE (10 routes)                  │
-│  /translations/questions/*                             │
-│  /translations/ui-texts/*                              │
-│  /translations/country-languages/*                     │
-└────────────────────┬───────────────────────────────────┘
-                     │
-                     ▼
-┌────────────────────────────────────────────────────────┐
-│          SUPABASE KV STORE (Persistence)               │
-│  - Questions translations                              │
-│  - UI texts translations                               │
-│  - Country-language mappings                           │
-└────────────────────────────────────────────────────────┘
-```
-
-### Modules principaux
-
-```
-TranslationManager (Hub)
-    ├── QuestionTranslation (25 questions)
-    │   ├── HorizontalScrollHint
-    │   ├── CharacterCounter
-    │   ├── TranslationKeyboardShortcuts
-    │   └── QuickTranslationExport
-    │
-    ├── UITextTranslation (150+ textes)
-    │
-    ├── CountryLanguageManager (30 pays)
-    │
-    └── TranslationStatistics (Dashboard)
-        └── LanguageProgressIndicator (8 langues)
-```
-
----
-
-## 📊 Données clés
-
-### Volume de données
-
-| Élément | Quantité | Statut |
-|---------|----------|--------|
-| **Questions** | 25 | ✅ Configurées |
-| **Langues cibles** | 7 (8 avec FR) | ✅ Actives |
-| **Traductions questions** | 175 (25×7) | 🔄 En cours |
-| **Textes UI** | 150+ | ✅ Configurés |
-| **Traductions UI** | 1050+ (150×7) | 🔄 En cours |
-| **Pays européens** | 30 | ✅ Mappés |
-| **Routes API** | 10 | ✅ Fonctionnelles |
-| **Composants React** | 16 | ✅ Implémentés |
-
-### Langues supportées
-
-| Code | Langue | Pays principaux | Status |
-|------|--------|-----------------|--------|
-| `fr` | Français | FR, BE, LU | ✅ Source |
-| `en` | English | GB, IE | 🔄 En cours |
-| `de` | Deutsch | DE, AT, CH | 🔄 En cours |
-| `es` | Español | ES | 🔄 En cours |
-| `it` | Italiano | IT | 🔄 En cours |
-| `nl` | Nederlands | NL, BE | 🔄 En cours |
-| `pt` | Português | PT | 🔄 En cours |
-| `pl` | Polski | PL | 🔄 En cours |
-
----
-
-## 🛠️ Outils disponibles
-
-### Pour les administrateurs
-
-- ✅ Interface de traduction intuitive
-- ✅ Génération automatique (MCP IA + API)
-- ✅ Filtrage multi-critères
-- ✅ Compteur de caractères temps réel
-- ✅ Raccourcis clavier (8 shortcuts)
-- ✅ Export JSON/CSV
-- ✅ Dashboard statistiques
-
-### Pour les développeurs
-
-- ✅ Hook `useI18n()` personnalisé
-- ✅ 10 routes API RESTful
-- ✅ KV Store Supabase
-- ✅ TypeScript strict
-- ✅ Context React global
-- ✅ Documentation inline
-
-### Pour les designers
-
-- ✅ Design system YOJOB appliqué
-- ✅ Palette de couleurs cohérente
-- ✅ Animations Motion fluides
-- ✅ Responsive mobile-first
-- ✅ Glassmorphism effects
-- ✅ Accessible (WCAG AA)
-
----
-
-## 🚀 Démarrage en 3 étapes
-
-### 1. Lisez le Quick Start (5 min)
-```bash
-Ouvrir : /docs/QUICK_START_ADMIN.md
-```
-
-### 2. Testez l'interface (15 min)
-```bash
-1. Accédez à /dashboard/admin/translations
-2. Ouvrez "Questions"
-3. Générez les traductions (MCP)
-4. Validez quelques traductions
-5. Exportez en JSON
-```
-
-### 3. Intégrez dans votre app (30 min)
 ```typescript
-// Utilisez le hook useI18n
-import { useI18n } from './hooks/useI18n';
+import { useLanguageManager } from './hooks/useLanguageManager';
 
-function MyComponent() {
-  const { t, locale, setLocale } = useI18n();
-  
+const { currentLanguage, setLanguage, isReady } = useLanguageManager();
+```
+
+### Exemple d'utilisation
+
+```tsx
+export default function MaPage() {
+  const { currentLanguage, setLanguage } = useLanguageManager();
+  const t = useServiceTranslation('interimEuropeen', currentLanguage);
+
   return (
     <div>
-      <h1>{t('questions.q1_label')}</h1>
-      <button onClick={() => setLocale('en')}>
-        Switch to English
-      </button>
+      <h1>{t.hero.title}</h1>
+      <LanguageSelector
+        currentLanguage={currentLanguage}
+        onLanguageChange={setLanguage}
+      />
     </div>
   );
 }
@@ -255,90 +95,149 @@ function MyComponent() {
 
 ---
 
-## 📚 Ressources externes
+## 🌐 Langues supportées
 
-### Standards internationaux
-- [ISO 639-1 Language Codes](https://en.wikipedia.org/wiki/List_of_ISO_639-1_codes)
-- [ISO 3166-1 Country Codes](https://en.wikipedia.org/wiki/ISO_3166-1)
-- [W3C Internationalization](https://www.w3.org/International/)
+Le site supporte **23 langues européennes** :
 
-### APIs de traduction
-- [DeepL API](https://www.deepl.com/pro-api) - Recommandé
-- [Google Translate API](https://cloud.google.com/translate)
-- [Azure Translator](https://azure.microsoft.com/services/cognitive-services/translator/)
-- [Anthropic Claude API](https://www.anthropic.com/api) - Pour MCP
-
-### Technologies utilisées
-- [React](https://react.dev) - Framework frontend
-- [TypeScript](https://www.typescriptlang.org) - Typage
-- [Tailwind CSS](https://tailwindcss.com) - Styling
-- [Framer Motion](https://www.framer.com/motion/) - Animations
-- [Supabase](https://supabase.com) - Backend as a Service
-- [Hono](https://hono.dev) - Web framework (Deno)
+| Langue | Code | Statut |
+|--------|------|--------|
+| 🇫🇷 Français | `fr` | ✅ Complet |
+| 🇬🇧 Anglais | `en` | ✅ Complet |
+| 🇩🇪 Allemand | `de` | ✅ Complet |
+| 🇪🇸 Espagnol | `es` | ✅ Complet |
+| 🇮🇹 Italien | `it` | ✅ Complet |
+| 🇳🇱 Néerlandais | `nl` | ✅ Complet |
+| 🇵🇹 Portugais | `pt` | ✅ Complet |
+| 🇵🇱 Polonais | `pl` | ✅ Complet |
+| 🇨🇿 Tchèque | `cs` | ✅ Complet |
+| 🇸🇰 Slovaque | `sk` | ✅ Complet |
+| 🇭🇺 Hongrois | `hu` | ✅ Complet |
+| 🇷🇴 Roumain | `ro` | ✅ Complet |
+| 🇧🇬 Bulgare | `bg` | ✅ Complet |
+| 🇭🇷 Croate | `hr` | ✅ Complet |
+| 🇸🇮 Slovène | `sl` | ✅ Complet |
+| 🇪🇪 Estonien | `et` | ✅ Complet |
+| 🇱🇻 Letton | `lv` | ✅ Complet |
+| 🇱🇹 Lituanien | `lt` | ✅ Complet |
+| 🇬🇷 Grec | `el` | ✅ Complet |
+| 🇸🇪 Suédois | `sv` | ✅ Complet |
+| 🇩🇰 Danois | `da` | ✅ Complet |
+| 🇫🇮 Finnois | `fi` | ✅ Complet |
+| 🇳🇴 Norvégien | `no` | ✅ Complet |
 
 ---
 
-## 🤝 Support & Contribution
+## 📊 Architecture du système
 
-### Besoin d'aide ?
-
-**Documentation** :
-- 📖 Lisez les 3 docs ci-dessus
-- 🔍 Utilisez Ctrl+F pour chercher un terme
-
-**Questions** :
-- 💬 Slack : `#yojob-translations`
-- 📧 Email : `support@yojob.com`
-- 🐛 Issues : GitHub (pour bugs)
-
-### Contribuer
-
-Pour améliorer la documentation :
-```bash
-1. Créez une branche : git checkout -b docs/update-translation-guide
-2. Éditez les fichiers dans /docs/
-3. Créez une PR avec description claire
-4. Tag @yojob-team pour review
+```
+┌─────────────────────────────────────────┐
+│   useLanguageManager (Hook central)    │
+│                                         │
+│  • Détection automatique                │
+│  • Gestion localStorage                 │
+│  • Synchronisation pages                │
+└─────────────┬───────────────────────────┘
+              │
+      ┌───────┴────────┐
+      │                │
+      ▼                ▼
+┌─────────────┐  ┌──────────────┐
+│ Landing Page│  │Pages Services│
+│             │  │              │
+│ Supabase DB │  │ Fichiers TS  │
+└─────────────┘  └──────────────┘
 ```
 
 ---
 
-## 📝 Changelog
+## 🔧 Maintenance
 
-### Version 1.0.0 (29 Novembre 2024)
-- ✅ Implémentation complète système multilingue
-- ✅ 16 composants React créés
-- ✅ 10 routes API implémentées
-- ✅ 8 langues européennes supportées
-- ✅ Documentation exhaustive (3 docs, 1500+ lignes)
-- ✅ Tests en environnement local OK
+### Ajouter une nouvelle langue
 
-### À venir (Version 1.1.0)
-- ⏳ Intégration API DeepL réelle
-- ⏳ Intégration MCP Claude via Anthropic
-- ⏳ Auto-save sur Ctrl+S
-- ⏳ Undo/Redo (Ctrl+Z/Y)
-- ⏳ Navigation Tab entre cellules
+1. Ajouter dans `/lib/languages.ts`
+2. Créer `/src/i18n/services/locales/[code].ts`
+3. Ajouter dans Supabase (pour landing)
+4. Tester avec la checklist
+
+### Modifier une traduction
+
+**Services** (fichiers statiques) :
+```bash
+/src/i18n/services/locales/fr.ts
+```
+
+**Landing** (Supabase) :
+```sql
+UPDATE kv_store_10092a63 
+SET value = '...' 
+WHERE key = 'landing_translations_fr';
+```
+
+---
+
+## 🧪 Tests
+
+Avant chaque déploiement, exécuter :
+
+1. Tests unitaires du hook
+2. Tests d'intégration multi-pages
+3. Tests manuels (checklist complète)
+4. Tests multi-navigateurs
+5. Tests responsive
+
+**Checklist complète** : [TESTING_CHECKLIST_LANGUAGE.md](./TESTING_CHECKLIST_LANGUAGE.md)
+
+---
+
+## 🆘 Support
+
+### Questions fréquentes
+
+**Q : Comment forcer une langue ?**
+```javascript
+localStorage.setItem('yojob_preferred_language', 'pl');
+window.location.reload();
+```
+
+**Q : Comment réinitialiser ?**
+```javascript
+localStorage.removeItem('yojob_preferred_language');
+window.location.reload();
+```
+
+**Q : La langue ne se synchronise pas ?**
+- Vérifier que toutes les pages utilisent `useLanguageManager`
+- Vérifier la console pour les warnings
+- Vérifier que localStorage n'est pas désactivé
 
 ---
 
 ## 📞 Contact
 
-**Équipe YOJOB Dev**
-- Website : [yojob.com](https://yojob.com)
-- Email : dev@yojob.com
-- GitHub : @yojob
+Pour toute question concernant le système de langue :
+- **Documentation** : Consultez les fichiers dans `/docs`
+- **Bugs** : Créer une issue avec le template de bug report
+- **Améliorations** : Proposer une PR avec description détaillée
 
 ---
 
-## 📄 Licence
+## 📝 Changelog
 
-**Propriétaire YOJOB** - Tous droits réservés
-
-Ce système est développé exclusivement pour YOJOB et ne peut être utilisé, copié, modifié ou distribué sans autorisation écrite.
+### Version 1.0.0 (Janvier 2025)
+- ✨ Système de langue unifié
+- ✨ Auto-détection navigateur
+- ✨ Persistance localStorage
+- ✨ Synchronisation inter-pages
+- 📚 Documentation complète
 
 ---
 
-**🌍 Ready to translate Europe!**
+## 🎉 Remerciements
 
-*Dernière mise à jour : 29 Novembre 2024*
+Merci à toute l'équipe YOJOB pour le développement et les tests de ce système !
+
+---
+
+**Dernière mise à jour** : Janvier 2025  
+**Version** : 1.0.0  
+**Licence** : Propriétaire YOJOB

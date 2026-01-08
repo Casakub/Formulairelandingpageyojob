@@ -47,6 +47,7 @@ import { EuropeMap } from './components/landing/EuropeMap';
 import { TestimonialCarousel } from './components/landing/TestimonialCarousel';
 import { LanguageSelector } from './components/landing/LanguageSelector';
 import { useLandingTranslations } from './hooks/useLandingTranslations';
+import { useLanguageManager } from './hooks/useLanguageManager';
 import { SEOHead } from './components/SEOHead';
 import { Link } from './components/Link';
 import { log, loggers } from './lib/logger';
@@ -149,41 +150,12 @@ export default function AppLanding() {
     message: '',
   });
 
-  // 🌍 Détecter la langue du navigateur au premier chargement avec validation
-  const getInitialLanguage = (): string => {
-    const supportedLangs = getAllLanguageCodes(); // 23 langues européennes supportées
-    
-    // 1. Vérifier localStorage (choix manuel de l'utilisateur = priorité max)
-    const savedLang = localStorage.getItem('yojob_preferred_language');
-    if (savedLang && supportedLangs.includes(savedLang)) {
-      log.languageChange('default', savedLang, 'localStorage');
-      return savedLang;
-    }
-    
-    // 2. Vérifier paramètre URL (?lang=pl)
-    const urlParams = new URLSearchParams(window.location.search);
-    const langParam = urlParams.get('lang');
-    if (langParam && supportedLangs.includes(langParam)) {
-      log.languageChange('default', langParam, 'url');
-      return langParam;
-    }
-    
-    // 3. Détecter la langue du navigateur (AUTO-DETECTION 🎯)
-    const browserLang = navigator.language.split('-')[0]; // 'pl-PL' -> 'pl', 'fr-FR' -> 'fr'
-    if (supportedLangs.includes(browserLang)) {
-      log.languageChange('default', browserLang, 'auto');
-      return browserLang;
-    }
-    
-    // 4. Fallback sur anglais si la langue du navigateur n'est pas supportée, sinon français
-    if (supportedLangs.includes('en')) {
-      loggers.language.info('Langue du navigateur non supportée, fallback sur anglais');
-      return 'en';
-    }
-    
-    loggers.language.info('Fallback final sur français');
-    return 'fr';
-  };
+  // 🌍 Hook unifié de gestion de la langue (détection auto + persistance)
+  const {
+    currentLanguage: globalLanguage,
+    setLanguage: setGlobalLanguage,
+    isReady: languageReady,
+  } = useLanguageManager();
 
   // 🌍 Récupérer les traductions depuis Supabase
   const {
@@ -194,7 +166,14 @@ export default function AppLanding() {
     isLoading,
     error,
     refresh,
-  } = useLandingTranslations(getInitialLanguage());
+  } = useLandingTranslations(globalLanguage);
+
+  // 🔄 Synchroniser la langue globale avec le hook de traductions
+  useEffect(() => {
+    if (languageReady && globalLanguage !== currentLanguage) {
+      setLanguage(globalLanguage);
+    }
+  }, [globalLanguage, languageReady]);
 
   // Fallback sur le contenu FR si la langue demandée n'existe pas
   const content = translations[currentLanguage] || translations['fr'] || {};
@@ -574,8 +553,8 @@ export default function AppLanding() {
               {/* Nouveau sélecteur de langue avec 23 langues européennes */}
               <div className="relative">
                 <LanguageSelector
-                  currentLanguage={currentLanguage}
-                  onLanguageChange={setLanguage}
+                  currentLanguage={globalLanguage}
+                  onLanguageChange={setGlobalLanguage}
                   availableLanguages={availableLanguages}
                   variant="default"
                 />
@@ -694,9 +673,9 @@ export default function AppLanding() {
                 {/* Sélecteur de langue mobile */}
                 <div className="mt-4">
                   <LanguageSelector
-                    currentLanguage={currentLanguage}
+                    currentLanguage={globalLanguage}
                     onLanguageChange={(lang) => {
-                      setLanguage(lang);
+                      setGlobalLanguage(lang);
                       setIsMenuOpen(false);
                     }}
                     availableLanguages={availableLanguages}

@@ -117,10 +117,52 @@ export interface ServiceTranslations {
 // Import des traductions par langue
 import { frServices } from './locales/fr';
 import { enServices } from './locales/en';
+import { deServices } from './locales/de';
+import { esServices } from './locales/es';
+import { itServices } from './locales/it';
+import { nlServices } from './locales/nl';
+import { ptServices } from './locales/pt';
+import { plServices } from './locales/pl';
+import { csServices } from './locales/cs';
+import { skServices } from './locales/sk';
+import { huServices } from './locales/hu';
+import { roServices } from './locales/ro';
+import { bgServices } from './locales/bg';
+import { hrServices } from './locales/hr';
+import { slServices } from './locales/sl';
+import { etServices } from './locales/et';
+import { lvServices } from './locales/lv';
+import { ltServices } from './locales/lt';
+import { elServices } from './locales/el';
+import { svServices } from './locales/sv';
+import { daServices } from './locales/da';
+import { fiServices } from './locales/fi';
+import { noServices } from './locales/no';
 
 const SERVICE_TRANSLATIONS: Partial<Record<SupportedLanguage, ServiceTranslations>> = {
   fr: frServices,
   en: enServices,
+  de: deServices,
+  es: esServices,
+  it: itServices,
+  nl: nlServices,
+  pt: ptServices,
+  pl: plServices,
+  cs: csServices,
+  sk: skServices,
+  hu: huServices,
+  ro: roServices,
+  bg: bgServices,
+  hr: hrServices,
+  sl: slServices,
+  et: etServices,
+  lv: lvServices,
+  lt: ltServices,
+  el: elServices,
+  sv: svServices,
+  da: daServices,
+  fi: fiServices,
+  no: noServices,
 };
 
 /**

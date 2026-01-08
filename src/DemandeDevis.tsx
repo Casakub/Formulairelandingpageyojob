@@ -33,6 +33,7 @@ import { StepRecapitulatif } from './components/devis/StepRecapitulatif';
 import { LanguageSelector, getSuggestedLanguage } from './src/i18n/devis';
 import type { DevisLanguage } from './src/i18n/devis/types';
 import { useDevisTranslationStatic } from './hooks/useDevisTranslation';
+import { useLanguageManager } from './hooks/useLanguageManager';
 
 // 🎯 Import du système SEO optimisé
 import { SEOHead } from './components/SEOHead';
@@ -133,10 +134,19 @@ export interface DevisFormData {
 
 export default function DemandeDevis() {
   const [currentStep, setCurrentStep] = useState(1);
-  const [lang, setLang] = useState<DevisLanguage>('fr');
+  
+  // 🌍 Hook unifié de gestion de la langue (auto-détection + persistance + synchronisation)
+  const {
+    currentLanguage: globalLanguage,
+    setLanguage: setGlobalLanguage,
+    isReady: languageReady,
+  } = useLanguageManager();
+  
+  // Cast vers DevisLanguage pour le système de traduction
+  const lang = globalLanguage as DevisLanguage;
   
   const handleLanguageChange = (newLang: DevisLanguage) => {
-    setLang(newLang);
+    setGlobalLanguage(newLang);
   };
   
   // Charger les traductions pour la langue active
