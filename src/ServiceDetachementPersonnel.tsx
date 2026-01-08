@@ -1,46 +1,6 @@
-import { useState } from 'react';
-import { Helmet, HelmetProvider } from 'react-helmet-async';
-import { motion } from 'motion/react';
-import {
-  Plane,
-  Users,
-  Globe,
-  ShieldCheck,
-  FileText,
-  CheckCircle,
-  ArrowRight,
-  Building2,
-  Target,
-  Clock,
-  Euro,
-  Network,
-  UserCheck,
-  ChevronDown,
-  ChevronUp,
-  Factory,
-  Wrench,
-  UtensilsCrossed,
-  Truck,
-  Car,
-  Trees,
-  Package,
-  Star,
-  Award,
-  Briefcase,
-  Phone,
-  Mail,
-  MapPin,
-  Linkedin,
-  Twitter,
-  Facebook,
-  Sparkles,
-  Apple
-} from 'lucide-react';
-import { Button } from './components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from './components/ui/card';
 import { Badge } from './components/ui/badge';
 import { LogoSvg } from './imports/YojobLogoComplete';
-import { LanguageSelector } from './components/landing/LanguageSelector';
+import { LanguageSelector } from './components/shared/LanguageSelector';
 
 interface FAQItemProps {
   question: string;

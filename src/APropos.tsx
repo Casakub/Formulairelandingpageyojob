@@ -1,35 +1,6 @@
-import { useState } from 'react';
-import { Helmet, HelmetProvider } from 'react-helmet-async';
-import { motion } from 'motion/react';
-import {
-  Users,
-  Globe,
-  Target,
-  Award,
-  ArrowRight,
-  CheckCircle,
-  Heart,
-  Zap,
-  ShieldCheck,
-  TrendingUp,
-  Building2,
-  Star,
-  Handshake,
-  Clock,
-  Network,
-  Linkedin,
-  Twitter,
-  Facebook,
-  MapPin,
-  Phone,
-  Mail
-} from 'lucide-react';
-import { Button } from './components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from './components/ui/card';
-import { Badge } from './components/ui/badge';
 import { LogoSvg } from './imports/YojobLogoComplete';
 import { SEOHead } from './components/SEOHead';
-import { LanguageSelector } from './components/landing/LanguageSelector';
+import { LanguageSelector } from './components/shared/LanguageSelector';
 
 export default function APropos() {
   const [isScrolled, setIsScrolled] = useState(false);

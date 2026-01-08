@@ -1,35 +1,6 @@
-import { useState } from 'react';
-import { Helmet, HelmetProvider } from 'react-helmet-async';
-import { motion } from 'motion/react';
-import {
-  Building2,
-  Factory,
-  Tractor,
-  UtensilsCrossed,
-  Heart,
-  Laptop,
-  Truck,
-  ShoppingBag,
-  Wrench,
-  ArrowRight,
-  CheckCircle,
-  Users,
-  TrendingUp,
-  Briefcase,
-  Globe,
-  MapPin,
-  Phone,
-  Mail,
-  Linkedin,
-  Twitter,
-  Facebook
-} from 'lucide-react';
-import { Button } from './components/ui/button';
-import { Card, CardContent } from './components/ui/card';
-import { Badge } from './components/ui/badge';
 import { LogoSvg } from './imports/YojobLogoComplete';
 import { SEOHead } from './components/SEOHead';
-import { LanguageSelector } from './components/landing/LanguageSelector';
+import { LanguageSelector } from './components/shared/LanguageSelector';
 
 export default function NosSecteurs() {
   const [isScrolled, setIsScrolled] = useState(false);

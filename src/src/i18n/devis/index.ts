@@ -37,4 +37,4 @@ export { ro } from './locales/ro';
 
 // Ré-exports pour faciliter l'usage
 export { useDevisTranslation, useDevisTranslationStatic } from '../../../hooks/useDevisTranslation';
-export { LanguageSelector, LanguageSelectorCompact, LanguageBadge } from '../../../components/devis/LanguageSelector';
+// ✨ LanguageSelector est maintenant partagé dans /components/shared/LanguageSelector.tsx

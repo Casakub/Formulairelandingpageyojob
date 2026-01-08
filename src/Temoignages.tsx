@@ -1,18 +1,18 @@
 import { useState } from 'react';
-import { Helmet, HelmetProvider } from 'react-helmet-async';
 import { motion } from 'motion/react';
+import { Helmet, HelmetProvider } from 'react-helmet-async';
 import {
-  Star,
-  Quote,
-  ArrowRight,
-  CheckCircle,
-  TrendingUp,
-  Users,
   Building2,
   Factory,
   Briefcase,
-  Clock,
+  Users,
+  CheckCircle,
+  ArrowRight,
+  Star,
+  Quote,
+  TrendingUp,
   Award,
+  Clock,
   MapPin,
   Phone,
   Mail,
@@ -20,13 +20,13 @@ import {
   Twitter,
   Facebook
 } from 'lucide-react';
+import { Badge } from './components/ui/badge';
 import { Button } from './components/ui/button';
 import { Card, CardContent } from './components/ui/card';
-import { Badge } from './components/ui/badge';
 import { LogoSvg } from './imports/YojobLogoComplete';
 import { TestimonialCarousel } from './components/landing/TestimonialCarousel';
 import { SEOHead } from './components/SEOHead';
-import { LanguageSelector } from './components/landing/LanguageSelector';
+import { LanguageSelector } from './components/shared/LanguageSelector';
 
 export default function Temoignages() {
   const [isScrolled, setIsScrolled] = useState(false);

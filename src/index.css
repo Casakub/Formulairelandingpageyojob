@@ -1567,10 +1567,6 @@
     width: 1px;
   }
 
-  .w-\[120px\] {
-    width: 120px;
-  }
-
   .w-\[140px\] {
     width: 140px;
   }
@@ -6186,10 +6182,6 @@
     white-space: pre-wrap;
   }
 
-  .\!text-slate-900 {
-    color: var(--color-slate-900) !important;
-  }
-
   .text-\[\#1E3A8A\] {
     color: #1e3a8a;
   }
@@ -8049,6 +8041,18 @@
   }
 
   @media (hover: hover) {
+    .hover\:bg-cyan-500\/30:hover {
+      background-color: color-mix(in srgb, oklch(.715 .143 215.221) 30%, transparent);
+    }
+
+    @supports (color: color-mix(in lab, red, red)) {
+      .hover\:bg-cyan-500\/30:hover {
+        background-color: color-mix(in oklab, var(--color-cyan-500) 30%, transparent);
+      }
+    }
+  }
+
+  @media (hover: hover) {
     .hover\:bg-cyan-600:hover {
       background-color: var(--color-cyan-600);
     }
@@ -9171,10 +9175,6 @@
 
   .focus\:bg-\[\#7C3AED\]\/20:focus {
     background-color: oklab(54.1337% .0963843 -.226968 / .2);
-  }
-
-  .focus\:bg-slate-100:focus {
-    background-color: var(--color-slate-100);
   }
 
   .focus\:bg-white\/10:focus {
@@ -10581,16 +10581,6 @@
     }
   }
 
-  .\[\&_button\]\:\!text-slate-900 button {
-    color: var(--color-slate-900) !important;
-  }
-
-  @media (hover: hover) {
-    .\[\&_button\]\:hover\:bg-slate-100 button:hover {
-      background-color: var(--color-slate-100);
-    }
-  }
-
   .\[\&_p\]\:leading-relaxed p {
     --tw-leading: var(--leading-relaxed);
     line-height: var(--leading-relaxed);
@@ -10619,10 +10609,6 @@
 
   .\[\&\:last-child\]\:pb-6:last-child {
     padding-bottom: calc(var(--spacing) * 6);
-  }
-
-  .\[\&\>span\]\:text-white > span {
-    color: var(--color-white);
   }
 
   .\[\&\>span\]\:text-white\/60 > span {

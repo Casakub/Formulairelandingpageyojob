@@ -45,7 +45,7 @@ import { Badge } from './components/ui/badge';
 import { CountUpStat } from './components/landing/CountUpStat';
 import { EuropeMap } from './components/landing/EuropeMap';
 import { TestimonialCarousel } from './components/landing/TestimonialCarousel';
-import { LanguageSelector } from './components/landing/LanguageSelector';
+import { LanguageSelector } from './components/shared/LanguageSelector';
 import { useLandingTranslations } from './hooks/useLandingTranslations';
 import { useLanguageManager } from './hooks/useLanguageManager';
 import { SEOHead } from './components/SEOHead';

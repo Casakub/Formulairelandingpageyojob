@@ -1,36 +1,6 @@
-import { useState } from 'react';
-import { Helmet, HelmetProvider } from 'react-helmet-async';
-import { motion } from 'motion/react';
-import {
-  Globe,
-  Network,
-  ArrowRight,
-  CheckCircle,
-  MapPin,
-  Building2,
-  Users,
-  Star,
-  Search,
-  Filter,
-  TrendingUp,
-  Phone,
-  Mail,
-  Linkedin,
-  Twitter,
-  Facebook,
-  FileText,
-  Shield,
-  Lock,
-  Clock,
-  BarChart3
-} from 'lucide-react';
-import { Button } from './components/ui/button';
-import { Card, CardContent } from './components/ui/card';
-import { Badge } from './components/ui/badge';
-import { LogoSvg } from './imports/YojobLogoComplete';
 import { EuropeMap } from './components/landing/EuropeMap';
 import { SEOHead } from './components/SEOHead';
-import { LanguageSelector } from './components/landing/LanguageSelector';
+import { LanguageSelector } from './components/shared/LanguageSelector';
 
 export default function NotreReseau() {
   const [isScrolled, setIsScrolled] = useState(false);

@@ -30,7 +30,8 @@ import { Step5Candidats } from './components/devis/Step5Candidats';
 import { StepRecapitulatif } from './components/devis/StepRecapitulatif';
 
 // Import du système de traduction
-import { LanguageSelector, getSuggestedLanguage } from './src/i18n/devis';
+import { LanguageSelector } from './components/shared/LanguageSelector';
+import { getSuggestedLanguage, MVP_LANGUAGES } from './src/i18n/devis';
 import type { DevisLanguage } from './src/i18n/devis/types';
 import { useDevisTranslationStatic } from './hooks/useDevisTranslation';
 import { useLanguageManager } from './hooks/useLanguageManager';
@@ -443,10 +444,13 @@ export default function DemandeDevis() {
               {/* Language Selector */}
               <div className="flex items-center gap-2 sm:gap-4">
                 <LanguageSelector 
-                  value={lang} 
-                  onChange={handleLanguageChange}
+                  currentLanguage={lang}
+                  onLanguageChange={handleLanguageChange}
+                  availableLanguages={MVP_LANGUAGES}
                   suggestedCountry={formData.entreprise.pays}
-                  showMVPOnly={true}
+                  showCountrySuggestion={true}
+                  languageSource="devis"
+                  variant="default"
                 />
                 <Button
                   className="relative overflow-hidden group rounded-full bg-white/10 backdrop-blur-md text-white border border-white/20 hover:bg-white/20 hover:border-cyan-400/50 shadow-lg hover:shadow-cyan-500/30 transition-all duration-300 px-3 sm:px-4"
