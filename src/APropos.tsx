@@ -281,8 +281,8 @@ export default function APropos() {
                 <Target className="w-4 h-4 mr-2" />
                 Notre mission
               </Badge>
-              <h2 className="text-white mb-4">Simplifier le recrutement européen</h2>
-              <p className="text-white/70 text-lg max-w-3xl mx-auto">
+              <h2 className="text-white mb-4 text-[20px]">Simplifier le recrutement européen</h2>
+              <p className="text-white/70 text-lg max-w-3xl mx-auto text-[16px]">
                 YOJOB est né d'un constat simple : recruter des talents européens est complexe, chronophage et semé d'embûches administratives. Notre mission est de vous offrir un service clé en main, rapide et 100% conforme.
               </p>
             </motion.div>
@@ -295,7 +295,7 @@ export default function APropos() {
               >
                 <Card className="h-full border border-white/10 bg-white/5 backdrop-blur-sm">
                   <CardContent className="p-8">
-                    <h3 className="text-white mb-4">Le problème que nous résolvons</h3>
+                    <h3 className="text-white mb-4 text-[20px]">Le problème que nous résolvons</h3>
                     <ul className="space-y-3 text-white/70">
                       <li className="flex items-start gap-3">
                         <CheckCircle className="w-5 h-5 text-red-400 mt-1 flex-shrink-0" />
@@ -325,7 +325,7 @@ export default function APropos() {
               >
                 <Card className="h-full border border-white/10 bg-white/5 backdrop-blur-sm">
                   <CardContent className="p-8">
-                    <h3 className="text-white mb-4">Notre solution</h3>
+                    <h3 className="text-white mb-4 text-[20px]">Notre solution</h3>
                     <ul className="space-y-3 text-white/70">
                       <li className="flex items-start gap-3">
                         <CheckCircle className="w-5 h-5 text-green-400 mt-1 flex-shrink-0" />
@@ -366,8 +366,8 @@ export default function APropos() {
                 <Heart className="w-4 h-4 mr-2" />
                 Nos valeurs
               </Badge>
-              <h2 className="text-white mb-4">Ce qui nous anime au quotidien</h2>
-              <p className="text-white/70 text-lg max-w-2xl mx-auto">
+              <h2 className="text-white mb-4 text-[20px]">Ce qui nous anime au quotidien</h2>
+              <p className="text-white/70 text-lg max-w-2xl mx-auto text-[16px]">
                 Quatre piliers guident notre action et nos relations avec nos clients et partenaires.
               </p>
             </motion.div>
@@ -412,7 +412,7 @@ export default function APropos() {
                 <Clock className="w-4 h-4 mr-2" />
                 Notre histoire
               </Badge>
-              <h2 className="text-white mb-4">10 ans d'innovation et de croissance</h2>
+              <h2 className="text-white mb-4 text-[20px]">10 ans d'innovation et de croissance</h2>
             </motion.div>
 
             <div className="relative">
@@ -440,7 +440,7 @@ export default function APropos() {
                             {item.icon}
                           </div>
                           <div className="text-cyan-400 mb-2">{item.year}</div>
-                          <h3 className="text-white mb-2">{item.title}</h3>
+                          <h3 className="text-white mb-2 text-[20px]">{item.title}</h3>
                           <p className="text-white/70 text-sm">{item.description}</p>
                         </CardContent>
                       </Card>
@@ -465,8 +465,8 @@ export default function APropos() {
               viewport={{ once: true }}
               className="bg-white/10 backdrop-blur-sm border border-white/20 rounded-3xl p-12"
             >
-              <h2 className="text-white mb-4">Prêt à recruter vos talents européens ?</h2>
-              <p className="text-white/80 text-lg mb-8 max-w-2xl mx-auto">
+              <h2 className="text-white mb-4 text-[20px]">Prêt à recruter vos talents européens ?</h2>
+              <p className="text-white/80 text-lg mb-8 max-w-2xl mx-auto text-[16px]">
                 Rejoignez les centaines d'entreprises qui nous font confiance pour leur recrutement européen.
               </p>
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
