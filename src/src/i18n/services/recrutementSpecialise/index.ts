@@ -14,23 +14,23 @@ export { itRecrutementSpecialise } from './it';
 export { nlRecrutementSpecialise } from './nl';
 export { ptRecrutementSpecialise } from './pt';
 export { plRecrutementSpecialise } from './pl';
+export { csRecrutementSpecialise } from './cs';
+export { skRecrutementSpecialise } from './sk';
+export { huRecrutementSpecialise } from './hu';
+export { roRecrutementSpecialise } from './ro';
+export { bgRecrutementSpecialise } from './bg';
+export { hrRecrutementSpecialise } from './hr';
+export { slRecrutementSpecialise } from './sl';
+export { etRecrutementSpecialise } from './et';
+export { lvRecrutementSpecialise } from './lv';
+export { ltRecrutementSpecialise } from './lt';
+export { elRecrutementSpecialise } from './el';
+export { svRecrutementSpecialise } from './sv';
+export { daRecrutementSpecialise } from './da';
+export { fiRecrutementSpecialise } from './fi';
+export { noRecrutementSpecialise } from './no';
 
-// TODO: Ajouter les autres langues européennes
-// export { csRecrutementSpecialise } from './cs';
-// export { skRecrutementSpecialise } from './sk';
-// export { huRecrutementSpecialise } from './hu';
-// export { roRecrutementSpecialise } from './ro';
-// export { bgRecrutementSpecialise } from './bg';
-// export { hrRecrutementSpecialise } from './hr';
-// export { slRecrutementSpecialise } from './sl';
-// export { elRecrutementSpecialise } from './el';
-// export { etRecrutementSpecialise } from './et';
-// export { lvRecrutementSpecialise } from './lv';
-// export { ltRecrutementSpecialise } from './lt';
-// export { svRecrutementSpecialise } from './sv';
-// export { daRecrutementSpecialise } from './da';
-// export { fiRecrutementSpecialise } from './fi';
-// export { noRecrutementSpecialise } from './no';
+// Toutes les langues européennes disponibles sont maintenant ajoutées !
 
 /**
  * 📋 LISTE DES LANGUES DISPONIBLES
@@ -41,7 +41,7 @@ export { plRecrutementSpecialise } from './pl';
  * ⚠️ IMPORTANT : Ajouter ici chaque nouvelle langue après avoir créé
  * son fichier de traduction (ex: de.ts, es.ts, etc.)
  */
-export const AVAILABLE_LANGUAGES_RECRUTEMENT_SPECIALISE = ['fr', 'en', 'de', 'es', 'it', 'nl', 'pt', 'pl'] as const;
+export const AVAILABLE_LANGUAGES_RECRUTEMENT_SPECIALISE = ['fr', 'en', 'de', 'es', 'it', 'nl', 'pt', 'pl', 'cs', 'sk', 'hu', 'ro', 'bg', 'hr', 'sl', 'et', 'lv', 'lt', 'el', 'sv', 'da', 'fi', 'no'] as const;
 
 /**
  * Type des langues disponibles

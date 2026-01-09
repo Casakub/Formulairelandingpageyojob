@@ -153,10 +153,48 @@ import { itRecrutementSpecialise } from './recrutementSpecialise/it';
 import { nlRecrutementSpecialise } from './recrutementSpecialise/nl';
 import { ptRecrutementSpecialise } from './recrutementSpecialise/pt';
 import { plRecrutementSpecialise } from './recrutementSpecialise/pl';
+import { csRecrutementSpecialise } from './recrutementSpecialise/cs';
+import { skRecrutementSpecialise } from './recrutementSpecialise/sk';
+import { huRecrutementSpecialise } from './recrutementSpecialise/hu';
+import { roRecrutementSpecialise } from './recrutementSpecialise/ro';
+import { bgRecrutementSpecialise } from './recrutementSpecialise/bg';
+import { hrRecrutementSpecialise } from './recrutementSpecialise/hr';
+import { slRecrutementSpecialise } from './recrutementSpecialise/sl';
+import { etRecrutementSpecialise } from './recrutementSpecialise/et';
+import { lvRecrutementSpecialise } from './recrutementSpecialise/lv';
+import { ltRecrutementSpecialise } from './recrutementSpecialise/lt';
+import { elRecrutementSpecialise } from './recrutementSpecialise/el';
+import { svRecrutementSpecialise } from './recrutementSpecialise/sv';
+import { daRecrutementSpecialise } from './recrutementSpecialise/da';
+import { fiRecrutementSpecialise } from './recrutementSpecialise/fi';
+import { noRecrutementSpecialise } from './recrutementSpecialise/no';
+
+import { frConseilConformite } from './conseilConformite/fr';
+import { enConseilConformite } from './conseilConformite/en';
+import { deConseilConformite } from './conseilConformite/de';
+import { esConseilConformite } from './conseilConformite/es';
+import { itConseilConformite } from './conseilConformite/it';
+import { nlConseilConformite } from './conseilConformite/nl';
+import { ptConseilConformite } from './conseilConformite/pt';
+import { plConseilConformite } from './conseilConformite/pl';
+import { csConseilConformite } from './conseilConformite/cs';
+import { skConseilConformite } from './conseilConformite/sk';
+import { huConseilConformite } from './conseilConformite/hu';
+import { roConseilConformite } from './conseilConformite/ro';
+import { bgConseilConformite } from './conseilConformite/bg';
+import { hrConseilConformite } from './conseilConformite/hr';
+import { slConseilConformite } from './conseilConformite/sl';
+import { etConseilConformite } from './conseilConformite/et';
+import { lvConseilConformite } from './conseilConformite/lv';
+import { ltConseilConformite } from './conseilConformite/lt';
+import { elConseilConformite } from './conseilConformite/el';
+import { svConseilConformite } from './conseilConformite/sv';
+import { daConseilConformite } from './conseilConformite/da';
+import { fiConseilConformite } from './conseilConformite/fi';
+import { noConseilConformite } from './conseilConformite/no';
 
 // TODO: Import des autres services quand ils seront créés
-// import { frConseilConformite } from './conseilConformite/fr';
-// import { enConseilConformite } from './conseilConformite/en';
+// import { gaConseilConformite } from './conseilConformite/ga';
 // import { frDetachementPersonnel } from './detachementPersonnel/fr';
 // import { enDetachementPersonnel } from './detachementPersonnel/en';
 
@@ -209,10 +247,46 @@ function loadServiceTranslation(
       nl: nlRecrutementSpecialise,
       pt: ptRecrutementSpecialise,
       pl: plRecrutementSpecialise,
-      // TODO: Ajouter les autres langues
+      cs: csRecrutementSpecialise,
+      sk: skRecrutementSpecialise,
+      hu: huRecrutementSpecialise,
+      ro: roRecrutementSpecialise,
+      bg: bgRecrutementSpecialise,
+      hr: hrRecrutementSpecialise,
+      sl: slRecrutementSpecialise,
+      et: etRecrutementSpecialise,
+      lv: lvRecrutementSpecialise,
+      lt: ltRecrutementSpecialise,
+      el: elRecrutementSpecialise,
+      sv: svRecrutementSpecialise,
+      da: daRecrutementSpecialise,
+      fi: fiRecrutementSpecialise,
+      no: noRecrutementSpecialise,
     },
     conseilConformite: {
-      // TODO: Ajouter les traductions
+      fr: frConseilConformite,
+      en: enConseilConformite,
+      de: deConseilConformite,
+      es: esConseilConformite,
+      it: itConseilConformite,
+      nl: nlConseilConformite,
+      pt: ptConseilConformite,
+      pl: plConseilConformite,
+      cs: csConseilConformite,
+      sk: skConseilConformite,
+      hu: huConseilConformite,
+      ro: roConseilConformite,
+      bg: bgConseilConformite,
+      hr: hrConseilConformite,
+      sl: slConseilConformite,
+      et: etConseilConformite,
+      lv: lvConseilConformite,
+      lt: ltConseilConformite,
+      el: elConseilConformite,
+      sv: svConseilConformite,
+      da: daConseilConformite,
+      fi: fiConseilConformite,
+      no: noConseilConformite,
     },
     detachementPersonnel: {
       // TODO: Ajouter les traductions
