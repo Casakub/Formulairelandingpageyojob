@@ -1,49 +1,48 @@
 import { useState } from 'react';
-import { motion } from 'motion/react';
 import { Helmet, HelmetProvider } from 'react-helmet-async';
+import { motion } from 'motion/react';
 import {
+  Search,
   Target,
   Users,
   TrendingUp,
-  CheckCircle,
-  Clock,
   Award,
-  Briefcase,
-  ChevronDown,
-  ChevronUp,
-  ArrowRight,
-  MapPin,
-  Phone,
-  Mail,
-  Linkedin,
-  Twitter,
-  Facebook,
+  Clock,
+  Shield,
+  Zap,
   Building2,
   Factory,
-  Zap,
-  ShieldCheck,
+  Heart,
+  Code,
+  Sparkles,
   FileText,
-  Globe,
-  Search,
-  MessageSquare,
   Network,
   UserCheck,
+  CheckCircle,
+  ArrowRight,
+  ChevronDown,
+  ChevronUp,
+  Star,
+  Briefcase,
+  Globe,
+  MessageSquare,
   Apple,
   Car,
   Truck,
   UtensilsCrossed,
   Trees,
   Package,
-  Sparkles,
-  Star
 } from 'lucide-react';
 import { Badge } from './components/ui/badge';
 import { Button } from './components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from './components/ui/card';
 import { LogoSvg } from './imports/YojobLogoComplete';
 import { LanguageSelector } from './components/shared/LanguageSelector';
+import { Footer } from './components/landing/Footer';
 import { useServiceTranslation } from './src/i18n/services/useServiceTranslation';
 import { useLanguageManager } from './hooks/useLanguageManager';
+import { footerTranslations } from './src/i18n/services/footer';
+import { AVAILABLE_LANGUAGES_RECRUTEMENT_SPECIALISE } from './src/i18n/services/recrutementSpecialise';
 import type { SupportedLanguage } from './src/i18n/types';
 
 interface FAQItemProps {
@@ -89,7 +88,7 @@ function FAQItem({ question, answer }: FAQItemProps) {
 
 export default function ServiceRecrutementSpecialise() {
   // Use global language manager
-  const { language: globalLanguage, setLanguage } = useLanguageManager();
+  const { currentLanguage: globalLanguage, setLanguage } = useLanguageManager();
   
   // Get translations for current language
   const t = useServiceTranslation('recrutementSpecialise', globalLanguage as SupportedLanguage);
@@ -200,7 +199,7 @@ export default function ServiceRecrutementSpecialise() {
               <LanguageSelector
                 currentLanguage={globalLanguage}
                 onLanguageChange={setLanguage}
-                availableLanguages={['fr', 'en']}
+                availableLanguages={AVAILABLE_LANGUAGES_RECRUTEMENT_SPECIALISE}
               />
               <a 
                 href="/devis"
@@ -559,190 +558,7 @@ export default function ServiceRecrutementSpecialise() {
         </section>
 
         {/* Footer */}
-        <footer className="relative overflow-hidden bg-gradient-to-b from-[#0a0e27] to-[#1a1f3a] text-white py-12 lg:py-16">
-          {/* Radial gradients - same as network section */}
-          <div className="absolute inset-0" style={{
-            backgroundImage: 'radial-gradient(circle at 20% 50%, rgba(6, 182, 212, 0.3) 0%, transparent 50%), radial-gradient(circle at 80% 80%, rgba(124, 58, 237, 0.3) 0%, transparent 50%)',
-          }} />
-
-          {/* Grid pattern overlay */}
-          <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGRlZnM+PHBhdHRlcm4gaWQ9ImdyaWQiIHdpZHRoPSI2MCIgaGVpZ2h0PSI2MCIgcGF0dGVyblVuaXRzPSJ1c2VyU3BhY2VPblVzZSI+PHBhdGggZD0iTSAxMCAwIEwgMCAwIDAgMTAiIGZpbGw9Im5vbmUiIHN0cm9rZT0id2hpdGUiIHN0cm9rZS13aWR0aD0iMC41Ii8+PC9wYXR0ZXJuPjwvZGVmcz48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSJ1cmwoI2dyaWQpIi8+PC9zdmc+')] opacity-10" />
-
-          <div className="container mx-auto px-4 relative z-10">
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 lg:gap-10 mb-10 lg:mb-12">
-              {/* Column 1: Logo & Description */}
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.6 }}
-              >
-                <motion.div 
-                  className="w-32 h-32 inline-block mb-6"
-                  whileHover={{ scale: 1.05, y: -2 }}
-                  transition={{ duration: 0.3 }}
-                >
-                  <LogoSvg 
-                    className="w-full h-full" 
-                    aria-label="YOJOB"
-                  />
-                </motion.div>
-                <p className="text-white/80 mb-[24px] leading-relaxed max-w-xs text-[13px] mt-[-46px]">
-                  Leader du recrutement européen. 500+ agences partenaires dans 27 pays pour connecter les talents aux opportunités.
-                </p>
-              </motion.div>
-
-              {/* Column 2: Services */}
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.6, delay: 0.1 }}
-              >
-                <h3 className="text-white mb-4 text-cyan-300">
-                  Services
-                </h3>
-                <ul className="space-y-2.5 text-sm">
-                  <motion.li whileHover={{ x: 5 }} transition={{ duration: 0.2 }}>
-                    <a href="/services/interim-europeen" className="text-white/80 hover:text-white transition-colors inline-flex items-center gap-2 group">
-                      <ArrowRight className="w-3 h-3 opacity-0 group-hover:opacity-100 transition-opacity" />
-                      Intérim européen
-                    </a>
-                  </motion.li>
-                  <motion.li whileHover={{ x: 5 }} transition={{ duration: 0.2 }}>
-                    <a href="/services/recrutement-specialise" className="text-white/80 hover:text-white transition-colors inline-flex items-center gap-2 group">
-                      <ArrowRight className="w-3 h-3 opacity-0 group-hover:opacity-100 transition-opacity" />
-                      Recrutement spécialisé
-                    </a>
-                  </motion.li>
-                  <motion.li whileHover={{ x: 5 }} transition={{ duration: 0.2 }}>
-                    <a href="/services/conseil-conformite" className="text-white/80 hover:text-white transition-colors inline-flex items-center gap-2 group">
-                      <ArrowRight className="w-3 h-3 opacity-0 group-hover:opacity-100 transition-opacity" />
-                      Conseil & Conformité
-                    </a>
-                  </motion.li>
-                  <motion.li whileHover={{ x: 5 }} transition={{ duration: 0.2 }}>
-                    <a href="/services/detachement-personnel" className="text-white/80 hover:text-white transition-colors inline-flex items-center gap-2 group">
-                      <ArrowRight className="w-3 h-3 opacity-0 group-hover:opacity-100 transition-opacity" />
-                      Détachement de personnel
-                    </a>
-                  </motion.li>
-                </ul>
-              </motion.div>
-
-              {/* Column 3: Company */}
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.6, delay: 0.2 }}
-              >
-                <h3 className="text-white mb-4 text-cyan-300">
-                  Entreprise
-                </h3>
-                <ul className="space-y-2.5 text-sm">
-                  <motion.li whileHover={{ x: 5 }} transition={{ duration: 0.2 }}>
-                    <a href="/a-propos" className="text-white/80 hover:text-white transition-colors inline-flex items-center gap-2 group">
-                      <ArrowRight className="w-3 h-3 opacity-0 group-hover:opacity-100 transition-opacity" />
-                      À propos
-                    </a>
-                  </motion.li>
-                  <motion.li whileHover={{ x: 5 }} transition={{ duration: 0.2 }}>
-                    <a href="/notre-reseau" className="text-white/80 hover:text-white transition-colors inline-flex items-center gap-2 group">
-                      <ArrowRight className="w-3 h-3 opacity-0 group-hover:opacity-100 transition-opacity" />
-                      Notre réseau
-                    </a>
-                  </motion.li>
-                  <motion.li whileHover={{ x: 5 }} transition={{ duration: 0.2 }}>
-                    <a href="/nos-secteurs" className="text-white/80 hover:text-white transition-colors inline-flex items-center gap-2 group">
-                      <ArrowRight className="w-3 h-3 opacity-0 group-hover:opacity-100 transition-opacity" />
-                      Nos secteurs
-                    </a>
-                  </motion.li>
-                  <motion.li whileHover={{ x: 5 }} transition={{ duration: 0.2 }}>
-                    <a href="/temoignages" className="text-white/80 hover:text-white transition-colors inline-flex items-center gap-2 group">
-                      <ArrowRight className="w-3 h-3 opacity-0 group-hover:opacity-100 transition-opacity" />
-                      Témoignages
-                    </a>
-                  </motion.li>
-                </ul>
-              </motion.div>
-
-              {/* Column 4: Contact */}
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.6, delay: 0.3 }}
-              >
-                <h3 className="text-white mb-4 text-cyan-300">
-                  Contact
-                </h3>
-                <ul className="space-y-3 text-sm">
-                  <motion.li 
-                    className="flex items-start gap-3 text-white/80"
-                    whileHover={{ x: 3 }}
-                  >
-                    <Globe className="w-5 h-5 text-cyan-400 flex-shrink-0" />
-                    <span>Bordeaux, France</span>
-                  </motion.li>
-                  <motion.li 
-                    className="flex items-center gap-3 text-white/80"
-                    whileHover={{ x: 3 }}
-                  >
-                    <FileText className="w-5 h-5 text-violet-400" />
-                    <a href="tel:+33650622524" className="hover:text-white transition-colors">
-                      +33 6 50 62 25 24
-                    </a>
-                  </motion.li>
-                  <motion.li 
-                    className="flex items-center gap-3 text-white/80"
-                    whileHover={{ x: 3 }}
-                  >
-                    <CheckCircle className="w-5 h-5 text-cyan-400" />
-                    <span>contact@yojob.fr</span>
-                  </motion.li>
-                </ul>
-              </motion.div>
-            </div>
-
-            {/* Copyright */}
-            <motion.div 
-              className="border-t border-white/20 pt-6 lg:pt-8 text-center"
-              initial={{ opacity: 0 }}
-              whileInView={{ opacity: 1 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.6, delay: 0.4 }}
-            >
-              <div className="flex flex-col sm:flex-row items-center justify-center gap-2 text-sm text-white/80 mb-3">
-                <p>© 2026 YOJOB. Tous droits réservés.</p>
-              </div>
-              {/* Footer Links */}
-              <div className="flex flex-wrap items-center justify-center gap-4 text-xs text-white/50">
-                <a 
-                  href="/privacy" 
-                  className="hover:text-cyan-400 transition-colors underline decoration-dotted"
-                >
-                  Politique de confidentialité
-                </a>
-                <span className="text-white/30">•</span>
-                <a 
-                  href="/legal" 
-                  className="hover:text-cyan-400 transition-colors underline decoration-dotted"
-                >
-                  Mentions légales
-                </a>
-                <span className="text-white/30">•</span>
-                <a 
-                  href="/cgv" 
-                  className="hover:text-cyan-400 transition-colors underline decoration-dotted"
-                >
-                  CGV
-                </a>
-              </div>
-            </motion.div>
-          </div>
-        </footer>
+        <Footer content={footerTranslations[globalLanguage as SupportedLanguage]} />
       </div>
     </>
   );

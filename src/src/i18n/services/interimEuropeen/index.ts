@@ -41,6 +41,25 @@ export { fiInterimEuropeen } from './fi';
 export { noInterimEuropeen } from './no';
 
 /**
+ * 📋 LISTE DES LANGUES DISPONIBLES
+ * 
+ * Cette constante est utilisée par le LanguageSelector pour n'afficher
+ * que les langues qui ont été traduites.
+ */
+export const AVAILABLE_LANGUAGES_INTERIM_EUROPEEN = [
+  'fr', 'en', 'de', 'es', 'it', 'nl', 'pt',  // Ouest
+  'pl', 'cs', 'sk', 'hu',                     // Centre
+  'ro', 'bg', 'hr', 'sl', 'el',               // Sud-Est
+  'et', 'lv', 'lt',                           // Baltes
+  'sv', 'da', 'fi', 'no'                      // Nordiques
+] as const;
+
+/**
+ * Type des langues disponibles
+ */
+export type InterimEuropeenLanguage = typeof AVAILABLE_LANGUAGES_INTERIM_EUROPEEN[number];
+
+/**
  * Type pour les traductions Intérim Européen
  */
 export interface InterimEuropeenTranslation {

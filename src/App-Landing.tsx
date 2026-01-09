@@ -555,12 +555,12 @@ export default function AppLanding() {
                 <LanguageSelector
                   currentLanguage={globalLanguage}
                   onLanguageChange={setGlobalLanguage}
-                  availableLanguages={availableLanguages}
+                  availableLanguages={getAllLanguageCodes()}
                   variant="default"
                 />
                 {/* Badge "New" pour attirer l'attention */}
                 <div className="absolute -top-2 -right-2 z-[10000] bg-gradient-to-r from-yellow-400 to-orange-500 text-white text-xs px-2 py-0.5 rounded-full shadow-lg border-2 border-white animate-pulse">
-                  {availableLanguages.length} langues
+                  {getAllLanguageCodes().length} langues
                 </div>
               </div>
               <a 
@@ -678,7 +678,7 @@ export default function AppLanding() {
                       setGlobalLanguage(lang);
                       setIsMenuOpen(false);
                     }}
-                    availableLanguages={availableLanguages}
+                    availableLanguages={getAllLanguageCodes()}
                     variant="mobile"
                   />
                 </div>

@@ -1,16 +1,12 @@
 import { useState } from 'react';
-import { motion } from 'motion/react';
 import { Helmet, HelmetProvider } from 'react-helmet-async';
+import { motion } from 'motion/react';
 import {
-  Building2,
-  Target,
-  CheckCircle,
   Globe,
   FileText,
   Zap,
   ShieldCheck,
-  Network,
-  UserCheck,
+  Building2,
   Factory,
   Apple,
   Car,
@@ -19,10 +15,14 @@ import {
   Trees,
   Package,
   Sparkles,
-  Star,
+  Network,
+  UserCheck,
+  CheckCircle,
+  Target,
+  ArrowRight,
   ChevronDown,
   ChevronUp,
-  ArrowRight
+  Star,
 } from 'lucide-react';
 import { Badge } from './components/ui/badge';
 import { Button } from './components/ui/button';
@@ -33,6 +33,7 @@ import { Footer } from './components/landing/Footer';
 import { useServiceTranslation } from './src/i18n/services/useServiceTranslation';
 import { useLanguageManager } from './hooks/useLanguageManager';
 import { footerTranslations } from './src/i18n/services/footer';
+import { AVAILABLE_LANGUAGES_INTERIM_EUROPEEN } from './src/i18n/services/interimEuropeen';
 import type { SupportedLanguage } from './src/i18n/types';
 
 interface FAQItemProps {
@@ -192,7 +193,7 @@ export default function ServiceInterimEuropeen() {
               <LanguageSelector
                 currentLanguage={globalLanguage}
                 onLanguageChange={setGlobalLanguage}
-                availableLanguages={['fr', 'en', 'de', 'es', 'it', 'nl', 'pt', 'pl', 'cs', 'sk', 'hu', 'ro', 'bg', 'hr', 'sl', 'et', 'lv', 'lt', 'el', 'sv', 'da', 'fi', 'no']}
+                availableLanguages={AVAILABLE_LANGUAGES_INTERIM_EUROPEEN}
               />
               <a 
                 href="/devis"

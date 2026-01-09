@@ -136,7 +136,7 @@ export default function APropos() {
               <LanguageSelector
                 currentLanguage={language}
                 onLanguageChange={setLanguage}
-                availableLanguages={['fr', 'en']}
+                availableLanguages={['fr', 'en', 'de', 'es', 'it', 'nl', 'pt', 'pl', 'cs', 'sk', 'hu', 'ro', 'bg', 'hr', 'sl', 'et', 'lv', 'lt', 'el', 'sv', 'da', 'fi', 'no']}
               />
               <a 
                 href="/devis"

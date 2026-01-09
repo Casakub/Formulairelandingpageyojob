@@ -147,6 +147,12 @@ import { noInterimEuropeen } from './interimEuropeen/no';
 
 import { frRecrutementSpecialise } from './recrutementSpecialise/fr';
 import { enRecrutementSpecialise } from './recrutementSpecialise/en';
+import { deRecrutementSpecialise } from './recrutementSpecialise/de';
+import { esRecrutementSpecialise } from './recrutementSpecialise/es';
+import { itRecrutementSpecialise } from './recrutementSpecialise/it';
+import { nlRecrutementSpecialise } from './recrutementSpecialise/nl';
+import { ptRecrutementSpecialise } from './recrutementSpecialise/pt';
+import { plRecrutementSpecialise } from './recrutementSpecialise/pl';
 
 // TODO: Import des autres services quand ils seront créés
 // import { frConseilConformite } from './conseilConformite/fr';
@@ -197,6 +203,12 @@ function loadServiceTranslation(
     recrutementSpecialise: {
       fr: frRecrutementSpecialise,
       en: enRecrutementSpecialise,
+      de: deRecrutementSpecialise,
+      es: esRecrutementSpecialise,
+      it: itRecrutementSpecialise,
+      nl: nlRecrutementSpecialise,
+      pt: ptRecrutementSpecialise,
+      pl: plRecrutementSpecialise,
       // TODO: Ajouter les autres langues
     },
     conseilConformite: {
