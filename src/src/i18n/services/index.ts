@@ -198,6 +198,10 @@ import { noConseilConformite } from './conseilConformite/no';
 import { frDetachementPersonnel } from './detachementPersonnel/fr';
 import { enDetachementPersonnel } from './detachementPersonnel/en';
 import { deDetachementPersonnel } from './detachementPersonnel/de';
+import { esDetachementPersonnel } from './detachementPersonnel/es';
+import { itDetachementPersonnel } from './detachementPersonnel/it';
+import { nlDetachementPersonnel } from './detachementPersonnel/nl';
+import { ptDetachementPersonnel } from './detachementPersonnel/pt';
 
 /**
  * Loader de traductions par service
@@ -293,6 +297,10 @@ function loadServiceTranslation(
       fr: frDetachementPersonnel,
       en: enDetachementPersonnel,
       de: deDetachementPersonnel,
+      es: esDetachementPersonnel,
+      it: itDetachementPersonnel,
+      nl: nlDetachementPersonnel,
+      pt: ptDetachementPersonnel,
     },
   };
 

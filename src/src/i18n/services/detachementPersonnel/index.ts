@@ -8,9 +8,13 @@
 export { frDetachementPersonnel } from './fr';
 export { enDetachementPersonnel } from './en';
 export { deDetachementPersonnel } from './de';
+export { esDetachementPersonnel } from './es';
+export { itDetachementPersonnel } from './it';
+export { nlDetachementPersonnel } from './nl';
+export { ptDetachementPersonnel } from './pt';
 
 // TODO: Ajouter les autres langues européennes
-// export { esDetachementPersonnel } from './es';
+// export { plDetachementPersonnel } from './pl';
 // etc.
 
 /**
@@ -22,7 +26,7 @@ export { deDetachementPersonnel } from './de';
  * ⚠️ IMPORTANT : Ajouter ici chaque nouvelle langue après avoir créé
  * son fichier de traduction (ex: de.ts, es.ts, etc.)
  */
-export const AVAILABLE_LANGUAGES_DETACHMENT_PERSONNEL = ['fr', 'en', 'de'] as const;
+export const AVAILABLE_LANGUAGES_DETACHMENT_PERSONNEL = ['fr', 'en', 'de', 'es', 'it', 'nl', 'pt'] as const;
 
 /**
  * Type pour les langues disponibles
