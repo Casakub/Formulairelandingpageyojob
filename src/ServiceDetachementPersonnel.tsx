@@ -1,6 +1,46 @@
+import { useState } from 'react';
+import { motion } from 'motion/react';
+import { Helmet, HelmetProvider } from 'react-helmet-async';
 import { Badge } from './components/ui/badge';
+import { Button } from './components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from './components/ui/card';
 import { LogoSvg } from './imports/YojobLogoComplete';
 import { LanguageSelector } from './components/shared/LanguageSelector';
+import { Footer } from './components/landing/Footer';
+import { useLanguageManager } from './hooks/useLanguageManager';
+import { useServiceTranslation } from './src/i18n/services/useServiceTranslation';
+import { AVAILABLE_LANGUAGES_DETACHMENT_PERSONNEL } from './src/i18n/services/detachementPersonnel';
+import { footerTranslations } from './src/i18n/services/footer';
+import type { SupportedLanguage } from './src/i18n/types';
+import { 
+  ChevronDown, 
+  ChevronUp, 
+  Users, 
+  Building2, 
+  Euro, 
+  Phone,
+  ArrowRight,
+  CheckCircle,
+  FileText,
+  UserCheck,
+  Network,
+  MapPin,
+  Mail,
+  Clock,
+  Target,
+  Factory,
+  Apple,
+  Car,
+  Truck,
+  UtensilsCrossed,
+  Trees,
+  Package,
+  Sparkles,
+  Star,
+  Linkedin,
+  Twitter,
+  Facebook
+} from 'lucide-react';
 
 interface FAQItemProps {
   question: string;
@@ -44,68 +84,109 @@ function FAQItem({ question, answer }: FAQItemProps) {
 }
 
 export default function ServiceDetachementPersonnel() {
-  const [language, setLanguage] = useState('fr');
+  // Use global language manager
+  const { currentLanguage: globalLanguage, setLanguage } = useLanguageManager();
+  
+  // Get translations for current language
+  const t = useServiceTranslation('detachementPersonnel', globalLanguage as SupportedLanguage);
+  
+  // Get footer translations
+  const footerT = footerTranslations[globalLanguage as SupportedLanguage] || footerTranslations.fr;
 
-  const faqs = [
-    {
-      question: "Qui est l'employeur du travailleur détaché ?",
-      answer: "Le travailleur détaché reste employé par l'agence d'emploi temporaire (ETT) de son pays d'origine. C'est l'ETT qui est son employeur légal, qui le paie, gère ses cotisations sociales et reste son interlocuteur RH. Vous êtes l'entreprise utilisatrice qui accueille le travailleur sur votre site."
-    },
-    {
-      question: "Comment sont gérés l'hébergement et le transport ?",
-      answer: "YOJOB coordonne avec l'ETT partenaire l'organisation complète du transport aller-retour (avion, bus, covoiturage selon la distance). Pour l'hébergement, nous pouvons vous mettre en relation avec nos partenaires locaux (hôtels, résidences, appartements) ou l'ETT peut gérer directement selon vos préférences."
-    },
-    {
-      question: "Quelle est la différence entre intérim européen et détachement ?",
-      answer: "C'est la même chose ! Le détachement désigne le fait qu'un travailleur employé dans un pays A vient travailler temporairement dans un pays B tout en restant affilié à la sécurité sociale du pays A. L'intérim européen est un type de détachement où l'employeur est une agence d'emploi temporaire."
-    },
-    {
-      question: "Quels sont les coûts à prévoir pour l'entreprise utilisatrice ?",
-      answer: "Vous recevez une facture de l'ETT qui inclut : le salaire brut du travailleur selon la convention collective applicable en France, les charges sociales, les frais de gestion de l'ETT, et éventuellement les frais de transport/hébergement selon l'accord. YOJOB vous fournit un devis transparent détaillant tous ces coûts avant toute signature."
-    },
-    {
-      question: "Que se passe-t-il en cas de problème pendant la mission ?",
-      answer: "YOJOB reste votre interlocuteur privilégié pendant toute la durée de la mission. En cas de difficulté (absence, problème de langue, non-conformité), nous contactons immédiatement l'ETT partenaire pour trouver une solution : remplacement du travailleur, médiation, adaptation du poste, etc. Notre rôle est de garantir la continuité de votre activité."
-    }
+  // Icons for advantages
+  const advantageIcons = [
+    <Users className="w-8 h-8" />,
+    <Building2 className="w-8 h-8" />,
+    <Euro className="w-8 h-8" />,
+    <Phone className="w-8 h-8" />
   ];
+
+  const advantageColors = [
+    "from-blue-500 to-blue-600",
+    "from-cyan-500 to-cyan-600",
+    "from-violet-500 to-violet-600",
+    "from-green-500 to-green-600"
+  ];
+
+  // Icons for sectors
+  const sectorIcons = [
+    <Building2 className="w-8 h-8 text-white" />,
+    <Factory className="w-8 h-8 text-white" />,
+    <Apple className="w-8 h-8 text-white" />,
+    <Car className="w-8 h-8 text-white" />,
+    <Truck className="w-8 h-8 text-white" />,
+    <UtensilsCrossed className="w-8 h-8 text-white" />,
+    <Trees className="w-8 h-8 text-white" />,
+    <Package className="w-8 h-8 text-white" />,
+    <Sparkles className="w-8 h-8 text-white" />
+  ];
+
+  const sectorColors = [
+    "from-slate-600 to-slate-700",
+    "from-blue-600 to-indigo-700",
+    "from-emerald-600 to-teal-700",
+    "from-blue-700 to-indigo-800",
+    "from-slate-700 to-cyan-800",
+    "from-rose-600 to-red-700",
+    "from-green-700 to-emerald-800",
+    "from-amber-600 to-orange-700",
+    "from-violet-600 to-indigo-700"
+  ];
+
+  // Icons for steps
+  const stepIcons = [
+    <FileText className="w-8 h-8" />,
+    <Network className="w-8 h-8" />,
+    <UserCheck className="w-8 h-8" />,
+    <CheckCircle className="w-8 h-8" />
+  ];
+
+  const stepColors = [
+    "from-blue-500 to-blue-600",
+    "from-cyan-500 to-cyan-600",
+    "from-violet-500 to-violet-600",
+    "from-green-500 to-green-600"
+  ];
+
+  const faqs = t.faq.items;
 
   const advantages = [
     {
-      icon: <Users className="w-8 h-8" />,
+      icon: advantageIcons[0],
       title: "Coordination complète",
       description: "Interface unique entre vous et l'ETT européen",
-      color: "from-blue-500 to-blue-600"
+      color: advantageColors[0]
     },
     {
-      icon: <Building2 className="w-8 h-8" />,
+      icon: advantageIcons[1],
       title: "Solutions logistiques",
       description: "Hébergement et transport organisés si besoin",
-      color: "from-cyan-500 to-cyan-600"
+      color: advantageColors[1]
     },
     {
-      icon: <Euro className="w-8 h-8" />,
+      icon: advantageIcons[2],
       title: "Transparence tarifaire",
       description: "Devis détaillé avec tous les coûts inclus",
-      color: "from-violet-500 to-violet-600"
+      color: advantageColors[2]
     },
     {
-      icon: <Phone className="w-8 h-8" />,
+      icon: advantageIcons[3],
       title: "Support continu",
       description: "Interlocuteur dédié pendant toute la mission",
-      color: "from-green-500 to-green-600"
+      color: advantageColors[3]
     }
   ];
 
   const sectors = [
-    { icon: <Building2 className="w-8 h-8 text-white" />, name: "Construction / BTP", color: "from-slate-600 to-slate-700" },
-    { icon: <Factory className="w-8 h-8 text-white" />, name: "Industrie & Métallurgie", color: "from-blue-600 to-indigo-700" },
-    { icon: <Apple className="w-8 h-8 text-white" />, name: "Agroalimentaire", color: "from-emerald-600 to-teal-700" },
-    { icon: <Car className="w-8 h-8 text-white" />, name: "Automobile & Équipementiers", color: "from-blue-700 to-indigo-800" },
-    { icon: <Truck className="w-8 h-8 text-white" />, name: "Logistique & Transport", color: "from-slate-700 to-cyan-800" },
-    { icon: <UtensilsCrossed className="w-8 h-8 text-white" />, name: "Hôtellerie-Restauration", color: "from-rose-600 to-red-700" },
-    { icon: <Trees className="w-8 h-8 text-white" />, name: "Agriculture & Sylviculture", color: "from-green-700 to-emerald-800" },
-    { icon: <Package className="w-8 h-8 text-white" />, name: "Plasturgie & Emballage", color: "from-amber-600 to-orange-700" },
-    { icon: <Sparkles className="w-8 h-8 text-white" />, name: "Nettoyage & Services", color: "from-violet-600 to-indigo-700" }
+    { icon: sectorIcons[0], name: "Construction / BTP", color: sectorColors[0] },
+    { icon: sectorIcons[1], name: "Industrie & Métallurgie", color: sectorColors[1] },
+    { icon: sectorIcons[2], name: "Agroalimentaire", color: sectorColors[2] },
+    { icon: sectorIcons[3], name: "Automobile & Équipementiers", color: sectorColors[3] },
+    { icon: sectorIcons[4], name: "Logistique & Transport", color: sectorColors[4] },
+    { icon: sectorIcons[5], name: "Hôtellerie-Restauration", color: sectorColors[5] },
+    { icon: sectorIcons[6], name: "Agriculture & Sylviculture", color: sectorColors[6] },
+    { icon: sectorIcons[7], name: "Plasturgie & Emballage", color: sectorColors[7] },
+    { icon: sectorIcons[8], name: "Nettoyage & Services", color: sectorColors[8] }
   ];
 
   const steps = [
@@ -113,29 +194,29 @@ export default function ServiceDetachementPersonnel() {
       number: "1",
       title: "Sélection des profils",
       description: "L'ETT sélectionne et qualifie les candidats selon vos critères",
-      icon: <FileText className="w-8 h-8" />,
-      color: "from-blue-500 to-blue-600"
+      icon: stepIcons[0],
+      color: stepColors[0]
     },
     {
       number: "2",
       title: "Formalités & logistique",
       description: "Organisation A1, SIPSI, transport, hébergement",
-      icon: <Network className="w-8 h-8" />,
-      color: "from-cyan-500 to-cyan-600"
+      icon: stepIcons[1],
+      color: stepColors[1]
     },
     {
       number: "3",
       title: "Arrivée sur site",
       description: "Les travailleurs arrivent, vous les accueillez et les intégrez",
-      icon: <UserCheck className="w-8 h-8" />,
-      color: "from-violet-500 to-violet-600"
+      icon: stepIcons[2],
+      color: stepColors[2]
     },
     {
       number: "4",
       title: "Suivi de mission",
       description: "Accompagnement continu et gestion des imprévus",
-      icon: <CheckCircle className="w-8 h-8" />,
-      color: "from-green-500 to-green-600"
+      icon: stepIcons[3],
+      color: stepColors[3]
     }
   ];
 
@@ -152,8 +233,8 @@ export default function ServiceDetachementPersonnel() {
     <>
       <HelmetProvider>
         <Helmet>
-          <title>Détachement de Personnel Européen | Travailleurs détachés | YOJOB</title>
-          <meta name="description" content="Simplifiez le détachement de travailleurs européens en France. Gestion complète : sélection, formalités, hébergement, transport." />
+          <title>{t.meta.title}</title>
+          <meta name="description" content={t.meta.description} />
         </Helmet>
       </HelmetProvider>
 
@@ -176,9 +257,9 @@ export default function ServiceDetachementPersonnel() {
             {/* CTA */}
             <div className="flex items-center gap-4">
               <LanguageSelector
-                currentLanguage={language}
+                currentLanguage={globalLanguage}
                 onLanguageChange={setLanguage}
-                availableLanguages={['fr', 'en', 'de', 'es', 'it', 'nl', 'pt', 'pl', 'cs', 'sk', 'hu', 'ro', 'bg', 'hr', 'sl', 'et', 'lv', 'lt', 'el', 'sv', 'da', 'fi', 'no']}
+                availableLanguages={AVAILABLE_LANGUAGES_DETACHMENT_PERSONNEL}
               />
               <a 
                 href="/devis"
@@ -209,19 +290,19 @@ export default function ServiceDetachementPersonnel() {
                 transition={{ duration: 0.6 }}
               >
                 <Badge className="mb-6 px-6 py-2 bg-gradient-to-r from-blue-500/20 to-green-500/20 border border-blue-400/30 text-blue-200 backdrop-blur-sm">
-                  ✈️ Détachement de Personnel
+                  {t.hero.badge}
                 </Badge>
                 <h1 className="text-white mb-6 max-w-3xl mx-auto text-[20px]">
-                  Le détachement de personnel européen simplifié
+                  {t.hero.title}
                 </h1>
                 <p className="text-white/80 mb-8 max-w-2xl mx-auto leading-relaxed text-[16px]">
-                  De la sélection des candidats à leur intégration sur site, nous coordonnons l'ensemble du processus de détachement avec nos ETT partenaires.
+                  {t.hero.subtitle}
                 </p>
                 <div className="flex flex-col sm:flex-row gap-4 justify-center">
                   <a href="/devis">
                     <Button className="relative overflow-hidden group rounded-full bg-gradient-to-r from-cyan-500 to-violet-600 hover:from-cyan-600 hover:to-violet-700 text-white shadow-2xl hover:shadow-cyan-500/50 transition-all px-8 py-6 text-lg w-full sm:w-auto">
                       <span className="relative z-10 flex items-center">
-                        Demander un devis
+                        {t.hero.cta.primary}
                         <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
                       </span>
                       <div className="absolute inset-0 -translate-x-full group-hover:translate-x-full transition-transform duration-700 bg-gradient-to-r from-transparent via-white/40 to-transparent" />
@@ -232,7 +313,7 @@ export default function ServiceDetachementPersonnel() {
                     className="relative overflow-hidden group rounded-full border-white/30 bg-white/10 backdrop-blur-md text-white hover:bg-white/20 hover:border-cyan-400/50 shadow-lg hover:shadow-cyan-500/30 transition-all px-8 py-6 text-lg w-full sm:w-auto"
                     onClick={() => document.getElementById('processus')?.scrollIntoView({ behavior: 'smooth' })}
                   >
-                    <span className="relative z-10">Découvrir le processus</span>
+                    <span className="relative z-10">{t.hero.cta.secondary}</span>
                     <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 bg-gradient-to-r from-cyan-500/10 to-violet-500/10" />
                   </Button>
                 </div>
@@ -251,9 +332,9 @@ export default function ServiceDetachementPersonnel() {
               className="text-center mb-12"
             >
               <Badge className="mb-4 px-6 py-2 bg-gradient-to-r from-violet-500/20 to-cyan-500/20 border border-violet-400/30 text-violet-200 backdrop-blur-sm">
-                🎯 Pour qui ?
+                {t.forWho.badge}
               </Badge>
-              <h2 className="text-white mb-4 text-[20px]">Ce service est fait pour vous</h2>
+              <h2 className="text-white mb-4 text-[20px]">{t.forWho.title}</h2>
             </motion.div>
 
             <div className="grid md:grid-cols-2 gap-8 max-w-5xl mx-auto">
@@ -267,11 +348,11 @@ export default function ServiceDetachementPersonnel() {
                     <div className="w-16 h-16 bg-gradient-to-br from-blue-500 to-blue-600 rounded-2xl flex items-center justify-center mb-4">
                       <Building2 className="w-8 h-8 text-white" />
                     </div>
-                    <CardTitle className="text-white text-[20px]">Entreprises Utilisatrices</CardTitle>
+                    <CardTitle className="text-white text-[20px]">{t.forWho.userCompanies.title}</CardTitle>
                   </CardHeader>
                   <CardContent>
                     <p className="text-white/70 leading-relaxed">
-                      Entreprises qui souhaitent accueillir des travailleurs européens détachés sans gérer la complexité administrative et logistique du détachement.
+                      {t.forWho.userCompanies.description}
                     </p>
                   </CardContent>
                 </Card>
@@ -287,17 +368,11 @@ export default function ServiceDetachementPersonnel() {
                     <div className="w-16 h-16 bg-gradient-to-br from-cyan-500 to-cyan-600 rounded-2xl flex items-center justify-center mb-4">
                       <Target className="w-8 h-8 text-white" />
                     </div>
-                    <CardTitle className="text-white text-[20px]">Vous êtes concerné si...</CardTitle>
+                    <CardTitle className="text-white text-[20px]">{t.forWho.concerns.title}</CardTitle>
                   </CardHeader>
                   <CardContent>
                     <ul className="space-y-3">
-                      {[
-                        "Vous voulez un accompagnement de A à Z",
-                        "Vous avez besoin de gérer l'hébergement et le transport",
-                        "Vous souhaitez un interlocuteur unique",
-                        "Vous voulez une transparence totale sur les coûts",
-                        "Vous recherchez une solution clé en main"
-                      ].map((item, index) => (
+                      {t.forWho.concerns.items.map((item, index) => (
                         <li key={index} className="flex items-start gap-3 text-white/70">
                           <CheckCircle className="w-5 h-5 text-green-400 flex-shrink-0 mt-0.5" />
                           <span>{item}</span>
@@ -321,13 +396,13 @@ export default function ServiceDetachementPersonnel() {
               className="text-center mb-12"
             >
               <Badge className="mb-4 px-6 py-2 bg-gradient-to-r from-green-500/20 to-cyan-500/20 border border-green-400/30 text-green-200 backdrop-blur-sm">
-                ✨ Vos avantages
+                {t.advantages.badge}
               </Badge>
-              <h2 className="text-white text-[20px]">Pourquoi choisir notre service de détachement</h2>
+              <h2 className="text-white text-[20px]">{t.advantages.title}</h2>
             </motion.div>
 
             <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-              {advantages.map((advantage, index) => (
+              {t.advantages.items.map((advantage, index) => (
                 <motion.div
                   key={index}
                   initial={{ opacity: 0, y: 20 }}
@@ -338,8 +413,8 @@ export default function ServiceDetachementPersonnel() {
                 >
                   <Card className="border border-white/10 bg-white/5 backdrop-blur-sm hover:border-cyan-400/50 transition-all duration-300 h-full">
                     <CardContent className="p-6">
-                      <div className={`w-16 h-16 bg-gradient-to-br ${advantage.color} rounded-2xl flex items-center justify-center mb-4 shadow-lg`}>
-                        {advantage.icon}
+                      <div className={`w-16 h-16 bg-gradient-to-br ${advantageColors[index]} rounded-2xl flex items-center justify-center mb-4 shadow-lg`}>
+                        {advantageIcons[index]}
                       </div>
                       <h3 className="text-white mb-2">{advantage.title}</h3>
                       <p className="text-white/70 text-sm leading-relaxed">{advantage.description}</p>
@@ -361,9 +436,9 @@ export default function ServiceDetachementPersonnel() {
               className="text-center mb-12"
             >
               <Badge className="mb-4 px-6 py-2 bg-gradient-to-r from-blue-500/20 to-violet-500/20 border border-blue-400/30 text-blue-200 backdrop-blur-sm">
-                📦 Ce qui est inclus
+                {t.included.badge}
               </Badge>
-              <h2 className="text-white text-[20px]">Notre offre complète de détachement</h2>
+              <h2 className="text-white text-[20px]">{t.included.title}</h2>
             </motion.div>
 
             <motion.div
@@ -375,7 +450,7 @@ export default function ServiceDetachementPersonnel() {
               <Card className="border border-white/10 bg-white/5 backdrop-blur-sm">
                 <CardContent className="p-8">
                   <div className="grid md:grid-cols-2 gap-4">
-                    {included.map((item, index) => (
+                    {t.included.items.map((item, index) => (
                       <motion.div
                         key={index}
                         initial={{ opacity: 0, x: -10 }}
@@ -405,15 +480,15 @@ export default function ServiceDetachementPersonnel() {
               className="text-center mb-12"
             >
               <Badge className="mb-4 px-6 py-2 bg-gradient-to-r from-violet-500/20 to-cyan-500/20 border border-violet-400/30 text-violet-200 backdrop-blur-sm">
-                🎯 Comment ça marche
+                {t.process.badge}
               </Badge>
-              <h2 className="text-white text-[20px]">Le processus en 4 étapes</h2>
+              <h2 className="text-white text-[20px]">{t.process.title}</h2>
             </motion.div>
 
             <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 relative">
               <div className="hidden lg:block absolute top-24 left-0 right-0 h-0.5 bg-gradient-to-r from-blue-500 via-cyan-500 to-green-500 opacity-30" style={{ width: 'calc(100% - 12rem)', left: '6rem' }} />
 
-              {steps.map((step, index) => (
+              {t.process.steps.map((step, index) => (
                 <motion.div
                   key={index}
                   initial={{ opacity: 0, y: 20 }}
@@ -424,11 +499,11 @@ export default function ServiceDetachementPersonnel() {
                 >
                   <Card className="border border-white/10 bg-white/5 backdrop-blur-sm hover:border-cyan-400/50 transition-all duration-300 h-full">
                     <CardContent className="p-6 relative">
-                      <div className={`w-12 h-12 bg-gradient-to-br ${step.color} rounded-xl flex items-center justify-center text-white text-xl absolute -top-6 right-6 shadow-lg rotate-12`}>
-                        {step.number}
+                      <div className={`w-12 h-12 bg-gradient-to-br ${stepColors[index]} rounded-xl flex items-center justify-center text-white text-xl absolute -top-6 right-6 shadow-lg rotate-12`}>
+                        {index + 1}
                       </div>
-                      <div className={`w-16 h-16 bg-gradient-to-br ${step.color} rounded-2xl flex items-center justify-center mb-4 shadow-lg`}>
-                        {step.icon}
+                      <div className={`w-16 h-16 bg-gradient-to-br ${stepColors[index]} rounded-2xl flex items-center justify-center mb-4 shadow-lg`}>
+                        {stepIcons[index]}
                       </div>
                       <h3 className="text-white mb-2">{step.title}</h3>
                       <p className="text-white/70 text-sm leading-relaxed">{step.description}</p>
@@ -450,13 +525,13 @@ export default function ServiceDetachementPersonnel() {
               className="text-center mb-12"
             >
               <Badge className="mb-4 px-6 py-2 bg-gradient-to-r from-orange-500/20 to-red-500/20 border border-orange-400/30 text-orange-200 backdrop-blur-sm">
-                🏭 Secteurs d'activité
+                {t.sectors.badge}
               </Badge>
-              <h2 className="text-white text-[20px]">Secteurs utilisant le détachement</h2>
+              <h2 className="text-white text-[20px]">{t.sectors.title}</h2>
             </motion.div>
 
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
-              {sectors.map((sector, index) => (
+              {t.sectors.items.map((sector, index) => (
                 <motion.div
                   key={index}
                   initial={{ opacity: 0, scale: 0.9 }}
@@ -468,8 +543,8 @@ export default function ServiceDetachementPersonnel() {
                 >
                   <Card className="border border-white/10 bg-white/5 backdrop-blur-sm hover:border-cyan-400/50 transition-all duration-300 h-full">
                     <CardContent className="p-6 text-center flex flex-col items-center justify-center h-full">
-                      <div className={`w-16 h-16 bg-gradient-to-br ${sector.color} rounded-2xl flex items-center justify-center mx-auto mb-3 shadow-lg`}>
-                        {sector.icon}
+                      <div className={`w-16 h-16 bg-gradient-to-br ${sectorColors[index]} rounded-2xl flex items-center justify-center mx-auto mb-3 shadow-lg`}>
+                        {sectorIcons[index]}
                       </div>
                       <p className="text-white text-sm leading-tight">{sector.name}</p>
                     </CardContent>
@@ -490,7 +565,7 @@ export default function ServiceDetachementPersonnel() {
               className="text-center mb-12"
             >
               <Badge className="mb-4 px-6 py-2 bg-gradient-to-r from-yellow-500/20 to-orange-500/20 border border-yellow-400/30 text-yellow-200 backdrop-blur-sm">
-                ⭐ Ils nous font confiance
+                {t.testimonial.badge}
               </Badge>
             </motion.div>
 
@@ -508,16 +583,16 @@ export default function ServiceDetachementPersonnel() {
                     ))}
                   </div>
                   <p className="text-white/90 text-lg leading-relaxed mb-6 italic">
-                    "YOJOB a géré de A à Z le détachement de 15 ouvriers portugais pour notre chantier : sélection, transport en bus, hébergement en résidence, formalités A1 et SIPSI. Nous n'avons eu qu'à les accueillir sur site. Service impeccable et transparent."
+                    {t.testimonial.quote}
                   </p>
                   <div className="flex items-center gap-4">
                     <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-green-500 rounded-full flex items-center justify-center text-white text-xl">
-                      SD
+                      {t.testimonial.author.initials}
                     </div>
                     <div>
-                      <p className="text-white">Sophie Durand</p>
-                      <p className="text-white/60 text-sm">Directrice de Projet - Batimex Construction</p>
-                      <p className="text-white/40 text-xs mt-1">Secteur : BTP</p>
+                      <p className="text-white">{t.testimonial.author.name}</p>
+                      <p className="text-white/60 text-sm">{t.testimonial.author.role}</p>
+                      <p className="text-white/40 text-xs mt-1">{t.testimonial.author.sector}</p>
                     </div>
                   </div>
                 </CardContent>
@@ -536,13 +611,13 @@ export default function ServiceDetachementPersonnel() {
               className="text-center mb-12"
             >
               <Badge className="mb-4 px-6 py-2 bg-gradient-to-r from-violet-500/20 to-pink-500/20 border border-violet-400/30 text-violet-200 backdrop-blur-sm">
-                ❓ Questions fréquentes
+                {t.faq.badge}
               </Badge>
-              <h2 className="text-white text-[20px]">Vos questions sur le détachement</h2>
+              <h2 className="text-white text-[20px]">{t.faq.title}</h2>
             </motion.div>
 
             <div className="max-w-3xl mx-auto space-y-4">
-              {faqs.map((faq, index) => (
+              {t.faq.items.map((faq, index) => (
                 <FAQItem key={index} question={faq.question} answer={faq.answer} />
               ))}
             </div>
@@ -565,231 +640,29 @@ export default function ServiceDetachementPersonnel() {
               className="text-center max-w-3xl mx-auto"
             >
               <h2 className="text-white mb-6 text-[20px]">
-                Prêt à simplifier vos détachements ?
+                {t.ctaFinal.title}
               </h2>
               <p className="text-white/80 mb-8 leading-relaxed text-[16px]">
-                Confiez-nous la coordination complète de vos détachements européens
+                {t.ctaFinal.subtitle}
               </p>
               <a href="/devis">
                 <Button className="relative overflow-hidden group rounded-full bg-gradient-to-r from-cyan-500 to-violet-600 hover:from-cyan-600 hover:to-violet-700 text-white shadow-2xl hover:shadow-cyan-500/50 transition-all px-8 py-6 text-lg w-full sm:w-auto">
                   <span className="relative z-10 flex items-center">
-                    Demander un devis
+                    {t.ctaFinal.cta}
                     <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
                   </span>
                   <div className="absolute inset-0 -translate-x-full group-hover:translate-x-full transition-transform duration-700 bg-gradient-to-r from-transparent via-white/40 to-transparent" />
                 </Button>
               </a>
               <p className="text-white/60 text-sm mt-6">
-                ✓ Réponse sous 24h • ✓ Sans engagement
+                {t.ctaFinal.features}
               </p>
             </motion.div>
           </div>
         </section>
 
         {/* Footer */}
-        <footer className="relative overflow-hidden bg-gradient-to-b from-[#0a0e27] to-[#1a1f3a] text-white py-12 lg:py-16">
-          {/* Radial gradients - same as network section */}
-          <div className="absolute inset-0" style={{
-            backgroundImage: 'radial-gradient(circle at 20% 50%, rgba(6, 182, 212, 0.3) 0%, transparent 50%), radial-gradient(circle at 80% 80%, rgba(124, 58, 237, 0.3) 0%, transparent 50%)',
-          }} />
-
-          <div className="container mx-auto px-4 relative z-10">
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 lg:gap-10 mb-10 lg:mb-12">
-              {/* Column 1: Logo & Description */}
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.6 }}
-              >
-                <motion.div 
-                  className="w-32 h-32 inline-block mb-6"
-                  whileHover={{ scale: 1.05, y: -2 }}
-                  transition={{ duration: 0.3 }}
-                >
-                  <LogoSvg 
-                    className="w-full h-full" 
-                    aria-label="YOJOB"
-                  />
-                </motion.div>
-                <p className="text-white/80 mb-[24px] leading-relaxed max-w-xs text-[13px] mt-[-46px] mr-[0px] ml-[0px]">
-                  Leader du recrutement européen. 500+ agences partenaires dans 27 pays pour connecter les talents aux opportunités.
-                </p>
-                <div className="flex gap-3">
-                  {[
-                    { icon: Linkedin, href: '#', color: 'cyan' },
-                    { icon: Twitter, href: '#', color: 'violet' },
-                    { icon: Facebook, href: '#', color: 'blue' }
-                  ].map((social, index) => (
-                    <motion.a
-                      key={index}
-                      href={social.href}
-                      className="w-10 h-10 bg-white/10 backdrop-blur-md border border-white/20 rounded-full flex items-center justify-center hover:bg-white/20 transition-all duration-300 group"
-                      whileHover={{ scale: 1.1, y: -3 }}
-                      transition={{ duration: 0.3 }}
-                    >
-                      <social.icon className={`w-5 h-5 group-hover:drop-shadow-[0_0_8px_rgba(6,182,212,0.8)] transition-all`} />
-                    </motion.a>
-                  ))}
-                </div>
-              </motion.div>
-
-              {/* Column 2: Services */}
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.6, delay: 0.1 }}
-              >
-                <h3 className="text-white mb-4 text-cyan-300">
-                  Services
-                </h3>
-                <ul className="space-y-2.5 text-sm">
-                  <motion.li whileHover={{ x: 5 }} transition={{ duration: 0.2 }}>
-                    <a href="/services/interim-europeen" className="text-white/80 hover:text-white transition-colors inline-flex items-center gap-2 group">
-                      <ArrowRight className="w-3 h-3 opacity-0 group-hover:opacity-100 transition-opacity" />
-                      Intérim européen
-                    </a>
-                  </motion.li>
-                  <motion.li whileHover={{ x: 5 }} transition={{ duration: 0.2 }}>
-                    <a href="/services/recrutement-specialise" className="text-white/80 hover:text-white transition-colors inline-flex items-center gap-2 group">
-                      <ArrowRight className="w-3 h-3 opacity-0 group-hover:opacity-100 transition-opacity" />
-                      Recrutement spécialisé
-                    </a>
-                  </motion.li>
-                  <motion.li whileHover={{ x: 5 }} transition={{ duration: 0.2 }}>
-                    <a href="/services/conseil-conformite" className="text-white/80 hover:text-white transition-colors inline-flex items-center gap-2 group">
-                      <ArrowRight className="w-3 h-3 opacity-0 group-hover:opacity-100 transition-opacity" />
-                      Conseil & Conformité
-                    </a>
-                  </motion.li>
-                  <motion.li whileHover={{ x: 5 }} transition={{ duration: 0.2 }}>
-                    <a href="/services/detachement-personnel" className="text-white/80 hover:text-white transition-colors inline-flex items-center gap-2 group">
-                      <ArrowRight className="w-3 h-3 opacity-0 group-hover:opacity-100 transition-opacity" />
-                      Détachement de personnel
-                    </a>
-                  </motion.li>
-                </ul>
-              </motion.div>
-
-              {/* Column 3: Company */}
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.6, delay: 0.2 }}
-              >
-                <h3 className="text-white mb-4 text-cyan-300">
-                  Entreprise
-                </h3>
-                <ul className="space-y-2.5 text-sm">
-                  <motion.li whileHover={{ x: 5 }} transition={{ duration: 0.2 }}>
-                    <a href="/a-propos" className="text-white/80 hover:text-white transition-colors inline-flex items-center gap-2 group">
-                      <ArrowRight className="w-3 h-3 opacity-0 group-hover:opacity-100 transition-opacity" />
-                      À propos
-                    </a>
-                  </motion.li>
-                  <motion.li whileHover={{ x: 5 }} transition={{ duration: 0.2 }}>
-                    <a href="/notre-reseau" className="text-white/80 hover:text-white transition-colors inline-flex items-center gap-2 group">
-                      <ArrowRight className="w-3 h-3 opacity-0 group-hover:opacity-100 transition-opacity" />
-                      Notre réseau
-                    </a>
-                  </motion.li>
-                  <motion.li whileHover={{ x: 5 }} transition={{ duration: 0.2 }}>
-                    <a href="/nos-secteurs" className="text-white/80 hover:text-white transition-colors inline-flex items-center gap-2 group">
-                      <ArrowRight className="w-3 h-3 opacity-0 group-hover:opacity-100 transition-opacity" />
-                      Nos secteurs
-                    </a>
-                  </motion.li>
-                  <motion.li whileHover={{ x: 5 }} transition={{ duration: 0.2 }}>
-                    <a href="/temoignages" className="text-white/80 hover:text-white transition-colors inline-flex items-center gap-2 group">
-                      <ArrowRight className="w-3 h-3 opacity-0 group-hover:opacity-100 transition-opacity" />
-                      Témoignages
-                    </a>
-                  </motion.li>
-                </ul>
-              </motion.div>
-
-              {/* Column 4: Contact */}
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.6, delay: 0.3 }}
-              >
-                <h3 className="text-white mb-4 text-cyan-300">
-                  Contact
-                </h3>
-                <ul className="space-y-3 text-sm">
-                  <motion.li 
-                    className="flex items-start gap-3 p-2 rounded-lg bg-white/5 backdrop-blur-sm hover:bg-white/10 transition-all duration-300"
-                    whileHover={{ x: 3 }}
-                  >
-                    <MapPin className="w-5 h-5 text-cyan-400 flex-shrink-0 drop-shadow-[0_0_8px_rgba(6,182,212,0.6)]" />
-                    <span className="text-white/90">Bordeaux, France</span>
-                  </motion.li>
-                  <motion.li 
-                    className="flex items-center gap-3 p-2 rounded-lg bg-white/5 backdrop-blur-sm hover:bg-white/10 transition-all duration-300"
-                    whileHover={{ x: 3 }}
-                  >
-                    <Phone className="w-5 h-5 text-violet-400 drop-shadow-[0_0_8px_rgba(124,58,237,0.6)]" />
-                    <a href="tel:+33650622524" className="text-white/90 hover:text-cyan-400 transition-colors">
-                      +33 6 50 62 25 24
-                    </a>
-                  </motion.li>
-                  <motion.li 
-                    className="flex items-center gap-3 p-2 rounded-lg bg-white/5 backdrop-blur-sm hover:bg-white/10 transition-all duration-300"
-                    whileHover={{ x: 3 }}
-                  >
-                    <Mail className="w-5 h-5 text-cyan-400 drop-shadow-[0_0_8px_rgba(6,182,212,0.6)]" />
-                    <a 
-                      href="mailto:contact@yojob.fr"
-                      className="text-white/90 hover:text-cyan-400 transition-colors"
-                    >
-                      contact@yojob.fr
-                    </a>
-                  </motion.li>
-                </ul>
-              </motion.div>
-            </div>
-
-            {/* Copyright */}
-            <motion.div 
-              className="border-t border-white/20 pt-6 lg:pt-8 text-center"
-              initial={{ opacity: 0 }}
-              whileInView={{ opacity: 1 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.6, delay: 0.4 }}
-            >
-              <div className="flex flex-col sm:flex-row items-center justify-center gap-2 text-sm text-white/80 mb-3">
-                <p>© 2026 YOJOB. Tous droits réservés.</p>
-              </div>
-              {/* Footer Links */}
-              <div className="flex flex-wrap items-center justify-center gap-4 text-xs text-white/50">
-                <a 
-                  href="/privacy" 
-                  className="hover:text-cyan-400 transition-colors underline decoration-dotted"
-                >
-                  Politique de confidentialité
-                </a>
-                <span className="text-white/30">•</span>
-                <a 
-                  href="/legal" 
-                  className="hover:text-cyan-400 transition-colors underline decoration-dotted"
-                >
-                  Mentions légales
-                </a>
-                <span className="text-white/30">•</span>
-                <a 
-                  href="/cgv" 
-                  className="hover:text-cyan-400 transition-colors underline decoration-dotted"
-                >
-                  CGV
-                </a>
-              </div>
-            </motion.div>
-          </div>
-        </footer>
+        <Footer content={footerT} />
       </div>
     </>
   );

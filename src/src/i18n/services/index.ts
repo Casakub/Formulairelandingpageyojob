@@ -169,6 +169,7 @@ import { daRecrutementSpecialise } from './recrutementSpecialise/da';
 import { fiRecrutementSpecialise } from './recrutementSpecialise/fi';
 import { noRecrutementSpecialise } from './recrutementSpecialise/no';
 
+// === IMPORTS CONSEIL & CONFORMITÉ ===
 import { frConseilConformite } from './conseilConformite/fr';
 import { enConseilConformite } from './conseilConformite/en';
 import { deConseilConformite } from './conseilConformite/de';
@@ -193,10 +194,10 @@ import { daConseilConformite } from './conseilConformite/da';
 import { fiConseilConformite } from './conseilConformite/fi';
 import { noConseilConformite } from './conseilConformite/no';
 
-// TODO: Import des autres services quand ils seront créés
-// import { gaConseilConformite } from './conseilConformite/ga';
-// import { frDetachementPersonnel } from './detachementPersonnel/fr';
-// import { enDetachementPersonnel } from './detachementPersonnel/en';
+// === IMPORTS DÉTACHEMENT DE PERSONNEL ===
+import { frDetachementPersonnel } from './detachementPersonnel/fr';
+import { enDetachementPersonnel } from './detachementPersonnel/en';
+import { deDetachementPersonnel } from './detachementPersonnel/de';
 
 /**
  * Loader de traductions par service
@@ -289,7 +290,9 @@ function loadServiceTranslation(
       no: noConseilConformite,
     },
     detachementPersonnel: {
-      // TODO: Ajouter les traductions
+      fr: frDetachementPersonnel,
+      en: enDetachementPersonnel,
+      de: deDetachementPersonnel,
     },
   };
 
