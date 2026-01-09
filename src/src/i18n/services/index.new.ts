@@ -123,27 +123,6 @@ export interface ServiceTranslations {
 // Import des traductions par service et par langue
 import { frInterimEuropeen } from './interimEuropeen/fr';
 import { enInterimEuropeen } from './interimEuropeen/en';
-import { deInterimEuropeen } from './interimEuropeen/de';
-import { esInterimEuropeen } from './interimEuropeen/es';
-import { itInterimEuropeen } from './interimEuropeen/it';
-import { nlInterimEuropeen } from './interimEuropeen/nl';
-import { ptInterimEuropeen } from './interimEuropeen/pt';
-import { plInterimEuropeen } from './interimEuropeen/pl';
-import { csInterimEuropeen } from './interimEuropeen/cs';
-import { skInterimEuropeen } from './interimEuropeen/sk';
-import { huInterimEuropeen } from './interimEuropeen/hu';
-import { roInterimEuropeen } from './interimEuropeen/ro';
-import { bgInterimEuropeen } from './interimEuropeen/bg';
-import { hrInterimEuropeen } from './interimEuropeen/hr';
-import { slInterimEuropeen } from './interimEuropeen/sl';
-import { elInterimEuropeen } from './interimEuropeen/el';
-import { etInterimEuropeen } from './interimEuropeen/et';
-import { lvInterimEuropeen } from './interimEuropeen/lv';
-import { ltInterimEuropeen } from './interimEuropeen/lt';
-import { svInterimEuropeen } from './interimEuropeen/sv';
-import { daInterimEuropeen } from './interimEuropeen/da';
-import { fiInterimEuropeen } from './interimEuropeen/fi';
-import { noInterimEuropeen } from './interimEuropeen/no';
 
 import { frRecrutementSpecialise } from './recrutementSpecialise/fr';
 import { enRecrutementSpecialise } from './recrutementSpecialise/en';
@@ -172,27 +151,7 @@ function loadServiceTranslation(
     interimEuropeen: {
       fr: frInterimEuropeen,
       en: enInterimEuropeen,
-      de: deInterimEuropeen,
-      es: esInterimEuropeen,
-      it: itInterimEuropeen,
-      nl: nlInterimEuropeen,
-      pt: ptInterimEuropeen,
-      pl: plInterimEuropeen,
-      cs: csInterimEuropeen,
-      sk: skInterimEuropeen,
-      hu: huInterimEuropeen,
-      ro: roInterimEuropeen,
-      bg: bgInterimEuropeen,
-      hr: hrInterimEuropeen,
-      sl: slInterimEuropeen,
-      el: elInterimEuropeen,
-      et: etInterimEuropeen,
-      lv: lvInterimEuropeen,
-      lt: ltInterimEuropeen,
-      sv: svInterimEuropeen,
-      da: daInterimEuropeen,
-      fi: fiInterimEuropeen,
-      no: noInterimEuropeen,
+      // TODO: Ajouter les autres langues
     },
     recrutementSpecialise: {
       fr: frRecrutementSpecialise,

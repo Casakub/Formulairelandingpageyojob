@@ -42,6 +42,9 @@ import { Button } from './components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from './components/ui/card';
 import { LogoSvg } from './imports/YojobLogoComplete';
 import { LanguageSelector } from './components/shared/LanguageSelector';
+import { useServiceTranslation } from './src/i18n/services/useServiceTranslation';
+import { useLanguageManager } from './hooks/useLanguageManager';
+import type { SupportedLanguage } from './src/i18n/types';
 
 interface FAQItemProps {
   question: string;
@@ -85,107 +88,94 @@ function FAQItem({ question, answer }: FAQItemProps) {
 }
 
 export default function ServiceRecrutementSpecialise() {
-  const [language, setLanguage] = useState('fr');
+  // Use global language manager
+  const { language: globalLanguage, setLanguage } = useLanguageManager();
+  
+  // Get translations for current language
+  const t = useServiceTranslation('recrutementSpecialise', globalLanguage as SupportedLanguage);
 
-  const faqs = [
-    {
-      question: "Quels secteurs d'activité couvrez-vous ?",
-      answer: "Nous couvrons tous les secteurs d'activité : BTP, industrie, hôtellerie-restauration, métallurgie, plasturgie, automobile, sylviculture, cartonnerie, et bien d'autres. Nos agences partenaires sont spécialisées par secteur pour garantir une parfaite compréhension de vos besoins."
-    },
-    {
-      question: "Comment vérifiez-vous les compétences des candidats ?",
-      answer: "Nos agences partenaires vérifient systématiquement les diplômes, certifications professionnelles (CACES, habilitations électriques, etc.), références employeurs, et font passer des tests techniques si nécessaire. Nous pouvons également organiser des évaluations pratiques sur site."
-    },
-    {
-      question: "Pouvez-vous recruter des profils avec des certifications spécifiques (CACES, habilitations...) ?",
-      answer: "Absolument. Nos agences partenaires disposent de viviers de candidats certifiés : CACES (R489, R490, R482...), habilitations électriques (B0, B1, B2, BR, BC, H0...), AIPR, SST, travail en hauteur, etc. Nous vérifions la validité de toutes les certifications avant présentation."
-    },
-    {
-      question: "Quel est le niveau de langue des candidats ?",
-      answer: "Le niveau de français varie selon le pays d'origine et le profil. Nous évaluons systématiquement le niveau de langue (A1 à C2) et vous présentons uniquement des candidats dont le niveau correspond à vos exigences. Pour les postes nécessitant un français courant, nous organisons des entretiens en visio."
-    },
-    {
-      question: "Proposez-vous des tests techniques avant embauche ?",
-      answer: "Oui, nous pouvons organiser des tests techniques adaptés à votre métier : soudure, conduite d'engins, mécanique, électricité, etc. Ces tests peuvent être réalisés dans le pays d'origine ou directement sur votre site lors d'une période d'essai."
-    }
+  // Icons for advantages
+  const advantageIcons = [
+    <Search className="w-8 h-8" />,
+    <Award className="w-8 h-8" />,
+    <MessageSquare className="w-8 h-8" />,
+    <TrendingUp className="w-8 h-8" />
+  ];
+  
+  const advantageColors = [
+    "from-blue-500 to-blue-600",
+    "from-cyan-500 to-cyan-600",
+    "from-violet-500 to-violet-600",
+    "from-green-500 to-green-600"
   ];
 
-  const advantages = [
-    {
-      icon: <Search className="w-8 h-8" />,
-      title: "Expertise sectorielle",
-      description: "Agences spécialisées par métier et secteur",
-      color: "from-blue-500 to-blue-600"
-    },
-    {
-      icon: <Award className="w-8 h-8" />,
-      title: "Profils qualifiés",
-      description: "Vérification des compétences et certifications",
-      color: "from-cyan-500 to-cyan-600"
-    },
-    {
-      icon: <MessageSquare className="w-8 h-8" />,
-      title: "Matching précis",
-      description: "Compétences techniques + niveau de langue adapté",
-      color: "from-violet-500 to-violet-600"
-    },
-    {
-      icon: <TrendingUp className="w-8 h-8" />,
-      title: "Accompagnement",
-      description: "Suivi personnalisé tout au long de la mission",
-      color: "from-green-500 to-green-600"
-    }
+  const advantages = t.benefits.items.map((item, index) => ({
+    icon: advantageIcons[index],
+    title: item.title,
+    description: item.description,
+    color: advantageColors[index]
+  }));
+
+  // Icons for sectors
+  const sectorIcons = [
+    <Building2 className="w-8 h-8 text-white" />,
+    <Factory className="w-8 h-8 text-white" />,
+    <Apple className="w-8 h-8 text-white" />,
+    <Car className="w-8 h-8 text-white" />,
+    <Truck className="w-8 h-8 text-white" />,
+    <UtensilsCrossed className="w-8 h-8 text-white" />,
+    <Trees className="w-8 h-8 text-white" />,
+    <Package className="w-8 h-8 text-white" />,
+    <Sparkles className="w-8 h-8 text-white" />
+  ];
+  
+  const sectorColors = [
+    "from-slate-600 to-slate-700",
+    "from-blue-600 to-indigo-700",
+    "from-emerald-600 to-teal-700",
+    "from-blue-700 to-indigo-800",
+    "from-slate-700 to-cyan-800",
+    "from-rose-600 to-red-700",
+    "from-green-700 to-emerald-800",
+    "from-amber-600 to-orange-700",
+    "from-violet-600 to-indigo-700"
   ];
 
-  const sectors = [
-    { icon: <Building2 className="w-8 h-8 text-white" />, name: "Construction / BTP", color: "from-slate-600 to-slate-700" },
-    { icon: <Factory className="w-8 h-8 text-white" />, name: "Industrie & Métallurgie", color: "from-blue-600 to-indigo-700" },
-    { icon: <Apple className="w-8 h-8 text-white" />, name: "Agroalimentaire", color: "from-emerald-600 to-teal-700" },
-    { icon: <Car className="w-8 h-8 text-white" />, name: "Automobile & Équipementiers", color: "from-blue-700 to-indigo-800" },
-    { icon: <Truck className="w-8 h-8 text-white" />, name: "Logistique & Transport", color: "from-slate-700 to-cyan-800" },
-    { icon: <UtensilsCrossed className="w-8 h-8 text-white" />, name: "Hôtellerie-Restauration", color: "from-rose-600 to-red-700" },
-    { icon: <Trees className="w-8 h-8 text-white" />, name: "Agriculture & Sylviculture", color: "from-green-700 to-emerald-800" },
-    { icon: <Package className="w-8 h-8 text-white" />, name: "Plasturgie & Emballage", color: "from-amber-600 to-orange-700" },
-    { icon: <Sparkles className="w-8 h-8 text-white" />, name: "Nettoyage & Services", color: "from-violet-600 to-indigo-700" }
+  const sectors = t.sectors.items.map((item, index) => ({
+    icon: sectorIcons[index],
+    name: item.name,
+    color: sectorColors[index]
+  }));
+
+  // Icons for steps
+  const stepIcons = [
+    <FileText className="w-8 h-8" />,
+    <Network className="w-8 h-8" />,
+    <UserCheck className="w-8 h-8" />,
+    <CheckCircle className="w-8 h-8" />
+  ];
+  
+  const stepColors = [
+    "from-blue-500 to-blue-600",
+    "from-cyan-500 to-cyan-600",
+    "from-violet-500 to-violet-600",
+    "from-green-500 to-green-600"
   ];
 
-  const steps = [
-    {
-      number: "1",
-      title: "Définissez le profil",
-      description: "Partagez-nous le profil recherché : compétences, certifications, expérience",
-      icon: <FileText className="w-8 h-8" />,
-      color: "from-blue-500 to-blue-600"
-    },
-    {
-      number: "2",
-      title: "Sourcing ciblé",
-      description: "Nos agences spécialisées identifient les meilleurs candidats",
-      icon: <Network className="w-8 h-8" />,
-      color: "from-cyan-500 to-cyan-600"
-    },
-    {
-      number: "3",
-      title: "Présélection",
-      description: "Vous recevez les CV qualifiés et menez les entretiens",
-      icon: <UserCheck className="w-8 h-8" />,
-      color: "from-violet-500 to-violet-600"
-    },
-    {
-      number: "4",
-      title: "Intégration",
-      description: "Le candidat retenu rejoint vos équipes, suivi personnalisé",
-      icon: <CheckCircle className="w-8 h-8" />,
-      color: "from-green-500 to-green-600"
-    }
-  ];
+  const steps = t.process.steps.map((step, index) => ({
+    number: `${index + 1}`,
+    title: step.title,
+    description: step.description,
+    icon: stepIcons[index],
+    color: stepColors[index]
+  }));
 
   return (
     <>
       <HelmetProvider>
         <Helmet>
-          <title>Recrutement Spécialisé Europe | Experts sectoriels | YOJOB</title>
-          <meta name="description" content="Trouvez les talents spécialisés dont vous avez besoin grâce à notre réseau d'experts sectoriels : BTP, industrie, hôtellerie, métallurgie..." />
+          <title>{t.meta.title}</title>
+          <meta name="description" content={t.meta.description} />
         </Helmet>
       </HelmetProvider>
 
@@ -208,7 +198,7 @@ export default function ServiceRecrutementSpecialise() {
             {/* CTA */}
             <div className="flex items-center gap-4">
               <LanguageSelector
-                currentLanguage={language}
+                currentLanguage={globalLanguage}
                 onLanguageChange={setLanguage}
                 availableLanguages={['fr', 'en']}
               />
@@ -217,7 +207,7 @@ export default function ServiceRecrutementSpecialise() {
                 className="relative overflow-hidden group rounded-full bg-white text-[#1E3A8A] hover:bg-cyan-50 shadow-2xl hover:shadow-white/70 transition-all duration-300 hover:scale-105 px-6 py-2.5 inline-flex items-center justify-center"
               >
                 <span className="relative z-10 flex items-center">
-                  Demander un devis
+                  {t.hero.cta.primary}
                   <ArrowRight className="ml-2 w-4 h-4" />
                 </span>
                 <div className="absolute inset-0 -translate-x-full group-hover:translate-x-full transition-transform duration-700 bg-gradient-to-r from-transparent via-white/40 to-transparent" />
@@ -241,19 +231,19 @@ export default function ServiceRecrutementSpecialise() {
                 transition={{ duration: 0.6 }}
               >
                 <Badge className="mb-6 px-6 py-2 bg-gradient-to-r from-cyan-500/20 to-violet-500/20 border border-cyan-400/30 text-cyan-200 backdrop-blur-sm">
-                  🎯 Recrutement Spécialisé
+                  {t.hero.badge}
                 </Badge>
                 <h1 className="text-white mb-6 max-w-3xl mx-auto text-[20px]">
-                  Des experts sectoriels pour vos recrutements pointus
+                  {t.hero.title}
                 </h1>
                 <p className="text-white/80 mb-8 max-w-2xl mx-auto leading-relaxed text-[16px]">
-                  Recrutez des profils techniques qualifiés dans toute l'Europe grâce à notre réseau d'experts RH spécialisés.
+                  {t.hero.subtitle}
                 </p>
                 <div className="flex flex-col sm:flex-row gap-4 justify-center">
                   <a href="/devis">
                     <Button className="relative overflow-hidden group rounded-full bg-gradient-to-r from-cyan-500 to-violet-600 hover:from-cyan-600 hover:to-violet-700 text-white shadow-2xl hover:shadow-cyan-500/50 transition-all px-12 py-6 text-lg">
                       <span className="relative z-10 flex items-center">
-                        Demander un devis
+                        {t.hero.cta.primary}
                         <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
                       </span>
                       <div className="absolute inset-0 -translate-x-full group-hover:translate-x-full transition-transform duration-700 bg-gradient-to-r from-transparent via-white/40 to-transparent" />
@@ -264,7 +254,7 @@ export default function ServiceRecrutementSpecialise() {
                     className="relative overflow-hidden group rounded-full border-white/30 bg-white/10 backdrop-blur-md text-white hover:bg-white/20 hover:border-cyan-400/50 shadow-lg hover:shadow-cyan-500/30 transition-all px-8 py-6 text-lg w-full sm:w-auto"
                     onClick={() => document.getElementById('processus')?.scrollIntoView({ behavior: 'smooth' })}
                   >
-                    <span className="relative z-10">Découvrir le processus</span>
+                    <span className="relative z-10">{t.hero.cta.secondary}</span>
                     <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 bg-gradient-to-r from-cyan-500/10 to-violet-500/10" />
                   </Button>
                 </div>
@@ -283,9 +273,9 @@ export default function ServiceRecrutementSpecialise() {
               className="text-center mb-12"
             >
               <Badge className="mb-4 px-6 py-2 bg-gradient-to-r from-violet-500/20 to-cyan-500/20 border border-violet-400/30 text-violet-200 backdrop-blur-sm">
-                🎯 Pour qui ?
+                {t.forWho.badge}
               </Badge>
-              <h2 className="text-white mb-4 text-[20px]">Ce service est fait pour vous</h2>
+              <h2 className="text-white mb-4 text-[20px]">{t.forWho.title}</h2>
             </motion.div>
 
             <div className="grid md:grid-cols-2 gap-8 max-w-5xl mx-auto">
@@ -299,11 +289,11 @@ export default function ServiceRecrutementSpecialise() {
                     <div className="w-16 h-16 bg-gradient-to-br from-cyan-500 to-cyan-600 rounded-2xl flex items-center justify-center mb-4">
                       <Building2 className="w-8 h-8 text-white" />
                     </div>
-                    <CardTitle className="text-white text-[20px]">Entreprises Utilisatrices</CardTitle>
+                    <CardTitle className="text-white text-[20px]">{t.forWho.userCompanies.title}</CardTitle>
                   </CardHeader>
                   <CardContent>
                     <p className="text-white/70 leading-relaxed">
-                      Entreprises recherchant des profils spécialisés avec des compétences techniques pointues, certifications spécifiques ou expertise sectorielle rare.
+                      {t.forWho.userCompanies.description}
                     </p>
                   </CardContent>
                 </Card>
@@ -319,17 +309,11 @@ export default function ServiceRecrutementSpecialise() {
                     <div className="w-16 h-16 bg-gradient-to-br from-violet-500 to-violet-600 rounded-2xl flex items-center justify-center mb-4">
                       <Target className="w-8 h-8 text-white" />
                     </div>
-                    <CardTitle className="text-white text-[20px]">Vous êtes concerné si...</CardTitle>
+                    <CardTitle className="text-white text-[20px]">{t.forWho.concerns.title}</CardTitle>
                   </CardHeader>
                   <CardContent>
                     <ul className="space-y-3">
-                      {[
-                        "Vous cherchez des profils avec certifications (CACES, habilitations...)",
-                        "Vous avez besoin de compétences techniques rares",
-                        "Vous recrutez dans un secteur spécialisé",
-                        "Vous voulez des candidats expérimentés",
-                        "Vous avez des exigences qualité élevées"
-                      ].map((item, index) => (
+                      {t.forWho.concerns.items.map((item, index) => (
                         <li key={index} className="flex items-start gap-3 text-white/70">
                           <CheckCircle className="w-5 h-5 text-green-400 flex-shrink-0 mt-0.5" />
                           <span>{item}</span>
@@ -353,9 +337,9 @@ export default function ServiceRecrutementSpecialise() {
               className="text-center mb-12"
             >
               <Badge className="mb-4 px-6 py-2 bg-gradient-to-r from-green-500/20 to-cyan-500/20 border border-green-400/30 text-green-200 backdrop-blur-sm">
-                ✨ Vos avantages
+                {t.benefits.subtitle}
               </Badge>
-              <h2 className="text-white text-[20px]">Pourquoi choisir notre recrutement spécialisé</h2>
+              <h2 className="text-white text-[20px]">{t.benefits.title}</h2>
             </motion.div>
 
             <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -393,9 +377,9 @@ export default function ServiceRecrutementSpecialise() {
               className="text-center mb-12"
             >
               <Badge className="mb-4 px-6 py-2 bg-gradient-to-r from-violet-500/20 to-cyan-500/20 border border-violet-400/30 text-violet-200 backdrop-blur-sm">
-                🎯 Comment ça marche
+                {t.process.badge}
               </Badge>
-              <h2 className="text-white text-[20px]">Le processus en 4 étapes</h2>
+              <h2 className="text-white text-[20px]">{t.process.title}</h2>
             </motion.div>
 
             <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 relative">
@@ -438,9 +422,9 @@ export default function ServiceRecrutementSpecialise() {
               className="text-center mb-12"
             >
               <Badge className="mb-4 px-6 py-2 bg-gradient-to-r from-orange-500/20 to-red-500/20 border border-orange-400/30 text-orange-200 backdrop-blur-sm">
-                🏭 Secteurs d'activité
+                {t.sectors.badge}
               </Badge>
-              <h2 className="text-white text-[20px]">Nos expertises sectorielles</h2>
+              <h2 className="text-white text-[20px]">{t.sectors.title}</h2>
             </motion.div>
 
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
@@ -478,7 +462,7 @@ export default function ServiceRecrutementSpecialise() {
               className="text-center mb-12"
             >
               <Badge className="mb-4 px-6 py-2 bg-gradient-to-r from-yellow-500/20 to-orange-500/20 border border-yellow-400/30 text-yellow-200 backdrop-blur-sm">
-                ⭐ Ils nous font confiance
+                {t.testimonial.badge}
               </Badge>
             </motion.div>
 
@@ -496,16 +480,16 @@ export default function ServiceRecrutementSpecialise() {
                     ))}
                   </div>
                   <p className="text-white/90 text-lg leading-relaxed mb-6 italic">
-                    "Nous cherchions des soudeurs qualifiés avec certification EN 9606. YOJOB a mobilisé son réseau et nous a présenté 8 candidats roumains parfaitement qualifiés en moins d'une semaine. La qualité du sourcing est remarquable."
+                    "{t.testimonial.quote}"
                   </p>
                   <div className="flex items-center gap-4">
                     <div className="w-12 h-12 bg-gradient-to-br from-cyan-500 to-violet-500 rounded-full flex items-center justify-center text-white text-xl">
                       ML
                     </div>
                     <div>
-                      <p className="text-white">Marie Lambert</p>
-                      <p className="text-white/60 text-sm">DRH - MetalIndustrie France</p>
-                      <p className="text-white/40 text-xs mt-1">Secteur : Métallurgie</p>
+                      <p className="text-white">{t.testimonial.author.name}</p>
+                      <p className="text-white/60 text-sm">{t.testimonial.author.role}</p>
+                      <p className="text-white/40 text-xs mt-1">{t.testimonial.author.sector}</p>
                     </div>
                   </div>
                 </CardContent>
@@ -524,13 +508,13 @@ export default function ServiceRecrutementSpecialise() {
               className="text-center mb-12"
             >
               <Badge className="mb-4 px-6 py-2 bg-gradient-to-r from-violet-500/20 to-pink-500/20 border border-violet-400/30 text-violet-200 backdrop-blur-sm">
-                ❓ Questions fréquentes
+                {t.faq.badge}
               </Badge>
-              <h2 className="text-white text-[20px]">Vos questions sur le recrutement spécialisé</h2>
+              <h2 className="text-white text-[20px]">{t.faq.title}</h2>
             </motion.div>
 
             <div className="max-w-3xl mx-auto space-y-4">
-              {faqs.map((faq, index) => (
+              {t.faq.items.map((faq, index) => (
                 <FAQItem key={index} question={faq.question} answer={faq.answer} />
               ))}
             </div>
@@ -553,22 +537,22 @@ export default function ServiceRecrutementSpecialise() {
               className="text-center max-w-3xl mx-auto"
             >
               <h2 className="text-white mb-6 text-[20px]">
-                Prêt à trouver les experts dont vous avez besoin ?
+                {t.ctaFinal.title}
               </h2>
               <p className="text-white/80 mb-8 leading-relaxed text-[16px]">
-                Décrivez-nous le profil recherché et accédez à notre réseau d'agences spécialisées
+                {t.ctaFinal.subtitle}
               </p>
               <a href="/devis">
                 <Button className="relative overflow-hidden group rounded-full bg-gradient-to-r from-cyan-500 to-violet-600 hover:from-cyan-600 hover:to-violet-700 text-white shadow-2xl hover:shadow-cyan-500/50 transition-all px-12 py-6 text-lg">
                   <span className="relative z-10 flex items-center">
-                    Demander un devis
+                    {t.ctaFinal.cta}
                     <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
                   </span>
                   <div className="absolute inset-0 -translate-x-full group-hover:translate-x-full transition-transform duration-700 bg-gradient-to-r from-transparent via-white/40 to-transparent" />
                 </Button>
               </a>
               <p className="text-white/60 text-sm mt-6">
-                ✓ Réponse sous 24h • ✓ Sans engagement
+                {t.ctaFinal.features}
               </p>
             </motion.div>
           </div>
