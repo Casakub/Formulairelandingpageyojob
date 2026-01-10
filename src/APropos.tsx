@@ -1,6 +1,33 @@
 import { LogoSvg } from './imports/YojobLogoComplete';
 import { SEOHead } from './components/SEOHead';
 import { LanguageSelector } from './components/shared/LanguageSelector';
+import { useState, useEffect } from 'react';
+import { motion } from 'motion/react';
+import { Badge } from './components/ui/badge';
+import { Button } from './components/ui/button';
+import { Card, CardContent } from './components/ui/card';
+import { 
+  Heart, 
+  ShieldCheck, 
+  Zap, 
+  Handshake, 
+  Star, 
+  Globe, 
+  Network, 
+  Users, 
+  CheckCircle, 
+  Clock, 
+  Award, 
+  Target, 
+  ArrowRight,
+  Linkedin,
+  Twitter,
+  Facebook,
+  MapPin,
+  Phone,
+  Mail
+} from 'lucide-react';
+import { Helmet, HelmetProvider } from 'react-helmet-async';
 
 export default function APropos() {
   const [isScrolled, setIsScrolled] = useState(false);
@@ -8,13 +35,13 @@ export default function APropos() {
   const [revealedEmail, setRevealedEmail] = useState(false);
 
   // Header scroll effect
-  useState(() => {
+  useEffect(() => {
     const handleScroll = () => {
       setIsScrolled(window.scrollY > 50);
     };
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
-  });
+  }, []);
 
   const handleEmailReveal = () => {
     setRevealedEmail(!revealedEmail);
@@ -70,7 +97,7 @@ export default function APropos() {
       color: "from-cyan-500 to-blue-600"
     },
     {
-      year: "2026",
+      year: "2026 - 2027",
       title: "Développement du logiciel",
       description: "Création d'une plateforme digitale basée sur les résultats de l'enquête (à venir).",
       icon: <Zap className="w-6 h-6" />,

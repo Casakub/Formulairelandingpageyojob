@@ -202,6 +202,22 @@ import { esDetachementPersonnel } from './detachementPersonnel/es';
 import { itDetachementPersonnel } from './detachementPersonnel/it';
 import { nlDetachementPersonnel } from './detachementPersonnel/nl';
 import { ptDetachementPersonnel } from './detachementPersonnel/pt';
+import { plDetachementPersonnel } from './detachementPersonnel/pl';
+import { csDetachementPersonnel } from './detachementPersonnel/cs';
+import { skDetachementPersonnel } from './detachementPersonnel/sk';
+import { huDetachementPersonnel } from './detachementPersonnel/hu';
+import { roDetachementPersonnel } from './detachementPersonnel/ro';
+import { bgDetachementPersonnel } from './detachementPersonnel/bg';
+import { hrDetachementPersonnel } from './detachementPersonnel/hr';
+import { slDetachementPersonnel } from './detachementPersonnel/sl';
+import { etDetachementPersonnel } from './detachementPersonnel/et';
+import { lvDetachementPersonnel } from './detachementPersonnel/lv';
+import { ltDetachementPersonnel } from './detachementPersonnel/lt';
+import { elDetachementPersonnel } from './detachementPersonnel/el';
+import { svDetachementPersonnel } from './detachementPersonnel/sv';
+import { daDetachementPersonnel } from './detachementPersonnel/da';
+import { fiDetachementPersonnel } from './detachementPersonnel/fi';
+import { noDetachementPersonnel } from './detachementPersonnel/no';
 
 /**
  * Loader de traductions par service
@@ -301,6 +317,22 @@ function loadServiceTranslation(
       it: itDetachementPersonnel,
       nl: nlDetachementPersonnel,
       pt: ptDetachementPersonnel,
+      pl: plDetachementPersonnel,
+      cs: csDetachementPersonnel,
+      sk: skDetachementPersonnel,
+      hu: huDetachementPersonnel,
+      ro: roDetachementPersonnel,
+      bg: bgDetachementPersonnel,
+      hr: hrDetachementPersonnel,
+      sl: slDetachementPersonnel,
+      et: etDetachementPersonnel,
+      lv: lvDetachementPersonnel,
+      lt: ltDetachementPersonnel,
+      el: elDetachementPersonnel,
+      sv: svDetachementPersonnel,
+      da: daDetachementPersonnel,
+      fi: fiDetachementPersonnel,
+      no: noDetachementPersonnel,
     },
   };
 
