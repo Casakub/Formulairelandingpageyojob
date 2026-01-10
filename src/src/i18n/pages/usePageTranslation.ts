@@ -11,7 +11,7 @@
  */
 
 import { useMemo } from 'react';
-import { frAPropos, enAPropos } from './aPropos';
+import { frAPropos, enAPropos, deAPropos, esAPropos, itAPropos, nlAPropos, ptAPropos, plAPropos, csAPropos, skAPropos, huAPropos, roAPropos, bgAPropos, hrAPropos, slAPropos, etAPropos, lvAPropos, ltAPropos, elAPropos, svAPropos, daAPropos, fiAPropos, noAPropos } from './aPropos';
 
 /**
  * Type pour les pages disponibles
@@ -29,7 +29,28 @@ export type SupportedLanguage = 'fr' | 'en' | 'de' | 'es' | 'it' | 'nl' | 'pt' |
 const pageTranslations = {
   'a-propos': {
     fr: frAPropos,
-    en: enAPropos
+    en: enAPropos,
+    de: deAPropos,
+    es: esAPropos,
+    it: itAPropos,
+    nl: nlAPropos,
+    pt: ptAPropos,
+    pl: plAPropos,
+    cs: csAPropos,
+    sk: skAPropos,
+    hu: huAPropos,
+    ro: roAPropos,
+    bg: bgAPropos,
+    hr: hrAPropos,
+    sl: slAPropos,
+    et: etAPropos,
+    lv: lvAPropos,
+    lt: ltAPropos,
+    el: elAPropos,
+    sv: svAPropos,
+    da: daAPropos,
+    fi: fiAPropos,
+    no: noAPropos
   },
   'notre-reseau': {
     fr: frAPropos, // TODO: Créer les vraies traductions
