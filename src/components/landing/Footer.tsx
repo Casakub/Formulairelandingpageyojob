@@ -17,49 +17,19 @@ import {
 } from 'lucide-react';
 import { Badge } from '../ui/badge';
 import { LogoSvg } from '../../imports/YojobLogoComplete';
-
-interface FooterContent {
-  logo?: {
-    tagline: string;
-  };
-  columns?: {
-    services?: {
-      title: string;
-      links: Array<{ label: string; href: string }>;
-    };
-    company?: {
-      title: string;
-      links: Array<{ label: string; href: string }>;
-    };
-    contact?: {
-      title: string;
-    };
-  };
-  contact?: {
-    address: string;
-    phone: string;
-    email: string;
-  };
-  bottom?: {
-    copyright: string;
-    links?: {
-      privacy: string;
-      legal: string;
-      terms: string;
-    };
-  };
-}
+import { useFooterTranslation } from '../../hooks/useFooterTranslation';
 
 interface FooterProps {
-  variant?: 'full' | 'minimal';
-  showSupabaseBadge?: boolean;
-  content?: FooterContent;
+  language?: string;
 }
 
-export function Footer({ variant = 'full', showSupabaseBadge = false, content }: FooterProps) {
+export function Footer({ language = 'fr' }: FooterProps) {
   const [revealedEmail, setRevealedEmail] = useState(false);
+  
+  // Récupérer les traductions du footer
+  const content = useFooterTranslation(language);
 
-  if (variant === 'minimal') {
+  if (content.variant === 'minimal') {
     return (
       <footer className="relative z-10 border-t border-white/10 bg-white/5 backdrop-blur-md mt-20 py-8">
         <div className="container mx-auto px-4">
@@ -245,38 +215,22 @@ export function Footer({ variant = 'full', showSupabaseBadge = false, content }:
           transition={{ duration: 0.6, delay: 0.4 }}
         >
           <div className="flex flex-col sm:flex-row items-center justify-center gap-2 text-sm text-white/80 mb-3">
-            <p>{content?.bottom?.copyright || '© 2026 YOJOB. Tous droits réservés.'}</p>
-            {showSupabaseBadge && (
-              <Badge className="bg-green-500/20 backdrop-blur-md border-green-400/30 text-green-300 px-3 py-1 shadow-lg flex items-center gap-1.5">
-                <span className="relative flex h-2 w-2">
-                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
-                  <span className="relative inline-flex rounded-full h-2 w-2 bg-green-500"></span>
-                </span>
-                <span className="text-xs">Supabase Live</span>
-              </Badge>
-            )}
+            <p>© 2026 {content?.bottom?.rights || 'YOJOB. Tous droits réservés.'}</p>
           </div>
           {/* Footer Links */}
           <div className="flex flex-wrap items-center justify-center gap-4 text-xs text-white/50">
             <a 
-              href="/privacy" 
-              className="hover:text-cyan-400 transition-colors underline decoration-dotted"
-            >
-              {content?.bottom?.links?.privacy || 'Politique de confidentialité'}
-            </a>
-            <span className="text-white/30">•</span>
-            <a 
               href="/legal" 
               className="hover:text-cyan-400 transition-colors underline decoration-dotted"
             >
-              {content?.bottom?.links?.legal || 'Mentions légales'}
+              {content?.bottom?.legal || 'Mentions légales'}
             </a>
             <span className="text-white/30">•</span>
             <a 
               href="/cgv" 
               className="hover:text-cyan-400 transition-colors underline decoration-dotted"
             >
-              {content?.bottom?.links?.terms || 'CGV'}
+              {content?.bottom?.terms || 'CGV'}
             </a>
           </div>
         </motion.div>

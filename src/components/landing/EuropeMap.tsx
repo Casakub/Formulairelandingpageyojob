@@ -11,6 +11,7 @@ interface Country {
 interface EuropeMapProps {
   variant?: 'hero' | 'network';
   agenciesLabel?: string; // "agences partenaires" / "partner agencies"
+  countryNames?: Record<string, string>; // Traductions des noms de pays { FR: "France", DE: "Allemagne", ... }
 }
 
 const countries: Country[] = [
@@ -178,7 +179,7 @@ const countries: Country[] = [
   }
 ];
 
-export function EuropeMap({ variant = 'hero', agenciesLabel = 'agences partenaires' }: EuropeMapProps) {
+export function EuropeMap({ variant = 'hero', agenciesLabel = 'agences partenaires', countryNames }: EuropeMapProps) {
   const [hoveredCountry, setHoveredCountry] = useState<Country | null>(null);
 
   const handleMouseEnter = (country: Country) => {
@@ -354,7 +355,7 @@ export function EuropeMap({ variant = 'hero', agenciesLabel = 'agences partenair
               transform: 'translate(-50%, -50%)',
             }}
           >
-            <div className={`${isNetwork ? 'text-lg' : 'text-base'} mb-1 drop-shadow-lg text-white`}>{hoveredCountry.name}</div>
+            <div className={`${isNetwork ? 'text-lg' : 'text-base'} mb-1 drop-shadow-lg text-white`}>{countryNames?.[hoveredCountry.code] || hoveredCountry.name}</div>
             <div className={`bg-gradient-to-r from-cyan-300 to-violet-300 bg-clip-text text-transparent ${isNetwork ? 'text-base' : 'text-sm'} drop-shadow-md`}>
               ✓ {hoveredCountry.agencies} {agenciesLabel}
             </div>

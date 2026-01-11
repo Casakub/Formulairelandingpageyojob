@@ -6,12 +6,10 @@
 
 // === EXPORTS DES TRADUCTIONS ===
 export * from './aPropos';
+export * from './notreReseau';
+export * from './nosSecteurs';
+export * from './temoignages';
 
 // === EXPORTS DES HOOKS ===
 export { usePageTranslation, getAvailableLanguagesForPage } from './usePageTranslation';
 export type { PageKey, SupportedLanguage } from './usePageTranslation';
-
-// TODO: Ajouter les exports pour les autres pages
-// export * from './notreReseau';
-// export * from './nosSecteurs';
-// export * from './temoignages';

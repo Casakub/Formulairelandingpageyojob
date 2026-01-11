@@ -11,10 +11,8 @@
  */
 
 import { useMemo } from 'react';
-import { frAPropos, enAPropos, deAPropos, esAPropos, itAPropos, nlAPropos, ptAPropos, plAPropos, csAPropos, skAPropos, huAPropos, roAPropos, bgAPropos, hrAPropos, slAPropos, etAPropos, lvAPropos, ltAPropos, elAPropos, svAPropos, daAPropos, fiAPropos, noAPropos } from './aPropos';
-import { frNotreReseau, enNotreReseau, deNotreReseau, esNotreReseau, itNotreReseau, nlNotreReseau, ptNotreReseau } from './notreReseau';
-import { frNosSecteurs, enNosSecteurs } from './nosSecteurs';
-import { frTemoignages, enTemoignages } from './temoignages';
+import { frAPropos, enAPropos, deAPropos, esAPropos, itAPropos, nlAPropos, ptAPropos, plAPropos, csAPropos, skAPropos, huAPropos, roAPropos, bgAPropos, hrAPropos, slAPropos, etAPropos, lvAPropos, ltAPropos, elAPropos, svAPropos, daAPropos, fiAPropos, noAPropos } from '../src/i18n/pages/aPropos';
+import { frNotreReseau, enNotreReseau, deNotreReseau, esNotreReseau, itNotreReseau, nlNotreReseau, ptNotreReseau, plNotreReseau, csNotreReseau, skNotreReseau, huNotreReseau, roNotreReseau, bgNotreReseau, hrNotreReseau, slNotreReseau, etNotreReseau, lvNotreReseau, ltNotreReseau, elNotreReseau, svNotreReseau, daNotreReseau, fiNotreReseau } from '../src/i18n/pages/notreReseau';
 
 /**
  * Type pour les pages disponibles
@@ -62,15 +60,30 @@ const pageTranslations = {
     es: esNotreReseau,
     it: itNotreReseau,
     nl: nlNotreReseau,
-    pt: ptNotreReseau
+    pt: ptNotreReseau,
+    pl: plNotreReseau,
+    cs: csNotreReseau,
+    sk: skNotreReseau,
+    hu: huNotreReseau,
+    ro: roNotreReseau,
+    bg: bgNotreReseau,
+    hr: hrNotreReseau,
+    sl: slNotreReseau,
+    et: etNotreReseau,
+    lv: lvNotreReseau,
+    lt: ltNotreReseau,
+    el: elNotreReseau,
+    sv: svNotreReseau,
+    da: daNotreReseau,
+    fi: fiNotreReseau
   },
   'nos-secteurs': {
-    fr: frNosSecteurs,
-    en: enNosSecteurs
+    fr: frAPropos, // TODO: Créer les vraies traductions
+    en: enAPropos  // TODO: Créer les vraies traductions
   },
   'temoignages': {
-    fr: frTemoignages,
-    en: enTemoignages
+    fr: frAPropos, // TODO: Créer les vraies traductions
+    en: enAPropos  // TODO: Créer les vraies traductions
   }
 } as const;
 
@@ -119,7 +132,7 @@ export function usePageTranslation(pageKey: PageKey, language: SupportedLanguage
  * @example
  * ```tsx
  * const availableLanguages = getAvailableLanguagesForPage('a-propos');
- * console.log(availableLanguages); // ['fr', 'en']
+ * console.log(availableLanguages); // ['fr', 'en', 'de', ...]
  * ```
  */
 export function getAvailableLanguagesForPage(pageKey: PageKey): SupportedLanguage[] {

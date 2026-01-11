@@ -447,7 +447,7 @@ export default function APropos() {
         </section>
 
         {/* FOOTER */}
-        <Footer content={footerTranslations[validLanguage]} />
+        <Footer language={currentLanguage} />
       </div>
     </HelmetProvider>
   );

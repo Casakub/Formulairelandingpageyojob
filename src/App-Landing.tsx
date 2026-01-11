@@ -48,6 +48,7 @@ import { TestimonialCarousel } from './components/landing/TestimonialCarousel';
 import { LanguageSelector } from './components/shared/LanguageSelector';
 import { useLandingTranslations } from './hooks/useLandingTranslations';
 import { useLanguageManager } from './hooks/useLanguageManager';
+import { useEuropeMapTranslation } from './hooks/useEuropeMapTranslation';
 import { SEOHead } from './components/SEOHead';
 import { Link } from './components/Link';
 import { log, loggers } from './lib/logger';
@@ -167,6 +168,9 @@ export default function AppLanding() {
     error,
     refresh,
   } = useLandingTranslations(globalLanguage);
+
+  // 🗺️ Récupérer les traductions de la carte Europe
+  const europeMapTranslations = useEuropeMapTranslation(globalLanguage as any);
 
   // 🔄 Synchroniser la langue globale avec le hook de traductions
   useEffect(() => {
@@ -830,7 +834,11 @@ export default function AppLanding() {
                 
                 {/* Glassmorphism container */}
                 <div className="relative bg-white/10 backdrop-blur-xl border-2 border-white/20 rounded-3xl shadow-2xl px-[135px] py-[40px]">
-                  <EuropeMap variant="hero" agenciesLabel={content.network?.mapLabel || 'agences partenaires'} />
+                  <EuropeMap 
+                    variant="hero" 
+                    agenciesLabel={europeMapTranslations.agenciesLabel}
+                    countryNames={europeMapTranslations.countries}
+                  />
 
                   {/* Floating stats badges - Enhanced */}
                   <motion.div
@@ -1245,7 +1253,11 @@ export default function AppLanding() {
           transition={{ duration: 0.6 }}
           className="mb-16 px-4 relative z-10"
         >
-          <EuropeMap variant="network" agenciesLabel={content.network?.mapLabel || 'agences partenaires'} />
+          <EuropeMap 
+            variant="network" 
+            agenciesLabel={europeMapTranslations.agenciesLabel}
+            countryNames={europeMapTranslations.countries}
+          />
         </motion.div>
 
         {/* Country Badges and rest - back in container */}
