@@ -1,5 +1,26 @@
 export { frNosSecteurs } from './fr';
 export { enNosSecteurs } from './en';
+export { deNosSecteurs } from './de';
+export { esNosSecteurs } from './es';
+export { itNosSecteurs } from './it';
+export { nlNosSecteurs } from './nl';
+export { ptNosSecteurs } from './pt';
+export { plNosSecteurs } from './pl';
+export { csNosSecteurs } from './cs';
+export { skNosSecteurs } from './sk';
+export { huNosSecteurs } from './hu';
+export { roNosSecteurs } from './ro';
+export { bgNosSecteurs } from './bg';
+export { hrNosSecteurs } from './hr';
+export { slNosSecteurs } from './sl';
+export { etNosSecteurs } from './et';
+export { lvNosSecteurs } from './lv';
+export { ltNosSecteurs } from './lt';
+export { elNosSecteurs } from './el';
+export { svNosSecteurs } from './sv';
+export { daNosSecteurs } from './da';
+export { fiNosSecteurs } from './fi';
+export { noNosSecteurs } from './no';
 
-export const AVAILABLE_LANGUAGES_NOS_SECTEURS = ['fr', 'en'] as const;
+export const AVAILABLE_LANGUAGES_NOS_SECTEURS = ['fr', 'en', 'de', 'es', 'it', 'nl', 'pt', 'pl', 'cs', 'sk', 'hu', 'ro', 'bg', 'hr', 'sl', 'et', 'lv', 'lt', 'el', 'sv', 'da', 'fi', 'no'] as const;
 export type NosSecteursSupportedLanguage = typeof AVAILABLE_LANGUAGES_NOS_SECTEURS[number];

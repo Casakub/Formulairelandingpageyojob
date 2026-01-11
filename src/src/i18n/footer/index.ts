@@ -20,6 +20,7 @@ export { elFooter } from './el';
 export { svFooter } from './sv';
 export { daFooter } from './da';
 export { fiFooter } from './fi';
+export { noFooter } from './no';
 
 /**
  * 📋 LISTE DES LANGUES DISPONIBLES POUR LE FOOTER
@@ -29,4 +30,4 @@ export { fiFooter } from './fi';
  * ⚠️ IMPORTANT : Ajouter ici chaque nouvelle langue après avoir créé
  * son fichier de traduction (ex: de.ts, es.ts, etc.)
  */
-export const AVAILABLE_LANGUAGES_FOOTER = ['fr', 'en', 'de', 'es', 'it', 'nl', 'pt', 'pl', 'cs', 'sk', 'hu', 'ro', 'bg', 'hr', 'sl', 'et', 'lv', 'lt', 'el', 'sv', 'da', 'fi'] as const;
+export const AVAILABLE_LANGUAGES_FOOTER = ['fr', 'en', 'de', 'es', 'it', 'nl', 'pt', 'pl', 'cs', 'sk', 'hu', 'ro', 'bg', 'hr', 'sl', 'et', 'lv', 'lt', 'el', 'sv', 'da', 'fi', 'no'] as const;

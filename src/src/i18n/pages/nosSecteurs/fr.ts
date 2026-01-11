@@ -196,5 +196,8 @@ export const frNosSecteurs = {
     subtitle: "Que vous soyez dans le BTP, l'industrie, l'agriculture ou tout autre secteur : nos 500+ agences partenaires vous connectent aux meilleurs profils européens.",
     primaryCta: "Demander un devis gratuit",
     secondaryCta: "Voir nos services"
-  }
+  },
+  
+  // Lien des cartes secteurs
+  recruitNowLink: "Recruter maintenant"
 };

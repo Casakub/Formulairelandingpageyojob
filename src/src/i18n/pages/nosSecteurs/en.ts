@@ -196,5 +196,8 @@ export const enNosSecteurs = {
     subtitle: "Whether you're in construction, industry, agriculture or any other sector: our 500+ partner agencies connect you to the best European profiles.",
     primaryCta: "Request a free quote",
     secondaryCta: "See our services"
-  }
+  },
+  
+  // Sector card link
+  recruitNowLink: "Recruit now"
 };

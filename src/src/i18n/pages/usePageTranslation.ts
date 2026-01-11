@@ -12,8 +12,8 @@
 
 import { useMemo } from 'react';
 import { frAPropos, enAPropos, deAPropos, esAPropos, itAPropos, nlAPropos, ptAPropos, plAPropos, csAPropos, skAPropos, huAPropos, roAPropos, bgAPropos, hrAPropos, slAPropos, etAPropos, lvAPropos, ltAPropos, elAPropos, svAPropos, daAPropos, fiAPropos, noAPropos } from './aPropos';
-import { frNotreReseau, enNotreReseau, deNotreReseau, esNotreReseau, itNotreReseau, nlNotreReseau, ptNotreReseau } from './notreReseau';
-import { frNosSecteurs, enNosSecteurs } from './nosSecteurs';
+import { frNotreReseau, enNotreReseau, deNotreReseau, esNotreReseau, itNotreReseau, nlNotreReseau, ptNotreReseau, plNotreReseau, csNotreReseau, skNotreReseau, huNotreReseau, roNotreReseau, bgNotreReseau, hrNotreReseau, slNotreReseau, etNotreReseau, lvNotreReseau, ltNotreReseau, elNotreReseau, svNotreReseau, daNotreReseau, fiNotreReseau, noNotreReseau } from './notreReseau';
+import { frNosSecteurs, enNosSecteurs, deNosSecteurs, esNosSecteurs, itNosSecteurs, nlNosSecteurs, ptNosSecteurs, plNosSecteurs, csNosSecteurs, skNosSecteurs, huNosSecteurs, roNosSecteurs, bgNosSecteurs, hrNosSecteurs, slNosSecteurs, etNosSecteurs, lvNosSecteurs, ltNosSecteurs, elNosSecteurs, svNosSecteurs, daNosSecteurs, fiNosSecteurs, noNosSecteurs } from './nosSecteurs';
 import { frTemoignages, enTemoignages } from './temoignages';
 
 /**
@@ -62,11 +62,48 @@ const pageTranslations = {
     es: esNotreReseau,
     it: itNotreReseau,
     nl: nlNotreReseau,
-    pt: ptNotreReseau
+    pt: ptNotreReseau,
+    pl: plNotreReseau,
+    cs: csNotreReseau,
+    sk: skNotreReseau,
+    hu: huNotreReseau,
+    ro: roNotreReseau,
+    bg: bgNotreReseau,
+    hr: hrNotreReseau,
+    sl: slNotreReseau,
+    et: etNotreReseau,
+    lv: lvNotreReseau,
+    lt: ltNotreReseau,
+    el: elNotreReseau,
+    sv: svNotreReseau,
+    da: daNotreReseau,
+    fi: fiNotreReseau,
+    no: noNotreReseau
   },
   'nos-secteurs': {
     fr: frNosSecteurs,
-    en: enNosSecteurs
+    en: enNosSecteurs,
+    de: deNosSecteurs,
+    es: esNosSecteurs,
+    it: itNosSecteurs,
+    nl: nlNosSecteurs,
+    pt: ptNosSecteurs,
+    pl: plNosSecteurs,
+    cs: csNosSecteurs,
+    sk: skNosSecteurs,
+    hu: huNosSecteurs,
+    ro: roNosSecteurs,
+    bg: bgNosSecteurs,
+    hr: hrNosSecteurs,
+    sl: slNosSecteurs,
+    et: etNosSecteurs,
+    lv: lvNosSecteurs,
+    lt: ltNosSecteurs,
+    el: elNosSecteurs,
+    sv: svNosSecteurs,
+    da: daNosSecteurs,
+    fi: fiNosSecteurs,
+    no: noNosSecteurs
   },
   'temoignages': {
     fr: frTemoignages,

@@ -3,7 +3,7 @@
  * 
  * Page présentant les 6 secteurs d'activité couverts par YOJOB
  * Design: Glassmorphism + Gradients + Animations Motion
- * Traductions: FR/EN
+ * Traductions: FR/EN/DE/ES/IT/NL/PT/PL/CS/SK/HU/RO/BG/HR/SL/ET/LV/LT/EL/SV/DA/FI/NO
  * 
  * @version 1.0.0
  */
@@ -39,7 +39,7 @@ export default function NosSecteurs() {
   const [isScrolled, setIsScrolled] = useState(false);
   const { currentLanguage, setLanguage } = useLanguageManager();
   
-  // Ensure we use a valid language code (only fr and en are translated)
+  // Ensure we use a valid language code (fr, en, de, es, it, nl, pt, pl, cs, sk, hu, ro, bg, hr, sl, et, lv, lt, el, sv, da, fi, and no are currently translated)
   const validLanguage: NosSecteursSupportedLanguage = AVAILABLE_LANGUAGES_NOS_SECTEURS.includes(currentLanguage as any) 
     ? (currentLanguage as NosSecteursSupportedLanguage)
     : 'fr';
@@ -237,7 +237,7 @@ export default function NosSecteurs() {
                         href="/devis"
                         className="inline-flex items-center gap-2 text-cyan-400 hover:text-cyan-300 text-sm group/link"
                       >
-                        <span>Recruter maintenant</span>
+                        <span>{t.recruitNowLink}</span>
                         <ArrowRight className="w-4 h-4 group-hover/link:translate-x-1 transition-transform" />
                       </a>
                     </CardContent>

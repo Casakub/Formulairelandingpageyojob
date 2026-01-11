@@ -21,9 +21,10 @@ export { elNotreReseau } from './el';
 export { svNotreReseau } from './sv';
 export { daNotreReseau } from './da';
 export { fiNotreReseau } from './fi';
+export { noNotreReseau } from './no';
 
 // TODO: Ajouter les autres langues européennes si besoin
-// Langues actuellement disponibles : FR, EN, DE, ES, IT, NL, PT, PL, CS, SK, HU, RO, BG, HR, SL, ET, LV, LT, EL, SV, DA, FI
+// Langues actuellement disponibles : FR, EN, DE, ES, IT, NL, PT, PL, CS, SK, HU, RO, BG, HR, SL, ET, LV, LT, EL, SV, DA, FI, NO
 
 /**
  * 📋 LISTE DES LANGUES DISPONIBLES
@@ -34,4 +35,4 @@ export { fiNotreReseau } from './fi';
  * ⚠️ IMPORTANT : Ajouter ici chaque nouvelle langue après avoir créé
  * son fichier de traduction (ex: de.ts, es.ts, etc.)
  */
-export const AVAILABLE_LANGUAGES_NOTRE_RESEAU = ['fr', 'en', 'de', 'es', 'it', 'nl', 'pt', 'pl', 'cs', 'sk', 'hu', 'ro', 'bg', 'hr', 'sl', 'et', 'lv', 'lt', 'el', 'sv', 'da', 'fi'] as const;
+export const AVAILABLE_LANGUAGES_NOTRE_RESEAU = ['fr', 'en', 'de', 'es', 'it', 'nl', 'pt', 'pl', 'cs', 'sk', 'hu', 'ro', 'bg', 'hr', 'sl', 'et', 'lv', 'lt', 'el', 'sv', 'da', 'fi', 'no'] as const;

@@ -7,12 +7,12 @@
  */
 
 import { useMemo } from 'react';
-import { frFooter, enFooter, deFooter, esFooter, itFooter, nlFooter, ptFooter, plFooter, csFooter, skFooter, huFooter, roFooter, bgFooter, hrFooter, slFooter, etFooter, lvFooter, ltFooter, elFooter, svFooter, daFooter, fiFooter } from '../src/i18n/footer';
+import { frFooter, enFooter, deFooter, esFooter, itFooter, nlFooter, ptFooter, plFooter, csFooter, skFooter, huFooter, roFooter, bgFooter, hrFooter, slFooter, etFooter, lvFooter, ltFooter, elFooter, svFooter, daFooter, fiFooter, noFooter } from '../src/i18n/footer';
 
 /**
  * Type pour les langues supportées dans le footer
  */
-export type FooterLanguage = 'fr' | 'en' | 'de' | 'es' | 'it' | 'nl' | 'pt' | 'pl' | 'cs' | 'sk' | 'hu' | 'ro' | 'bg' | 'hr' | 'sl' | 'et' | 'lv' | 'lt' | 'el' | 'sv' | 'da' | 'fi';
+export type FooterLanguage = 'fr' | 'en' | 'de' | 'es' | 'it' | 'nl' | 'pt' | 'pl' | 'cs' | 'sk' | 'hu' | 'ro' | 'bg' | 'hr' | 'sl' | 'et' | 'lv' | 'lt' | 'el' | 'sv' | 'da' | 'fi' | 'no';
 
 /**
  * Map des traductions du footer par langue
@@ -39,7 +39,8 @@ const footerTranslations = {
   el: elFooter,
   sv: svFooter,
   da: daFooter,
-  fi: fiFooter
+  fi: fiFooter,
+  no: noFooter
 } as const;
 
 /**
