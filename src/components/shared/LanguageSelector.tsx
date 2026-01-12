@@ -145,7 +145,7 @@ export function LanguageSelector({
   // === DESKTOP VARIANT ===
   return (
     <div className={`space-y-2 ${className}`}>
-      <div className="relative z-50" ref={dropdownRef}>
+      <div className="relative z-[100]" ref={dropdownRef}>
         <button
           onClick={() => setIsOpen(!isOpen)}
           className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-violet-600 via-purple-600 to-cyan-600 hover:from-violet-500 hover:via-purple-500 hover:to-cyan-500 backdrop-blur-md rounded-full text-white border border-white/30 shadow-lg hover:shadow-xl transition-all group"

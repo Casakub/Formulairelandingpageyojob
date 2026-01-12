@@ -7,6 +7,7 @@
  * - Nos Secteurs
  * - Témoignages
  * - Politique de Confidentialité
+ * - Mentions Légales
  * 
  * @version 1.0.0
  */
@@ -17,11 +18,12 @@ import { frNotreReseau, enNotreReseau, deNotreReseau, esNotreReseau, itNotreRese
 import { frNosSecteurs, enNosSecteurs, deNosSecteurs, esNosSecteurs, itNosSecteurs, nlNosSecteurs, ptNosSecteurs, plNosSecteurs, csNosSecteurs, skNosSecteurs, huNosSecteurs, roNosSecteurs, bgNosSecteurs, hrNosSecteurs, slNosSecteurs, etNosSecteurs, lvNosSecteurs, ltNosSecteurs, elNosSecteurs, svNosSecteurs, daNosSecteurs, fiNosSecteurs, noNosSecteurs } from './nosSecteurs';
 import { frTemoignages, enTemoignages, deTemoignages, esTemoignages, itTemoignages, nlTemoignages, ptTemoignages, plTemoignages, csTemoignages, skTemoignages, huTemoignages, roTemoignages, bgTemoignages, hrTemoignages, slTemoignages, etTemoignages, lvTemoignages, ltTemoignages, elTemoignages, svTemoignages, daTemoignages, fiTemoignages, noTemoignages } from './temoignages';
 import { frPrivacy, enPrivacy, privacyDE, privacyES, privacyIT, privacyNL, privacyPT, privacyPL, privacyCS, privacySK, privacyHU, privacyRO, privacyBG, privacyHR, privacySL, privacyET, privacyLV, privacyLT, privacyEL, privacySV, privacyDA, privacyFI, privacyNO } from './privacy';
+import { legalFR, legalEN, legalDE, legalES, legalIT, legalNL, legalPT } from './legal';
 
 /**
  * Type pour les pages disponibles
  */
-export type PageKey = 'a-propos' | 'notre-reseau' | 'nos-secteurs' | 'temoignages' | 'privacy';
+export type PageKey = 'a-propos' | 'notre-reseau' | 'nos-secteurs' | 'temoignages' | 'privacy' | 'legal';
 
 /**
  * Type pour les langues supportées
@@ -156,6 +158,15 @@ const pageTranslations = {
     da: privacyDA,
     fi: privacyFI,
     no: privacyNO
+  },
+  'legal': {
+    fr: legalFR,
+    en: legalEN,
+    de: legalDE,
+    es: legalES,
+    it: legalIT,
+    nl: legalNL,
+    pt: legalPT
   }
 } as const;
 
