@@ -18,7 +18,7 @@ import { frNotreReseau, enNotreReseau, deNotreReseau, esNotreReseau, itNotreRese
 import { frNosSecteurs, enNosSecteurs, deNosSecteurs, esNosSecteurs, itNosSecteurs, nlNosSecteurs, ptNosSecteurs, plNosSecteurs, csNosSecteurs, skNosSecteurs, huNosSecteurs, roNosSecteurs, bgNosSecteurs, hrNosSecteurs, slNosSecteurs, etNosSecteurs, lvNosSecteurs, ltNosSecteurs, elNosSecteurs, svNosSecteurs, daNosSecteurs, fiNosSecteurs, noNosSecteurs } from './nosSecteurs';
 import { frTemoignages, enTemoignages, deTemoignages, esTemoignages, itTemoignages, nlTemoignages, ptTemoignages, plTemoignages, csTemoignages, skTemoignages, huTemoignages, roTemoignages, bgTemoignages, hrTemoignages, slTemoignages, etTemoignages, lvTemoignages, ltTemoignages, elTemoignages, svTemoignages, daTemoignages, fiTemoignages, noTemoignages } from './temoignages';
 import { frPrivacy, enPrivacy, privacyDE, privacyES, privacyIT, privacyNL, privacyPT, privacyPL, privacyCS, privacySK, privacyHU, privacyRO, privacyBG, privacyHR, privacySL, privacyET, privacyLV, privacyLT, privacyEL, privacySV, privacyDA, privacyFI, privacyNO } from './privacy';
-import { legalFR, legalEN, legalDE, legalES, legalIT, legalNL, legalPT } from './legal';
+import { legalFR, legalEN, legalDE, legalES, legalIT, legalNL, legalPT, legalPL, legalCS, legalSK, legalHU, legalRO, legalBG, legalHR, legalSL, legalET, legalLV, legalLT, legalEL, legalSV, legalDA, legalFI, legalNO } from './legal';
 
 /**
  * Type pour les pages disponibles
@@ -166,7 +166,23 @@ const pageTranslations = {
     es: legalES,
     it: legalIT,
     nl: legalNL,
-    pt: legalPT
+    pt: legalPT,
+    pl: legalPL,
+    cs: legalCS,
+    sk: legalSK,
+    hu: legalHU,
+    ro: legalRO,
+    bg: legalBG,
+    hr: legalHR,
+    sl: legalSL,
+    et: legalET,
+    lv: legalLV,
+    lt: legalLT,
+    el: legalEL,
+    sv: legalSV,
+    da: legalDA,
+    fi: legalFI,
+    no: legalNO
   }
 } as const;
 
