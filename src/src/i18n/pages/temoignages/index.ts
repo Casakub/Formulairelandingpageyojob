@@ -1,5 +1,26 @@
 export { frTemoignages } from './fr';
 export { enTemoignages } from './en';
+export { deTemoignages } from './de';
+export { esTemoignages } from './es';
+export { itTemoignages } from './it';
+export { nlTemoignages } from './nl';
+export { ptTemoignages } from './pt';
+export { plTemoignages } from './pl';
+export { csTemoignages } from './cs';
+export { skTemoignages } from './sk';
+export { huTemoignages } from './hu';
+export { roTemoignages } from './ro';
+export { bgTemoignages } from './bg';
+export { hrTemoignages } from './hr';
+export { slTemoignages } from './sl';
+export { etTemoignages } from './et';
+export { lvTemoignages } from './lv';
+export { ltTemoignages } from './lt';
+export { elTemoignages } from './el';
+export { svTemoignages } from './sv';
+export { daTemoignages } from './da';
+export { fiTemoignages } from './fi';
+export { noTemoignages } from './no';
 
-export const AVAILABLE_LANGUAGES_TEMOIGNAGES = ['fr', 'en'] as const;
+export const AVAILABLE_LANGUAGES_TEMOIGNAGES = ['fr', 'en', 'de', 'es', 'it', 'nl', 'pt', 'pl', 'cs', 'sk', 'hu', 'ro', 'bg', 'hr', 'sl', 'et', 'lv', 'lt', 'el', 'sv', 'da', 'fi', 'no'] as const;
 export type TemoignagesSupportedLanguage = typeof AVAILABLE_LANGUAGES_TEMOIGNAGES[number];

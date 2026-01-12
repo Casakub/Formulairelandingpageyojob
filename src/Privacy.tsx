@@ -28,6 +28,10 @@ import { Badge } from './components/ui/badge';
 import { Skeleton } from './components/ui/skeleton';
 import { projectId, publicAnonKey } from './utils/supabase/info';
 import { LogoSvg } from './imports/YojobLogoComplete';
+import { LanguageSelector } from './components/shared/LanguageSelector';
+import { useLanguageManager } from './hooks/useLanguageManager';
+import { usePageTranslation } from './src/i18n/pages/usePageTranslation';
+import { AVAILABLE_LANGUAGES_PRIVACY } from './src/i18n/pages/privacy';
 
 interface ComplianceData {
   companyName: string;
@@ -79,6 +83,9 @@ export default function Privacy() {
   const dpoName = complianceData?.dpoName || 'Alexandre AUGER';
   const dpoEmail = complianceData?.dpoEmail || 'dpo@yojob.fr';
 
+  const { currentLanguage, setLanguage } = useLanguageManager();
+  const t = usePageTranslation('privacy', currentLanguage);
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#0a0e27] via-[#1a1f3a] to-[#0a0e27]">
       {/* Background effects */}
@@ -88,7 +95,7 @@ export default function Privacy() {
       </div>
 
       {/* Header */}
-      <header className="relative z-10 border-b border-white/10 bg-white/5 backdrop-blur-md">
+      <header className="relative z-50 border-b border-white/10 bg-white/5 backdrop-blur-md">
         <div className="container mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
             <a href="/" className="flex items-center gap-3 group">
@@ -101,13 +108,20 @@ export default function Privacy() {
                 {company}
               </span>
             </a>
-            <Button
-              className="relative overflow-hidden group rounded-full bg-white/10 backdrop-blur-md text-white border border-white/20 hover:bg-white/20 hover:border-cyan-400/50 shadow-lg hover:shadow-cyan-500/30 transition-all duration-300"
-              onClick={() => window.history.back()}
-            >
-              <ArrowLeft className="w-4 h-4 mr-2" />
-              Retour
-            </Button>
+            <div className="flex items-center gap-4">
+              <LanguageSelector 
+                currentLanguage={currentLanguage}
+                onLanguageChange={setLanguage}
+                availableLanguages={AVAILABLE_LANGUAGES_PRIVACY}
+              />
+              <Button
+                className="relative overflow-hidden group rounded-full bg-white/10 backdrop-blur-md text-white border border-white/20 hover:bg-white/20 hover:border-cyan-400/50 shadow-lg hover:shadow-cyan-500/30 transition-all duration-300"
+                onClick={() => window.history.back()}
+              >
+                <ArrowLeft className="w-4 h-4 mr-2" />
+                {currentLanguage === 'en' ? 'Back' : 'Retour'}
+              </Button>
+            </div>
           </div>
         </div>
       </header>
@@ -123,21 +137,21 @@ export default function Privacy() {
         >
           <Badge className="bg-gradient-to-r from-cyan-500/20 to-violet-500/20 border-cyan-400/30 text-cyan-300 px-4 py-2 mb-6 inline-flex items-center gap-2">
             <Shield className="w-4 h-4" />
-            Politique de Confidentialité
+            {t.hero.badge}
           </Badge>
           
           <h1 className="text-white mb-4 bg-gradient-to-r from-white via-cyan-200 to-violet-200 bg-clip-text text-transparent">
-            Protection de vos données personnelles
+            {t.hero.title}
           </h1>
           
           <p className="text-white/70 text-lg max-w-2xl mx-auto">
-            Chez {company}, nous nous engageons à protéger et respecter votre vie privée conformément au Règlement Général sur la Protection des Données (RGPD).
+            {t.hero.subtitle.replace('{company}', company)}
           </p>
           
           <div className="flex items-center justify-center gap-2 mt-6">
             <CheckCircle className="w-5 h-5 text-green-400" />
             <span className="text-white/80 text-sm">
-              Dernière mise à jour : {new Date().toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' })}
+              {t.hero.lastUpdate} {new Date().toLocaleDateString(currentLanguage === 'en' ? 'en-GB' : 'fr-FR', { day: 'numeric', month: 'long', year: 'numeric' })}
             </span>
           </div>
         </motion.div>
@@ -156,9 +170,9 @@ export default function Privacy() {
                   <UserCheck className="w-6 h-6 text-white" />
                 </div>
                 <div>
-                  <CardTitle className="text-white">Délégué à la Protection des Données (DPO)</CardTitle>
+                  <CardTitle className="text-white">{t.dpo.title}</CardTitle>
                   <CardDescription className="text-white/60">
-                    Votre interlocuteur privilégié pour toute question relative à vos données
+                    {t.dpo.subtitle}
                   </CardDescription>
                 </div>
               </div>
@@ -195,17 +209,17 @@ export default function Privacy() {
           {/* Section 1: Responsable du traitement */}
           <PrivacySection
             icon={Building2}
-            title="1. Responsable du traitement"
+            title={t.sections.dataController.title}
             delay={0.2}
           >
             <p className="text-white/80 mb-4">
-              Le responsable du traitement des données à caractère personnel est :
+              {t.sections.dataController.intro}
             </p>
             <div className="bg-white/5 border border-white/10 rounded-lg p-4 space-y-2">
               <p className="text-white"><strong>{company}</strong></p>
-              <p className="text-white/70">Bordeaux, France</p>
+              <p className="text-white/70">{t.sections.dataController.location}</p>
               <p className="text-white/70">
-                Email : <a href={`mailto:${dpoEmail}`} className="text-cyan-400 hover:underline">{dpoEmail}</a>
+                {t.sections.dataController.email} <a href={`mailto:${dpoEmail}`} className="text-cyan-400 hover:underline">{dpoEmail}</a>
               </p>
             </div>
           </PrivacySection>
@@ -213,51 +227,44 @@ export default function Privacy() {
           {/* Section 2: Données collectées */}
           <PrivacySection
             icon={Database}
-            title="2. Données personnelles collectées"
+            title={t.sections.dataCollected.title}
             delay={0.3}
           >
             <p className="text-white/80 mb-4">
-              Nous collectons les données suivantes dans le cadre de nos services de recrutement européen :
+              {t.sections.dataCollected.intro}
             </p>
             <div className="grid gap-3">
-              <DataItem icon={<CheckCircle className="w-4 h-4 text-green-400" />}>
-                <strong>Données d'identification :</strong> Nom, prénom, email, téléphone
-              </DataItem>
-              <DataItem icon={<CheckCircle className="w-4 h-4 text-green-400" />}>
-                <strong>Données professionnelles :</strong> Entreprise, fonction, secteur d'activité
-              </DataItem>
-              <DataItem icon={<CheckCircle className="w-4 h-4 text-green-400" />}>
-                <strong>Données de contact :</strong> Adresse postale, préférences de communication
-              </DataItem>
-              <DataItem icon={<CheckCircle className="w-4 h-4 text-green-400" />}>
-                <strong>Données de navigation :</strong> Cookies, adresse IP, données de connexion
-              </DataItem>
+              {t.sections.dataCollected.items.map((item, index) => (
+                <DataItem key={index} icon={<CheckCircle className="w-4 h-4 text-green-400" />}>
+                  <strong>{item.label}</strong> {item.description}
+                </DataItem>
+              ))}
             </div>
           </PrivacySection>
 
           {/* Section 3: Finalités */}
           <PrivacySection
             icon={Target}
-            title="3. Finalités du traitement"
+            title={t.sections.purposes.title}
             delay={0.4}
           >
             <p className="text-white/80 mb-4">
-              Vos données sont collectées et traitées pour les finalités suivantes :
+              {t.sections.purposes.intro}
             </p>
             <div className="space-y-4">
               <FinalityCard
-                title="Gestion des demandes de recrutement"
-                description="Traiter vos demandes de devis et vous mettre en relation avec notre réseau d'agences partenaires."
+                title={t.sections.purposes.items[0].title}
+                description={t.sections.purposes.items[0].description}
                 color="cyan"
               />
               <FinalityCard
-                title="Amélioration de nos services"
-                description="Analyser l'utilisation de nos services pour améliorer votre expérience utilisateur."
+                title={t.sections.purposes.items[1].title}
+                description={t.sections.purposes.items[1].description}
                 color="violet"
               />
               <FinalityCard
-                title="Communication commerciale"
-                description="Vous informer de nos nouveaux services et de notre marketplace européenne (avec votre consentement)."
+                title={t.sections.purposes.items[2].title}
+                description={t.sections.purposes.items[2].description}
                 color="blue"
               />
             </div>
@@ -266,44 +273,39 @@ export default function Privacy() {
           {/* Section 4: Base légale */}
           <PrivacySection
             icon={FileText}
-            title="4. Base légale du traitement"
+            title={t.sections.legalBasis.title}
             delay={0.5}
           >
             <p className="text-white/80 mb-4">
-              Le traitement de vos données repose sur les bases légales suivantes :
+              {t.sections.legalBasis.intro}
             </p>
             <div className="grid gap-3">
-              <LegalBasisItem 
-                basis="Exécution du contrat"
-                description="Traitement nécessaire pour répondre à vos demandes de recrutement"
-              />
-              <LegalBasisItem 
-                basis="Consentement"
-                description="Pour l'envoi de communications marketing (vous pouvez retirer votre consentement à tout moment)"
-              />
-              <LegalBasisItem 
-                basis="Intérêt légitime"
-                description="Amélioration de nos services et sécurité de notre plateforme"
-              />
+              {t.sections.legalBasis.items.map((item, index) => (
+                <LegalBasisItem 
+                  key={index}
+                  basis={item.basis}
+                  description={item.description}
+                />
+              ))}
             </div>
           </PrivacySection>
 
           {/* Section 5: Durée de conservation */}
           <PrivacySection
             icon={Clock}
-            title="5. Durée de conservation"
+            title={t.sections.retention.title}
             delay={0.6}
           >
             <p className="text-white/80 mb-4">
-              Nous conservons vos données personnelles pour les durées suivantes :
+              {t.sections.retention.intro}
             </p>
             <div className="bg-white/5 border border-white/10 rounded-lg p-6 space-y-3">
-              <RetentionItem period="3 ans" description="Données des prospects et clients" />
-              <RetentionItem period="13 mois" description="Cookies et données de navigation" />
-              <RetentionItem period="5 ans" description="Documents comptables et fiscaux" />
+              <RetentionItem period={t.sections.retention.items[0].period} description={t.sections.retention.items[0].description} />
+              <RetentionItem period={t.sections.retention.items[1].period} description={t.sections.retention.items[1].description} />
+              <RetentionItem period={t.sections.retention.items[2].period} description={t.sections.retention.items[2].description} />
               <RetentionItem 
-                period={`${complianceData?.data_retention_days || 365} jours`} 
-                description="Données de formulaires (paramétrable)"
+                period={t.sections.retention.items[3].period.replace('{days}', String(complianceData?.data_retention_days || 365))} 
+                description={t.sections.retention.items[3].description}
                 highlight
               />
             </div>
@@ -312,54 +314,54 @@ export default function Privacy() {
           {/* Section 6: Vos droits */}
           <PrivacySection
             icon={Shield}
-            title="6. Vos droits"
+            title={t.sections.rights.title}
             delay={0.7}
           >
             <p className="text-white/80 mb-4">
-              Conformément au RGPD, vous disposez des droits suivants :
+              {t.sections.rights.intro}
             </p>
             <div className="grid md:grid-cols-2 gap-4">
               <RightCard
                 icon={<Eye className="w-5 h-5" />}
-                title="Droit d'accès"
-                description="Obtenir une copie de vos données personnelles"
+                title={t.sections.rights.items[0].title}
+                description={t.sections.rights.items[0].description}
                 color="cyan"
               />
               <RightCard
                 icon={<Edit className="w-5 h-5" />}
-                title="Droit de rectification"
-                description="Corriger vos données inexactes ou incomplètes"
+                title={t.sections.rights.items[1].title}
+                description={t.sections.rights.items[1].description}
                 color="violet"
               />
               <RightCard
                 icon={<Trash2 className="w-5 h-5" />}
-                title="Droit à l'effacement"
-                description="Demander la suppression de vos données"
+                title={t.sections.rights.items[2].title}
+                description={t.sections.rights.items[2].description}
                 color="red"
               />
               <RightCard
                 icon={<Lock className="w-5 h-5" />}
-                title="Droit à la limitation"
-                description="Limiter le traitement de vos données"
+                title={t.sections.rights.items[3].title}
+                description={t.sections.rights.items[3].description}
                 color="orange"
               />
               <RightCard
                 icon={<Download className="w-5 h-5" />}
-                title="Droit à la portabilité"
-                description="Recevoir vos données dans un format structuré"
+                title={t.sections.rights.items[4].title}
+                description={t.sections.rights.items[4].description}
                 color="blue"
               />
               <RightCard
                 icon={<XCircle className="w-5 h-5" />}
-                title="Droit d'opposition"
-                description="Vous opposer au traitement de vos données"
+                title={t.sections.rights.items[5].title}
+                description={t.sections.rights.items[5].description}
                 color="pink"
               />
             </div>
             <div className="mt-6 bg-gradient-to-r from-cyan-500/10 to-violet-500/10 border border-cyan-400/30 rounded-lg p-4">
               <p className="text-white/90 text-sm">
                 <Info className="w-4 h-4 inline mr-2 text-cyan-400" />
-                Pour exercer vos droits, contactez notre DPO à l'adresse{' '}
+                {t.sections.rights.footer}{' '}
                 <a href={`mailto:${dpoEmail}`} className="text-cyan-400 hover:underline font-medium">
                   {dpoEmail}
                 </a>
@@ -370,53 +372,42 @@ export default function Privacy() {
           {/* Section 7: Sécurité */}
           <PrivacySection
             icon={Lock}
-            title="7. Sécurité des données"
+            title={t.sections.security.title}
             delay={0.8}
           >
             <p className="text-white/80 mb-4">
-              Nous mettons en œuvre des mesures de sécurité techniques et organisationnelles appropriées :
+              {t.sections.security.intro}
             </p>
             <div className="grid gap-3">
-              <SecurityMeasure 
-                measure="Chiffrement des données en transit et au repos (SSL/TLS)"
-              />
-              <SecurityMeasure 
-                measure="Accès restreint aux données par authentification forte"
-              />
-              <SecurityMeasure 
-                measure="Sauvegardes régulières et plan de continuité d'activité"
-              />
-              <SecurityMeasure 
-                measure="Audits de sécurité et mises à jour régulières"
-              />
-              <SecurityMeasure 
-                measure="Formation du personnel aux bonnes pratiques RGPD"
-              />
+              {t.sections.security.measures.map((measure, index) => (
+                <SecurityMeasure 
+                  key={index}
+                  measure={measure}
+                />
+              ))}
             </div>
           </PrivacySection>
 
           {/* Section 8: Transferts de données */}
           <PrivacySection
             icon={Globe}
-            title="8. Transferts de données"
+            title={t.sections.transfers.title}
             delay={0.9}
           >
             <p className="text-white/80 mb-4">
-              Dans le cadre de notre réseau européen de 500+ agences partenaires dans 27 pays :
+              {t.sections.transfers.intro}
             </p>
             <div className="space-y-4">
               <div className="bg-white/5 border border-white/10 rounded-lg p-4">
-                <h4 className="text-white mb-2">🇪🇺 Au sein de l'Union Européenne</h4>
+                <h4 className="text-white mb-2">{t.sections.transfers.eu.title}</h4>
                 <p className="text-white/70 text-sm">
-                  Vos données peuvent être transférées à nos agences partenaires situées dans l'UE/EEE, 
-                  qui bénéficient du même niveau de protection RGPD.
+                  {t.sections.transfers.eu.description}
                 </p>
               </div>
               <div className="bg-white/5 border border-white/10 rounded-lg p-4">
-                <h4 className="text-white mb-2">🌍 Hors Union Européenne</h4>
+                <h4 className="text-white mb-2">{t.sections.transfers.nonEu.title}</h4>
                 <p className="text-white/70 text-sm">
-                  En cas de transfert hors UE, nous utilisons les Clauses Contractuelles Types (CCT) de la Commission européenne 
-                  pour garantir un niveau de protection adéquat.
+                  {t.sections.transfers.nonEu.description}
                 </p>
               </div>
             </div>
@@ -425,49 +416,44 @@ export default function Privacy() {
           {/* Section 9: Cookies */}
           <PrivacySection
             icon={Cookie}
-            title="9. Cookies et traceurs"
+            title={t.sections.cookies.title}
             delay={1.0}
           >
             <p className="text-white/80 mb-4">
-              Notre site utilise des cookies pour améliorer votre expérience de navigation :
+              {t.sections.cookies.intro}
             </p>
             <div className="space-y-3">
-              <CookieType 
-                type="Cookies essentiels"
-                description="Nécessaires au fonctionnement du site (session, sécurité)"
-                required
-              />
-              <CookieType 
-                type="Cookies analytiques"
-                description="Mesure d'audience et statistiques de visite"
-                required={false}
-              />
-              <CookieType 
-                type="Cookies marketing"
-                description="Publicités ciblées et personnalisation"
-                required={false}
-              />
+              {t.sections.cookies.types.map((cookieType, index) => (
+                <CookieType 
+                  key={index}
+                  type={cookieType.type}
+                  description={cookieType.description}
+                  required={cookieType.required}
+                  language={currentLanguage}
+                  translations={t.badges}
+                />
+              ))}
             </div>
             <p className="text-white/70 text-sm mt-4">
-              Vous pouvez gérer vos préférences de cookies à tout moment via les paramètres de votre navigateur.
+              {t.sections.cookies.footer}
             </p>
           </PrivacySection>
 
           {/* Section 10: Contact et réclamation */}
           <PrivacySection
             icon={Mail}
-            title="10. Contact et réclamation"
+            title={t.sections.contact.title}
             delay={1.1}
           >
             <p className="text-white/80 mb-4">
-              Pour toute question concernant le traitement de vos données personnelles :
+              {t.sections.contact.intro}
             </p>
             <div className="grid md:grid-cols-2 gap-4">
               <Card className="border border-white/10 bg-gradient-to-br from-cyan-500/10 to-transparent backdrop-blur-sm">
                 <CardHeader>
                   <CardTitle className="text-white text-lg flex items-center gap-2">
                     <Mail className="w-5 h-5 text-cyan-400" />
-                    Contactez notre DPO
+                    {t.sections.contact.dpoCard.title}
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
@@ -485,11 +471,11 @@ export default function Privacy() {
                 <CardHeader>
                   <CardTitle className="text-white text-lg flex items-center gap-2">
                     <Shield className="w-5 h-5 text-violet-400" />
-                    Autorité de contrôle
+                    {t.sections.contact.cnilCard.title}
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <p className="text-white/70 text-sm mb-2">CNIL (France)</p>
+                  <p className="text-white/70 text-sm mb-2">{t.sections.contact.cnilCard.name}</p>
                   <a 
                     href="https://www.cnil.fr"
                     target="_blank"
@@ -503,8 +489,7 @@ export default function Privacy() {
             </div>
             <div className="mt-6 bg-white/5 border border-white/10 rounded-lg p-4">
               <p className="text-white/80 text-sm">
-                Si vous estimez que vos droits ne sont pas respectés, vous avez le droit d'introduire une réclamation 
-                auprès de la Commission Nationale de l'Informatique et des Libertés (CNIL).
+                {t.sections.contact.footer}
               </p>
             </div>
           </PrivacySection>
@@ -520,10 +505,9 @@ export default function Privacy() {
           <Card className="border border-cyan-400/30 bg-gradient-to-br from-cyan-500/10 via-violet-500/10 to-transparent backdrop-blur-md shadow-2xl">
             <CardContent className="p-8">
               <Shield className="w-16 h-16 text-cyan-400 mx-auto mb-4" />
-              <h3 className="text-white text-2xl mb-3">Vos données en sécurité</h3>
+              <h3 className="text-white text-2xl mb-3">{t.cta.title}</h3>
               <p className="text-white/70 mb-6 max-w-2xl mx-auto">
-                La protection de vos données personnelles est notre priorité. 
-                Nous nous engageons à respecter le RGPD et à garantir la sécurité de vos informations.
+                {t.cta.description}
               </p>
               <div className="flex flex-wrap gap-4 justify-center">
                 <Link href="/">
@@ -531,7 +515,7 @@ export default function Privacy() {
                     className="bg-gradient-to-r from-cyan-500 to-violet-500 hover:from-cyan-600 hover:to-violet-600 text-white shadow-lg shadow-cyan-500/30"
                   >
                     <ArrowLeft className="w-4 h-4 mr-2" />
-                    Retour à l'accueil
+                    {t.cta.backHome}
                   </Button>
                 </Link>
                 <Button
@@ -539,7 +523,7 @@ export default function Privacy() {
                   onClick={() => window.location.href = `mailto:${dpoEmail}`}
                 >
                   <Mail className="w-4 h-4 mr-2" />
-                  Contacter le DPO
+                  {t.cta.contactDpo}
                   <div className="absolute inset-0 -translate-x-full group-hover:translate-x-full transition-transform duration-700 bg-gradient-to-r from-transparent via-white/30 to-transparent" />
                 </Button>
               </div>
@@ -552,7 +536,7 @@ export default function Privacy() {
       <footer className="relative z-10 border-t border-white/10 bg-white/5 backdrop-blur-md mt-20 py-8">
         <div className="container mx-auto px-4 text-center">
           <p className="text-white/60 text-sm">
-            © {new Date().getFullYear()} {company}. Tous droits réservés.
+            © {new Date().getFullYear()} {company}. {currentLanguage === 'en' ? 'All rights reserved.' : 'Tous droits réservés.'}
           </p>
         </div>
       </footer>
@@ -675,7 +659,7 @@ function SecurityMeasure({ measure }: { measure: string }) {
   );
 }
 
-function CookieType({ type, description, required }: { type: string; description: string; required: boolean }) {
+function CookieType({ type, description, required, language, translations }: { type: string; description: string; required: boolean; language: string; translations: Record<string, string> }) {
   return (
     <div className="flex items-start justify-between gap-4 bg-white/5 border border-white/10 rounded-lg p-3">
       <div className="flex-1">
@@ -683,7 +667,7 @@ function CookieType({ type, description, required }: { type: string; description
         <p className="text-white/60 text-xs">{description}</p>
       </div>
       <Badge className={required ? 'bg-green-500/20 text-green-300 border-green-400/30' : 'bg-white/10 text-white/70 border-white/20'}>
-        {required ? 'Requis' : 'Optionnel'}
+        {required ? translations.required : translations.optional}
       </Badge>
     </div>
   );

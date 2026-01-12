@@ -261,12 +261,8 @@ export default function Temoignages() {
 
                     {/* Avatar & Info */}
                     <div className="flex items-center gap-4 border-t border-white/10 pt-6">
-                      <div className="w-14 h-14 rounded-full overflow-hidden bg-gradient-to-br from-cyan-400 to-violet-400 flex-shrink-0">
-                        <ImageWithFallback
-                          src={`https://source.unsplash.com/100x100/?${testimonial.avatar}`}
-                          alt={testimonial.name}
-                          className="w-full h-full object-cover"
-                        />
+                      <div className="w-14 h-14 rounded-full overflow-hidden flex-shrink-0 bg-gradient-to-br from-blue-900 via-purple-600 to-cyan-500 flex items-center justify-center text-white font-bold text-xl">
+                        {testimonial.name.split(' ').map((n: string) => n[0]).join('')}
                       </div>
                       <div className="flex-1 min-w-0">
                         <h4 className="text-white truncate">{testimonial.name}</h4>

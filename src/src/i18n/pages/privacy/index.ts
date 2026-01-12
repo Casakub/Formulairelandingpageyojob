@@ -1,0 +1,26 @@
+export { frPrivacy } from './fr';
+export { enPrivacy } from './en';
+export { privacyDE } from './de';
+export { privacyES } from './es';
+export { privacyIT } from './it';
+export { privacyNL } from './nl';
+export { privacyPT } from './pt';
+export { privacyPL } from './pl';
+export { privacyCS } from './cs';
+export { privacySK } from './sk';
+export { privacyHU } from './hu';
+export { privacyRO } from './ro';
+export { privacyBG } from './bg';
+export { privacyHR } from './hr';
+export { privacySL } from './sl';
+export { privacyET } from './et';
+export { privacyLV } from './lv';
+export { privacyLT } from './lt';
+export { privacyEL } from './el';
+export { privacySV } from './sv';
+export { privacyDA } from './da';
+export { privacyFI } from './fi';
+export { privacyNO } from './no';
+
+export const AVAILABLE_LANGUAGES_PRIVACY: string[] = ['fr', 'en', 'de', 'es', 'it', 'nl', 'pt', 'pl', 'cs', 'sk', 'hu', 'ro', 'bg', 'hr', 'sl', 'et', 'lv', 'lt', 'el', 'sv', 'da', 'fi', 'no'];
+export type PrivacySupportedLanguage = 'fr' | 'en' | 'de' | 'es' | 'it' | 'nl' | 'pt' | 'pl' | 'cs' | 'sk' | 'hu' | 'ro' | 'bg' | 'hr' | 'sl' | 'et' | 'lv' | 'lt' | 'el' | 'sv' | 'da' | 'fi' | 'no';

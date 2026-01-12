@@ -6,6 +6,7 @@
  * - Notre Réseau
  * - Nos Secteurs
  * - Témoignages
+ * - Politique de Confidentialité
  * 
  * @version 1.0.0
  */
@@ -14,12 +15,13 @@ import { useMemo } from 'react';
 import { frAPropos, enAPropos, deAPropos, esAPropos, itAPropos, nlAPropos, ptAPropos, plAPropos, csAPropos, skAPropos, huAPropos, roAPropos, bgAPropos, hrAPropos, slAPropos, etAPropos, lvAPropos, ltAPropos, elAPropos, svAPropos, daAPropos, fiAPropos, noAPropos } from './aPropos';
 import { frNotreReseau, enNotreReseau, deNotreReseau, esNotreReseau, itNotreReseau, nlNotreReseau, ptNotreReseau, plNotreReseau, csNotreReseau, skNotreReseau, huNotreReseau, roNotreReseau, bgNotreReseau, hrNotreReseau, slNotreReseau, etNotreReseau, lvNotreReseau, ltNotreReseau, elNotreReseau, svNotreReseau, daNotreReseau, fiNotreReseau, noNotreReseau } from './notreReseau';
 import { frNosSecteurs, enNosSecteurs, deNosSecteurs, esNosSecteurs, itNosSecteurs, nlNosSecteurs, ptNosSecteurs, plNosSecteurs, csNosSecteurs, skNosSecteurs, huNosSecteurs, roNosSecteurs, bgNosSecteurs, hrNosSecteurs, slNosSecteurs, etNosSecteurs, lvNosSecteurs, ltNosSecteurs, elNosSecteurs, svNosSecteurs, daNosSecteurs, fiNosSecteurs, noNosSecteurs } from './nosSecteurs';
-import { frTemoignages, enTemoignages } from './temoignages';
+import { frTemoignages, enTemoignages, deTemoignages, esTemoignages, itTemoignages, nlTemoignages, ptTemoignages, plTemoignages, csTemoignages, skTemoignages, huTemoignages, roTemoignages, bgTemoignages, hrTemoignages, slTemoignages, etTemoignages, lvTemoignages, ltTemoignages, elTemoignages, svTemoignages, daTemoignages, fiTemoignages, noTemoignages } from './temoignages';
+import { frPrivacy, enPrivacy, privacyDE, privacyES, privacyIT, privacyNL, privacyPT, privacyPL, privacyCS, privacySK, privacyHU, privacyRO, privacyBG, privacyHR, privacySL, privacyET, privacyLV, privacyLT, privacyEL, privacySV, privacyDA, privacyFI, privacyNO } from './privacy';
 
 /**
  * Type pour les pages disponibles
  */
-export type PageKey = 'a-propos' | 'notre-reseau' | 'nos-secteurs' | 'temoignages';
+export type PageKey = 'a-propos' | 'notre-reseau' | 'nos-secteurs' | 'temoignages' | 'privacy';
 
 /**
  * Type pour les langues supportées
@@ -107,7 +109,53 @@ const pageTranslations = {
   },
   'temoignages': {
     fr: frTemoignages,
-    en: enTemoignages
+    en: enTemoignages,
+    de: deTemoignages,
+    es: esTemoignages,
+    it: itTemoignages,
+    nl: nlTemoignages,
+    pt: ptTemoignages,
+    pl: plTemoignages,
+    cs: csTemoignages,
+    sk: skTemoignages,
+    hu: huTemoignages,
+    ro: roTemoignages,
+    bg: bgTemoignages,
+    hr: hrTemoignages,
+    sl: slTemoignages,
+    et: etTemoignages,
+    lv: lvTemoignages,
+    lt: ltTemoignages,
+    el: elTemoignages,
+    sv: svTemoignages,
+    da: daTemoignages,
+    fi: fiTemoignages,
+    no: noTemoignages
+  },
+  'privacy': {
+    fr: frPrivacy,
+    en: enPrivacy,
+    de: privacyDE,
+    es: privacyES,
+    it: privacyIT,
+    nl: privacyNL,
+    pt: privacyPT,
+    pl: privacyPL,
+    cs: privacyCS,
+    sk: privacySK,
+    hu: privacyHU,
+    ro: privacyRO,
+    bg: privacyBG,
+    hr: privacyHR,
+    sl: privacySL,
+    et: privacyET,
+    lv: privacyLV,
+    lt: privacyLT,
+    el: privacyEL,
+    sv: privacySV,
+    da: privacyDA,
+    fi: privacyFI,
+    no: privacyNO
   }
 } as const;
 
@@ -124,7 +172,7 @@ const pageTranslations = {
  * console.log(t.hero.title); // "Le courtage en recrutement européen, réinventé"
  * ```
  */
-export function usePageTranslation(pageKey: PageKey, language: SupportedLanguage) {
+export function usePageTranslation(pageKey: PageKey, language: SupportedLanguage | string) {
   return useMemo(() => {
     const pageData = pageTranslations[pageKey];
     
