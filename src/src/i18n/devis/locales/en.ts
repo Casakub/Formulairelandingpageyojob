@@ -230,6 +230,12 @@ export const en: DevisTranslations = {
       facteurPays: "Country factor",
       final: "Final coefficient",
     },
+    summary: {
+      title: "Employee Compensation",
+      salaireBrutMensuel: "Gross monthly salary",
+      tauxHoraireBrut: "Gross hourly rate",
+      baseMensuelle: "(Base 151.67h/month according to collective agreement)",
+    },
   },
 
   // === STEP 4: CONDITIONS ===

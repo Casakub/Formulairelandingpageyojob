@@ -188,6 +188,11 @@ export const pl: DevisTranslations = {
   step3: {
     title: "Określ Swoje Wymagania",
     subtitle: "Opisz dokładnie stanowiska, których szukasz.",
+    profileLabel: "Profil",
+    addProfile: "Dodaj Kolejny Profil",
+    removeProfile: "Usuń Ten Profil",
+    loadingConfig: "Ładowanie konfiguracji...",
+    missingRegionWarning: "⚠️ Proszę wybrać region w kroku 1, aby automatycznie wyświetlić wynagrodzenia.",
     fields: {
       secteur: {
         label: "Sektor Branżowy",
@@ -229,6 +234,12 @@ export const pl: DevisTranslations = {
       base: "Współcz. bazowy",
       facteurPays: "Współcz. kraju",
       final: "Współczynnik końcowy",
+    },
+    summary: {
+      title: "Wynagrodzenie pracownika",
+      salaireBrutMensuel: "Wynagrodzenie brutto miesięczne",
+      tauxHoraireBrut: "Stawka godzinowa brutto",
+      baseMensuelle: "(Podstawa 151,67 godz./mies. według układu zbiorowego)",
     },
   },
 

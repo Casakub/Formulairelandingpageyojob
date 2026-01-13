@@ -178,17 +178,17 @@ export function Step4Conditions({ data, pays, region, onChange, lang = 'fr' }: S
             <SelectTrigger className="bg-white/10 border-white/20 text-white">
               <SelectValue placeholder={periodeEssaiLabel} />
             </SelectTrigger>
-            <SelectContent className="bg-gray-900 border-white/20">
-              <SelectItem value="2" className="text-white hover:bg-white/10">
+            <SelectContent className="bg-white border-gray-200">
+              <SelectItem value="2" className="text-gray-900 hover:bg-slate-100">
                 {t.step4.fields.periodeEssai.options['2']}
               </SelectItem>
-              <SelectItem value="3" className="text-white hover:bg-white/10">
+              <SelectItem value="3" className="text-gray-900 hover:bg-slate-100">
                 {t.step4.fields.periodeEssai.options['3']}
               </SelectItem>
-              <SelectItem value="5" className="text-white hover:bg-white/10">
+              <SelectItem value="5" className="text-gray-900 hover:bg-slate-100">
                 {t.step4.fields.periodeEssai.options['5']}
               </SelectItem>
-              <SelectItem value="15" className="text-white hover:bg-white/10">
+              <SelectItem value="15" className="text-gray-900 hover:bg-slate-100">
                 {t.step4.fields.periodeEssai.options['15']}
               </SelectItem>
             </SelectContent>
@@ -235,20 +235,20 @@ export function Step4Conditions({ data, pays, region, onChange, lang = 'fr' }: S
             <SelectTrigger className="bg-white/10 border-white/20 text-white">
               <SelectValue placeholder={motifRecoursLabel} />
             </SelectTrigger>
-            <SelectContent className="bg-gray-900 border-white/20">
-              <SelectItem value="accroissement" className="text-white hover:bg-white/10">
+            <SelectContent className="bg-white border-gray-200">
+              <SelectItem value="accroissement" className="text-gray-900 hover:bg-slate-100">
                 {t.step4.fields.motifRecours.options.accroissement}
               </SelectItem>
-              <SelectItem value="remplacement" className="text-white hover:bg-white/10">
+              <SelectItem value="remplacement" className="text-gray-900 hover:bg-slate-100">
                 {t.step4.fields.motifRecours.options.remplacement}
               </SelectItem>
-              <SelectItem value="saisonnier" className="text-white hover:bg-white/10">
+              <SelectItem value="saisonnier" className="text-gray-900 hover:bg-slate-100">
                 {t.step4.fields.motifRecours.options.saisonnier}
               </SelectItem>
-              <SelectItem value="exportation" className="text-white hover:bg-white/10">
+              <SelectItem value="exportation" className="text-gray-900 hover:bg-slate-100">
                 {t.step4.fields.motifRecours.options.exportation}
               </SelectItem>
-              <SelectItem value="autre" className="text-white hover:bg-white/10">
+              <SelectItem value="autre" className="text-gray-900 hover:bg-slate-100">
                 {t.step4.fields.motifRecours.options.autre}
               </SelectItem>
             </SelectContent>
@@ -264,17 +264,17 @@ export function Step4Conditions({ data, pays, region, onChange, lang = 'fr' }: S
             <SelectTrigger className="bg-white/10 border-white/20 text-white">
               <SelectValue placeholder={delaiPaiementLabel} />
             </SelectTrigger>
-            <SelectContent className="bg-gray-900 border-white/20">
-              <SelectItem value="reception" className="text-white hover:bg-white/10">
+            <SelectContent className="bg-white border-gray-200">
+              <SelectItem value="reception" className="text-gray-900 hover:bg-slate-100">
                 {t.step4.fields.delaiPaiement.options.reception}
               </SelectItem>
-              <SelectItem value="j30" className="text-white hover:bg-white/10">
+              <SelectItem value="j30" className="text-gray-900 hover:bg-slate-100">
                 {t.step4.fields.delaiPaiement.options.j30}
               </SelectItem>
-              <SelectItem value="j45" className="text-white hover:bg-white/10">
+              <SelectItem value="j45" className="text-gray-900 hover:bg-slate-100">
                 {t.step4.fields.delaiPaiement.options.j45}
               </SelectItem>
-              <SelectItem value="j60" className="text-white hover:bg-white/10">
+              <SelectItem value="j60" className="text-gray-900 hover:bg-slate-100">
                 {t.step4.fields.delaiPaiement.options.j60}
               </SelectItem>
             </SelectContent>

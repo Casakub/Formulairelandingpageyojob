@@ -230,6 +230,12 @@ export const es: DevisTranslations = {
       facteurPays: "Factor país",
       final: "Coeficiente final",
     },
+    summary: {
+      title: "Remuneración del empleado",
+      salaireBrutMensuel: "Salario bruto mensual",
+      tauxHoraireBrut: "Tarifa horaria bruta",
+      baseMensuelle: "(Base 151,67h/mes según convenio colectivo)",
+    },
   },
 
   // === PASO 4: CONDICIONES ===

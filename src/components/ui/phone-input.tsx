@@ -106,26 +106,26 @@ export function PhoneInput({
       {/* Sélecteur de code pays */}
       <Select value={countryCode} onValueChange={handleCountryChange}>
         <SelectTrigger 
-          className={`w-[140px] bg-white/10 border-white/20 text-white ${error ? 'border-red-500' : ''}`}
+          className={`w-[140px] bg-white border-gray-200 text-gray-900 ${error ? 'border-red-500' : ''}`}
         >
           <SelectValue>
             <span className="flex items-center gap-2">
               <span className="text-xl">{currentCountry.flag}</span>
-              <span className="text-sm">{currentCountry.dialCode}</span>
+              <span className="text-sm text-gray-900">{currentCountry.dialCode}</span>
             </span>
           </SelectValue>
         </SelectTrigger>
-        <SelectContent className="max-h-[300px] overflow-y-auto bg-[#2d1b69] backdrop-blur-xl border border-white/30 text-white shadow-xl z-[9999]">
+        <SelectContent className="max-h-[300px] overflow-y-auto bg-white backdrop-blur-xl border border-gray-200 shadow-xl z-[9999]">
           {EU_COUNTRY_CODES.map((country) => (
             <SelectItem 
               key={country.code} 
               value={country.code}
-              className="hover:bg-white/10 focus:bg-white/10 text-white cursor-pointer"
+              className="hover:bg-slate-100 focus:bg-slate-100 text-gray-900 cursor-pointer"
             >
               <div className="flex items-center gap-2">
                 <span className="text-xl">{country.flag}</span>
-                <span className="text-sm">{country.name[lang]}</span>
-                <span className="text-xs text-white/60">{country.dialCode}</span>
+                <span className="text-sm text-gray-900">{country.name[lang]}</span>
+                <span className="text-xs text-gray-500">{country.dialCode}</span>
               </div>
             </SelectItem>
           ))}
@@ -138,7 +138,7 @@ export function PhoneInput({
         value={localNumber}
         onChange={handleLocalNumberChange}
         onBlur={onBlur}
-        className={`flex-1 bg-white/10 border-white/20 text-white placeholder:text-white/40 ${error ? 'border-red-500' : ''} ${className}`}
+        className={`flex-1 bg-white border-gray-200 text-gray-900 placeholder:text-gray-400 ${error ? 'border-red-500' : ''} ${className}`}
         placeholder={placeholder || currentCountry.placeholder}
         required={required}
       />

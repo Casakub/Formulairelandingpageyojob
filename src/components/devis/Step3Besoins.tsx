@@ -258,9 +258,9 @@ export function Step3Besoins({ data, pays, region, onChange, lang = 'fr' }: Step
                           : t.step3.fields.secteur.placeholder}
                       </span>
                     </SelectTrigger>
-                    <SelectContent position="popper" sideOffset={5} className="bg-[#2d1b69]/95 backdrop-blur-xl border border-white/20 text-white z-50">
+                    <SelectContent position="popper" sideOffset={5} className="bg-white backdrop-blur-xl border border-gray-200 z-50">
                       {Object.keys(SECTEURS_DATA).map((secteurKey) => (
-                        <SelectItem key={secteurKey} value={secteurKey} className="text-white hover:bg-white/10 focus:bg-white/10">
+                        <SelectItem key={secteurKey} value={secteurKey} className="text-gray-900 hover:bg-slate-100 focus:bg-slate-100">
                           {t.secteurs?.[secteurKey]?.label || SECTEUR_KEY_TO_LABEL[secteurKey] || secteurKey}
                         </SelectItem>
                       ))}
@@ -303,16 +303,16 @@ export function Step3Besoins({ data, pays, region, onChange, lang = 'fr' }: Step
                         <span className="text-white/60">{isLoading ? t.common.loading : t.step3.fields.nationalite.placeholder}</span>
                       )}
                     </SelectTrigger>
-                    <SelectContent position="popper" sideOffset={5} className="bg-[#2d1b69]/95 backdrop-blur-xl border border-white/20 text-white z-50">
+                    <SelectContent position="popper" sideOffset={5} className="bg-white backdrop-blur-xl border border-gray-200 z-50">
                       {paysDisponibles.length > 0 ? (
                         paysDisponibles.map((pays) => (
-                          <SelectItem key={pays.code} value={pays.code} className="text-white hover:bg-white/10 focus:bg-white/10">
+                          <SelectItem key={pays.code} value={pays.code} className="text-gray-900 hover:bg-slate-100 focus:bg-slate-100">
                             <span className="mr-2">{pays.flag}</span>
                             {translatePays(pays.label, lang)}
                           </SelectItem>
                         ))
                       ) : (
-                        <SelectItem value="RO" className="text-white hover:bg-white/10 focus:bg-white/10">
+                        <SelectItem value="RO" className="text-gray-900 hover:bg-slate-100 focus:bg-slate-100">
                           <span className="mr-2">🇷🇴</span>
                           {translatePays('Roumanie', lang)}
                         </SelectItem>
@@ -341,9 +341,9 @@ export function Step3Besoins({ data, pays, region, onChange, lang = 'fr' }: Step
                           : t.step3.fields.poste.placeholder}
                       </span>
                     </SelectTrigger>
-                    <SelectContent position="popper" sideOffset={5} className="bg-[#2d1b69]/95 backdrop-blur-xl border border-white/20 text-white z-50">
+                    <SelectContent position="popper" sideOffset={5} className="bg-white backdrop-blur-xl border border-gray-200 z-50">
                       {poste.secteur && getPostesForSecteur(poste.secteur).map((posteKey) => (
-                        <SelectItem key={posteKey} value={posteKey} className="text-white hover:bg-white/10 focus:bg-white/10">
+                        <SelectItem key={posteKey} value={posteKey} className="text-gray-900 hover:bg-slate-100 focus:bg-slate-100">
                           {t.secteurs[poste.secteur]?.postes[posteKey] || posteKey}
                         </SelectItem>
                       ))}
@@ -368,9 +368,9 @@ export function Step3Besoins({ data, pays, region, onChange, lang = 'fr' }: Step
                           : t.step3.fields.classification.placeholder}
                       </span>
                     </SelectTrigger>
-                    <SelectContent position="popper" sideOffset={5} className="bg-[#2d1b69]/95 backdrop-blur-xl border border-white/20 text-white z-50">
+                    <SelectContent position="popper" sideOffset={5} className="bg-white backdrop-blur-xl border border-gray-200 z-50">
                       {poste.secteur && getClassificationsForSecteur(poste.secteur).map((classKey) => (
-                        <SelectItem key={classKey} value={classKey} className="text-white hover:bg-white/10 focus:bg-white/10">
+                        <SelectItem key={classKey} value={classKey} className="text-gray-900 hover:bg-slate-100 focus:bg-slate-100">
                           {t.secteurs[poste.secteur]?.classifications[classKey] || classKey}
                         </SelectItem>
                       ))}
@@ -411,19 +411,19 @@ export function Step3Besoins({ data, pays, region, onChange, lang = 'fr' }: Step
                 <div className="space-y-3 mt-4">
                   {/* 🆕 Rémunération simplifiée - SANS taux ETT (incomplet car sans options) */}
                   <div className="p-4 bg-gradient-to-r from-green-500/10 to-cyan-500/10 border border-green-500/30 rounded-lg">
-                    <p className="text-green-200 text-sm mb-3 font-medium">💶 {t.step3.summary.title}</p>
+                    <p className="text-green-200 text-sm mb-3 font-medium">💶 {t.step3?.summary?.title || "Rémunération du salarié"}</p>
                     <div className="space-y-3">
                       <div className="flex justify-between items-center">
-                        <span className="text-white/70">{t.step3.summary.salaireBrutMensuel}</span>
+                        <span className="text-white/70">{t.step3?.summary?.salaireBrutMensuel || "Salaire brut mensuel"}</span>
                         <span className="text-white text-xl font-medium">{formaterMontant(poste.salaireBrut)}</span>
                       </div>
                       <div className="flex justify-between items-center">
-                        <span className="text-white/70">{t.step3.summary.tauxHoraireBrut}</span>
+                        <span className="text-white/70">{t.step3?.summary?.tauxHoraireBrut || "Taux horaire brut"}</span>
                         <span className="text-white text-xl font-medium">{formaterMontant(poste.tauxHoraireBrut)}/h</span>
                       </div>
                       <div className="border-t border-white/10 my-2"></div>
                       <p className="text-white/50 text-xs text-center">
-                        {t.step3.summary.baseMensuelle}
+                        {t.step3?.summary?.baseMensuelle || "Base 151,67h/mois"}
                       </p>
                     </div>
                   </div>

@@ -230,6 +230,12 @@ export const de: DevisTranslations = {
       facteurPays: "Länderfaktor",
       final: "Endkoeffizient",
     },
+    summary: {
+      title: "Arbeitnehmervergütung",
+      salaireBrutMensuel: "Bruttomonatsgehalt",
+      tauxHoraireBrut: "Bruttostundenlohn",
+      baseMensuelle: "(Basis 151,67 Std./Monat gemäß Tarifvertrag)",
+    },
   },
 
   // === SCHRITT 4: BEDINGUNGEN ===

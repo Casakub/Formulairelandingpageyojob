@@ -189,9 +189,9 @@ export function Step5Candidats({ data, onChange, lang = 'fr' }: Step5CandidatsPr
                 <SelectTrigger className="bg-white/10 border-white/20 text-white">
                   <SelectValue />
                 </SelectTrigger>
-                <SelectContent className="bg-gray-900 border-white/20">
+                <SelectContent className="bg-white border-gray-200">
                   {NIVEAUX_LANGUE.map((niveau) => (
-                    <SelectItem key={niveau.value} value={niveau.value} className="text-white hover:bg-white/10">
+                    <SelectItem key={niveau.value} value={niveau.value} className="text-gray-900 hover:bg-slate-100">
                       {translateLanguageLevel(niveau.value, lang)}
                     </SelectItem>
                   ))}

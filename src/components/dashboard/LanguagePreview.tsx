@@ -85,7 +85,7 @@ export function LanguagePreview({ onClose }: LanguagePreviewProps) {
                 <SelectTrigger className="w-[280px] bg-white">
                   <SelectValue />
                 </SelectTrigger>
-                <SelectContent className="z-[10000]">
+                <SelectContent className="bg-white border-gray-200 z-[10000]">
                   {availableLanguages.map((lang) => (
                     <SelectItem key={lang.code} value={lang.code}>
                       <div className="flex items-center gap-2">
