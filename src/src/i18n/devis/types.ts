@@ -246,6 +246,7 @@ export interface DevisTranslations {
   step4: {
     title: string;
     subtitle: string;
+    dateError: string;
     fields: {
       dateDebut: {
         label: string;
@@ -435,6 +436,9 @@ export interface DevisTranslations {
     sections: {
       experience: {
         title: string;
+        obligatoire: {
+          label: string;
+        };
         annees: {
           label: string;
           placeholder: string;
@@ -446,6 +450,26 @@ export interface DevisTranslations {
           };
         };
         competences: {
+          label: string;
+          placeholder: string;
+        };
+      };
+      formation: {
+        title: string;
+        obligatoire: {
+          label: string;
+        };
+        type: {
+          label: string;
+          placeholder: string;
+        };
+      };
+      travailRisque: {
+        title: string;
+        active: {
+          label: string;
+        };
+        precisions: {
           label: string;
           placeholder: string;
         };
@@ -469,6 +493,23 @@ export interface DevisTranslations {
           label: string;
           placeholder: string;
         };
+        languageNames: {
+          francais: string;
+          anglais: string;
+          portugais: string;
+          espagnol: string;
+          italien: string;
+          autre: string;
+        };
+        levels: {
+          'non-requis': string;
+          'A1': string;
+          'A2': string;
+          'B1': string;
+          'B2': string;
+          'C1': string;
+          'C2': string;
+        };
       };
       permis: {
         title: string;
@@ -482,9 +523,25 @@ export interface DevisTranslations {
             d: string;
           };
         };
+        categorie: {
+          label: string;
+          placeholder: string;
+        };
+      };
+      outillage: {
+        title: string;
+        requis: {
+          label: string;
+        };
+        type: {
+          label: string;
+          placeholder: string;
+        };
       };
       epi: {
         title: string;
+        infoLegale: string;
+        selectionCount: string;
         fournis: {
           label: string;
           helper: string;
@@ -496,6 +553,18 @@ export interface DevisTranslations {
         liste: {
           label: string;
           placeholder: string;
+        };
+        items: {
+          casque: string;
+          lunettes: string;
+          protections_auditives: string;
+          gants: string;
+          chaussures: string;
+          harnais: string;
+          vetements: string;
+          masque: string;
+          protection_faciale: string;
+          vetements_visibilite: string;
         };
       };
       autresExigences: {
@@ -593,6 +662,107 @@ export interface DevisTranslations {
       classifications: {
         [classificationKey: string]: string;
       };
+    };
+  };
+
+  // === PAYS EUROPÉENS ===
+  pays: {
+    [paysKey: string]: string;
+  };
+
+  // === PAGE RÉCAPITULATIF (SIGNATURE) ===
+  pageRecap: {
+    header: {
+      title: string;
+      exportPDF: string;
+      loading: string;
+      notFound: string;
+    };
+    statut: {
+      signe: string;
+      nouveau: string;
+    };
+    dates: {
+      creeLe: string;
+      a: string;
+      signeLe: string;
+      derniereModification: string;
+    };
+    entreprise: {
+      title: string;
+      raisonSociale: string;
+      siret: string;
+      codeAPE: string;
+      tvaIntracommunautaire: string;
+      adresse: string;
+      siteInternet: string;
+    };
+    contact: {
+      title: string;
+      nomComplet: string;
+      fonction: string;
+      email: string;
+      telephonePortable: string;
+      telephoneFixe: string;
+    };
+    postes: {
+      title: string;
+      nationalite: string;
+      salaireBrut: string;
+      tauxHoraireBrut: string;
+      coefficientETT: string;
+      tauxETT: string;
+    };
+    conditions: {
+      title: string;
+      dateDebut: string;
+      dateFin: string;
+      periodeEssai: string;
+      baseHoraire: string;
+      heuresMois: string;
+      lieuxMission: string;
+      motifRecours: string;
+    };
+    exigences: {
+      title: string;
+      experience: string;
+      competences: string;
+      langues: string;
+      permis: string;
+      epi: string;
+    };
+    calculs: {
+      title: string;
+      salaireBrut: string;
+      coefficientETT: string;
+      tauxHoraireBrut: string;
+      tauxETT: string;
+      baseHoraire: string;
+      coutMensuel: string;
+      duree: string;
+      coutTotal: string;
+    };
+    signature: {
+      title: string;
+      intro: string;
+      nomComplet: {
+        label: string;
+        placeholder: string;
+      };
+      email: {
+        label: string;
+        placeholder: string;
+      };
+      checkbox: string;
+      boutonSigner: string;
+      enCours: string;
+      succes: string;
+      erreur: string;
+    };
+    actions: {
+      modifier: string;
+      telecharger: string;
+      partager: string;
     };
   };
 }
