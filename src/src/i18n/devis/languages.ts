@@ -51,6 +51,11 @@ export const DEVIS_LANGUAGES: DevisLanguageOption[] = [
 export const MVP_LANGUAGES: DevisLanguage[] = ['fr', 'en', 'de', 'es', 'pl', 'ro'];
 
 /**
+ * Langues disponibles (TOUTES LES 22 LANGUES - 100% COMPLÉTÉ !)
+ */
+export const AVAILABLE_LANGUAGES: DevisLanguage[] = ['fr', 'en', 'de', 'es', 'pl', 'ro', 'it', 'pt', 'nl', 'bg', 'hu', 'cs', 'sk', 'hr', 'sl', 'et', 'lt', 'lv', 'el', 'fi', 'sv', 'da'];
+
+/**
  * Langue par défaut
  */
 export const DEFAULT_LANGUAGE: DevisLanguage = 'fr';

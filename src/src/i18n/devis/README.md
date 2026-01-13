@@ -40,6 +40,50 @@
 | 🇵🇱 Polski | `pl` | Pologne | ⭐⭐⭐⭐⭐ |
 | 🇷🇴 Română | `ro` | Roumanie | ⭐⭐⭐⭐⭐ |
 
+### Langues Phase 2 (Europe de l'Ouest)
+
+| Langue | Code | Pays principaux | Statut |
+|--------|------|-----------------|--------|
+| 🇮🇹 Italiano | `it` | Italie | ✅ Complété |
+| 🇵🇹 Português | `pt` | Portugal | ✅ Complété |
+| 🇳🇱 Nederlands | `nl` | Pays-Bas, Belgique | ✅ Complété |
+
+**✨ Phase 2 : 100% COMPLÉTÉE ! 🎉**
+
+### Langues Phase 3 (Europe de l'Est)
+
+| Langue | Code | Pays principaux | Statut |
+|--------|------|-----------------|--------|
+| 🇧🇬 Български | `bg` | Bulgarie | ✅ Complété |
+| 🇭🇺 Magyar | `hu` | Hongrie | ✅ Complété |
+| 🇨🇿 Čeština | `cs` | République Tchèque | ✅ Complété |
+| 🇸🇰 Slovenčina | `sk` | Slovaquie | ✅ Complété |
+| 🇭🇷 Hrvatski | `hr` | Croatie | ✅ Complété |
+| 🇸🇮 Slovenščina | `sl` | Slovénie | ✅ Complété |
+
+**🎉 Phase 3 : 100% COMPLÉTÉE ! 🎊**
+
+### Langues Phase 5 (Pays Baltes & Finno-ougriens)
+
+| Langue | Code | Pays principaux | Statut |
+|--------|------|-----------------|--------|
+| 🇪🇪 Eesti | `et` | Estonie | ✅ Complété |
+| 🇱🇹 Lietuvių | `lt` | Lituanie | ✅ Complété |
+| 🇱🇻 Latviešu | `lv` | Lettonie | ✅ Complété |
+
+**🎊 Phase 5 : 100% COMPLÉTÉE ! 🎉**
+
+### Langues Phase 4 (Europe du Sud & Nordique)
+
+| Langue | Code | Pays principaux | Statut |
+|--------|------|-----------------|--------|
+| 🇬🇷 Ελληνικά | `el` | Grèce, Chypre | ✅ Complété |
+| 🇫🇮 Suomi | `fi` | Finlande | ✅ Complété |
+| 🇸🇪 Svenska | `sv` | Suède | ✅ Complété |
+| 🇩🇰 Dansk | `da` | Danemark | ✅ Complété |
+
+**🎉🎊 Phase 4 : 100% COMPLÉTÉE ! 🏆✨**
+
 ---
 
 ## 🚀 Installation

@@ -31,7 +31,7 @@ import { StepRecapitulatif } from './components/devis/StepRecapitulatif';
 
 // Import du système de traduction
 import { LanguageSelector } from './components/shared/LanguageSelector';
-import { getSuggestedLanguage, MVP_LANGUAGES } from './src/i18n/devis';
+import { getSuggestedLanguage, AVAILABLE_LANGUAGES } from './src/i18n/devis';
 import type { DevisLanguage } from './src/i18n/devis/types';
 import { useDevisTranslationStatic } from './hooks/useDevisTranslation';
 import { useLanguageManager } from './hooks/useLanguageManager';
@@ -446,7 +446,7 @@ export default function DemandeDevis() {
                 <LanguageSelector 
                   currentLanguage={lang}
                   onLanguageChange={handleLanguageChange}
-                  availableLanguages={MVP_LANGUAGES}
+                  availableLanguages={AVAILABLE_LANGUAGES}
                   suggestedCountry={formData.entreprise.pays}
                   showCountrySuggestion={true}
                   languageSource="devis"

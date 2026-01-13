@@ -223,6 +223,7 @@
       <ul>
         <li><strong>Langue de base :</strong> Français (fr)</li>
         <li><strong>MVP (6 langues) :</strong> FR, EN, DE, ES, PL, RO</li>
+        <li><strong>Phase 2 (3 langues) :</strong> IT, PT, NL</li>
         <li><strong>Total clés :</strong> ~170 clés à traduire</li>
         <li><strong>Stockage :</strong> KV Store Supabase</li>
       </ul>
@@ -254,6 +255,18 @@
     <div class="controls">
       <button class="btn btn-primary" onclick="seedFrench()" id="btn-fr">
         🇫🇷 Seed Français (Base)
+      </button>
+      <button class="btn btn-secondary" onclick="seedItalian()" id="btn-it">
+        🇮🇹 Seed Italien (IT)
+      </button>
+      <button class="btn btn-secondary" onclick="seedPortuguese()" id="btn-pt">
+        🇵🇹 Seed Portugais (PT)
+      </button>
+      <button class="btn btn-secondary" onclick="seedDutch()" id="btn-nl">
+        🇳🇱 Seed Néerlandais (NL)
+      </button>
+      <button class="btn btn-secondary" onclick="seedBulgarian()" id="btn-bg">
+        🇧🇬 Seed Bulgare (BG)
       </button>
       <button class="btn btn-secondary" onclick="seedMVP()" id="btn-mvp">
         🌍 Seed MVP (6 langues)
@@ -349,6 +362,154 @@
           updateStats();
           updateProgress(100);
           log('✅ Traductions françaises initialisées avec succès !', 'success');
+        } else {
+          throw new Error(result.error || 'Erreur inconnue');
+        }
+
+      } catch (error) {
+        stats.errors++;
+        updateStats();
+        log(`❌ Erreur: ${error.message}`, 'error');
+      } finally {
+        btn.disabled = false;
+      }
+    };
+
+    // Seed Italien
+    window.seedItalian = async function() {
+      const btn = document.getElementById('btn-it');
+      btn.disabled = true;
+
+      try {
+        log('🇮🇹 Chargement des traductions italiennes...', 'info');
+
+        const { it } = await import('/src/i18n/devis/locales/it.ts');
+
+        log('📤 Envoi vers le backend...', 'info');
+
+        const result = await makeRequest('/devis-translations/seed', {
+          method: 'POST',
+          body: JSON.stringify({ lang: 'it', translations: it })
+        });
+
+        if (result.success) {
+          stats.languages++;
+          stats.success++;
+          stats.keys += 170; // Estimation
+          updateStats();
+          updateProgress((stats.languages / 9) * 100);
+          log('✅ Traductions italiennes initialisées avec succès !', 'success');
+        } else {
+          throw new Error(result.error || 'Erreur inconnue');
+        }
+
+      } catch (error) {
+        stats.errors++;
+        updateStats();
+        log(`❌ Erreur: ${error.message}`, 'error');
+      } finally {
+        btn.disabled = false;
+      }
+    };
+
+    // Seed Portugais
+    window.seedPortuguese = async function() {
+      const btn = document.getElementById('btn-pt');
+      btn.disabled = true;
+
+      try {
+        log('🇵🇹 Chargement des traductions portugaises...', 'info');
+
+        const { pt } = await import('/src/i18n/devis/locales/pt.ts');
+
+        log('📤 Envoi vers le backend...', 'info');
+
+        const result = await makeRequest('/devis-translations/seed', {
+          method: 'POST',
+          body: JSON.stringify({ lang: 'pt', translations: pt })
+        });
+
+        if (result.success) {
+          stats.languages++;
+          stats.success++;
+          stats.keys += 170; // Estimation
+          updateStats();
+          updateProgress((stats.languages / 9) * 100);
+          log('✅ Traductions portugaises initialisées avec succès !', 'success');
+        } else {
+          throw new Error(result.error || 'Erreur inconnue');
+        }
+
+      } catch (error) {
+        stats.errors++;
+        updateStats();
+        log(`❌ Erreur: ${error.message}`, 'error');
+      } finally {
+        btn.disabled = false;
+      }
+    };
+
+    // Seed Néerlandais
+    window.seedDutch = async function() {
+      const btn = document.getElementById('btn-nl');
+      btn.disabled = true;
+
+      try {
+        log('🇳🇱 Chargement des traductions néerlandaises...', 'info');
+
+        const { nl } = await import('/src/i18n/devis/locales/nl.ts');
+
+        log('📤 Envoi vers le backend...', 'info');
+
+        const result = await makeRequest('/devis-translations/seed', {
+          method: 'POST',
+          body: JSON.stringify({ lang: 'nl', translations: nl })
+        });
+
+        if (result.success) {
+          stats.languages++;
+          stats.success++;
+          stats.keys += 170; // Estimation
+          updateStats();
+          updateProgress((stats.languages / 9) * 100);
+          log('✅ Traductions néerlandaises initialisées avec succès !', 'success');
+        } else {
+          throw new Error(result.error || 'Erreur inconnue');
+        }
+
+      } catch (error) {
+        stats.errors++;
+        updateStats();
+        log(`❌ Erreur: ${error.message}`, 'error');
+      } finally {
+        btn.disabled = false;
+      }
+    };
+
+    // Seed Bulgare
+    window.seedBulgarian = async function() {
+      const btn = document.getElementById('btn-bg');
+      btn.disabled = true;
+
+      try {
+        log('🇧🇬 Chargement des traductions bulgares...', 'info');
+
+        const { bg } = await import('/src/i18n/devis/locales/bg.ts');
+
+        log('📤 Envoi vers le backend...', 'info');
+
+        const result = await makeRequest('/devis-translations/seed', {
+          method: 'POST',
+          body: JSON.stringify({ lang: 'bg', translations: bg })
+        });
+
+        if (result.success) {
+          stats.languages++;
+          stats.success++;
+          stats.keys += 170; // Estimation
+          updateStats();
+          updateProgress((stats.languages / 9) * 100);
+          log('✅ Traductions bulgares initialisées avec succès !', 'success');
         } else {
           throw new Error(result.error || 'Erreur inconnue');
         }

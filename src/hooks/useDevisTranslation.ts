@@ -16,9 +16,25 @@ import { de } from '../src/i18n/devis/locales/de';
 import { es } from '../src/i18n/devis/locales/es';
 import { pl } from '../src/i18n/devis/locales/pl';
 import { ro } from '../src/i18n/devis/locales/ro';
+import { it } from '../src/i18n/devis/locales/it';
+import { pt } from '../src/i18n/devis/locales/pt';
+import { nl } from '../src/i18n/devis/locales/nl';
+import { bg } from '../src/i18n/devis/locales/bg';
+import { hu } from '../src/i18n/devis/locales/hu';
+import { cs } from '../src/i18n/devis/locales/cs';
+import { sk } from '../src/i18n/devis/locales/sk';
+import { hr } from '../src/i18n/devis/locales/hr';
+import { sl } from '../src/i18n/devis/locales/sl';
+import { et } from '../src/i18n/devis/locales/et';
+import { lt } from '../src/i18n/devis/locales/lt';
+import { lv } from '../src/i18n/devis/locales/lv';
+import { el } from '../src/i18n/devis/locales/el';
+import { fi } from '../src/i18n/devis/locales/fi';
+import { sv } from '../src/i18n/devis/locales/sv';
+import { da } from '../src/i18n/devis/locales/da';
 import { projectId, publicAnonKey } from '../utils/supabase/info';
 
-// Cache des traductions locales
+// Cache des traductions locales - 🎉 TOUTES LES 22 LANGUES DISPONIBLES ! 🏆
 const LOCAL_TRANSLATIONS: Record<string, DevisTranslations> = {
   fr,
   en,
@@ -26,6 +42,22 @@ const LOCAL_TRANSLATIONS: Record<string, DevisTranslations> = {
   es,
   pl,
   ro,
+  it,
+  pt,
+  nl,
+  bg,
+  hu,
+  cs,
+  sk,
+  hr,
+  sl,
+  et,
+  lt,
+  lv,
+  el,
+  fi,
+  sv,
+  da,
 };
 
 interface UseDevisTranslationReturn {
