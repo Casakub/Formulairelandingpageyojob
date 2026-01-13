@@ -12,6 +12,15 @@ export { cgvHU } from './hu';
 export { cgvRO } from './ro';
 export { cgvHR } from './hr';
 export { cgvSL } from './sl';
+export { cgvET } from './et';
+export { cgvLV } from './lv';
+export { cgvLT } from './lt';
+export { cgvEL } from './el';
+export { cgvBG } from './bg';
+export { cgvSV } from './sv';
+export { cgvDA } from './da';
+export { cgvFI } from './fi';
+export { cgvNO } from './no';
 
-export const AVAILABLE_LANGUAGES_CGV: string[] = ['fr', 'en', 'de', 'es', 'it', 'nl', 'pt', 'pl', 'cs', 'sk', 'hu', 'ro', 'hr', 'sl'];
-export type CGVSupportedLanguage = 'fr' | 'en' | 'de' | 'es' | 'it' | 'nl' | 'pt' | 'pl' | 'cs' | 'sk' | 'hu' | 'ro' | 'hr' | 'sl';
+export const AVAILABLE_LANGUAGES_CGV: string[] = ['fr', 'en', 'de', 'es', 'it', 'nl', 'pt', 'pl', 'cs', 'sk', 'hu', 'ro', 'hr', 'sl', 'et', 'lv', 'lt', 'el', 'bg', 'sv', 'da', 'fi', 'no'];
+export type CGVSupportedLanguage = 'fr' | 'en' | 'de' | 'es' | 'it' | 'nl' | 'pt' | 'pl' | 'cs' | 'sk' | 'hu' | 'ro' | 'hr' | 'sl' | 'et' | 'lv' | 'lt' | 'el' | 'bg' | 'sv' | 'da' | 'fi' | 'no';

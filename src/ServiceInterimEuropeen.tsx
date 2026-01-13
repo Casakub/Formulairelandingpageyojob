@@ -32,7 +32,6 @@ import { LanguageSelector } from './components/shared/LanguageSelector';
 import { Footer } from './components/landing/Footer';
 import { useServiceTranslation } from './src/i18n/services/useServiceTranslation';
 import { useLanguageManager } from './hooks/useLanguageManager';
-import { footerTranslations } from './src/i18n/services/footer';
 import { AVAILABLE_LANGUAGES_INTERIM_EUROPEEN } from './src/i18n/services/interimEuropeen';
 import type { SupportedLanguage } from './src/i18n/types';
 
@@ -200,7 +199,7 @@ export default function ServiceInterimEuropeen() {
                 className="relative overflow-hidden group rounded-full bg-white text-[#1E3A8A] hover:bg-cyan-50 shadow-2xl hover:shadow-white/70 transition-all duration-300 hover:scale-105 px-6 py-2.5 inline-flex items-center justify-center"
               >
                 <span className="relative z-10 flex items-center">
-                  Demander un devis
+                  {t.hero.cta.primary}
                   <ArrowRight className="ml-2 w-4 h-4" />
                 </span>
                 <div className="absolute inset-0 -translate-x-full group-hover:translate-x-full transition-transform duration-700 bg-gradient-to-r from-transparent via-white/40 to-transparent" />
@@ -554,7 +553,7 @@ export default function ServiceInterimEuropeen() {
         </section>
 
         {/* Footer */}
-        <Footer content={footerTranslations[globalLanguage as SupportedLanguage]} />
+        <Footer language={globalLanguage} />
       </div>
     </>
   );

@@ -32,6 +32,13 @@ export function useLandingTranslations(
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
+  // 🔄 Synchroniser currentLanguage avec initialLanguage quand il change (navigation entre pages)
+  useEffect(() => {
+    if (initialLanguage && initialLanguage !== currentLanguage) {
+      setCurrentLanguage(initialLanguage);
+    }
+  }, [initialLanguage]);
+
   // 🎯 Sauvegarder la langue initiale détectée automatiquement (1ère visite uniquement)
   useEffect(() => {
     const savedLang = localStorage.getItem('yojob_preferred_language');

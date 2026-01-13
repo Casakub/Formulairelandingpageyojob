@@ -130,75 +130,79 @@
 }
 
 /**
- * Base typography. This is not applied to elements which have an ancestor with a Tailwind text class.
+ * Base typography. Applied to all elements unless overridden by specific Tailwind classes.
  */
 @layer base {
-  :where(:not(:has([class*=' text-']), :not(:has([class^='text-'])))) {
-    h1 {
-      font-size: 2rem; /* 32px mobile */
-      font-weight: 800; /* Extra bold pour H1 */
-      line-height: 1.2;
+  h1:not([class*='text-']):not([class*='font-']):not([class*='leading-']) {
+    font-size: 2.25rem; /* 36px mobile - Impactant mais équilibré */
+    font-weight: 800; /* Extra bold pour H1 */
+    line-height: 1.15; /* Serré pour effet impact */
+  }
+  
+  @media (min-width: 768px) {
+    h1:not([class*='text-']):not([class*='font-']):not([class*='leading-']) {
+      font-size: 3rem; /* 48px tablet - Taille idéale */
     }
-    
-    @media (min-width: 768px) {
-      h1 {
-        font-size: 3rem; /* 48px desktop */
-      }
-    }
+  }
 
-    h2 {
-      font-size: 1.75rem; /* 28px mobile */
-      font-weight: 700; /* Bold pour H2 */
-      line-height: 1.3;
+  @media (min-width: 1024px) {
+    h1:not([class*='text-']):not([class*='font-']):not([class*='leading-']) {
+      font-size: 3.5rem; /* 56px desktop - Sweet spot UI/UX */
     }
-    
-    @media (min-width: 768px) {
-      h2 {
-        font-size: 2.25rem; /* 36px desktop */
-      }
-    }
+  }
 
-    h3 {
-      font-size: 1.25rem; /* 20px mobile */
-      font-weight: 600; /* Semi-bold pour H3 */
-      line-height: 1.4;
+  h2:not([class*='text-']):not([class*='font-']):not([class*='leading-']) {
+    font-size: 1.75rem; /* 28px mobile */
+    font-weight: 700; /* Bold pour H2 */
+    line-height: 1.25; /* Serré */
+  }
+  
+  @media (min-width: 768px) {
+    h2:not([class*='text-']):not([class*='font-']):not([class*='leading-']) {
+      font-size: 2.25rem; /* 36px desktop - Bonne hiérarchie */
     }
-    
-    @media (min-width: 768px) {
-      h3 {
-        font-size: 1.5rem; /* 24px desktop */
-      }
-    }
+  }
 
-    h4 {
-      font-size: 1.125rem; /* 18px */
-      font-weight: var(--font-weight-medium);
-      line-height: 1.5;
+  h3:not([class*='text-']):not([class*='font-']):not([class*='leading-']) {
+    font-size: 1.125rem; /* 18px mobile */
+    font-weight: 600; /* Semi-bold pour H3 */
+    line-height: 1.3;
+  }
+  
+  @media (min-width: 768px) {
+    h3:not([class*='text-']):not([class*='font-']):not([class*='leading-']) {
+      font-size: 1.25rem; /* 20px desktop */
     }
+  }
 
-    p {
-      font-size: 1rem; /* 16px */
-      font-weight: var(--font-weight-normal);
-      line-height: 1.6;
-    }
+  h4:not([class*='text-']):not([class*='font-']):not([class*='font-']):not([class*='leading-']) {
+    font-size: 1.125rem; /* 18px */
+    font-weight: var(--font-weight-medium);
+    line-height: 1.5;
+  }
 
-    label {
-      font-size: var(--text-base);
-      font-weight: var(--font-weight-medium);
-      line-height: 1.5;
-    }
+  p:not([class*='text-']):not([class*='font-']):not([class*='leading-']) {
+    font-size: 1rem; /* 16px */
+    font-weight: var(--font-weight-normal);
+    line-height: 1.6;
+  }
 
-    button {
-      font-size: var(--text-base);
-      font-weight: var(--font-weight-medium);
-      line-height: 1.5;
-    }
+  label:not([class*='text-']):not([class*='font-']):not([class*='leading-']) {
+    font-size: var(--text-base);
+    font-weight: var(--font-weight-medium);
+    line-height: 1.5;
+  }
 
-    input {
-      font-size: var(--text-base);
-      font-weight: var(--font-weight-normal);
-      line-height: 1.5;
-    }
+  button:not([class*='text-']):not([class*='font-']):not([class*='leading-']) {
+    font-size: var(--text-base);
+    font-weight: var(--font-weight-medium);
+    line-height: 1.5;
+  }
+
+  input:not([class*='text-']):not([class*='font-']):not([class*='leading-']) {
+    font-size: var(--text-base);
+    font-weight: var(--font-weight-normal);
+    line-height: 1.5;
   }
 }
 

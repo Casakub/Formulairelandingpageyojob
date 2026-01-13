@@ -344,12 +344,15 @@ function loadServiceTranslation(
     return translation;
   }
 
-  // Fallback sur FR
+  // Fallback sur FR si la langue n'existe pas
   const frTranslation = serviceTranslations?.fr;
   if (frTranslation) {
-    console.warn(
-      `Translation not found for ${servicePage}/${language}, falling back to FR`
-    );
+    // Ne logger qu'en développement
+    if (process.env.NODE_ENV === 'development') {
+      console.warn(
+        `[i18n] Translation for "${language}" not available in ${servicePage}, using French fallback`
+      );
+    }
     return frTranslation;
   }
 

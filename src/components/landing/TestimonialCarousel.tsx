@@ -3,7 +3,7 @@ import { ChevronLeft, ChevronRight, Star } from 'lucide-react';
 import { Button } from '../ui/button';
 import { Card } from '../ui/card';
 import { motion, AnimatePresence } from 'motion/react';
-import { useLandingContent } from '../../hooks/useLandingContent';
+import type { TestimonialItem } from '../../types/landingContent';
 
 // Fallback images from Unsplash (used if no avatar is uploaded)
 const FALLBACK_IMAGES = [
@@ -35,12 +35,12 @@ function getAvatarColor(name: string): string {
   return colors[index];
 }
 
-export function TestimonialCarousel() {
-  const { landingContent } = useLandingContent();
-  const [currentIndex, setCurrentIndex] = useState(0);
+interface TestimonialCarouselProps {
+  testimonials?: TestimonialItem[];
+}
 
-  // Get testimonials from CMS (French version)
-  const testimonials = landingContent.fr?.testimonials || [];
+export function TestimonialCarousel({ testimonials = [] }: TestimonialCarouselProps) {
+  const [currentIndex, setCurrentIndex] = useState(0);
 
   // If no testimonials, don't render anything
   if (testimonials.length === 0) {

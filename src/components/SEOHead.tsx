@@ -64,9 +64,9 @@ export function SEOHead(props: SEOHeadProps) {
       // ANCIENNE API (compatibilité App-Landing)
       const { content, language } = props as SEOHeadPropsOld;
       metadata = {
-        title: content?.meta?.title || 'YOJOB',
-        description: content?.meta?.description || '',
-        h1: content?.meta?.title || 'YOJOB',
+        title: content?.seo?.metaTitle || content?.meta?.title || 'YOJOB',
+        description: content?.seo?.metaDescription || content?.meta?.description || '',
+        h1: content?.seo?.h1 || content?.meta?.title || 'YOJOB',
         keywords: []
       };
       currentLang = language as DevisLanguage || 'fr';

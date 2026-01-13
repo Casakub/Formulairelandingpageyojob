@@ -143,7 +143,7 @@ export interface CTAFormContent {
       email: { label: string; placeholder: string };
       phone: { label: string; placeholder: string };
       company: { label: string; placeholder: string };
-      needType: { label: string; placeholder: string };
+      needType: { label: string; placeholder: string; options: string[] };
       message: { label: string; placeholder: string };
     };
     ctaLabel: string;
@@ -247,25 +247,6 @@ export type LandingContentCollection = {
 export const SUPPORTED_LANGUAGES: LanguageMetadata[] = [
   { code: 'fr', name: 'French', nativeName: 'Français', flag: '🇫🇷', status: 'validated' },
   { code: 'en', name: 'English', nativeName: 'English', flag: '🇬🇧', status: 'validated' },
-  { code: 'de', name: 'German', nativeName: 'Deutsch', flag: '🇩🇪', status: 'to_translate' },
+  { code: 'de', name: 'German', nativeName: 'Deutsch', flag: '🇩🇪', status: 'validated' },
   { code: 'es', name: 'Spanish', nativeName: 'Español', flag: '🇪🇸', status: 'to_translate' },
-  { code: 'it', name: 'Italian', nativeName: 'Italiano', flag: '🇮🇹', status: 'to_translate' },
-  { code: 'pt', name: 'Portuguese', nativeName: 'Português', flag: '🇵🇹', status: 'to_translate' },
-  { code: 'nl', name: 'Dutch', nativeName: 'Nederlands', flag: '🇳🇱', status: 'to_translate' },
-  { code: 'pl', name: 'Polish', nativeName: 'Polski', flag: '🇵🇱', status: 'to_translate' },
-  { code: 'ro', name: 'Romanian', nativeName: 'Română', flag: '🇷🇴', status: 'to_translate' },
-  { code: 'bg', name: 'Bulgarian', nativeName: 'Български', flag: '🇧🇬', status: 'to_translate' },
-  { code: 'hu', name: 'Hungarian', nativeName: 'Magyar', flag: '🇭🇺', status: 'to_translate' },
-  { code: 'cs', name: 'Czech', nativeName: 'Čeština', flag: '🇨🇿', status: 'to_translate' },
-  { code: 'sk', name: 'Slovak', nativeName: 'Slovenčina', flag: '🇸🇰', status: 'to_translate' },
-  { code: 'hr', name: 'Croatian', nativeName: 'Hrvatski', flag: '🇭🇷', status: 'to_translate' },
-  { code: 'sl', name: 'Slovenian', nativeName: 'Slovenščina', flag: '🇸🇮', status: 'to_translate' },
-  { code: 'lt', name: 'Lithuanian', nativeName: 'Lietuvių', flag: '🇱🇹', status: 'to_translate' },
-  { code: 'lv', name: 'Latvian', nativeName: 'Latviešu', flag: '🇱🇻', status: 'to_translate' },
-  { code: 'et', name: 'Estonian', nativeName: 'Eesti', flag: '🇪🇪', status: 'to_translate' },
-  { code: 'el', name: 'Greek', nativeName: 'Ελληνικά', flag: '🇬🇷', status: 'to_translate' },
-  { code: 'sv', name: 'Swedish', nativeName: 'Svenska', flag: '🇸🇪', status: 'to_translate' },
-  { code: 'da', name: 'Danish', nativeName: 'Dansk', flag: '🇩🇰', status: 'to_translate' },
-  { code: 'fi', name: 'Finnish', nativeName: 'Suomi', flag: '🇫🇮', status: 'to_translate' },
-  { code: 'no', name: 'Norwegian', nativeName: 'Norsk', flag: '🇳🇴', status: 'to_translate' },
 ];

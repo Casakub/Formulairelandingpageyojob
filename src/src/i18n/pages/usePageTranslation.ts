@@ -20,7 +20,7 @@ import { frNosSecteurs, enNosSecteurs, deNosSecteurs, esNosSecteurs, itNosSecteu
 import { frTemoignages, enTemoignages, deTemoignages, esTemoignages, itTemoignages, nlTemoignages, ptTemoignages, plTemoignages, csTemoignages, skTemoignages, huTemoignages, roTemoignages, bgTemoignages, hrTemoignages, slTemoignages, etTemoignages, lvTemoignages, ltTemoignages, elTemoignages, svTemoignages, daTemoignages, fiTemoignages, noTemoignages } from './temoignages';
 import { frPrivacy, enPrivacy, privacyDE, privacyES, privacyIT, privacyNL, privacyPT, privacyPL, privacyCS, privacySK, privacyHU, privacyRO, privacyBG, privacyHR, privacySL, privacyET, privacyLV, privacyLT, privacyEL, privacySV, privacyDA, privacyFI, privacyNO } from './privacy';
 import { legalFR, legalEN, legalDE, legalES, legalIT, legalNL, legalPT, legalPL, legalCS, legalSK, legalHU, legalRO, legalBG, legalHR, legalSL, legalET, legalLV, legalLT, legalEL, legalSV, legalDA, legalFI, legalNO } from './legal';
-import { cgvFR, cgvEN, cgvDE, cgvES, cgvIT, cgvNL, cgvPT, cgvPL, cgvCS, cgvSK, cgvHU, cgvRO, cgvHR, cgvSL } from './cgv';
+import { cgvFR, cgvEN, cgvDE, cgvES, cgvIT, cgvNL, cgvPT, cgvPL, cgvCS, cgvSK, cgvHU, cgvRO, cgvHR, cgvSL, cgvET, cgvLV, cgvLT, cgvEL, cgvBG, cgvSV, cgvDA, cgvFI, cgvNO } from './cgv';
 
 /**
  * Type pour les pages disponibles
@@ -200,7 +200,16 @@ const pageTranslations = {
     hu: cgvHU,
     ro: cgvRO,
     hr: cgvHR,
-    sl: cgvSL
+    sl: cgvSL,
+    et: cgvET,
+    lv: cgvLV,
+    lt: cgvLT,
+    el: cgvEL,
+    bg: cgvBG,
+    sv: cgvSV,
+    da: cgvDA,
+    fi: cgvFI,
+    no: cgvNO
   }
 } as const;
 

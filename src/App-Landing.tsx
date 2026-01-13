@@ -46,7 +46,8 @@ import { CountUpStat } from './components/landing/CountUpStat';
 import { EuropeMap } from './components/landing/EuropeMap';
 import { TestimonialCarousel } from './components/landing/TestimonialCarousel';
 import { LanguageSelector } from './components/shared/LanguageSelector';
-import { useLandingTranslations } from './hooks/useLandingTranslations';
+import { useLandingPageTranslation } from './src/i18n/pages/landingPage/useLandingPageTranslation';
+import { AVAILABLE_LANGUAGES_LANDING } from './src/i18n/pages/landingPage';
 import { useLanguageManager } from './hooks/useLanguageManager';
 import { useEuropeMapTranslation } from './hooks/useEuropeMapTranslation';
 import { SEOHead } from './components/SEOHead';
@@ -55,6 +56,7 @@ import { log, loggers } from './lib/logger';
 import { getAllLanguageCodes } from './lib/languages';
 import { projectId, publicAnonKey } from './utils/supabase/info';
 import { LogoSvg } from './imports/YojobLogoComplete';
+import type { SupportedLanguage } from './src/i18n/types';
 
 // 🎨 Mapping des icônes : string → Composant React
 const ICON_MAP: Record<string, any> = {
@@ -153,48 +155,25 @@ export default function AppLanding() {
 
   // 🌍 Hook unifié de gestion de la langue (détection auto + persistance)
   const {
-    currentLanguage: globalLanguage,
-    setLanguage: setGlobalLanguage,
+    currentLanguage,
+    setLanguage,
     isReady: languageReady,
   } = useLanguageManager();
 
-  // 🌍 Récupérer les traductions depuis Supabase
-  const {
-    translations,
-    currentLanguage,
-    setLanguage,
-    availableLanguages,
-    isLoading,
-    error,
-    refresh,
-  } = useLandingTranslations(globalLanguage);
+  // 🌍 Récupérer les traductions de la landing page (fichiers statiques)
+  const content = useLandingPageTranslation(currentLanguage as SupportedLanguage);
 
   // 🗺️ Récupérer les traductions de la carte Europe
-  const europeMapTranslations = useEuropeMapTranslation(globalLanguage as any);
-
-  // 🔄 Synchroniser la langue globale avec le hook de traductions
-  useEffect(() => {
-    if (languageReady && globalLanguage !== currentLanguage) {
-      setLanguage(globalLanguage);
-    }
-  }, [globalLanguage, languageReady]);
-
-  // Fallback sur le contenu FR si la langue demandée n'existe pas
-  const content = translations[currentLanguage] || translations['fr'] || {};
+  const europeMapTranslations = useEuropeMapTranslation(currentLanguage as any);
 
   // 🐛 DEBUG: Afficher les informations de langue et traductions (développement uniquement)
   useEffect(() => {
-    loggers.language.group('Landing Page - État des traductions', true);
+    loggers.language.group('Landing Page - Traductions chargées', true);
     loggers.language.debug('Langue courante:', currentLanguage);
-    loggers.language.debug('Langues disponibles:', availableLanguages);
-    loggers.language.debug('Traductions chargées:', Object.keys(translations));
-    loggers.language.debug('Contenu utilisé:', content?.language || 'NO CONTENT');
-    loggers.language.debug('Chargement:', isLoading);
-    if (error) {
-      loggers.language.error('Erreur lors du chargement des traductions:', error);
-    }
+    loggers.language.debug('Langue du contenu:', content.language);
+    loggers.language.debug('Ready:', languageReady);
     loggers.language.groupEnd();
-  }, [currentLanguage, translations, isLoading, error, content]);
+  }, [currentLanguage, content, languageReady]);
 
   // Sticky header effect
   useEffect(() => {
@@ -204,17 +183,6 @@ export default function AppLanding() {
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
-
-  // Écouter les mises à jour de traductions depuis l'admin
-  useEffect(() => {
-    const handleTranslationsUpdate = () => {
-      loggers.translation.info('Traductions mises à jour, rechargement...');
-      refresh();
-    };
-
-    window.addEventListener('landing-translations-updated', handleTranslationsUpdate);
-    return () => window.removeEventListener('landing-translations-updated', handleTranslationsUpdate);
-  }, [refresh]);
 
   // 🛡️ Protection anti-bot pour l'email
   const handleEmailReveal = (e: React.MouseEvent) => {
@@ -402,98 +370,11 @@ export default function AppLanding() {
     document.getElementById('services')?.scrollIntoView({ behavior: 'smooth' });
   };
 
-  // 🔄 Afficher un écran de chargement pendant le chargement des traductions
-  if (isLoading) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-[#1E3A8A] via-[#7C3AED] to-[#06B6D4] flex items-center justify-center">
-        <div className="text-center">
-          <div className="w-16 h-16 border-4 border-white/30 border-t-white rounded-full animate-spin mx-auto mb-4"></div>
-          <p className="text-white text-lg">Chargement...</p>
-        </div>
-      </div>
-    );
-  }
-
-  // ⚠️ Afficher un message d'erreur si le chargement échoue
-  if (error) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-red-900 via-red-800 to-red-900 flex items-center justify-center p-4">
-        <div className="text-center max-w-2xl bg-white/10 backdrop-blur-md p-8 rounded-2xl border border-white/20">
-          <div className="w-16 h-16 bg-red-500 rounded-full flex items-center justify-center mx-auto mb-4">
-            <X className="w-8 h-8 text-white" />
-          </div>
-          <h2 className="text-white text-2xl mb-4">Configuration requise : Table de traduction manquante</h2>
-          <div className="text-left bg-red-950/50 p-4 rounded-lg mb-6 text-sm">
-            <p className="text-red-200 mb-3"><strong>Erreur :</strong> {error}</p>
-            <p className="text-red-200 mb-2"><strong>Cause probable :</strong> La table <code className="bg-red-900/50 px-2 py-0.5 rounded">landing_translations</code> n'existe pas encore dans Supabase.</p>
-          </div>
-          <div className="text-left bg-white/5 p-4 rounded-lg mb-6 text-sm">
-            <h3 className="text-white mb-2 flex items-center gap-2">
-              <span className="bg-cyan-500 text-white px-2 py-0.5 rounded text-xs">1</span>
-              Exécuter la migration SQL
-            </h3>
-            <p className="text-red-100 mb-2 pl-7">Supabase Dashboard → SQL Editor → Exécuter :</p>
-            <code className="block bg-red-900/30 px-3 py-2 rounded text-xs text-red-200 ml-7">/supabase/migrations/11_landing_translations_table.sql</code>
-          </div>
-          <div className="text-left bg-white/5 p-4 rounded-lg mb-6 text-sm">
-            <h3 className="text-white mb-2 flex items-center gap-2">
-              <span className="bg-cyan-500 text-white px-2 py-0.5 rounded text-xs">2</span>
-              Migrer vos données existantes
-            </h3>
-            <p className="text-red-100 pl-7">Dashboard → Paramètres → "Migration vers Supabase"</p>
-          </div>
-          <div className="flex gap-3 justify-center mt-6">
-            <Button 
-              onClick={() => window.location.reload()} 
-              className="bg-white text-red-900 hover:bg-red-50"
-            >
-              Réessayer
-            </Button>
-            <Link href="/admin">
-              <Button className="bg-cyan-500 text-white hover:bg-cyan-600">
-                Aller au Dashboard
-              </Button>
-            </Link>
-          </div>
-          <p className="text-red-300 text-xs mt-4">💡 Consultez <code>/MIGRATION_GUIDE.md</code> pour le guide complet</p>
-        </div>
-      </div>
-    );
-  }
-
-  // ⚠️ Si aucune traduction n'est disponible (première installation)
-  if (!content || Object.keys(content).length === 0) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-orange-900 via-orange-800 to-orange-900 flex items-center justify-center p-4">
-        <div className="text-center max-w-md bg-white/10 backdrop-blur-md p-8 rounded-2xl border border-white/20">
-          <div className="w-16 h-16 bg-orange-500 rounded-full flex items-center justify-center mx-auto mb-4">
-            <Globe className="w-8 h-8 text-white" />
-          </div>
-          <h2 className="text-white text-2xl mb-4">Aucune traduction disponible</h2>
-          <p className="text-orange-200 mb-6">
-            La table existe mais elle est vide. Migrez vos traductions depuis localStorage vers Supabase.
-          </p>
-          <div className="text-left bg-white/5 p-4 rounded-lg mb-6 text-sm">
-            <p className="text-orange-100 mb-2">📍 <strong>Dashboard → Paramètres</strong></p>
-            <p className="text-orange-200 pl-5">Cherchez la card "Migration vers Supabase"</p>
-            <p className="text-orange-200 pl-5">Cliquez sur "Lancer la migration"</p>
-          </div>
-          <Link href="/admin">
-            <Button className="bg-white text-orange-900 hover:bg-orange-50 w-full">
-              Aller au Dashboard
-            </Button>
-          </Link>
-          <p className="text-orange-300 text-xs mt-4">⚡ Migration en ~1 minute</p>
-        </div>
-      </div>
-    );
-  }
-
   return (
     <HelmetProvider>
       <div className="min-h-screen bg-white">
         {/* 🎯 SEO Head - Toutes les balises SEO */}
-        <SEOHead content={content} language={currentLanguage} allContent={translations} />
+        <SEOHead content={content} language={currentLanguage} />
 
         {/* HEADER */}
       <header
@@ -557,8 +438,8 @@ export default function AppLanding() {
               {/* Nouveau sélecteur de langue avec 23 langues européennes */}
               <div className="relative">
                 <LanguageSelector
-                  currentLanguage={globalLanguage}
-                  onLanguageChange={setGlobalLanguage}
+                  currentLanguage={currentLanguage}
+                  onLanguageChange={setLanguage}
                   availableLanguages={getAllLanguageCodes()}
                   variant="default"
                 />
@@ -750,7 +631,7 @@ export default function AppLanding() {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.2 }}
-                className="text-white mb-2 lg:mb-6 text-4xl lg:text-5xl xl:text-6xl font-extrabold leading-tight"
+                className="mb-2 lg:mb-6"
               >
                 {content.hero?.title || 'Le plus grand réseau de recrutement européen : 500+ agences dans 27 pays'}
               </motion.h1>
@@ -759,7 +640,7 @@ export default function AppLanding() {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.4 }}
-                className="text-white/95 text-lg lg:text-xl mb-4 lg:mb-8 leading-relaxed"
+                className="text-white/95 mb-4 lg:mb-8"
               >
                 {content.hero?.subtitle || "Recrutez vos talents qualifiés en Europe grâce à nos agences partenaires vérifiées. Intérim, CDI, détachement : une solution 100% conforme et clé en main pour tous vos besoins de main-d'œuvre européenne, avec respect des formalités légales (A1, SIPSI, vérifications)."}
               </motion.p>
@@ -985,8 +866,8 @@ export default function AppLanding() {
                 {content.stats?.badge || FRENCH_FALLBACKS.stats.badge}
               </Badge>
             </motion.div>
-            <h2 className="text-gray-900 mb-4 text-[20px]">{content.stats?.title || FRENCH_FALLBACKS.stats.title}</h2>
-            <p className="text-gray-600 text-xl max-w-2xl mx-auto text-[16px]">
+            <h2 className="text-gray-900 mb-4 text-[20px] font-bold">{content.stats?.title || FRENCH_FALLBACKS.stats.title}</h2>
+            <p className="text-gray-600 max-w-2xl mx-auto">
               {content.stats?.subtitle || FRENCH_FALLBACKS.stats.subtitle}
             </p>
           </motion.div>
@@ -1125,8 +1006,8 @@ export default function AppLanding() {
               <span className="text-2xl">⚡</span>
               <span className="text-white/90 tracking-wide">{content.services?.badge || '💼 Our Services'}</span>
             </motion.div>
-            <h2 className="text-white mb-6 text-[20px]">{content.services?.title || 'Solutions adapted to your needs'}</h2>
-            <p className="text-white/80 text-xl max-w-2xl mx-auto text-[16px]">
+            <h2 className="text-white mb-6 text-[20px] font-bold">{content.services?.title || 'Solutions adapted to your needs'}</h2>
+            <p className="text-white/80 max-w-2xl mx-auto">
               {content.services?.subtitle || 'We support you in all your European recruitment procedures.'}
             </p>
           </motion.div>
@@ -1173,7 +1054,7 @@ export default function AppLanding() {
                       <CardTitle className="text-white mb-3 text-center text-[20px]">{service.title}</CardTitle>
                     </CardHeader>
                     <CardContent className="relative">
-                      <p className="text-gray-300 text-center text-sm leading-relaxed mb-4">
+                      <p className="text-gray-300 text-center mb-4">
                         {service.description}
                       </p>
                       <Link href={serviceUrls[index] || service.href || '#contact'} className="text-cyan-400 hover:text-cyan-300 flex items-center justify-center gap-2 group/link">
@@ -1239,7 +1120,7 @@ export default function AppLanding() {
               </div>
             </motion.div>
             <h2 className="text-white mb-6 text-[20px]">{content.network?.title || 'A network covering all of Europe'}</h2>
-            <p className="text-cyan-100 text-xl max-w-3xl mx-auto text-[16px]">
+            <p className="text-cyan-100 max-w-3xl mx-auto">
               {content.network?.subtitle || 'More than 500 partner agencies in 27 countries to meet all your recruitment needs.'}
             </p>
           </motion.div>
@@ -1308,7 +1189,7 @@ export default function AppLanding() {
                         <h3 className="text-white mb-3 text-center lg:text-left px-0 text-[24px]">
                           {content.network?.waitlist?.title || 'Votre plateforme tout-en-un du détachement européen'}
                         </h3>
-                        <p className="text-cyan-100 leading-relaxed text-center lg:text-left px-0 text-[14px]">
+                        <p className="text-cyan-100 text-center lg:text-left px-0">
                           {content.network?.waitlist?.subtitle || 'Centralisez tous vos documents et données de détachement dans un espace sécurisé. Réalisez vos démarches administratives directement en ligne et gérez vos offres d\'emploi depuis une interface unique. Simplifiez votre conformité et gagnez un temps précieux.'}
                         </p>
                       </div>
@@ -1418,8 +1299,8 @@ export default function AppLanding() {
                 {content.steps?.badge || '🎯 How It Works'}
               </Badge>
             </motion.div>
-            <h2 className="text-gray-900 mb-4 text-[20px]">{content.steps?.title || 'A simple and efficient process'}</h2>
-            <p className="text-gray-600 text-xl max-w-2xl mx-auto text-[16px]">
+            <h2 className="text-gray-900 mb-4 text-[20px] font-bold">{content.steps?.title || 'A simple and efficient process'}</h2>
+            <p className="text-gray-600 max-w-2xl mx-auto">
               {content.steps?.subtitle || 'In 4 steps, find the talents you need anywhere in Europe.'}
             </p>
           </motion.div>
@@ -1479,7 +1360,7 @@ export default function AppLanding() {
                       </div>
                       
                       <h3 className="text-gray-900 mb-3 text-center">{step.title}</h3>
-                      <p className="text-gray-600 text-center text-sm leading-relaxed">
+                      <p className="text-gray-600 text-center">
                         {step.description}
                       </p>
                     </CardContent>
@@ -1518,13 +1399,13 @@ export default function AppLanding() {
               <span className="text-2xl">⭐</span>
               <span className="text-white/90 tracking-wide">{content.testimonials?.badge || 'Témoignages clients'}</span>
             </motion.div>
-            <h2 className="text-white mb-6 text-[20px]">{content.testimonials?.title || 'Ils nous font confiance'}</h2>
-            <p className="text-white/80 text-xl max-w-2xl mx-auto text-[16px]">
+            <h2 className="text-white mb-6 font-bold text-[20px]">{content.testimonials?.title || 'Ils nous font confiance'}</h2>
+            <p className="text-white/80 max-w-2xl mx-auto">
               {content.testimonials?.subtitle || 'Découvrez les retours d\'expérience de nos clients satisfaits à travers toute l\'Europe'}
             </p>
           </motion.div>
 
-          <TestimonialCarousel />
+          <TestimonialCarousel testimonials={content.testimonials?.testimonials || []} />
         </div>
       </section>
 
@@ -1546,8 +1427,8 @@ export default function AppLanding() {
               <span className="text-2xl">{content?.sectors?.badge?.split(' ')[0] || '🎯'}</span>
               <span className="text-[#1E3A8A] tracking-wide">{content?.sectors?.badge?.substring(2) || 'Tous secteurs'}</span>
             </motion.div>
-            <h2 className="text-gray-900 mb-4 text-[20px]">{content?.sectors?.title || 'Tous secteurs, tous profils'}</h2>
-            <p className="text-gray-600 text-xl max-w-3xl mx-auto text-[16px]">
+            <h2 className="text-gray-900 mb-4 text-[20px] font-bold">{content?.sectors?.title || 'Tous secteurs, tous profils'}</h2>
+            <p className="text-gray-600 max-w-3xl mx-auto">
               {content?.sectors?.subtitle || 'Nous recrutons pour l\'ensemble des secteurs d\'activité à travers toute l\'Europe'}
             </p>
           </motion.div>
@@ -1580,7 +1461,7 @@ export default function AppLanding() {
                         </div>
                       </div>
                       
-                      <p className="text-sm text-gray-700 group-hover:text-gray-900 transition-colors duration-300 leading-tight">
+                      <p className="text-gray-700 group-hover:text-gray-900 transition-colors duration-300">
                         {sector.name}
                       </p>
                     </div>
@@ -1633,7 +1514,7 @@ export default function AppLanding() {
               </motion.div>
 
               <motion.h2 
-                className="text-white mb-3 lg:mb-4 text-3xl lg:text-4xl font-extrabold leading-tight"
+                className="mb-3 lg:mb-4"
                 initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
@@ -1643,7 +1524,7 @@ export default function AppLanding() {
               </motion.h2>
               
               <motion.p 
-                className="text-lg lg:text-xl text-white/95 mb-5 lg:mb-6 leading-relaxed"
+                className="text-white/95 mb-5 lg:mb-6"
                 initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
@@ -1672,7 +1553,7 @@ export default function AppLanding() {
                           <CheckCircle className="w-5 h-5 lg:w-6 lg:h-6 text-green-400 drop-shadow-[0_0_8px_rgba(34,197,94,0.5)]" />
                         )}
                       </div>
-                      <span className="text-sm lg:text-base font-medium">{benefit.title}</span>
+                      <span>{benefit.title}</span>
                     </motion.div>
                   );
                 })}
@@ -1690,7 +1571,7 @@ export default function AppLanding() {
                 <form onSubmit={handleContactSubmit} className="space-y-4 lg:space-y-5">
                   <div className="grid md:grid-cols-2 gap-3 lg:gap-4">
                     <div className="space-y-1.5 lg:space-y-2">
-                      <Label htmlFor="name" className="text-gray-700 font-medium">{content.ctaForm.form.fields.name.label} *</Label>
+                      <Label htmlFor="name" className="text-gray-700">{content.ctaForm.form.fields.name.label} *</Label>
                       <Input
                         id="name"
                         value={formData.name}
@@ -1701,7 +1582,7 @@ export default function AppLanding() {
                       />
                     </div>
                     <div className="space-y-1.5 lg:space-y-2">
-                      <Label htmlFor="email" className="text-gray-700 font-medium">{content.ctaForm.form.fields.email.label} *</Label>
+                      <Label htmlFor="email" className="text-gray-700">{content.ctaForm.form.fields.email.label} *</Label>
                       <Input
                         id="email"
                         type="email"
@@ -1716,7 +1597,7 @@ export default function AppLanding() {
 
                   <div className="grid md:grid-cols-2 gap-3 lg:gap-4">
                     <div className="space-y-1.5 lg:space-y-2">
-                      <Label htmlFor="phone" className="text-gray-700 font-medium">{content.ctaForm.form.fields.phone.label} *</Label>
+                      <Label htmlFor="phone" className="text-gray-700">{content.ctaForm.form.fields.phone.label} *</Label>
                       <Input
                         id="phone"
                         type="tel"
@@ -1728,7 +1609,7 @@ export default function AppLanding() {
                       />
                     </div>
                     <div className="space-y-1.5 lg:space-y-2">
-                      <Label htmlFor="company" className="text-gray-700 font-medium">{content.ctaForm.form.fields.company.label} *</Label>
+                      <Label htmlFor="company" className="text-gray-700">{content.ctaForm.form.fields.company.label} *</Label>
                       <Input
                         id="company"
                         value={formData.company}
@@ -1742,7 +1623,7 @@ export default function AppLanding() {
 
                   {content.ctaForm?.form?.fields?.contactType && (
                     <div className="space-y-1.5 lg:space-y-2">
-                      <Label htmlFor="contactType" className="text-gray-700 font-medium">{content.ctaForm.form.fields.contactType.label} *</Label>
+                      <Label htmlFor="contactType" className="text-gray-700">{content.ctaForm.form.fields.contactType.label} *</Label>
                       <Select
                         value={formData.contactType}
                         onValueChange={(value) => setFormData({ ...formData, contactType: value })}
@@ -1762,7 +1643,7 @@ export default function AppLanding() {
                   )}
 
                   <div className="space-y-1.5 lg:space-y-2">
-                    <Label htmlFor="needType" className="text-gray-700 font-medium">{content.ctaForm.form.fields.needType.label} *</Label>
+                    <Label htmlFor="needType" className="text-gray-700">{content.ctaForm.form.fields.needType.label} *</Label>
                     <Select
                       value={formData.needType}
                       onValueChange={(value) => setFormData({ ...formData, needType: value })}
@@ -1772,16 +1653,16 @@ export default function AppLanding() {
                         <SelectValue placeholder={content.ctaForm.form.fields.needType.placeholder} />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="interim">Intérim européen</SelectItem>
-                        <SelectItem value="recruitment">Recrutement spécialisé</SelectItem>
-                        <SelectItem value="consulting">Conseil & Conformité</SelectItem>
-                        <SelectItem value="other">Autre besoin</SelectItem>
+                        <SelectItem value="interim">{content.ctaForm.form.fields.needType.options[0]}</SelectItem>
+                        <SelectItem value="recruitment">{content.ctaForm.form.fields.needType.options[1]}</SelectItem>
+                        <SelectItem value="consulting">{content.ctaForm.form.fields.needType.options[2]}</SelectItem>
+                        <SelectItem value="other">{content.ctaForm.form.fields.needType.options[3]}</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
 
                   <div className="space-y-1.5 lg:space-y-2">
-                    <Label htmlFor="message" className="text-gray-700 font-medium">{content.ctaForm.form.fields.message.label} *</Label>
+                    <Label htmlFor="message" className="text-gray-700">{content.ctaForm.form.fields.message.label} *</Label>
                     <Textarea
                       id="message"
                       value={formData.message}
@@ -1793,7 +1674,7 @@ export default function AppLanding() {
                     />
                   </div>
 
-                  <div className="text-xs lg:text-sm text-gray-500 leading-snug">
+                  <div className="text-gray-500">
                     {content.ctaForm.form.securityNote}
                   </div>
 
@@ -1845,7 +1726,7 @@ export default function AppLanding() {
                   aria-label="YOJOB"
                 />
               </motion.div>
-              <p className="text-white/80 mb-[24px] leading-relaxed max-w-xs text-[13px] mt-[-46px] mr-[0px] ml-[0px]">
+              <p className="text-white/80 mb-[24px] max-w-xs mt-[-46px] mr-[0px] ml-[0px]">
                 {content.footer?.logo?.tagline || 'Leader du recrutement européen. 500+ agences partenaires dans 27 pays pour connecter les talents aux opportunités.'}
               </p>
               <div className="flex gap-3">
@@ -1877,7 +1758,7 @@ export default function AppLanding() {
               <h3 className="text-white mb-4 text-cyan-300">
                 {content.footer?.columns?.services?.title || 'Services'}
               </h3>
-              <ul className="space-y-2.5 text-sm">
+              <ul className="space-y-2.5">
                 {(content.footer?.columns?.services?.links || []).map((link, index) => {
                   const serviceFooterUrls = [
                     '/services/interim-europeen',
@@ -1907,31 +1788,15 @@ export default function AppLanding() {
               <h3 className="text-white mb-4 text-cyan-300">
                 {content.footer?.columns?.company?.title || 'Entreprise'}
               </h3>
-              <ul className="space-y-2.5 text-sm">
-                <motion.li whileHover={{ x: 5 }} transition={{ duration: 0.2 }}>
-                  <a href="/a-propos" className="text-white/80 hover:text-white transition-colors inline-flex items-center gap-2 group">
-                    <ArrowRight className="w-3 h-3 opacity-0 group-hover:opacity-100 transition-opacity" />
-                    À propos
-                  </a>
-                </motion.li>
-                <motion.li whileHover={{ x: 5 }} transition={{ duration: 0.2 }}>
-                  <a href="/notre-reseau" className="text-white/80 hover:text-white transition-colors inline-flex items-center gap-2 group">
-                    <ArrowRight className="w-3 h-3 opacity-0 group-hover:opacity-100 transition-opacity" />
-                    Notre réseau
-                  </a>
-                </motion.li>
-                <motion.li whileHover={{ x: 5 }} transition={{ duration: 0.2 }}>
-                  <a href="/nos-secteurs" className="text-white/80 hover:text-white transition-colors inline-flex items-center gap-2 group">
-                    <ArrowRight className="w-3 h-3 opacity-0 group-hover:opacity-100 transition-opacity" />
-                    Nos secteurs
-                  </a>
-                </motion.li>
-                <motion.li whileHover={{ x: 5 }} transition={{ duration: 0.2 }}>
-                  <a href="/temoignages" className="text-white/80 hover:text-white transition-colors inline-flex items-center gap-2 group">
-                    <ArrowRight className="w-3 h-3 opacity-0 group-hover:opacity-100 transition-opacity" />
-                    Témoignages
-                  </a>
-                </motion.li>
+              <ul className="space-y-2.5">
+                {(content.footer?.columns?.company?.links || []).map((link, index) => (
+                  <motion.li key={index} whileHover={{ x: 5 }} transition={{ duration: 0.2 }}>
+                    <a href={link.href} className="text-white/80 hover:text-white transition-colors inline-flex items-center gap-2 group">
+                      <ArrowRight className="w-3 h-3 opacity-0 group-hover:opacity-100 transition-opacity" />
+                      {link.label}
+                    </a>
+                  </motion.li>
+                ))}
               </ul>
             </motion.div>
 
@@ -1945,7 +1810,7 @@ export default function AppLanding() {
               <h3 className="text-white mb-4 text-cyan-300">
                 {content.footer?.columns?.contact?.title || 'Contact'}
               </h3>
-              <ul className="space-y-3 text-sm">
+              <ul className="space-y-3">
                 <motion.li 
                   className="flex items-start gap-3 p-2 rounded-lg bg-white/5 backdrop-blur-sm hover:bg-white/10 transition-all duration-300"
                   whileHover={{ x: 3 }}
@@ -1990,37 +1855,29 @@ export default function AppLanding() {
             viewport={{ once: true }}
             transition={{ duration: 0.6, delay: 0.4 }}
           >
-            <div className="flex flex-col sm:flex-row items-center justify-center gap-2 text-sm text-white/80 mb-3">
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-2 text-white/80 mb-3">
               <p>{content.footer?.bottom?.copyright || '© 2024 YOJOB. Tous droits réservés.'}</p>
-              {/* Badge Supabase Live */}
+              {/* Badge Langues Disponibles */}
               <Badge className="bg-green-500/20 backdrop-blur-md border-green-400/30 text-green-300 px-3 py-1 shadow-lg flex items-center gap-1.5">
                 <span className="w-2 h-2 bg-green-400 rounded-full animate-pulse" />
-                Traductions Live • {availableLanguages.length} langues
+                Traductions • {AVAILABLE_LANGUAGES_LANDING.length} langues
               </Badge>
             </div>
             {/* Footer Links */}
-            <div className="flex flex-wrap items-center justify-center gap-4 text-xs text-white/50">
-              <a 
-                href="/privacy" 
-                className="hover:text-cyan-400 transition-colors underline decoration-dotted"
-              >
-                Politique de confidentialité
-              </a>
-              <span className="text-white/30">•</span>
-              <a 
-                href="/legal" 
-                className="hover:text-cyan-400 transition-colors underline decoration-dotted"
-              >
-                Mentions légales
-              </a>
-              <span className="text-white/30">•</span>
-              <a 
-                href="/cgv" 
-                className="hover:text-cyan-400 transition-colors underline decoration-dotted"
-              >
-                CGV
-              </a>
-
+            <div className="flex flex-wrap items-center justify-center gap-4 text-white/50">
+              {(content.footer?.bottom?.legalLinks || []).map((link, index) => (
+                <span key={index} className="flex items-center gap-4">
+                  <a 
+                    href={link.href} 
+                    className="hover:text-cyan-400 transition-colors underline decoration-dotted"
+                  >
+                    {link.label}
+                  </a>
+                  {index < (content.footer?.bottom?.legalLinks || []).length - 1 && (
+                    <span className="text-white/30">•</span>
+                  )}
+                </span>
+              ))}
             </div>
           </motion.div>
         </div>
