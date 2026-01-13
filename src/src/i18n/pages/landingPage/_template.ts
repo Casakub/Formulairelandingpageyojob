@@ -54,7 +54,8 @@ export const [LANGUAGE_CODE]LandingPage: LandingPageContent = {
       network: "[Traduire] Réseau",
       contact: "[Traduire] Contact"
     },
-    cta: "[Traduire] Demander un devis"
+    cta: "[Traduire] Demander un devis",
+    survey: "[Traduire] Enquête Européenne"
   },
 
   // Hero Section
@@ -318,7 +319,7 @@ export const [LANGUAGE_CODE]LandingPage: LandingPageContent = {
       facebook: "https://facebook.com/yojob"
     },
     bottom: {
-      copyright: "© 2025 YOJOB. [Traduire] Tous droits réservés.",
+      copyright: "© 2026 YOJOB. [Traduire] Tous droits réservés.",
       madeWith: "[Traduire] Fait avec ❤️ pour faciliter le recrutement européen",
       legalLinks: [
         { label: "[Traduire] Mentions légales", href: "/mentions-legales" },

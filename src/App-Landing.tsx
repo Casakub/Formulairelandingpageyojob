@@ -454,7 +454,7 @@ export default function AppLanding() {
               >
                 <span className="relative z-10 flex items-center gap-2">
                   <FileText className="w-4 h-4" />
-                  <span>Enquête Européenne</span>
+                  <span>{content.header?.survey || 'Enquête Européenne'}</span>
                   <Badge className="bg-yellow-400 text-yellow-900 border-0 text-xs px-2 py-0.5">
                     5 min
                   </Badge>
@@ -542,7 +542,7 @@ export default function AppLanding() {
                 >
                   <span className="relative z-10 flex items-center gap-2">
                     <FileText className="w-4 h-4" />
-                    <span>Enquête Européenne</span>
+                    <span>{content.header?.survey || 'Enquête Européenne'}</span>
                     <Badge className="bg-yellow-400 text-yellow-900 border-0 text-xs px-2 py-0.5">
                       5 min
                     </Badge>
@@ -558,9 +558,9 @@ export default function AppLanding() {
                 {/* Sélecteur de langue mobile */}
                 <div className="mt-4">
                   <LanguageSelector
-                    currentLanguage={globalLanguage}
+                    currentLanguage={currentLanguage}
                     onLanguageChange={(lang) => {
-                      setGlobalLanguage(lang);
+                      setLanguage(lang);
                       setIsMenuOpen(false);
                     }}
                     availableLanguages={getAllLanguageCodes()}
@@ -1856,7 +1856,7 @@ export default function AppLanding() {
             transition={{ duration: 0.6, delay: 0.4 }}
           >
             <div className="flex flex-col sm:flex-row items-center justify-center gap-2 text-white/80 mb-3">
-              <p>{content.footer?.bottom?.copyright || '© 2024 YOJOB. Tous droits réservés.'}</p>
+              <p>{content.footer?.bottom?.copyright || '© 2026 YOJOB. Tous droits réservés.'}</p>
               {/* Badge Langues Disponibles */}
               <Badge className="bg-green-500/20 backdrop-blur-md border-green-400/30 text-green-300 px-3 py-1 shadow-lg flex items-center gap-1.5">
                 <span className="w-2 h-2 bg-green-400 rounded-full animate-pulse" />

@@ -47,7 +47,8 @@ export const hrLandingPage: LandingPageContent = {
       network: "Mreža",
       contact: "Kontakt"
     },
-    cta: "Zatražite ponudu"
+    cta: "Zatražite ponudu",
+    survey: "Europska anketa"
   },
 
   // Hero Section
@@ -330,7 +331,7 @@ export const hrLandingPage: LandingPageContent = {
       facebook: "https://facebook.com/yojob"
     },
     bottom: {
-      copyright: "© 2025 YOJOB. Sva prava pridržana.",
+      copyright: "© 2026 YOJOB. Sva prava pridržana.",
       madeWith: "Izrađeno s ❤️ kako bi se olakšalo europsko zapošljavanje",
       legalLinks: [
         { label: "Pravne napomene", href: "/pravne-napomene" },

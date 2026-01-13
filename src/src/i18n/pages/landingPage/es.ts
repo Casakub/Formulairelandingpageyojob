@@ -47,7 +47,8 @@ export const esLandingPage: LandingPageContent = {
       network: "Red",
       contact: "Contacto"
     },
-    cta: "Solicitar presupuesto"
+    cta: "Solicitar presupuesto",
+    survey: "Encuesta Europea"
   },
 
   // Hero Section
@@ -330,7 +331,7 @@ export const esLandingPage: LandingPageContent = {
       facebook: "https://facebook.com/yojob"
     },
     bottom: {
-      copyright: "© 2025 YOJOB. Todos los derechos reservados.",
+      copyright: "© 2026 YOJOB. Todos los derechos reservados.",
       madeWith: "Hecho con ❤️ para facilitar el reclutamiento europeo",
       legalLinks: [
         { label: "Aviso legal", href: "/aviso-legal" },

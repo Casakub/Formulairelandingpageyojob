@@ -47,7 +47,8 @@ export const skLandingPage: LandingPageContent = {
       network: "Sieť",
       contact: "Kontakt"
     },
-    cta: "Požiadať o ponuku"
+    cta: "Požiadať o ponuku",
+    survey: "Európsky prieskum"
   },
 
   // Hero Section
@@ -330,7 +331,7 @@ export const skLandingPage: LandingPageContent = {
       facebook: "https://facebook.com/yojob"
     },
     bottom: {
-      copyright: "© 2025 YOJOB. Všetky práva vyhradené.",
+      copyright: "© 2026 YOJOB. Všetky práva vyhradené.",
       madeWith: "Vytvorené s ❤️ pre uľahčenie európskeho náboru",
       legalLinks: [
         { label: "Právne upozornenie", href: "/pravne-upozornenie" },

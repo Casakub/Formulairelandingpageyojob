@@ -47,7 +47,8 @@ export const lvLandingPage: LandingPageContent = {
       network: "Tīkls",
       contact: "Kontakti"
     },
-    cta: "Pieprasīt piedāvājumu"
+    cta: "Pieprasīt piedāvājumu",
+    survey: "Eiropas aptauja"
   },
 
   // Hero Section
@@ -330,7 +331,7 @@ export const lvLandingPage: LandingPageContent = {
       facebook: "https://facebook.com/yojob"
     },
     bottom: {
-      copyright: "© 2025 YOJOB. Visas tiesības aizsargātas.",
+      copyright: "© 2026 YOJOB. Visas tiesības aizsargātas.",
       madeWith: "Izveidots ar ❤️, lai atvieglotu Eiropas personāla atlasi",
       legalLinks: [
         { label: "Juridiskā informācija", href: "/juridiska-informacija" },

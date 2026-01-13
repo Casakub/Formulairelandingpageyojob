@@ -47,7 +47,8 @@ export const ltLandingPage: LandingPageContent = {
       network: "Tinklas",
       contact: "Kontaktai"
     },
-    cta: "Prašyti pasiūlymo"
+    cta: "Prašyti pasiūlymo",
+    survey: "Europos apklausa"
   },
 
   // Hero Section
@@ -330,7 +331,7 @@ export const ltLandingPage: LandingPageContent = {
       facebook: "https://facebook.com/yojob"
     },
     bottom: {
-      copyright: "© 2025 YOJOB. Visos teisės saugomos.",
+      copyright: "© 2026 YOJOB. Visos teisės saugomos.",
       madeWith: "Sukurta su ❤️ Europos įdarbinimo palengvinimui",
       legalLinks: [
         { label: "Teisinė informacija", href: "/teisine-informacija" },

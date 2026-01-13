@@ -47,7 +47,8 @@ export const bgLandingPage: LandingPageContent = {
       network: "Мрежа",
       contact: "Контакт"
     },
-    cta: "Поискайте оферта"
+    cta: "Поискайте оферта",
+    survey: "Европейско проучване"
   },
 
   // Hero Section
@@ -330,7 +331,7 @@ export const bgLandingPage: LandingPageContent = {
       facebook: "https://facebook.com/yojob"
     },
     bottom: {
-      copyright: "© 2025 YOJOB. Всички права запазени.",
+      copyright: "© 2026 YOJOB. Всички права запазени.",
       madeWith: "Създадено с ❤️ за улесняване на европейското набиране",
       legalLinks: [
         { label: "Правна информация", href: "/pravna-informatsia" },

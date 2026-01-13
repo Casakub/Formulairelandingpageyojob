@@ -47,7 +47,8 @@ export const elLandingPage: LandingPageContent = {
       network: "Δίκτυο",
       contact: "Επικοινωνία"
     },
-    cta: "Ζητήστε προσφορά"
+    cta: "Ζητήστε προσφορά",
+    survey: "Ευρωπαϊκή έρευνα"
   },
 
   // Hero Section
@@ -330,7 +331,7 @@ export const elLandingPage: LandingPageContent = {
       facebook: "https://facebook.com/yojob"
     },
     bottom: {
-      copyright: "© 2025 YOJOB. Όλα τα δικαιώματα διατηρούνται.",
+      copyright: "© 2026 YOJOB. Όλα τα δικαιώματα διατηρούνται.",
       madeWith: "Δημιουργήθηκε με ❤️ για να διευκολύνει την Ευρωπαϊκή πρόσληψη",
       legalLinks: [
         { label: "Νομικές πληροφορίες", href: "/nomikes-pliroforles" },

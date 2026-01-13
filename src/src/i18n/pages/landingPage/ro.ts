@@ -47,7 +47,8 @@ export const roLandingPage: LandingPageContent = {
       network: "Rețea",
       contact: "Contact"
     },
-    cta: "Solicită o ofertă"
+    cta: "Solicită o ofertă",
+    survey: "Sondaj European"
   },
 
   // Hero Section
@@ -330,7 +331,7 @@ export const roLandingPage: LandingPageContent = {
       facebook: "https://facebook.com/yojob"
     },
     bottom: {
-      copyright: "© 2025 YOJOB. Toate drepturile rezervate.",
+      copyright: "© 2026 YOJOB. Toate drepturile rezervate.",
       madeWith: "Creat cu ❤️ pentru a facilita recrutarea europeană",
       legalLinks: [
         { label: "Mențiuni legale", href: "/mentiuni-legale" },

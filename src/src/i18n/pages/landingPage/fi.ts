@@ -47,7 +47,8 @@ export const fiLandingPage: LandingPageContent = {
       network: "Verkosto",
       contact: "Yhteystiedot"
     },
-    cta: "Pyydä tarjous"
+    cta: "Pyydä tarjous",
+    survey: "Eurooppalainen kysely"
   },
 
   // Hero Section
@@ -330,7 +331,7 @@ export const fiLandingPage: LandingPageContent = {
       facebook: "https://facebook.com/yojob"
     },
     bottom: {
-      copyright: "© 2025 YOJOB. Kaikki oikeudet pidätetään.",
+      copyright: "© 2026 YOJOB. Kaikki oikeudet pidätetään.",
       madeWith: "Tehty ❤️:lla eurooppalaisen rekrytoinnin helpottamiseksi",
       legalLinks: [
         { label: "Oikeudelliset tiedot", href: "/oikeudelliset-tiedot" },

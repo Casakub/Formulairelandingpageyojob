@@ -47,7 +47,8 @@ export const deLandingPage: LandingPageContent = {
       network: "Netzwerk",
       contact: "Kontakt"
     },
-    cta: "Angebot anfordern"
+    cta: "Angebot anfordern",
+    survey: "Europäische Umfrage"
   },
 
   // Hero Section
@@ -320,7 +321,7 @@ export const deLandingPage: LandingPageContent = {
       facebook: "https://facebook.com/yojob"
     },
     bottom: {
-      copyright: "© 2025 YOJOB. Alle Rechte vorbehalten.",
+      copyright: "© 2026 YOJOB. Alle Rechte vorbehalten.",
       madeWith: "Mit ❤️ gemacht, um europäische Personalbeschaffung zu erleichtern",
       legalLinks: [
         { label: "Impressum", href: "/mentions-legales" },

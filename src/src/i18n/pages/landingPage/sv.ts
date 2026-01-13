@@ -47,7 +47,8 @@ export const svLandingPage: LandingPageContent = {
       network: "Nätverk",
       contact: "Kontakt"
     },
-    cta: "Begär offert"
+    cta: "Begär offert",
+    survey: "Europeisk undersökning"
   },
 
   // Hero Section
@@ -330,7 +331,7 @@ export const svLandingPage: LandingPageContent = {
       facebook: "https://facebook.com/yojob"
     },
     bottom: {
-      copyright: "© 2025 YOJOB. Alla rättigheter förbehållna.",
+      copyright: "© 2026 YOJOB. Alla rättigheter förbehållna.",
       madeWith: "Skapad med ❤️ för att underlätta europeisk rekrytering",
       legalLinks: [
         { label: "Juridisk information", href: "/juridisk-information" },

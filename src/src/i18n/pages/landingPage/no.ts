@@ -47,7 +47,8 @@ export const noLandingPage: LandingPageContent = {
       network: "Nettverk",
       contact: "Kontakt"
     },
-    cta: "Be om tilbud"
+    cta: "Be om tilbud",
+    survey: "Europeisk undersøkelse"
   },
 
   // Hero Section
@@ -330,7 +331,7 @@ export const noLandingPage: LandingPageContent = {
       facebook: "https://facebook.com/yojob"
     },
     bottom: {
-      copyright: "© 2025 YOJOB. Alle rettigheter reservert.",
+      copyright: "© 2026 YOJOB. Alle rettigheter reservert.",
       madeWith: "Laget med ❤️ for å lette europeisk rekruttering",
       legalLinks: [
         { label: "Juridisk informasjon", href: "/juridisk-informasjon" },

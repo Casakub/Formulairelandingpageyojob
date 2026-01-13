@@ -47,7 +47,8 @@ export const huLandingPage: LandingPageContent = {
       network: "Hálózat",
       contact: "Kapcsolat"
     },
-    cta: "Ajánlatkérés"
+    cta: "Ajánlatkérés",
+    survey: "Európai Felmérés"
   },
 
   // Hero Section
@@ -330,7 +331,7 @@ export const huLandingPage: LandingPageContent = {
       facebook: "https://facebook.com/yojob"
     },
     bottom: {
-      copyright: "© 2025 YOJOB. Minden jog fenntartva.",
+      copyright: "© 2026 YOJOB. Minden jog fenntartva.",
       madeWith: "❤️-tel készült az európai toborzás megkönnyítésére",
       legalLinks: [
         { label: "Jogi nyilatkozat", href: "/jogi-nyilatkozat" },

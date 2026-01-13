@@ -47,7 +47,8 @@ export const nlLandingPage: LandingPageContent = {
       network: "Netwerk",
       contact: "Contact"
     },
-    cta: "Offerte aanvragen"
+    cta: "Offerte aanvragen",
+    survey: "Europese Enquête"
   },
 
   // Hero Section
@@ -330,7 +331,7 @@ export const nlLandingPage: LandingPageContent = {
       facebook: "https://facebook.com/yojob"
     },
     bottom: {
-      copyright: "© 2025 YOJOB. Alle rechten voorbehouden.",
+      copyright: "© 2026 YOJOB. Alle rechten voorbehouden.",
       madeWith: "Gemaakt met ❤️ om Europese werving te vergemakkelijken",
       legalLinks: [
         { label: "Juridische vermeldingen", href: "/juridische-vermeldingen" },

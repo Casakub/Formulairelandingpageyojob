@@ -47,7 +47,8 @@ export const enLandingPage: LandingPageContent = {
       network: "Network",
       contact: "Contact"
     },
-    cta: "Request a quote"
+    cta: "Request a quote",
+    survey: "European Survey"
   },
 
   // Hero Section
@@ -320,7 +321,7 @@ export const enLandingPage: LandingPageContent = {
       facebook: "https://facebook.com/yojob"
     },
     bottom: {
-      copyright: "© 2025 YOJOB. All rights reserved.",
+      copyright: "© 2026 YOJOB. All rights reserved.",
       madeWith: "Made with ❤️ to facilitate European recruitment",
       legalLinks: [
         { label: "Legal notice", href: "/mentions-legales" },

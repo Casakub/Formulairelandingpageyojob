@@ -47,7 +47,8 @@ export const etLandingPage: LandingPageContent = {
       network: "Võrgustik",
       contact: "Kontakt"
     },
-    cta: "Küsi pakkumist"
+    cta: "Küsi pakkumist",
+    survey: "Euroopa küsitlus"
   },
 
   // Hero Section
@@ -330,7 +331,7 @@ export const etLandingPage: LandingPageContent = {
       facebook: "https://facebook.com/yojob"
     },
     bottom: {
-      copyright: "© 2025 YOJOB. Kõik õigused kaitstud.",
+      copyright: "© 2026 YOJOB. Kõik õigused kaitstud.",
       madeWith: "Tehtud ❤️-ga Euroopa värbamise hõlbustamiseks",
       legalLinks: [
         { label: "Juriidiline teave", href: "/juriidiline-teave" },
