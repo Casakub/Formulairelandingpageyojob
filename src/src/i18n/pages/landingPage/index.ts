@@ -22,14 +22,33 @@ import { frLandingPage } from './fr';
 import { enLandingPage } from './en';
 import { deLandingPage } from './de';
 import { esLandingPage } from './es';
+import { itLandingPage } from './it';
+import { nlLandingPage } from './nl';
+import { ptLandingPage } from './pt';
+import { plLandingPage } from './pl';
+import { csLandingPage } from './cs';
+import { skLandingPage } from './sk';
+import { huLandingPage } from './hu';
+import { roLandingPage } from './ro';
+import { bgLandingPage } from './bg';
+import { hrLandingPage } from './hr';
+import { slLandingPage } from './sl';
+import { etLandingPage } from './et';
+import { lvLandingPage } from './lv';
+import { ltLandingPage } from './lt';
+import { elLandingPage } from './el';
+import { svLandingPage } from './sv';
+import { daLandingPage } from './da';
+import { fiLandingPage } from './fi';
+import { noLandingPage } from './no';
 
 // Liste des langues disponibles pour la landing page
-export const AVAILABLE_LANGUAGES_LANDING: SupportedLanguage[] = ['fr', 'en', 'de', 'es'];
+export const AVAILABLE_LANGUAGES_LANDING: SupportedLanguage[] = ['fr', 'en', 'de', 'es', 'it', 'nl', 'pt', 'pl', 'cs', 'sk', 'hu', 'ro', 'bg', 'hr', 'sl', 'et', 'lv', 'lt', 'el', 'sv', 'da', 'fi', 'no'];
 
 /**
  * Récupère les traductions pour une langue donnée
  * 
- * @param language - Code langue (fr, en, de, es, etc.)
+ * @param language - Code langue (fr, en, de, es, it, nl, pt, pl, cs, sk, hu, ro, bg, hr, sl, et, lv, lt, el, sv, da, fi, no, etc.)
  * @returns Traductions de la landing page
  * 
  * @example
@@ -42,14 +61,27 @@ export function getLandingPageTranslation(language: SupportedLanguage = 'fr'): L
     en: enLandingPage,
     de: deLandingPage,
     es: esLandingPage,
+    it: itLandingPage,
+    nl: nlLandingPage,
+    pt: ptLandingPage,
+    pl: plLandingPage,
+    cs: csLandingPage,
+    sk: skLandingPage,
+    hu: huLandingPage,
+    ro: roLandingPage,
+    bg: bgLandingPage,
+    hr: hrLandingPage,
+    sl: slLandingPage,
+    et: etLandingPage,
+    lv: lvLandingPage,
+    lt: ltLandingPage,
+    el: elLandingPage,
+    sv: svLandingPage,
+    da: daLandingPage,
+    fi: fiLandingPage,
+    no: noLandingPage,
   };
 
   // Fallback sur le français si la langue n'est pas disponible
   return translations[language] || translations['fr'];
 }
-
-// Export du type pour faciliter l'utilisation
-export type { LandingPageContent };
-
-// Export du hook
-export { useLandingPageTranslation } from './useLandingPageTranslation';
