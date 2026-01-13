@@ -243,8 +243,7 @@ export function SelectItem({ value, children, className = '' }: SelectItemProps)
     <button
       type="button"
       onClick={handleClick}
-      style={{ color: 'inherit' }}
-      className={`w-full text-left px-3 py-2 text-sm cursor-pointer hover:bg-slate-100 transition-colors ${
+      className={`w-full text-left px-3 py-2 text-sm cursor-pointer text-gray-900 hover:bg-slate-100 transition-colors ${
         isSelected ? 'bg-blue-50 text-blue-700 font-medium' : ''
       } ${className}`}
     >

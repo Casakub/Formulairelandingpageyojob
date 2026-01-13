@@ -76,6 +76,16 @@ export function Step3Besoins({ data, pays, region, onChange, lang = 'fr' }: Step
   const { getPaysActifs, getCoefficientDetail, getPaysInfo, isLoading } = useDevisConfig();
   const paysDisponibles = getPaysActifs();
 
+  // 🐛 DEBUG: Vérifier l'état des traductions
+  console.log('🔍 [Step3Besoins] État des traductions:', {
+    lang,
+    isLoadingTranslations,
+    hasT: !!t,
+    hasStep3: !!t?.step3,
+    hasSecteurs: !!t?.secteurs,
+    tKeys: t ? Object.keys(t) : [],
+  });
+
   const handleAddPoste = () => {
     const newPoste: Poste = {
       id: crypto.randomUUID(),
@@ -182,7 +192,22 @@ export function Step3Besoins({ data, pays, region, onChange, lang = 'fr' }: Step
   if (isLoadingTranslations) {
     return (
       <div className="flex items-center justify-center py-12">
-        <div className="text-white/70">{t.common.loading}</div>
+        <div className="text-white/70">{t?.common?.loading || "Chargement..."}</div>
+      </div>
+    );
+  }
+
+  // Protection : Vérifier que les traductions sont complètes
+  if (!t || !t.step3 || !t.secteurs) {
+    console.error('❌ [Step3Besoins] Traductions incomplètes:', {
+      hasT: !!t,
+      hasStep3: !!t?.step3,
+      hasSecteurs: !!t?.secteurs,
+      tKeys: t ? Object.keys(t) : [],
+    });
+    return (
+      <div className="flex items-center justify-center py-12">
+        <div className="text-white/70">Chargement des traductions...</div>
       </div>
     );
   }
@@ -226,8 +251,8 @@ export function Step3Besoins({ data, pays, region, onChange, lang = 'fr' }: Step
                     value={poste.secteur}
                     onValueChange={(value) => handlePosteChange(poste.id, 'secteur', value)}
                   >
-                    <SelectTrigger className="bg-white/10 border-white/20 text-white [&>span]:text-white/90">
-                      <span className="text-white/90">
+                    <SelectTrigger className="bg-white/5 border-white/20 text-white focus:border-cyan-400">
+                      <span className="flex items-center gap-2">
                         {poste.secteur && t.secteurs[poste.secteur]?.label 
                           ? t.secteurs[poste.secteur].label 
                           : t.step3.fields.secteur.placeholder}
@@ -236,7 +261,7 @@ export function Step3Besoins({ data, pays, region, onChange, lang = 'fr' }: Step
                     <SelectContent position="popper" sideOffset={5} className="bg-[#2d1b69]/95 backdrop-blur-xl border border-white/20 text-white z-50">
                       {Object.keys(SECTEURS_DATA).map((secteurKey) => (
                         <SelectItem key={secteurKey} value={secteurKey} className="text-white hover:bg-white/10 focus:bg-white/10">
-                          {t.secteurs[secteurKey]?.label || secteurKey}
+                          {t.secteurs?.[secteurKey]?.label || SECTEUR_KEY_TO_LABEL[secteurKey] || secteurKey}
                         </SelectItem>
                       ))}
                     </SelectContent>
@@ -407,7 +432,7 @@ export function Step3Besoins({ data, pays, region, onChange, lang = 'fr' }: Step
                 // 🆕 Placeholder quand le salaire n'est pas calculé
                 <div className="space-y-3 mt-4">
                   <div className="p-4 bg-yellow-500/10 border border-yellow-500/30 rounded-lg">
-                    <p className="text-yellow-200 text-sm mb-2 font-medium">⚠️ {t.step3.summary.title}</p>
+                    <p className="text-yellow-200 text-sm mb-2 font-medium">⚠️ {t.step3?.summary?.title || "Rémunération du salarié"}</p>
                     <p className="text-yellow-100/70 text-xs">
                       {!region 
                         ? "Veuillez sélectionner votre région à l'étape 1 pour afficher les salaires."

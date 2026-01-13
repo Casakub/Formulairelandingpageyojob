@@ -134,7 +134,9 @@ export interface DevisFormData {
 }
 
 export default function DemandeDevis() {
+  // ⚠️ TOUS LES HOOKS DOIVENT ÊTRE APPELÉS AVANT TOUT RETURN CONDITIONNEL
   const [currentStep, setCurrentStep] = useState(1);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   
   // 🌍 Hook unifié de gestion de la langue (auto-détection + persistance + synchronisation)
   const {
@@ -146,23 +148,10 @@ export default function DemandeDevis() {
   // Cast vers DevisLanguage pour le système de traduction
   const lang = globalLanguage as DevisLanguage;
   
-  const handleLanguageChange = (newLang: DevisLanguage) => {
-    setGlobalLanguage(newLang);
-  };
-  
   // Charger les traductions pour la langue active
-  const { t } = useDevisTranslationStatic(lang);
+  const { t, isLoading: isLoadingTranslations } = useDevisTranslationStatic(lang);
   
-  // Générer les steps avec traductions dynamiquement
-  const STEPS = [
-    { id: 1, title: t.navigation.steps.entreprise.title, icon: Building2, badge: t.navigation.steps.entreprise.badge },
-    { id: 2, title: t.navigation.steps.contact.title, icon: User, badge: t.navigation.steps.contact.badge },
-    { id: 3, title: t.navigation.steps.besoins.title, icon: Briefcase, badge: t.navigation.steps.besoins.badge },
-    { id: 4, title: t.navigation.steps.conditions.title, icon: FileText, badge: t.navigation.steps.conditions.badge },
-    { id: 5, title: t.navigation.steps.candidats.title, icon: Users, badge: t.navigation.steps.candidats.badge },
-    { id: 6, title: t.navigation.steps.recapitulatif.title, icon: FileCheck, badge: t.navigation.steps.recapitulatif.badge }
-  ];
-
+  // État du formulaire (doit être déclaré AVANT tout return conditionnel)
   const [formData, setFormData] = useState<DevisFormData>({
     entreprise: {
       pays: 'France', // Valeur par défaut
@@ -242,8 +231,32 @@ export default function DemandeDevis() {
       epis: []
     }
   });
-
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  
+  // 🛡️ Attendre que les traductions ET la langue soient prêtes (APRÈS tous les hooks)
+  if (!languageReady || isLoadingTranslations) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-blue-900 via-violet-900 to-cyan-900 flex items-center justify-center">
+        <div className="text-white text-xl">Chargement...</div>
+      </div>
+    );
+  }
+  
+  // 🐛 DEBUG: Log la langue avant de charger les traductions
+  console.log('🔍 [DemandeDevis] Langue active:', { globalLanguage, lang, languageReady });
+  
+  const handleLanguageChange = (newLang: DevisLanguage) => {
+    setGlobalLanguage(newLang);
+  };
+  
+  // Générer les steps avec traductions dynamiquement
+  const STEPS = [
+    { id: 1, title: t.navigation.steps.entreprise.title, icon: Building2, badge: t.navigation.steps.entreprise.badge },
+    { id: 2, title: t.navigation.steps.contact.title, icon: User, badge: t.navigation.steps.contact.badge },
+    { id: 3, title: t.navigation.steps.besoins.title, icon: Briefcase, badge: t.navigation.steps.besoins.badge },
+    { id: 4, title: t.navigation.steps.conditions.title, icon: FileText, badge: t.navigation.steps.conditions.badge },
+    { id: 5, title: t.navigation.steps.candidats.title, icon: Users, badge: t.navigation.steps.candidats.badge },
+    { id: 6, title: t.navigation.steps.recapitulatif.title, icon: FileCheck, badge: t.navigation.steps.recapitulatif.badge }
+  ];
 
   const progress = (currentStep / STEPS.length) * 100;
 
