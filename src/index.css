@@ -549,20 +549,20 @@
   }
 
   h1:not([class*="text-"]):not([class*="font-"]):not([class*="leading-"]) {
-    font-size: 2.25rem;
+    font-size: 1.85rem;
     font-weight: 800;
     line-height: 1.15;
   }
 
   @media (width >= 768px) {
     h1:not([class*="text-"]):not([class*="font-"]):not([class*="leading-"]) {
-      font-size: 3rem;
+      font-size: 2rem;
     }
   }
 
   @media (width >= 1024px) {
     h1:not([class*="text-"]):not([class*="font-"]):not([class*="leading-"]) {
-      font-size: 3.5rem;
+      font-size: 2.5rem;
     }
   }
 

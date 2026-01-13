@@ -134,20 +134,20 @@
  */
 @layer base {
   h1:not([class*='text-']):not([class*='font-']):not([class*='leading-']) {
-    font-size: 2.25rem; /* 36px mobile - Impactant mais équilibré */
+    font-size: 1.85rem; /* 36px mobile - Impactant mais équilibré */
     font-weight: 800; /* Extra bold pour H1 */
     line-height: 1.15; /* Serré pour effet impact */
   }
   
   @media (min-width: 768px) {
     h1:not([class*='text-']):not([class*='font-']):not([class*='leading-']) {
-      font-size: 3rem; /* 48px tablet - Taille idéale */
+      font-size: 2rem; /* 48px tablet - Taille idéale */
     }
   }
 
   @media (min-width: 1024px) {
     h1:not([class*='text-']):not([class*='font-']):not([class*='leading-']) {
-      font-size: 3.5rem; /* 56px desktop - Sweet spot UI/UX */
+      font-size: 2.5rem; /* 56px desktop - Sweet spot UI/UX */
     }
   }
 

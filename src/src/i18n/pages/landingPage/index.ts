@@ -21,14 +21,15 @@ import type { LandingPageContent } from '../../../types/landingContent';
 import { frLandingPage } from './fr';
 import { enLandingPage } from './en';
 import { deLandingPage } from './de';
+import { esLandingPage } from './es';
 
 // Liste des langues disponibles pour la landing page
-export const AVAILABLE_LANGUAGES_LANDING: SupportedLanguage[] = ['fr', 'en', 'de'];
+export const AVAILABLE_LANGUAGES_LANDING: SupportedLanguage[] = ['fr', 'en', 'de', 'es'];
 
 /**
  * Récupère les traductions pour une langue donnée
  * 
- * @param language - Code langue (fr, en, de, etc.)
+ * @param language - Code langue (fr, en, de, es, etc.)
  * @returns Traductions de la landing page
  * 
  * @example
@@ -40,6 +41,7 @@ export function getLandingPageTranslation(language: SupportedLanguage = 'fr'): L
     fr: frLandingPage,
     en: enLandingPage,
     de: deLandingPage,
+    es: esLandingPage,
   };
 
   // Fallback sur le français si la langue n'est pas disponible
