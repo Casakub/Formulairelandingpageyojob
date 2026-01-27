@@ -1,870 +1,173 @@
 {
   "salaires": {
     "ÎLE-DE-FRANCE": {
-      "Bâtiment": {
-        "N1P1": 1850,
-        "N1P2": 1920,
-        "N2P1": 2050,
-        "N2P2": 2180,
-        "N3P1": 2400,
-        "N3P2": 2600,
-        "N4P1": 2900,
-        "N4P2": 3200
-      },
-      "Métallurgie": {
-        "Niveau I": 1800,
-        "Niveau II": 1950,
-        "Niveau III": 2200,
-        "Niveau IV": 2500,
-        "Niveau V": 2800
-      },
-      "TP": {
-        "N1": 1850,
-        "N2": 2000,
-        "N3": 2300,
-        "N4": 2700
-      },
-      "Hôtellerie": {
-        "Niveau I": 1750,
-        "Niveau II": 1900,
-        "Niveau III": 2100,
-        "Niveau IV": 2400,
-        "Niveau V": 2700
-      },
-      "Restauration": {
-        "Niveau I": 1750,
-        "Niveau II": 1900,
-        "Niveau III": 2100,
-        "Niveau IV": 2400,
-        "Niveau V": 2800
-      },
-      "Plasturgie": {
-        "Niveau I": 1800,
-        "Niveau II": 1950,
-        "Niveau III": 2200,
-        "Niveau IV": 2500
-      },
-      "Automobile Carrosserie": {
-        "Niveau I": 1800,
-        "Niveau II": 1950,
-        "Niveau III": 2200,
-        "Niveau IV": 2600
-      },
-      "Sylviculture": {
-        "Niveau I": 1850,
-        "Niveau II": 2000,
-        "Niveau III": 2300,
-        "Niveau IV": 2700
-      },
-      "Cartonnerie": {
-        "Niveau I": 1800,
-        "Niveau II": 1950,
-        "Niveau III": 2200,
-        "Niveau IV": 2500
-      },
-      "Autre": {
-        "À définir": 1800
-      }
+      "Bâtiment": { "N1P1": 1823, "N1P2": 1835, "N2P1": 1876, "N2P2": 1876, "N3P1": 2011, "N3P2": 2133, "N4P1": 2260, "N4P2": 2475 },
+      "Métallurgie": { "Niveau I": 1823, "Niveau II": 1910, "Niveau III": 2075, "Niveau IV": 2285, "Niveau V": 2675 },
+      "TP": { "N1": 1920, "N2": 2012, "N3": 2347, "N4": 2802 },
+      "Hôtellerie": { "Niveau I": 1823, "Niveau II": 1900, "Niveau III": 2100, "Niveau IV": 2400, "Niveau V": 2700 },
+      "Restauration": { "Niveau I": 1823, "Niveau II": 1900, "Niveau III": 2100, "Niveau IV": 2400, "Niveau V": 2800 },
+      "Plasturgie": { "Niveau I": 1823, "Niveau II": 1861, "Niveau III": 2029, "Niveau IV": 2404 },
+      "Automobile Carrosserie": { "Niveau I": 1823, "Niveau II": 1950, "Niveau III": 2200, "Niveau IV": 2600 },
+      "Sylviculture": { "Niveau I": 1850, "Niveau II": 2000, "Niveau III": 2300, "Niveau IV": 2700 },
+      "Cartonnerie": { "Niveau I": 1823, "Niveau II": 1950, "Niveau III": 2200, "Niveau IV": 2500 },
+      "Autre": { "À définir": 1823 }
     },
     "PROVENCE-ALPES-CÔTE D'AZUR": {
-      "Bâtiment": {
-        "N1P1": 1800,
-        "N1P2": 1870,
-        "N2P1": 2000,
-        "N2P2": 2130,
-        "N3P1": 2350,
-        "N3P2": 2550,
-        "N4P1": 2850,
-        "N4P2": 3150
-      },
-      "Métallurgie": {
-        "Niveau I": 1750,
-        "Niveau II": 1900,
-        "Niveau III": 2150,
-        "Niveau IV": 2450,
-        "Niveau V": 2750
-      },
-      "TP": {
-        "N1": 1800,
-        "N2": 1950,
-        "N3": 2250,
-        "N4": 2650
-      },
-      "Hôtellerie": {
-        "Niveau I": 1700,
-        "Niveau II": 1850,
-        "Niveau III": 2050,
-        "Niveau IV": 2350,
-        "Niveau V": 2650
-      },
-      "Restauration": {
-        "Niveau I": 1700,
-        "Niveau II": 1850,
-        "Niveau III": 2050,
-        "Niveau IV": 2350,
-        "Niveau V": 2750
-      },
-      "Plasturgie": {
-        "Niveau I": 1750,
-        "Niveau II": 1900,
-        "Niveau III": 2150,
-        "Niveau IV": 2450
-      },
-      "Automobile Carrosserie": {
-        "Niveau I": 1750,
-        "Niveau II": 1900,
-        "Niveau III": 2150,
-        "Niveau IV": 2550
-      },
-      "Sylviculture": {
-        "Niveau I": 1800,
-        "Niveau II": 1950,
-        "Niveau III": 2250,
-        "Niveau IV": 2650
-      },
-      "Cartonnerie": {
-        "Niveau I": 1750,
-        "Niveau II": 1900,
-        "Niveau III": 2150,
-        "Niveau IV": 2450
-      },
-      "Autre": {
-        "À définir": 1750
-      }
+      "Bâtiment": { "N1P1": 1838, "N1P2": 1868, "N2P1": 1975, "N2P2": 1975, "N3P1": 2171, "N3P2": 2341, "N4P1": 2510, "N4P2": 2680 },
+      "Métallurgie": { "Niveau I": 1823, "Niveau II": 1910, "Niveau III": 2075, "Niveau IV": 2285, "Niveau V": 2675 },
+      "TP": { "N1": 1894, "N2": 2033, "N3": 2400, "N4": 2798 },
+      "Hôtellerie": { "Niveau I": 1823, "Niveau II": 1850, "Niveau III": 2050, "Niveau IV": 2350, "Niveau V": 2650 },
+      "Restauration": { "Niveau I": 1823, "Niveau II": 1850, "Niveau III": 2050, "Niveau IV": 2350, "Niveau V": 2750 },
+      "Plasturgie": { "Niveau I": 1823, "Niveau II": 1861, "Niveau III": 2029, "Niveau IV": 2404 },
+      "Automobile Carrosserie": { "Niveau I": 1823, "Niveau II": 1900, "Niveau III": 2150, "Niveau IV": 2550 },
+      "Sylviculture": { "Niveau I": 1823, "Niveau II": 1950, "Niveau III": 2250, "Niveau IV": 2650 },
+      "Cartonnerie": { "Niveau I": 1823, "Niveau II": 1900, "Niveau III": 2150, "Niveau IV": 2450 },
+      "Autre": { "À définir": 1823 }
     },
     "AUVERGNE-RHÔNE-ALPES": {
-      "Bâtiment": {
-        "N1P1": 1750,
-        "N1P2": 1820,
-        "N2P1": 1950,
-        "N2P2": 2080,
-        "N3P1": 2300,
-        "N3P2": 2500,
-        "N4P1": 2800,
-        "N4P2": 3100
-      },
-      "Métallurgie": {
-        "Niveau I": 1700,
-        "Niveau II": 1850,
-        "Niveau III": 2100,
-        "Niveau IV": 2400,
-        "Niveau V": 2700
-      },
-      "TP": {
-        "N1": 1750,
-        "N2": 1900,
-        "N3": 2200,
-        "N4": 2600
-      },
-      "Hôtellerie": {
-        "Niveau I": 1650,
-        "Niveau II": 1800,
-        "Niveau III": 2000,
-        "Niveau IV": 2300,
-        "Niveau V": 2600
-      },
-      "Restauration": {
-        "Niveau I": 1650,
-        "Niveau II": 1800,
-        "Niveau III": 2000,
-        "Niveau IV": 2300,
-        "Niveau V": 2700
-      },
-      "Plasturgie": {
-        "Niveau I": 1700,
-        "Niveau II": 1850,
-        "Niveau III": 2100,
-        "Niveau IV": 2400
-      },
-      "Automobile Carrosserie": {
-        "Niveau I": 1700,
-        "Niveau II": 1850,
-        "Niveau III": 2100,
-        "Niveau IV": 2500
-      },
-      "Sylviculture": {
-        "Niveau I": 1750,
-        "Niveau II": 1900,
-        "Niveau III": 2200,
-        "Niveau IV": 2600
-      },
-      "Cartonnerie": {
-        "Niveau I": 1700,
-        "Niveau II": 1850,
-        "Niveau III": 2100,
-        "Niveau IV": 2400
-      },
-      "Autre": {
-        "À définir": 1700
-      }
+      "Bâtiment": { "N1P1": 1823, "N1P2": 1823, "N2P1": 1865, "N2P2": 1865, "N3P1": 2060, "N3P2": 2235, "N4P1": 2404, "N4P2": 2549 },
+      "Métallurgie": { "Niveau I": 1823, "Niveau II": 1910, "Niveau III": 2075, "Niveau IV": 2285, "Niveau V": 2675 },
+      "TP": { "N1": 1924, "N2": 2052, "N3": 2366, "N4": 2771 },
+      "Hôtellerie": { "Niveau I": 1823, "Niveau II": 1800, "Niveau III": 2000, "Niveau IV": 2300, "Niveau V": 2600 },
+      "Restauration": { "Niveau I": 1823, "Niveau II": 1800, "Niveau III": 2000, "Niveau IV": 2300, "Niveau V": 2700 },
+      "Plasturgie": { "Niveau I": 1823, "Niveau II": 1861, "Niveau III": 2029, "Niveau IV": 2404 },
+      "Automobile Carrosserie": { "Niveau I": 1823, "Niveau II": 1850, "Niveau III": 2100, "Niveau IV": 2500 },
+      "Sylviculture": { "Niveau I": 1823, "Niveau II": 1900, "Niveau III": 2200, "Niveau IV": 2600 },
+      "Cartonnerie": { "Niveau I": 1823, "Niveau II": 1850, "Niveau III": 2100, "Niveau IV": 2400 },
+      "Autre": { "À définir": 1823 }
     },
     "BOURGOGNE-FRANCHE-COMTÉ": {
-      "Bâtiment": {
-        "N1P1": 1750,
-        "N1P2": 1820,
-        "N2P1": 1950,
-        "N2P2": 2080,
-        "N3P1": 2300,
-        "N3P2": 2500,
-        "N4P1": 2800,
-        "N4P2": 3100
-      },
-      "Métallurgie": {
-        "Niveau I": 1700,
-        "Niveau II": 1850,
-        "Niveau III": 2100,
-        "Niveau IV": 2400,
-        "Niveau V": 2700
-      },
-      "TP": {
-        "N1": 1750,
-        "N2": 1900,
-        "N3": 2200,
-        "N4": 2600
-      },
-      "Hôtellerie": {
-        "Niveau I": 1650,
-        "Niveau II": 1800,
-        "Niveau III": 2000,
-        "Niveau IV": 2300,
-        "Niveau V": 2600
-      },
-      "Restauration": {
-        "Niveau I": 1650,
-        "Niveau II": 1800,
-        "Niveau III": 2000,
-        "Niveau IV": 2300,
-        "Niveau V": 2700
-      },
-      "Plasturgie": {
-        "Niveau I": 1700,
-        "Niveau II": 1850,
-        "Niveau III": 2100,
-        "Niveau IV": 2400
-      },
-      "Automobile Carrosserie": {
-        "Niveau I": 1700,
-        "Niveau II": 1850,
-        "Niveau III": 2100,
-        "Niveau IV": 2500
-      },
-      "Sylviculture": {
-        "Niveau I": 1750,
-        "Niveau II": 1900,
-        "Niveau III": 2200,
-        "Niveau IV": 2600
-      },
-      "Cartonnerie": {
-        "Niveau I": 1700,
-        "Niveau II": 1850,
-        "Niveau III": 2100,
-        "Niveau IV": 2400
-      },
-      "Autre": {
-        "À définir": 1700
-      }
+      "Bâtiment": { "N1P1": 1823, "N1P2": 1840, "N2P1": 1874, "N2P2": 1874, "N3P1": 2051, "N3P2": 2193, "N4P1": 2335, "N4P2": 2477 },
+      "Métallurgie": { "Niveau I": 1823, "Niveau II": 1910, "Niveau III": 2075, "Niveau IV": 2285, "Niveau V": 2675 },
+      "TP": { "N1": 1900, "N2": 2000, "N3": 2300, "N4": 2700 },
+      "Hôtellerie": { "Niveau I": 1823, "Niveau II": 1850, "Niveau III": 2000, "Niveau IV": 2250, "Niveau V": 2550 },
+      "Restauration": { "Niveau I": 1823, "Niveau II": 1850, "Niveau III": 2000, "Niveau IV": 2250, "Niveau V": 2650 },
+      "Plasturgie": { "Niveau I": 1823, "Niveau II": 1861, "Niveau III": 2029, "Niveau IV": 2404 },
+      "Automobile Carrosserie": { "Niveau I": 1823, "Niveau II": 1850, "Niveau III": 2100, "Niveau IV": 2450 },
+      "Sylviculture": { "Niveau I": 1823, "Niveau II": 1900, "Niveau III": 2150, "Niveau IV": 2550 },
+      "Cartonnerie": { "Niveau I": 1823, "Niveau II": 1850, "Niveau III": 2100, "Niveau IV": 2400 },
+      "Autre": { "À définir": 1823 }
     },
     "BRETAGNE": {
-      "Bâtiment": {
-        "N1P1": 1750,
-        "N1P2": 1820,
-        "N2P1": 1950,
-        "N2P2": 2080,
-        "N3P1": 2300,
-        "N3P2": 2500,
-        "N4P1": 2800,
-        "N4P2": 3100
-      },
-      "Métallurgie": {
-        "Niveau I": 1700,
-        "Niveau II": 1850,
-        "Niveau III": 2100,
-        "Niveau IV": 2400,
-        "Niveau V": 2700
-      },
-      "TP": {
-        "N1": 1750,
-        "N2": 1900,
-        "N3": 2200,
-        "N4": 2600
-      },
-      "Hôtellerie": {
-        "Niveau I": 1650,
-        "Niveau II": 1800,
-        "Niveau III": 2000,
-        "Niveau IV": 2300,
-        "Niveau V": 2600
-      },
-      "Restauration": {
-        "Niveau I": 1650,
-        "Niveau II": 1800,
-        "Niveau III": 2000,
-        "Niveau IV": 2300,
-        "Niveau V": 2700
-      },
-      "Plasturgie": {
-        "Niveau I": 1700,
-        "Niveau II": 1850,
-        "Niveau III": 2100,
-        "Niveau IV": 2400
-      },
-      "Automobile Carrosserie": {
-        "Niveau I": 1700,
-        "Niveau II": 1850,
-        "Niveau III": 2100,
-        "Niveau IV": 2500
-      },
-      "Sylviculture": {
-        "Niveau I": 1750,
-        "Niveau II": 1900,
-        "Niveau III": 2200,
-        "Niveau IV": 2600
-      },
-      "Cartonnerie": {
-        "Niveau I": 1700,
-        "Niveau II": 1850,
-        "Niveau III": 2100,
-        "Niveau IV": 2400
-      },
-      "Autre": {
-        "À définir": 1700
-      }
+      "Bâtiment": { "N1P1": 1845, "N1P2": 1850, "N2P1": 1899, "N2P2": 1899, "N3P1": 2044, "N3P2": 2213, "N4P1": 2381, "N4P2": 2549 },
+      "Métallurgie": { "Niveau I": 1823, "Niveau II": 1910, "Niveau III": 2075, "Niveau IV": 2285, "Niveau V": 2675 },
+      "TP": { "N1": 1936, "N2": 1997, "N3": 2354, "N4": 2801 },
+      "Hôtellerie": { "Niveau I": 1823, "Niveau II": 1850, "Niveau III": 2000, "Niveau IV": 2250, "Niveau V": 2550 },
+      "Restauration": { "Niveau I": 1823, "Niveau II": 1850, "Niveau III": 2000, "Niveau IV": 2250, "Niveau V": 2650 },
+      "Plasturgie": { "Niveau I": 1823, "Niveau II": 1861, "Niveau III": 2029, "Niveau IV": 2404 },
+      "Automobile Carrosserie": { "Niveau I": 1823, "Niveau II": 1850, "Niveau III": 2100, "Niveau IV": 2450 },
+      "Sylviculture": { "Niveau I": 1823, "Niveau II": 1900, "Niveau III": 2150, "Niveau IV": 2550 },
+      "Cartonnerie": { "Niveau I": 1823, "Niveau II": 1850, "Niveau III": 2100, "Niveau IV": 2400 },
+      "Autre": { "À définir": 1823 }
     },
     "CENTRE-VAL DE LOIRE": {
-      "Bâtiment": {
-        "N1P1": 1750,
-        "N1P2": 1820,
-        "N2P1": 1950,
-        "N2P2": 2080,
-        "N3P1": 2300,
-        "N3P2": 2500,
-        "N4P1": 2800,
-        "N4P2": 3100
-      },
-      "Métallurgie": {
-        "Niveau I": 1700,
-        "Niveau II": 1850,
-        "Niveau III": 2100,
-        "Niveau IV": 2400,
-        "Niveau V": 2700
-      },
-      "TP": {
-        "N1": 1750,
-        "N2": 1900,
-        "N3": 2200,
-        "N4": 2600
-      },
-      "Hôtellerie": {
-        "Niveau I": 1650,
-        "Niveau II": 1800,
-        "Niveau III": 2000,
-        "Niveau IV": 2300,
-        "Niveau V": 2600
-      },
-      "Restauration": {
-        "Niveau I": 1650,
-        "Niveau II": 1800,
-        "Niveau III": 2000,
-        "Niveau IV": 2300,
-        "Niveau V": 2700
-      },
-      "Plasturgie": {
-        "Niveau I": 1700,
-        "Niveau II": 1850,
-        "Niveau III": 2100,
-        "Niveau IV": 2400
-      },
-      "Automobile Carrosserie": {
-        "Niveau I": 1700,
-        "Niveau II": 1850,
-        "Niveau III": 2100,
-        "Niveau IV": 2500
-      },
-      "Sylviculture": {
-        "Niveau I": 1750,
-        "Niveau II": 1900,
-        "Niveau III": 2200,
-        "Niveau IV": 2600
-      },
-      "Cartonnerie": {
-        "Niveau I": 1700,
-        "Niveau II": 1850,
-        "Niveau III": 2100,
-        "Niveau IV": 2400
-      },
-      "Autre": {
-        "À définir": 1700
-      }
+      "Bâtiment": { "N1P1": 1823, "N1P2": 1831, "N2P1": 1880, "N2P2": 1884, "N3P1": 2027, "N3P2": 2144, "N4P1": 2261, "N4P2": 2378 },
+      "Métallurgie": { "Niveau I": 1823, "Niveau II": 1910, "Niveau III": 2075, "Niveau IV": 2285, "Niveau V": 2675 },
+      "TP": { "N1": 1823, "N2": 1888, "N3": 2092, "N4": 2391 },
+      "Hôtellerie": { "Niveau I": 1823, "Niveau II": 1850, "Niveau III": 2000, "Niveau IV": 2250, "Niveau V": 2550 },
+      "Restauration": { "Niveau I": 1823, "Niveau II": 1850, "Niveau III": 2000, "Niveau IV": 2250, "Niveau V": 2650 },
+      "Plasturgie": { "Niveau I": 1823, "Niveau II": 1861, "Niveau III": 2029, "Niveau IV": 2404 },
+      "Automobile Carrosserie": { "Niveau I": 1823, "Niveau II": 1850, "Niveau III": 2100, "Niveau IV": 2450 },
+      "Sylviculture": { "Niveau I": 1823, "Niveau II": 1900, "Niveau III": 2150, "Niveau IV": 2550 },
+      "Cartonnerie": { "Niveau I": 1823, "Niveau II": 1850, "Niveau III": 2100, "Niveau IV": 2400 },
+      "Autre": { "À définir": 1823 }
     },
     "CORSE": {
-      "Bâtiment": {
-        "N1P1": 1750,
-        "N1P2": 1820,
-        "N2P1": 1950,
-        "N2P2": 2080,
-        "N3P1": 2300,
-        "N3P2": 2500,
-        "N4P1": 2800,
-        "N4P2": 3100
-      },
-      "Métallurgie": {
-        "Niveau I": 1700,
-        "Niveau II": 1850,
-        "Niveau III": 2100,
-        "Niveau IV": 2400,
-        "Niveau V": 2700
-      },
-      "TP": {
-        "N1": 1750,
-        "N2": 1900,
-        "N3": 2200,
-        "N4": 2600
-      },
-      "Hôtellerie": {
-        "Niveau I": 1650,
-        "Niveau II": 1800,
-        "Niveau III": 2000,
-        "Niveau IV": 2300,
-        "Niveau V": 2600
-      },
-      "Restauration": {
-        "Niveau I": 1650,
-        "Niveau II": 1800,
-        "Niveau III": 2000,
-        "Niveau IV": 2300,
-        "Niveau V": 2700
-      },
-      "Plasturgie": {
-        "Niveau I": 1700,
-        "Niveau II": 1850,
-        "Niveau III": 2100,
-        "Niveau IV": 2400
-      },
-      "Automobile Carrosserie": {
-        "Niveau I": 1700,
-        "Niveau II": 1850,
-        "Niveau III": 2100,
-        "Niveau IV": 2500
-      },
-      "Sylviculture": {
-        "Niveau I": 1750,
-        "Niveau II": 1900,
-        "Niveau III": 2200,
-        "Niveau IV": 2600
-      },
-      "Cartonnerie": {
-        "Niveau I": 1700,
-        "Niveau II": 1850,
-        "Niveau III": 2100,
-        "Niveau IV": 2400
-      },
-      "Autre": {
-        "À définir": 1700
-      }
+      "Bâtiment": { "N1P1": 1823, "N1P2": 1823, "N2P1": 1884, "N2P2": 1884, "N3P1": 2101, "N3P2": 2275, "N4P1": 2449, "N4P2": 2622 },
+      "Métallurgie": { "Niveau I": 1823, "Niveau II": 1910, "Niveau III": 2075, "Niveau IV": 2285, "Niveau V": 2675 },
+      "TP": { "N1": 1823, "N2": 1823, "N3": 1900, "N4": 2119 },
+      "Hôtellerie": { "Niveau I": 1823, "Niveau II": 1850, "Niveau III": 2050, "Niveau IV": 2300, "Niveau V": 2600 },
+      "Restauration": { "Niveau I": 1823, "Niveau II": 1850, "Niveau III": 2050, "Niveau IV": 2300, "Niveau V": 2700 },
+      "Plasturgie": { "Niveau I": 1823, "Niveau II": 1861, "Niveau III": 2029, "Niveau IV": 2404 },
+      "Automobile Carrosserie": { "Niveau I": 1823, "Niveau II": 1850, "Niveau III": 2100, "Niveau IV": 2500 },
+      "Sylviculture": { "Niveau I": 1823, "Niveau II": 1900, "Niveau III": 2200, "Niveau IV": 2600 },
+      "Cartonnerie": { "Niveau I": 1823, "Niveau II": 1850, "Niveau III": 2100, "Niveau IV": 2400 },
+      "Autre": { "À définir": 1823 }
     },
     "GRAND EST": {
-      "Bâtiment": {
-        "N1P1": 1750,
-        "N1P2": 1820,
-        "N2P1": 1950,
-        "N2P2": 2080,
-        "N3P1": 2300,
-        "N3P2": 2500,
-        "N4P1": 2800,
-        "N4P2": 3100
-      },
-      "Métallurgie": {
-        "Niveau I": 1700,
-        "Niveau II": 1850,
-        "Niveau III": 2100,
-        "Niveau IV": 2400,
-        "Niveau V": 2700
-      },
-      "TP": {
-        "N1": 1750,
-        "N2": 1900,
-        "N3": 2200,
-        "N4": 2600
-      },
-      "Hôtellerie": {
-        "Niveau I": 1650,
-        "Niveau II": 1800,
-        "Niveau III": 2000,
-        "Niveau IV": 2300,
-        "Niveau V": 2600
-      },
-      "Restauration": {
-        "Niveau I": 1650,
-        "Niveau II": 1800,
-        "Niveau III": 2000,
-        "Niveau IV": 2300,
-        "Niveau V": 2700
-      },
-      "Plasturgie": {
-        "Niveau I": 1700,
-        "Niveau II": 1850,
-        "Niveau III": 2100,
-        "Niveau IV": 2400
-      },
-      "Automobile Carrosserie": {
-        "Niveau I": 1700,
-        "Niveau II": 1850,
-        "Niveau III": 2100,
-        "Niveau IV": 2500
-      },
-      "Sylviculture": {
-        "Niveau I": 1750,
-        "Niveau II": 1900,
-        "Niveau III": 2200,
-        "Niveau IV": 2600
-      },
-      "Cartonnerie": {
-        "Niveau I": 1700,
-        "Niveau II": 1850,
-        "Niveau III": 2100,
-        "Niveau IV": 2400
-      },
-      "Autre": {
-        "À définir": 1700
-      }
+      "Bâtiment": { "N1P1": 1823, "N1P2": 1865, "N2P1": 1897, "N2P2": 1897, "N3P1": 2102, "N3P2": 2238, "N4P1": 2395, "N4P2": 2578 },
+      "Métallurgie": { "Niveau I": 1823, "Niveau II": 1910, "Niveau III": 2075, "Niveau IV": 2285, "Niveau V": 2675 },
+      "TP": { "N1": 1916, "N2": 2002, "N3": 2336, "N4": 2758 },
+      "Hôtellerie": { "Niveau I": 1823, "Niveau II": 1850, "Niveau III": 2000, "Niveau IV": 2250, "Niveau V": 2550 },
+      "Restauration": { "Niveau I": 1823, "Niveau II": 1850, "Niveau III": 2000, "Niveau IV": 2250, "Niveau V": 2650 },
+      "Plasturgie": { "Niveau I": 1823, "Niveau II": 1861, "Niveau III": 2029, "Niveau IV": 2404 },
+      "Automobile Carrosserie": { "Niveau I": 1823, "Niveau II": 1850, "Niveau III": 2100, "Niveau IV": 2450 },
+      "Sylviculture": { "Niveau I": 1823, "Niveau II": 1900, "Niveau III": 2150, "Niveau IV": 2550 },
+      "Cartonnerie": { "Niveau I": 1823, "Niveau II": 1850, "Niveau III": 2100, "Niveau IV": 2400 },
+      "Autre": { "À définir": 1823 }
     },
     "HAUTS-DE-FRANCE": {
-      "Bâtiment": {
-        "N1P1": 1750,
-        "N1P2": 1820,
-        "N2P1": 1950,
-        "N2P2": 2080,
-        "N3P1": 2300,
-        "N3P2": 2500,
-        "N4P1": 2800,
-        "N4P2": 3100
-      },
-      "Métallurgie": {
-        "Niveau I": 1700,
-        "Niveau II": 1850,
-        "Niveau III": 2100,
-        "Niveau IV": 2400,
-        "Niveau V": 2700
-      },
-      "TP": {
-        "N1": 1750,
-        "N2": 1900,
-        "N3": 2200,
-        "N4": 2600
-      },
-      "Hôtellerie": {
-        "Niveau I": 1650,
-        "Niveau II": 1800,
-        "Niveau III": 2000,
-        "Niveau IV": 2300,
-        "Niveau V": 2600
-      },
-      "Restauration": {
-        "Niveau I": 1650,
-        "Niveau II": 1800,
-        "Niveau III": 2000,
-        "Niveau IV": 2300,
-        "Niveau V": 2700
-      },
-      "Plasturgie": {
-        "Niveau I": 1700,
-        "Niveau II": 1850,
-        "Niveau III": 2100,
-        "Niveau IV": 2400
-      },
-      "Automobile Carrosserie": {
-        "Niveau I": 1700,
-        "Niveau II": 1850,
-        "Niveau III": 2100,
-        "Niveau IV": 2500
-      },
-      "Sylviculture": {
-        "Niveau I": 1750,
-        "Niveau II": 1900,
-        "Niveau III": 2200,
-        "Niveau IV": 2600
-      },
-      "Cartonnerie": {
-        "Niveau I": 1700,
-        "Niveau II": 1850,
-        "Niveau III": 2100,
-        "Niveau IV": 2400
-      },
-      "Autre": {
-        "À définir": 1700
-      }
+      "Bâtiment": { "N1P1": 1823, "N1P2": 1833, "N2P1": 1930, "N2P2": 1930, "N3P1": 2084, "N3P2": 2240, "N4P1": 2437, "N4P2": 2616 },
+      "Métallurgie": { "Niveau I": 1823, "Niveau II": 1910, "Niveau III": 2075, "Niveau IV": 2285, "Niveau V": 2675 },
+      "TP": { "N1": 1900, "N2": 2000, "N3": 2300, "N4": 2700 },
+      "Hôtellerie": { "Niveau I": 1823, "Niveau II": 1850, "Niveau III": 2000, "Niveau IV": 2250, "Niveau V": 2550 },
+      "Restauration": { "Niveau I": 1823, "Niveau II": 1850, "Niveau III": 2000, "Niveau IV": 2250, "Niveau V": 2650 },
+      "Plasturgie": { "Niveau I": 1823, "Niveau II": 1861, "Niveau III": 2029, "Niveau IV": 2404 },
+      "Automobile Carrosserie": { "Niveau I": 1823, "Niveau II": 1850, "Niveau III": 2100, "Niveau IV": 2450 },
+      "Sylviculture": { "Niveau I": 1823, "Niveau II": 1900, "Niveau III": 2150, "Niveau IV": 2550 },
+      "Cartonnerie": { "Niveau I": 1823, "Niveau II": 1850, "Niveau III": 2100, "Niveau IV": 2400 },
+      "Autre": { "À définir": 1823 }
     },
     "NORMANDIE": {
-      "Bâtiment": {
-        "N1P1": 1750,
-        "N1P2": 1820,
-        "N2P1": 1950,
-        "N2P2": 2080,
-        "N3P1": 2300,
-        "N3P2": 2500,
-        "N4P1": 2800,
-        "N4P2": 3100
-      },
-      "Métallurgie": {
-        "Niveau I": 1700,
-        "Niveau II": 1850,
-        "Niveau III": 2100,
-        "Niveau IV": 2400,
-        "Niveau V": 2700
-      },
-      "TP": {
-        "N1": 1750,
-        "N2": 1900,
-        "N3": 2200,
-        "N4": 2600
-      },
-      "Hôtellerie": {
-        "Niveau I": 1650,
-        "Niveau II": 1800,
-        "Niveau III": 2000,
-        "Niveau IV": 2300,
-        "Niveau V": 2600
-      },
-      "Restauration": {
-        "Niveau I": 1650,
-        "Niveau II": 1800,
-        "Niveau III": 2000,
-        "Niveau IV": 2300,
-        "Niveau V": 2700
-      },
-      "Plasturgie": {
-        "Niveau I": 1700,
-        "Niveau II": 1850,
-        "Niveau III": 2100,
-        "Niveau IV": 2400
-      },
-      "Automobile Carrosserie": {
-        "Niveau I": 1700,
-        "Niveau II": 1850,
-        "Niveau III": 2100,
-        "Niveau IV": 2500
-      },
-      "Sylviculture": {
-        "Niveau I": 1750,
-        "Niveau II": 1900,
-        "Niveau III": 2200,
-        "Niveau IV": 2600
-      },
-      "Cartonnerie": {
-        "Niveau I": 1700,
-        "Niveau II": 1850,
-        "Niveau III": 2100,
-        "Niveau IV": 2400
-      },
-      "Autre": {
-        "À définir": 1700
-      }
+      "Bâtiment": { "N1P1": 1823, "N1P2": 1824, "N2P1": 1862, "N2P2": 1862, "N3P1": 2041, "N3P2": 2185, "N4P1": 2352, "N4P2": 2497 },
+      "Métallurgie": { "Niveau I": 1823, "Niveau II": 1910, "Niveau III": 2075, "Niveau IV": 2285, "Niveau V": 2675 },
+      "TP": { "N1": 1932, "N2": 2033, "N3": 2400, "N4": 2852 },
+      "Hôtellerie": { "Niveau I": 1823, "Niveau II": 1850, "Niveau III": 2000, "Niveau IV": 2250, "Niveau V": 2550 },
+      "Restauration": { "Niveau I": 1823, "Niveau II": 1850, "Niveau III": 2000, "Niveau IV": 2250, "Niveau V": 2650 },
+      "Plasturgie": { "Niveau I": 1823, "Niveau II": 1861, "Niveau III": 2029, "Niveau IV": 2404 },
+      "Automobile Carrosserie": { "Niveau I": 1823, "Niveau II": 1850, "Niveau III": 2100, "Niveau IV": 2450 },
+      "Sylviculture": { "Niveau I": 1823, "Niveau II": 1900, "Niveau III": 2150, "Niveau IV": 2550 },
+      "Cartonnerie": { "Niveau I": 1823, "Niveau II": 1850, "Niveau III": 2100, "Niveau IV": 2400 },
+      "Autre": { "À définir": 1823 }
     },
     "NOUVELLE-AQUITAINE": {
-      "Bâtiment": {
-        "N1P1": 1750,
-        "N1P2": 1820,
-        "N2P1": 1950,
-        "N2P2": 2080,
-        "N3P1": 2300,
-        "N3P2": 2500,
-        "N4P1": 2800,
-        "N4P2": 3100
-      },
-      "Métallurgie": {
-        "Niveau I": 1700,
-        "Niveau II": 1850,
-        "Niveau III": 2100,
-        "Niveau IV": 2400,
-        "Niveau V": 2700
-      },
-      "TP": {
-        "N1": 1750,
-        "N2": 1900,
-        "N3": 2200,
-        "N4": 2600
-      },
-      "Hôtellerie": {
-        "Niveau I": 1650,
-        "Niveau II": 1800,
-        "Niveau III": 2000,
-        "Niveau IV": 2300,
-        "Niveau V": 2600
-      },
-      "Restauration": {
-        "Niveau I": 1650,
-        "Niveau II": 1800,
-        "Niveau III": 2000,
-        "Niveau IV": 2300,
-        "Niveau V": 2700
-      },
-      "Plasturgie": {
-        "Niveau I": 1700,
-        "Niveau II": 1850,
-        "Niveau III": 2100,
-        "Niveau IV": 2400
-      },
-      "Automobile Carrosserie": {
-        "Niveau I": 1700,
-        "Niveau II": 1850,
-        "Niveau III": 2100,
-        "Niveau IV": 2500
-      },
-      "Sylviculture": {
-        "Niveau I": 1750,
-        "Niveau II": 1900,
-        "Niveau III": 2200,
-        "Niveau IV": 2600
-      },
-      "Cartonnerie": {
-        "Niveau I": 1700,
-        "Niveau II": 1850,
-        "Niveau III": 2100,
-        "Niveau IV": 2400
-      },
-      "Autre": {
-        "À définir": 1700
-      }
+      "Bâtiment": { "N1P1": 1838, "N1P2": 1863, "N2P1": 1913, "N2P2": 1913, "N3P1": 2073, "N3P2": 2230, "N4P1": 2399, "N4P2": 2560 },
+      "Métallurgie": { "Niveau I": 1823, "Niveau II": 1910, "Niveau III": 2075, "Niveau IV": 2285, "Niveau V": 2675 },
+      "TP": { "N1": 1880, "N2": 1962, "N3": 2341, "N4": 2759 },
+      "Hôtellerie": { "Niveau I": 1823, "Niveau II": 1850, "Niveau III": 2000, "Niveau IV": 2250, "Niveau V": 2550 },
+      "Restauration": { "Niveau I": 1823, "Niveau II": 1850, "Niveau III": 2000, "Niveau IV": 2250, "Niveau V": 2650 },
+      "Plasturgie": { "Niveau I": 1823, "Niveau II": 1861, "Niveau III": 2029, "Niveau IV": 2404 },
+      "Automobile Carrosserie": { "Niveau I": 1823, "Niveau II": 1850, "Niveau III": 2100, "Niveau IV": 2450 },
+      "Sylviculture": { "Niveau I": 1823, "Niveau II": 1900, "Niveau III": 2150, "Niveau IV": 2550 },
+      "Cartonnerie": { "Niveau I": 1823, "Niveau II": 1850, "Niveau III": 2100, "Niveau IV": 2400 },
+      "Autre": { "À définir": 1823 }
     },
     "OCCITANIE": {
-      "Bâtiment": {
-        "N1P1": 1750,
-        "N1P2": 1820,
-        "N2P1": 1950,
-        "N2P2": 2080,
-        "N3P1": 2300,
-        "N3P2": 2500,
-        "N4P1": 2800,
-        "N4P2": 3100
-      },
-      "Métallurgie": {
-        "Niveau I": 1700,
-        "Niveau II": 1850,
-        "Niveau III": 2100,
-        "Niveau IV": 2400,
-        "Niveau V": 2700
-      },
-      "TP": {
-        "N1": 1750,
-        "N2": 1900,
-        "N3": 2200,
-        "N4": 2600
-      },
-      "Hôtellerie": {
-        "Niveau I": 1650,
-        "Niveau II": 1800,
-        "Niveau III": 2000,
-        "Niveau IV": 2300,
-        "Niveau V": 2600
-      },
-      "Restauration": {
-        "Niveau I": 1650,
-        "Niveau II": 1800,
-        "Niveau III": 2000,
-        "Niveau IV": 2300,
-        "Niveau V": 2700
-      },
-      "Plasturgie": {
-        "Niveau I": 1700,
-        "Niveau II": 1850,
-        "Niveau III": 2100,
-        "Niveau IV": 2400
-      },
-      "Automobile Carrosserie": {
-        "Niveau I": 1700,
-        "Niveau II": 1850,
-        "Niveau III": 2100,
-        "Niveau IV": 2500
-      },
-      "Sylviculture": {
-        "Niveau I": 1750,
-        "Niveau II": 1900,
-        "Niveau III": 2200,
-        "Niveau IV": 2600
-      },
-      "Cartonnerie": {
-        "Niveau I": 1700,
-        "Niveau II": 1850,
-        "Niveau III": 2100,
-        "Niveau IV": 2400
-      },
-      "Autre": {
-        "À définir": 1700
-      }
+      "Bâtiment": { "N1P1": 1823, "N1P2": 1823, "N2P1": 1867, "N2P2": 1867, "N3P1": 2046, "N3P2": 2207, "N4P1": 2336, "N4P2": 2500 },
+      "Métallurgie": { "Niveau I": 1823, "Niveau II": 1910, "Niveau III": 2075, "Niveau IV": 2285, "Niveau V": 2675 },
+      "TP": { "N1": 1873, "N2": 1990, "N3": 2354, "N4": 2744 },
+      "Hôtellerie": { "Niveau I": 1823, "Niveau II": 1850, "Niveau III": 2000, "Niveau IV": 2300, "Niveau V": 2600 },
+      "Restauration": { "Niveau I": 1823, "Niveau II": 1850, "Niveau III": 2000, "Niveau IV": 2300, "Niveau V": 2700 },
+      "Plasturgie": { "Niveau I": 1823, "Niveau II": 1861, "Niveau III": 2029, "Niveau IV": 2404 },
+      "Automobile Carrosserie": { "Niveau I": 1823, "Niveau II": 1850, "Niveau III": 2100, "Niveau IV": 2500 },
+      "Sylviculture": { "Niveau I": 1823, "Niveau II": 1900, "Niveau III": 2200, "Niveau IV": 2600 },
+      "Cartonnerie": { "Niveau I": 1823, "Niveau II": 1850, "Niveau III": 2100, "Niveau IV": 2400 },
+      "Autre": { "À définir": 1823 }
     },
     "PAYS DE LA LOIRE": {
-      "Bâtiment": {
-        "N1P1": 1750,
-        "N1P2": 1820,
-        "N2P1": 1950,
-        "N2P2": 2080,
-        "N3P1": 2300,
-        "N3P2": 2500,
-        "N4P1": 2800,
-        "N4P2": 3100
-      },
-      "Métallurgie": {
-        "Niveau I": 1700,
-        "Niveau II": 1850,
-        "Niveau III": 2100,
-        "Niveau IV": 2400,
-        "Niveau V": 2700
-      },
-      "TP": {
-        "N1": 1750,
-        "N2": 1900,
-        "N3": 2200,
-        "N4": 2600
-      },
-      "Hôtellerie": {
-        "Niveau I": 1650,
-        "Niveau II": 1800,
-        "Niveau III": 2000,
-        "Niveau IV": 2300,
-        "Niveau V": 2600
-      },
-      "Restauration": {
-        "Niveau I": 1650,
-        "Niveau II": 1800,
-        "Niveau III": 2000,
-        "Niveau IV": 2300,
-        "Niveau V": 2700
-      },
-      "Plasturgie": {
-        "Niveau I": 1700,
-        "Niveau II": 1850,
-        "Niveau III": 2100,
-        "Niveau IV": 2400
-      },
-      "Automobile Carrosserie": {
-        "Niveau I": 1700,
-        "Niveau II": 1850,
-        "Niveau III": 2100,
-        "Niveau IV": 2500
-      },
-      "Sylviculture": {
-        "Niveau I": 1750,
-        "Niveau II": 1900,
-        "Niveau III": 2200,
-        "Niveau IV": 2600
-      },
-      "Cartonnerie": {
-        "Niveau I": 1700,
-        "Niveau II": 1850,
-        "Niveau III": 2100,
-        "Niveau IV": 2400
-      },
-      "Autre": {
-        "À définir": 1700
-      }
+      "Bâtiment": { "N1P1": 1823, "N1P2": 1823, "N2P1": 1828, "N2P2": 1828, "N3P1": 2023, "N3P2": 2201, "N4P1": 2378, "N4P2": 2554 },
+      "Métallurgie": { "Niveau I": 1823, "Niveau II": 1910, "Niveau III": 2075, "Niveau IV": 2285, "Niveau V": 2675 },
+      "TP": { "N1": 1909, "N2": 2008, "N3": 2377, "N4": 2809 },
+      "Hôtellerie": { "Niveau I": 1823, "Niveau II": 1850, "Niveau III": 2000, "Niveau IV": 2250, "Niveau V": 2550 },
+      "Restauration": { "Niveau I": 1823, "Niveau II": 1850, "Niveau III": 2000, "Niveau IV": 2250, "Niveau V": 2650 },
+      "Plasturgie": { "Niveau I": 1823, "Niveau II": 1861, "Niveau III": 2029, "Niveau IV": 2404 },
+      "Automobile Carrosserie": { "Niveau I": 1823, "Niveau II": 1850, "Niveau III": 2100, "Niveau IV": 2450 },
+      "Sylviculture": { "Niveau I": 1823, "Niveau II": 1900, "Niveau III": 2150, "Niveau IV": 2550 },
+      "Cartonnerie": { "Niveau I": 1823, "Niveau II": 1850, "Niveau III": 2100, "Niveau IV": 2400 },
+      "Autre": { "À définir": 1823 }
     }
   },
   "base_horaire_standard": 151.67,
   "metadata": {
-    "version": "1.0.0",
-    "derniere_modification": "2024-12-20",
-    "modifie_par": "Initialisation système",
+    "version": "2.0.0",
+    "derniere_modification": "2026-01-27",
+    "modifie_par": "Claude Code",
+    "source": "code.travail.gouv.fr - Données officielles Janvier 2026",
     "description": "Grilles de salaires minimaux conventionnels par région, secteur et classification (en euros brut mensuel). Base horaire standard : 151.67h/mois.",
-    "note_importante": "Ces grilles doivent être mises à jour annuellement lors de la publication des avenants salaires des conventions collectives (généralement en janvier)."
+    "note_importante": "Données officielles IDCC 1596/1597 (Bâtiment), 1702 (TP), 3248 (Métallurgie), 292 (Plasturgie). Plancher SMIC 2026 : 1823€.",
+    "historique": [
+      "2026-01-27: Mise à jour avec données officielles code.travail.gouv.fr (SMIC 1823€)",
+      "2024-12-20: Initialisation système"
+    ]
   }
 }
