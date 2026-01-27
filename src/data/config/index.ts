@@ -1,5 +1,6 @@
 // Configuration centralisée pour le système de devis YOJOB
 // Ce fichier remplace les imports JSON qui ne sont pas supportés
+// Mise à jour: 2026-01-27 avec données officielles code.travail.gouv.fr
 
 export const configData = {
   pays: {
@@ -16,7 +17,7 @@ export const configData = {
       { code: "SI", label: "Slovénie", flag: "🇸🇮", actif: true, ordre: 10 }
     ]
   },
-  
+
   coefficients: {
     coefficients: {
       "Bâtiment": {
@@ -163,14 +164,14 @@ export const configData = {
       }
     }
   },
-  
+
   facteurs: {
     facteurs: {
       "RO": { code: "RO", label: "Roumanie", facteur: 1.00, description: "Coefficient de référence" },
       "PL": { code: "PL", label: "Pologne", facteur: 1.02, description: "Légère majoration liée aux coûts de détachement" },
-      "PT": { code: "PT", label: "Portugal", facteur: 1.05, description: "Majoration standard pour pays d'Europe du Sud" },
+      "PT": { code: "PT", label: "Portugal", facteur: 1.07, description: "Majoration pour pays d'Europe du Sud (révisé Jan 2026)" },
       "ES": { code: "ES", label: "Espagne", facteur: 1.06, description: "Majoration standard pour pays d'Europe du Sud" },
-      "BG": { code: "BG", label: "Bulgarie", facteur: 0.98, description: "Légère réduction liée aux coûts de détachement" },
+      "BG": { code: "BG", label: "Bulgarie", facteur: 1.00, description: "Coefficient de référence (révisé Jan 2026)" },
       "HU": { code: "HU", label: "Hongrie", facteur: 1.01, description: "Coefficient proche de la référence" },
       "SK": { code: "SK", label: "Slovaquie", facteur: 1.00, description: "Coefficient de référence" },
       "CZ": { code: "CZ", label: "Tchéquie", facteur: 1.03, description: "Légère majoration liée aux coûts de détachement" },
@@ -178,36 +179,169 @@ export const configData = {
       "SI": { code: "SI", label: "Slovénie", facteur: 1.04, description: "Majoration liée aux coûts de détachement" }
     }
   },
-  
+
   salaires: {
     salaires: {
       "ÎLE-DE-FRANCE": {
-        "Bâtiment": { "N1P1": 1850, "N1P2": 1920, "N2P1": 2050, "N2P2": 2180, "N3P1": 2400, "N3P2": 2600, "N4P1": 2900, "N4P2": 3200 },
-        "Métallurgie": { "Niveau I": 1800, "Niveau II": 1950, "Niveau III": 2200, "Niveau IV": 2500, "Niveau V": 2800 },
-        "TP": { "N1": 1850, "N2": 2000, "N3": 2300, "N4": 2700 },
-        "Hôtellerie": { "Niveau I": 1750, "Niveau II": 1900, "Niveau III": 2100, "Niveau IV": 2400, "Niveau V": 2700 },
-        "Restauration": { "Niveau I": 1750, "Niveau II": 1900, "Niveau III": 2100, "Niveau IV": 2400, "Niveau V": 2800 },
-        "Plasturgie": { "Niveau I": 1800, "Niveau II": 1950, "Niveau III": 2200, "Niveau IV": 2500 },
-        "Automobile Carrosserie": { "Niveau I": 1800, "Niveau II": 1950, "Niveau III": 2200, "Niveau IV": 2600 },
+        "Bâtiment": { "N1P1": 1823, "N1P2": 1835, "N2P1": 1876, "N2P2": 1876, "N3P1": 2011, "N3P2": 2133, "N4P1": 2260, "N4P2": 2475 },
+        "Métallurgie": { "Niveau I": 1823, "Niveau II": 1910, "Niveau III": 2075, "Niveau IV": 2285, "Niveau V": 2675 },
+        "TP": { "N1": 1920, "N2": 2012, "N3": 2347, "N4": 2802 },
+        "Hôtellerie": { "Niveau I": 1823, "Niveau II": 1900, "Niveau III": 2100, "Niveau IV": 2400, "Niveau V": 2700 },
+        "Restauration": { "Niveau I": 1823, "Niveau II": 1900, "Niveau III": 2100, "Niveau IV": 2400, "Niveau V": 2800 },
+        "Plasturgie": { "Niveau I": 1823, "Niveau II": 1861, "Niveau III": 2029, "Niveau IV": 2404 },
+        "Automobile Carrosserie": { "Niveau I": 1823, "Niveau II": 1950, "Niveau III": 2200, "Niveau IV": 2600 },
         "Sylviculture": { "Niveau I": 1850, "Niveau II": 2000, "Niveau III": 2300, "Niveau IV": 2700 },
-        "Cartonnerie": { "Niveau I": 1800, "Niveau II": 1950, "Niveau III": 2200, "Niveau IV": 2500 },
-        "Autre": { "À définir": 1800 }
+        "Cartonnerie": { "Niveau I": 1823, "Niveau II": 1950, "Niveau III": 2200, "Niveau IV": 2500 },
+        "Autre": { "À définir": 1823 }
+      },
+      "PROVENCE-ALPES-CÔTE D'AZUR": {
+        "Bâtiment": { "N1P1": 1838, "N1P2": 1868, "N2P1": 1975, "N2P2": 1975, "N3P1": 2171, "N3P2": 2341, "N4P1": 2510, "N4P2": 2680 },
+        "Métallurgie": { "Niveau I": 1823, "Niveau II": 1910, "Niveau III": 2075, "Niveau IV": 2285, "Niveau V": 2675 },
+        "TP": { "N1": 1894, "N2": 2033, "N3": 2400, "N4": 2798 },
+        "Hôtellerie": { "Niveau I": 1823, "Niveau II": 1850, "Niveau III": 2050, "Niveau IV": 2350, "Niveau V": 2650 },
+        "Restauration": { "Niveau I": 1823, "Niveau II": 1850, "Niveau III": 2050, "Niveau IV": 2350, "Niveau V": 2750 },
+        "Plasturgie": { "Niveau I": 1823, "Niveau II": 1861, "Niveau III": 2029, "Niveau IV": 2404 },
+        "Automobile Carrosserie": { "Niveau I": 1823, "Niveau II": 1900, "Niveau III": 2150, "Niveau IV": 2550 },
+        "Sylviculture": { "Niveau I": 1823, "Niveau II": 1950, "Niveau III": 2250, "Niveau IV": 2650 },
+        "Cartonnerie": { "Niveau I": 1823, "Niveau II": 1900, "Niveau III": 2150, "Niveau IV": 2450 },
+        "Autre": { "À définir": 1823 }
       },
       "AUVERGNE-RHÔNE-ALPES": {
-        "Bâtiment": { "N1P1": 1800, "N1P2": 1870, "N2P1": 2000, "N2P2": 2130, "N3P1": 2350, "N3P2": 2550, "N4P1": 2850, "N4P2": 3150 },
-        "Métallurgie": { "Niveau I": 1750, "Niveau II": 1900, "Niveau III": 2150, "Niveau IV": 2450, "Niveau V": 2750 },
-        "TP": { "N1": 1800, "N2": 1950, "N3": 2250, "N4": 2650 },
-        "Hôtellerie": { "Niveau I": 1700, "Niveau II": 1850, "Niveau III": 2050, "Niveau IV": 2350, "Niveau V": 2650 },
-        "Restauration": { "Niveau I": 1700, "Niveau II": 1850, "Niveau III": 2050, "Niveau IV": 2350, "Niveau V": 2750 },
-        "Plasturgie": { "Niveau I": 1750, "Niveau II": 1900, "Niveau III": 2150, "Niveau IV": 2450 },
-        "Automobile Carrosserie": { "Niveau I": 1750, "Niveau II": 1900, "Niveau III": 2150, "Niveau IV": 2550 },
-        "Sylviculture": { "Niveau I": 1800, "Niveau II": 1950, "Niveau III": 2250, "Niveau IV": 2650 },
-        "Cartonnerie": { "Niveau I": 1750, "Niveau II": 1900, "Niveau III": 2150, "Niveau IV": 2450 },
-        "Autre": { "À définir": 1750 }
+        "Bâtiment": { "N1P1": 1823, "N1P2": 1823, "N2P1": 1865, "N2P2": 1865, "N3P1": 2060, "N3P2": 2235, "N4P1": 2404, "N4P2": 2549 },
+        "Métallurgie": { "Niveau I": 1823, "Niveau II": 1910, "Niveau III": 2075, "Niveau IV": 2285, "Niveau V": 2675 },
+        "TP": { "N1": 1924, "N2": 2052, "N3": 2366, "N4": 2771 },
+        "Hôtellerie": { "Niveau I": 1823, "Niveau II": 1800, "Niveau III": 2000, "Niveau IV": 2300, "Niveau V": 2600 },
+        "Restauration": { "Niveau I": 1823, "Niveau II": 1800, "Niveau III": 2000, "Niveau IV": 2300, "Niveau V": 2700 },
+        "Plasturgie": { "Niveau I": 1823, "Niveau II": 1861, "Niveau III": 2029, "Niveau IV": 2404 },
+        "Automobile Carrosserie": { "Niveau I": 1823, "Niveau II": 1850, "Niveau III": 2100, "Niveau IV": 2500 },
+        "Sylviculture": { "Niveau I": 1823, "Niveau II": 1900, "Niveau III": 2200, "Niveau IV": 2600 },
+        "Cartonnerie": { "Niveau I": 1823, "Niveau II": 1850, "Niveau III": 2100, "Niveau IV": 2400 },
+        "Autre": { "À définir": 1823 }
+      },
+      "BOURGOGNE-FRANCHE-COMTÉ": {
+        "Bâtiment": { "N1P1": 1823, "N1P2": 1840, "N2P1": 1874, "N2P2": 1874, "N3P1": 2051, "N3P2": 2193, "N4P1": 2335, "N4P2": 2477 },
+        "Métallurgie": { "Niveau I": 1823, "Niveau II": 1910, "Niveau III": 2075, "Niveau IV": 2285, "Niveau V": 2675 },
+        "TP": { "N1": 1900, "N2": 2000, "N3": 2300, "N4": 2700 },
+        "Hôtellerie": { "Niveau I": 1823, "Niveau II": 1850, "Niveau III": 2000, "Niveau IV": 2250, "Niveau V": 2550 },
+        "Restauration": { "Niveau I": 1823, "Niveau II": 1850, "Niveau III": 2000, "Niveau IV": 2250, "Niveau V": 2650 },
+        "Plasturgie": { "Niveau I": 1823, "Niveau II": 1861, "Niveau III": 2029, "Niveau IV": 2404 },
+        "Automobile Carrosserie": { "Niveau I": 1823, "Niveau II": 1850, "Niveau III": 2100, "Niveau IV": 2450 },
+        "Sylviculture": { "Niveau I": 1823, "Niveau II": 1900, "Niveau III": 2150, "Niveau IV": 2550 },
+        "Cartonnerie": { "Niveau I": 1823, "Niveau II": 1850, "Niveau III": 2100, "Niveau IV": 2400 },
+        "Autre": { "À définir": 1823 }
+      },
+      "BRETAGNE": {
+        "Bâtiment": { "N1P1": 1845, "N1P2": 1850, "N2P1": 1899, "N2P2": 1899, "N3P1": 2044, "N3P2": 2213, "N4P1": 2381, "N4P2": 2549 },
+        "Métallurgie": { "Niveau I": 1823, "Niveau II": 1910, "Niveau III": 2075, "Niveau IV": 2285, "Niveau V": 2675 },
+        "TP": { "N1": 1936, "N2": 1997, "N3": 2354, "N4": 2801 },
+        "Hôtellerie": { "Niveau I": 1823, "Niveau II": 1850, "Niveau III": 2000, "Niveau IV": 2250, "Niveau V": 2550 },
+        "Restauration": { "Niveau I": 1823, "Niveau II": 1850, "Niveau III": 2000, "Niveau IV": 2250, "Niveau V": 2650 },
+        "Plasturgie": { "Niveau I": 1823, "Niveau II": 1861, "Niveau III": 2029, "Niveau IV": 2404 },
+        "Automobile Carrosserie": { "Niveau I": 1823, "Niveau II": 1850, "Niveau III": 2100, "Niveau IV": 2450 },
+        "Sylviculture": { "Niveau I": 1823, "Niveau II": 1900, "Niveau III": 2150, "Niveau IV": 2550 },
+        "Cartonnerie": { "Niveau I": 1823, "Niveau II": 1850, "Niveau III": 2100, "Niveau IV": 2400 },
+        "Autre": { "À définir": 1823 }
+      },
+      "CENTRE-VAL DE LOIRE": {
+        "Bâtiment": { "N1P1": 1823, "N1P2": 1831, "N2P1": 1880, "N2P2": 1884, "N3P1": 2027, "N3P2": 2144, "N4P1": 2261, "N4P2": 2378 },
+        "Métallurgie": { "Niveau I": 1823, "Niveau II": 1910, "Niveau III": 2075, "Niveau IV": 2285, "Niveau V": 2675 },
+        "TP": { "N1": 1823, "N2": 1888, "N3": 2092, "N4": 2391 },
+        "Hôtellerie": { "Niveau I": 1823, "Niveau II": 1850, "Niveau III": 2000, "Niveau IV": 2250, "Niveau V": 2550 },
+        "Restauration": { "Niveau I": 1823, "Niveau II": 1850, "Niveau III": 2000, "Niveau IV": 2250, "Niveau V": 2650 },
+        "Plasturgie": { "Niveau I": 1823, "Niveau II": 1861, "Niveau III": 2029, "Niveau IV": 2404 },
+        "Automobile Carrosserie": { "Niveau I": 1823, "Niveau II": 1850, "Niveau III": 2100, "Niveau IV": 2450 },
+        "Sylviculture": { "Niveau I": 1823, "Niveau II": 1900, "Niveau III": 2150, "Niveau IV": 2550 },
+        "Cartonnerie": { "Niveau I": 1823, "Niveau II": 1850, "Niveau III": 2100, "Niveau IV": 2400 },
+        "Autre": { "À définir": 1823 }
+      },
+      "CORSE": {
+        "Bâtiment": { "N1P1": 1823, "N1P2": 1823, "N2P1": 1884, "N2P2": 1884, "N3P1": 2101, "N3P2": 2275, "N4P1": 2449, "N4P2": 2622 },
+        "Métallurgie": { "Niveau I": 1823, "Niveau II": 1910, "Niveau III": 2075, "Niveau IV": 2285, "Niveau V": 2675 },
+        "TP": { "N1": 1823, "N2": 1823, "N3": 1900, "N4": 2119 },
+        "Hôtellerie": { "Niveau I": 1823, "Niveau II": 1850, "Niveau III": 2050, "Niveau IV": 2300, "Niveau V": 2600 },
+        "Restauration": { "Niveau I": 1823, "Niveau II": 1850, "Niveau III": 2050, "Niveau IV": 2300, "Niveau V": 2700 },
+        "Plasturgie": { "Niveau I": 1823, "Niveau II": 1861, "Niveau III": 2029, "Niveau IV": 2404 },
+        "Automobile Carrosserie": { "Niveau I": 1823, "Niveau II": 1850, "Niveau III": 2100, "Niveau IV": 2500 },
+        "Sylviculture": { "Niveau I": 1823, "Niveau II": 1900, "Niveau III": 2200, "Niveau IV": 2600 },
+        "Cartonnerie": { "Niveau I": 1823, "Niveau II": 1850, "Niveau III": 2100, "Niveau IV": 2400 },
+        "Autre": { "À définir": 1823 }
+      },
+      "GRAND EST": {
+        "Bâtiment": { "N1P1": 1823, "N1P2": 1865, "N2P1": 1897, "N2P2": 1897, "N3P1": 2102, "N3P2": 2238, "N4P1": 2395, "N4P2": 2578 },
+        "Métallurgie": { "Niveau I": 1823, "Niveau II": 1910, "Niveau III": 2075, "Niveau IV": 2285, "Niveau V": 2675 },
+        "TP": { "N1": 1916, "N2": 2002, "N3": 2336, "N4": 2758 },
+        "Hôtellerie": { "Niveau I": 1823, "Niveau II": 1850, "Niveau III": 2000, "Niveau IV": 2250, "Niveau V": 2550 },
+        "Restauration": { "Niveau I": 1823, "Niveau II": 1850, "Niveau III": 2000, "Niveau IV": 2250, "Niveau V": 2650 },
+        "Plasturgie": { "Niveau I": 1823, "Niveau II": 1861, "Niveau III": 2029, "Niveau IV": 2404 },
+        "Automobile Carrosserie": { "Niveau I": 1823, "Niveau II": 1850, "Niveau III": 2100, "Niveau IV": 2450 },
+        "Sylviculture": { "Niveau I": 1823, "Niveau II": 1900, "Niveau III": 2150, "Niveau IV": 2550 },
+        "Cartonnerie": { "Niveau I": 1823, "Niveau II": 1850, "Niveau III": 2100, "Niveau IV": 2400 },
+        "Autre": { "À définir": 1823 }
+      },
+      "HAUTS-DE-FRANCE": {
+        "Bâtiment": { "N1P1": 1823, "N1P2": 1833, "N2P1": 1930, "N2P2": 1930, "N3P1": 2084, "N3P2": 2240, "N4P1": 2437, "N4P2": 2616 },
+        "Métallurgie": { "Niveau I": 1823, "Niveau II": 1910, "Niveau III": 2075, "Niveau IV": 2285, "Niveau V": 2675 },
+        "TP": { "N1": 1900, "N2": 2000, "N3": 2300, "N4": 2700 },
+        "Hôtellerie": { "Niveau I": 1823, "Niveau II": 1850, "Niveau III": 2000, "Niveau IV": 2250, "Niveau V": 2550 },
+        "Restauration": { "Niveau I": 1823, "Niveau II": 1850, "Niveau III": 2000, "Niveau IV": 2250, "Niveau V": 2650 },
+        "Plasturgie": { "Niveau I": 1823, "Niveau II": 1861, "Niveau III": 2029, "Niveau IV": 2404 },
+        "Automobile Carrosserie": { "Niveau I": 1823, "Niveau II": 1850, "Niveau III": 2100, "Niveau IV": 2450 },
+        "Sylviculture": { "Niveau I": 1823, "Niveau II": 1900, "Niveau III": 2150, "Niveau IV": 2550 },
+        "Cartonnerie": { "Niveau I": 1823, "Niveau II": 1850, "Niveau III": 2100, "Niveau IV": 2400 },
+        "Autre": { "À définir": 1823 }
+      },
+      "NORMANDIE": {
+        "Bâtiment": { "N1P1": 1823, "N1P2": 1824, "N2P1": 1862, "N2P2": 1862, "N3P1": 2041, "N3P2": 2185, "N4P1": 2352, "N4P2": 2497 },
+        "Métallurgie": { "Niveau I": 1823, "Niveau II": 1910, "Niveau III": 2075, "Niveau IV": 2285, "Niveau V": 2675 },
+        "TP": { "N1": 1932, "N2": 2033, "N3": 2400, "N4": 2852 },
+        "Hôtellerie": { "Niveau I": 1823, "Niveau II": 1850, "Niveau III": 2000, "Niveau IV": 2250, "Niveau V": 2550 },
+        "Restauration": { "Niveau I": 1823, "Niveau II": 1850, "Niveau III": 2000, "Niveau IV": 2250, "Niveau V": 2650 },
+        "Plasturgie": { "Niveau I": 1823, "Niveau II": 1861, "Niveau III": 2029, "Niveau IV": 2404 },
+        "Automobile Carrosserie": { "Niveau I": 1823, "Niveau II": 1850, "Niveau III": 2100, "Niveau IV": 2450 },
+        "Sylviculture": { "Niveau I": 1823, "Niveau II": 1900, "Niveau III": 2150, "Niveau IV": 2550 },
+        "Cartonnerie": { "Niveau I": 1823, "Niveau II": 1850, "Niveau III": 2100, "Niveau IV": 2400 },
+        "Autre": { "À définir": 1823 }
+      },
+      "NOUVELLE-AQUITAINE": {
+        "Bâtiment": { "N1P1": 1838, "N1P2": 1863, "N2P1": 1913, "N2P2": 1913, "N3P1": 2073, "N3P2": 2230, "N4P1": 2399, "N4P2": 2560 },
+        "Métallurgie": { "Niveau I": 1823, "Niveau II": 1910, "Niveau III": 2075, "Niveau IV": 2285, "Niveau V": 2675 },
+        "TP": { "N1": 1880, "N2": 1962, "N3": 2341, "N4": 2759 },
+        "Hôtellerie": { "Niveau I": 1823, "Niveau II": 1850, "Niveau III": 2000, "Niveau IV": 2250, "Niveau V": 2550 },
+        "Restauration": { "Niveau I": 1823, "Niveau II": 1850, "Niveau III": 2000, "Niveau IV": 2250, "Niveau V": 2650 },
+        "Plasturgie": { "Niveau I": 1823, "Niveau II": 1861, "Niveau III": 2029, "Niveau IV": 2404 },
+        "Automobile Carrosserie": { "Niveau I": 1823, "Niveau II": 1850, "Niveau III": 2100, "Niveau IV": 2450 },
+        "Sylviculture": { "Niveau I": 1823, "Niveau II": 1900, "Niveau III": 2150, "Niveau IV": 2550 },
+        "Cartonnerie": { "Niveau I": 1823, "Niveau II": 1850, "Niveau III": 2100, "Niveau IV": 2400 },
+        "Autre": { "À définir": 1823 }
+      },
+      "OCCITANIE": {
+        "Bâtiment": { "N1P1": 1823, "N1P2": 1823, "N2P1": 1867, "N2P2": 1867, "N3P1": 2046, "N3P2": 2207, "N4P1": 2336, "N4P2": 2500 },
+        "Métallurgie": { "Niveau I": 1823, "Niveau II": 1910, "Niveau III": 2075, "Niveau IV": 2285, "Niveau V": 2675 },
+        "TP": { "N1": 1873, "N2": 1990, "N3": 2354, "N4": 2744 },
+        "Hôtellerie": { "Niveau I": 1823, "Niveau II": 1850, "Niveau III": 2000, "Niveau IV": 2300, "Niveau V": 2600 },
+        "Restauration": { "Niveau I": 1823, "Niveau II": 1850, "Niveau III": 2000, "Niveau IV": 2300, "Niveau V": 2700 },
+        "Plasturgie": { "Niveau I": 1823, "Niveau II": 1861, "Niveau III": 2029, "Niveau IV": 2404 },
+        "Automobile Carrosserie": { "Niveau I": 1823, "Niveau II": 1850, "Niveau III": 2100, "Niveau IV": 2500 },
+        "Sylviculture": { "Niveau I": 1823, "Niveau II": 1900, "Niveau III": 2200, "Niveau IV": 2600 },
+        "Cartonnerie": { "Niveau I": 1823, "Niveau II": 1850, "Niveau III": 2100, "Niveau IV": 2400 },
+        "Autre": { "À définir": 1823 }
+      },
+      "PAYS DE LA LOIRE": {
+        "Bâtiment": { "N1P1": 1823, "N1P2": 1823, "N2P1": 1828, "N2P2": 1828, "N3P1": 2023, "N3P2": 2201, "N4P1": 2378, "N4P2": 2554 },
+        "Métallurgie": { "Niveau I": 1823, "Niveau II": 1910, "Niveau III": 2075, "Niveau IV": 2285, "Niveau V": 2675 },
+        "TP": { "N1": 1909, "N2": 2008, "N3": 2377, "N4": 2809 },
+        "Hôtellerie": { "Niveau I": 1823, "Niveau II": 1850, "Niveau III": 2000, "Niveau IV": 2250, "Niveau V": 2550 },
+        "Restauration": { "Niveau I": 1823, "Niveau II": 1850, "Niveau III": 2000, "Niveau IV": 2250, "Niveau V": 2650 },
+        "Plasturgie": { "Niveau I": 1823, "Niveau II": 1861, "Niveau III": 2029, "Niveau IV": 2404 },
+        "Automobile Carrosserie": { "Niveau I": 1823, "Niveau II": 1850, "Niveau III": 2100, "Niveau IV": 2450 },
+        "Sylviculture": { "Niveau I": 1823, "Niveau II": 1900, "Niveau III": 2150, "Niveau IV": 2550 },
+        "Cartonnerie": { "Niveau I": 1823, "Niveau II": 1850, "Niveau III": 2100, "Niveau IV": 2400 },
+        "Autre": { "À définir": 1823 }
       }
-    }
+    },
+    base_horaire_standard: 151.67
   },
-  
+
   supplements: {
     supplements_horaires: {
       hebergement: { montant: 3.50, unite: "€/h", description: "Supplément horaire pour hébergement pris en charge par l'ETT" },
@@ -215,28 +349,160 @@ export const configData = {
     },
     paniers_repas: {
       "ÎLE-DE-FRANCE": {
-        "Bâtiment": 10.50,
-        "Métallurgie": 10.00,
-        "TP": 10.50,
-        "Hôtellerie": 9.50,
-        "Restauration": 9.50,
-        "Plasturgie": 10.00,
-        "Automobile Carrosserie": 10.00,
-        "Sylviculture": 10.00,
-        "Cartonnerie": 10.00,
-        "Autre": 10.00
+        "Bâtiment": 12.50,
+        "Métallurgie": 5.94,
+        "TP": 12.50,
+        "Hôtellerie": 5.94,
+        "Restauration": 5.94,
+        "Plasturgie": 5.94,
+        "Automobile Carrosserie": 5.94,
+        "Sylviculture": 9.00,
+        "Cartonnerie": 5.94,
+        "Autre": 8.00
+      },
+      "PROVENCE-ALPES-CÔTE D'AZUR": {
+        "Bâtiment": 11.50,
+        "Métallurgie": 5.94,
+        "TP": 11.50,
+        "Hôtellerie": 5.94,
+        "Restauration": 5.94,
+        "Plasturgie": 5.94,
+        "Automobile Carrosserie": 5.94,
+        "Sylviculture": 9.00,
+        "Cartonnerie": 5.94,
+        "Autre": 8.00
       },
       "AUVERGNE-RHÔNE-ALPES": {
+        "Bâtiment": 10.50,
+        "Métallurgie": 5.94,
+        "TP": 10.50,
+        "Hôtellerie": 5.94,
+        "Restauration": 5.94,
+        "Plasturgie": 5.94,
+        "Automobile Carrosserie": 5.94,
+        "Sylviculture": 9.00,
+        "Cartonnerie": 5.94,
+        "Autre": 8.00
+      },
+      "BOURGOGNE-FRANCHE-COMTÉ": {
         "Bâtiment": 10.00,
-        "Métallurgie": 9.50,
+        "Métallurgie": 5.94,
         "TP": 10.00,
-        "Hôtellerie": 9.00,
-        "Restauration": 9.00,
-        "Plasturgie": 9.50,
-        "Automobile Carrosserie": 9.50,
-        "Sylviculture": 9.50,
-        "Cartonnerie": 9.50,
-        "Autre": 9.50
+        "Hôtellerie": 5.94,
+        "Restauration": 5.94,
+        "Plasturgie": 5.94,
+        "Automobile Carrosserie": 5.94,
+        "Sylviculture": 9.00,
+        "Cartonnerie": 5.94,
+        "Autre": 8.00
+      },
+      "BRETAGNE": {
+        "Bâtiment": 10.00,
+        "Métallurgie": 5.94,
+        "TP": 10.00,
+        "Hôtellerie": 5.94,
+        "Restauration": 5.94,
+        "Plasturgie": 5.94,
+        "Automobile Carrosserie": 5.94,
+        "Sylviculture": 9.00,
+        "Cartonnerie": 5.94,
+        "Autre": 8.00
+      },
+      "CENTRE-VAL DE LOIRE": {
+        "Bâtiment": 10.00,
+        "Métallurgie": 5.94,
+        "TP": 10.00,
+        "Hôtellerie": 5.94,
+        "Restauration": 5.94,
+        "Plasturgie": 5.94,
+        "Automobile Carrosserie": 5.94,
+        "Sylviculture": 9.00,
+        "Cartonnerie": 5.94,
+        "Autre": 8.00
+      },
+      "CORSE": {
+        "Bâtiment": 10.50,
+        "Métallurgie": 5.94,
+        "TP": 10.50,
+        "Hôtellerie": 5.94,
+        "Restauration": 5.94,
+        "Plasturgie": 5.94,
+        "Automobile Carrosserie": 5.94,
+        "Sylviculture": 9.00,
+        "Cartonnerie": 5.94,
+        "Autre": 8.00
+      },
+      "GRAND EST": {
+        "Bâtiment": 10.00,
+        "Métallurgie": 5.94,
+        "TP": 10.00,
+        "Hôtellerie": 5.94,
+        "Restauration": 5.94,
+        "Plasturgie": 5.94,
+        "Automobile Carrosserie": 5.94,
+        "Sylviculture": 9.00,
+        "Cartonnerie": 5.94,
+        "Autre": 8.00
+      },
+      "HAUTS-DE-FRANCE": {
+        "Bâtiment": 10.00,
+        "Métallurgie": 5.94,
+        "TP": 10.00,
+        "Hôtellerie": 5.94,
+        "Restauration": 5.94,
+        "Plasturgie": 5.94,
+        "Automobile Carrosserie": 5.94,
+        "Sylviculture": 9.00,
+        "Cartonnerie": 5.94,
+        "Autre": 8.00
+      },
+      "NORMANDIE": {
+        "Bâtiment": 10.00,
+        "Métallurgie": 5.94,
+        "TP": 10.00,
+        "Hôtellerie": 5.94,
+        "Restauration": 5.94,
+        "Plasturgie": 5.94,
+        "Automobile Carrosserie": 5.94,
+        "Sylviculture": 9.00,
+        "Cartonnerie": 5.94,
+        "Autre": 8.00
+      },
+      "NOUVELLE-AQUITAINE": {
+        "Bâtiment": 10.00,
+        "Métallurgie": 5.94,
+        "TP": 10.00,
+        "Hôtellerie": 5.94,
+        "Restauration": 5.94,
+        "Plasturgie": 5.94,
+        "Automobile Carrosserie": 5.94,
+        "Sylviculture": 9.00,
+        "Cartonnerie": 5.94,
+        "Autre": 8.00
+      },
+      "OCCITANIE": {
+        "Bâtiment": 10.50,
+        "Métallurgie": 5.94,
+        "TP": 10.50,
+        "Hôtellerie": 5.94,
+        "Restauration": 5.94,
+        "Plasturgie": 5.94,
+        "Automobile Carrosserie": 5.94,
+        "Sylviculture": 9.00,
+        "Cartonnerie": 5.94,
+        "Autre": 8.00
+      },
+      "PAYS DE LA LOIRE": {
+        "Bâtiment": 10.00,
+        "Métallurgie": 5.94,
+        "TP": 10.00,
+        "Hôtellerie": 5.94,
+        "Restauration": 5.94,
+        "Plasturgie": 5.94,
+        "Automobile Carrosserie": 5.94,
+        "Sylviculture": 9.00,
+        "Cartonnerie": 5.94,
+        "Autre": 8.00
       }
     }
   }

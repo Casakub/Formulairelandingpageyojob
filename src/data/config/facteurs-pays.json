@@ -16,7 +16,7 @@
       "code": "PT",
       "label": "Portugal",
       "facteur": 1.07,
-      "description": "Majoration standard pour pays d'Europe du Sud"
+      "description": "Majoration pour pays d'Europe du Sud (révisé Jan 2026)"
     },
     "ES": {
       "code": "ES",
@@ -28,7 +28,7 @@
       "code": "BG",
       "label": "Bulgarie",
       "facteur": 1.00,
-      "description": "Légère réduction liée aux coûts de détachement"
+      "description": "Coefficient de référence (révisé Jan 2026)"
     },
     "HU": {
       "code": "HU",
@@ -62,9 +62,13 @@
     }
   },
   "metadata": {
-    "version": "1.0.0",
+    "version": "1.1.0",
     "derniere_modification": "2026-01-27",
-    "modifie_par": "Initialisation système",
-    "description": "Facteurs multiplicateurs par pays appliqués aux coefficients de base. Formule : Coefficient final = Coefficient base × Facteur pays"
+    "modifie_par": "Claude Code",
+    "description": "Facteurs multiplicateurs par pays appliqués aux coefficients de base. Formule : Coefficient final = Coefficient base × Facteur pays",
+    "historique": [
+      "2026-01-27: PT 1.05→1.07, BG 0.98→1.00 (révision des coûts de détachement)",
+      "2024-12-20: Initialisation système"
+    ]
   }
 }
