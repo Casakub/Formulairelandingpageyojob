@@ -7782,6 +7782,18 @@
   }
 
   @media (hover: hover) {
+    .hover\:border-violet-400\/50:hover {
+      border-color: color-mix(in srgb, oklch(.702 .183 293.541) 50%, transparent);
+    }
+
+    @supports (color: color-mix(in lab, red, red)) {
+      .hover\:border-violet-400\/50:hover {
+        border-color: color-mix(in oklab, var(--color-violet-400) 50%, transparent);
+      }
+    }
+  }
+
+  @media (hover: hover) {
     .hover\:border-white\/20:hover {
       border-color: #fff3;
     }
@@ -8144,6 +8156,18 @@
   @media (hover: hover) {
     .hover\:bg-violet-100:hover {
       background-color: var(--color-violet-100);
+    }
+  }
+
+  @media (hover: hover) {
+    .hover\:bg-violet-500\/20:hover {
+      background-color: color-mix(in srgb, oklch(.606 .25 292.717) 20%, transparent);
+    }
+
+    @supports (color: color-mix(in lab, red, red)) {
+      .hover\:bg-violet-500\/20:hover {
+        background-color: color-mix(in oklab, var(--color-violet-500) 20%, transparent);
+      }
     }
   }
 

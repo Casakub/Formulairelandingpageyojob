@@ -3,7 +3,7 @@ import { Button } from '../ui/button';
 import { Checkbox } from '../ui/checkbox';
 import { Label } from '../ui/label';
 import { useState } from 'react';
-import { ArrowRight, Download, CheckCircle, Building2, User, Briefcase, FileText, Clock } from 'lucide-react';
+import { ArrowRight, Download, CheckCircle, Building2, User, Briefcase, FileText, Clock, Edit2, Plus, ArrowLeft } from 'lucide-react';
 import { DevisFormData } from '../../DemandeDevis';
 import { 
   calculerRecapitulatif, 
@@ -22,9 +22,10 @@ interface StepRecapitulatifProps {
   onSubmit: () => void;
   isSubmitting: boolean;
   lang?: DevisLanguage;
+  onGoToStep?: (step: number) => void;  // 🆕 Fonction pour naviguer vers une étape
 }
 
-export function StepRecapitulatif({ formData, onSubmit, isSubmitting, lang = 'fr' }: StepRecapitulatifProps) {
+export function StepRecapitulatif({ formData, onSubmit, isSubmitting, lang = 'fr', onGoToStep }: StepRecapitulatifProps) {
   const { t, isLoading: isLoadingTranslations } = useDevisTranslationStatic(lang);
   const [accepteConditions, setAccepteConditions] = useState(false);
 
@@ -141,10 +142,23 @@ export function StepRecapitulatif({ formData, onSubmit, isSubmitting, lang = 'fr
       {/* Informations Entreprise */}
       <Card className="border border-white/10 bg-white/5 backdrop-blur-sm">
         <CardHeader>
-          <CardTitle className="text-white flex items-center gap-2">
-            <Building2 className="w-5 h-5 text-blue-400" />
-            {t.recapitulatif.entreprise.title}
-          </CardTitle>
+          <div className="flex items-center justify-between">
+            <CardTitle className="text-white flex items-center gap-2">
+              <Building2 className="w-5 h-5 text-blue-400" />
+              {t.recapitulatif.entreprise.title}
+            </CardTitle>
+            {onGoToStep && (
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => onGoToStep(1)}
+                className="border-white/20 bg-white/5 text-white hover:bg-white/10 hover:border-cyan-400/50"
+              >
+                <Edit2 className="w-4 h-4 mr-1" />
+                {t.common?.edit || 'Modifier'}
+              </Button>
+            )}
+          </div>
         </CardHeader>
         <CardContent className="space-y-2">
           <div className="grid md:grid-cols-2 gap-4">
@@ -177,10 +191,23 @@ export function StepRecapitulatif({ formData, onSubmit, isSubmitting, lang = 'fr
       {/* Contact */}
       <Card className="border border-white/10 bg-white/5 backdrop-blur-sm">
         <CardHeader>
-          <CardTitle className="text-white flex items-center gap-2">
-            <User className="w-5 h-5 text-cyan-400" />
-            {t.recapitulatif.contact.title}
-          </CardTitle>
+          <div className="flex items-center justify-between">
+            <CardTitle className="text-white flex items-center gap-2">
+              <User className="w-5 h-5 text-cyan-400" />
+              {t.recapitulatif.contact.title}
+            </CardTitle>
+            {onGoToStep && (
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => onGoToStep(2)}
+                className="border-white/20 bg-white/5 text-white hover:bg-white/10 hover:border-cyan-400/50"
+              >
+                <Edit2 className="w-4 h-4 mr-1" />
+                {t.common?.edit || 'Modifier'}
+              </Button>
+            )}
+          </div>
         </CardHeader>
         <CardContent className="space-y-2">
           <div className="grid md:grid-cols-2 gap-4">
@@ -209,10 +236,34 @@ export function StepRecapitulatif({ formData, onSubmit, isSubmitting, lang = 'fr
       {/* Postes demandés */}
       <Card className="border border-white/10 bg-white/5 backdrop-blur-sm">
         <CardHeader>
-          <CardTitle className="text-white flex items-center gap-2">
-            <Briefcase className="w-5 h-5 text-violet-400" />
-            {t.recapitulatif.postes.title} ({formData.postes.length})
-          </CardTitle>
+          <div className="flex items-center justify-between">
+            <CardTitle className="text-white flex items-center gap-2">
+              <Briefcase className="w-5 h-5 text-violet-400" />
+              {t.recapitulatif.postes.title} ({formData.postes.length})
+            </CardTitle>
+            {onGoToStep && (
+              <div className="flex items-center gap-2">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => onGoToStep(3)}
+                  className="border-violet-400/30 bg-violet-500/10 text-violet-200 hover:bg-violet-500/20 hover:border-violet-400/50"
+                >
+                  <Plus className="w-4 h-4 mr-1" />
+                  {t.common?.add || 'Ajouter'}
+                </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => onGoToStep(3)}
+                  className="border-white/20 bg-white/5 text-white hover:bg-white/10 hover:border-cyan-400/50"
+                >
+                  <Edit2 className="w-4 h-4 mr-1" />
+                  {t.common?.edit || 'Modifier'}
+                </Button>
+              </div>
+            )}
+          </div>
         </CardHeader>
         <CardContent className="space-y-4">
           {formData.postes.map((poste, index) => {
