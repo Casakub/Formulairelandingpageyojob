@@ -284,6 +284,14 @@ export default function DemandeDevis() {
     }
   };
 
+  // 🆕 Fonction pour naviguer vers une étape spécifique (depuis le récapitulatif)
+  const goToStep = (step: number) => {
+    if (step >= 1 && step <= STEPS.length) {
+      setCurrentStep(step);
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  };
+
   const validateCurrentStep = (): boolean => {
     // Validation basique (à améliorer)
     switch (currentStep) {
@@ -422,6 +430,7 @@ export default function DemandeDevis() {
             onSubmit={handleSubmit}
             lang={lang}
             isSubmitting={isSubmitting}
+            onGoToStep={goToStep}
           />
         );
       default:
