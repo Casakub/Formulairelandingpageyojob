@@ -4,11 +4,16 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '.
 import { Textarea } from '../ui/textarea';
 import { Switch } from '../ui/switch';
 import { RadioGroup, RadioGroupItem } from '../ui/radio-group';
-import { getPanierRepasByPays } from '../../data/devis-data-pays';
 import { formaterMontant } from '../../utils/devis-calculations';
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { useDevisTranslationStatic } from '../../hooks/useDevisTranslation';
+import { useDevisConfig } from '../../hooks/useDevisConfig';
 import type { DevisLanguage } from '../../src/i18n/devis/types';
+import { 
+  calculerPeriodeEssaiAuto, 
+  calculerDureeContratEnMois, 
+  getExplicationPeriodeEssai 
+} from '../../utils/periode-essai-auto';
 
 interface Step4ConditionsProps {
   data: {
@@ -33,13 +38,19 @@ interface Step4ConditionsProps {
   };
   pays: string;  // 🆕 Pays de l'entreprise cliente
   region: string;
+  postes?: Array<{ secteur: string; [key: string]: any }>;  // 🆕 Postes pour récupérer le secteur
   onChange: (data: any) => void;
   lang?: DevisLanguage;
 }
 
-export function Step4Conditions({ data, pays, region, onChange, lang = 'fr' }: Step4ConditionsProps) {
+export function Step4Conditions({ data, pays, region, postes, onChange, lang = 'fr' }: Step4ConditionsProps) {
   const { t, isLoading: isLoadingTranslations } = useDevisTranslationStatic(lang);
+  const { getPanierRepas } = useDevisConfig();
   const [dateError, setDateError] = useState('');
+
+  // 🆕 État pour gérer l'auto-calcul de la période d'essai
+  const [periodeEssaiAuto, setPeriodeEssaiAuto] = useState(true);
+  const [explicationPeriodeEssai, setExplicationPeriodeEssai] = useState('');
 
   // 🔍 DEBUG: Log de la langue active
   console.log('🌍 [Step4] Langue active:', lang);
@@ -48,6 +59,32 @@ export function Step4Conditions({ data, pays, region, onChange, lang = 'fr' }: S
     periodeEssai: t.step4.fields.periodeEssai.options,
     delaiPaiement: t.step4.fields.delaiPaiement.options
   });
+
+  // 🆕 Effet pour calculer automatiquement la période d'essai
+  useEffect(() => {
+    if (periodeEssaiAuto && data.dateDebut && data.dateFin) {
+      const periodeCalculee = calculerPeriodeEssaiAuto(data.dateDebut, data.dateFin);
+      const dureeMois = calculerDureeContratEnMois(data.dateDebut, data.dateFin);
+      
+      // Mettre à jour la période d'essai si elle est différente
+      if (data.periodeEssai !== periodeCalculee) {
+        console.log('📅 [Auto-calcul] Période d\'essai:', { 
+          dateDebut: data.dateDebut, 
+          dateFin: data.dateFin,
+          dureeMois: dureeMois.toFixed(1),
+          periodeCalculee 
+        });
+        
+        onChange({
+          ...data,
+          periodeEssai: periodeCalculee
+        });
+      }
+      
+      // Mettre à jour l'explication
+      setExplicationPeriodeEssai(getExplicationPeriodeEssai(periodeCalculee, dureeMois));
+    }
+  }, [data.dateDebut, data.dateFin, periodeEssaiAuto]);
 
   // ✅ SOLUTION: Utiliser useMemo pour recalculer les labels quand lang ou data changent
   const periodeEssaiLabel = useMemo(() => {
@@ -107,8 +144,26 @@ export function Step4Conditions({ data, pays, region, onChange, lang = 'fr' }: S
     });
   };
 
-  const montantPanierJour = getPanierRepasByPays(pays, region);
-  const supplementPanierHoraire = montantPanierJour / 7;
+  // 🆕 Obtenir le secteur principal (premier poste)
+  const secteurPrincipal = postes && postes.length > 0 ? postes[0].secteur : 'Autre';
+  
+  // 🆕 Calculer le montant du panier repas selon la région ET le secteur
+  const montantPanierJour = useMemo(() => {
+    console.log('🔍 [useMemo Panier] Calcul avec:', { 
+      region, 
+      secteurPrincipal, 
+      postes,
+      postesLength: postes?.length 
+    });
+    
+    if (region && secteurPrincipal) {
+      const montant = getPanierRepas(region, secteurPrincipal);
+      console.log('🍽️ [Panier repas] Résultat:', { region, secteur: secteurPrincipal, montant });
+      return montant;
+    }
+    console.warn('⚠️ [Panier repas] Fallback utilisé (région ou secteur manquant)');
+    return 10.00; // Fallback
+  }, [region, secteurPrincipal, getPanierRepas]);
 
   if (isLoadingTranslations) {
     return (
@@ -171,10 +226,40 @@ export function Step4Conditions({ data, pays, region, onChange, lang = 'fr' }: S
 
         {/* Période d'essai */}
         <div>
-          <Label className="text-white mb-2 block">
-            {t.step4.fields.periodeEssai.label}
-          </Label>
-          <Select key={`periodeEssai-${lang}-${data.periodeEssai}`} value={data.periodeEssai} onValueChange={(value) => handleChange('periodeEssai', value)}>
+          <div className="flex items-center justify-between mb-2">
+            <Label className="text-white">
+              {t.step4.fields.periodeEssai.label}
+            </Label>
+            {data.dateDebut && data.dateFin && (
+              <button
+                type="button"
+                onClick={() => setPeriodeEssaiAuto(!periodeEssaiAuto)}
+                className="text-xs text-white/60 hover:text-white transition-colors flex items-center gap-1"
+              >
+                {periodeEssaiAuto ? (
+                  <>
+                    <span className="inline-block w-2 h-2 bg-green-400 rounded-full animate-pulse"></span>
+                    Auto
+                  </>
+                ) : (
+                  <>
+                    <span className="inline-block w-2 h-2 bg-gray-400 rounded-full"></span>
+                    Manuel
+                  </>
+                )}
+              </button>
+            )}
+          </div>
+          <Select 
+            key={`periodeEssai-${lang}-${data.periodeEssai}`} 
+            value={data.periodeEssai} 
+            onValueChange={(value) => {
+              // Désactiver l'auto-calcul si l'utilisateur modifie manuellement
+              setPeriodeEssaiAuto(false);
+              handleChange('periodeEssai', value);
+            }}
+            disabled={periodeEssaiAuto && !!(data.dateDebut && data.dateFin)}
+          >
             <SelectTrigger className="bg-white/10 border-white/20 text-white">
               <SelectValue placeholder={periodeEssaiLabel} />
             </SelectTrigger>
@@ -193,6 +278,19 @@ export function Step4Conditions({ data, pays, region, onChange, lang = 'fr' }: S
               </SelectItem>
             </SelectContent>
           </Select>
+          {explicationPeriodeEssai && periodeEssaiAuto && (
+            <div className="bg-green-500/10 border border-green-500/30 rounded-lg p-2 mt-2">
+              <p className="text-green-200 text-xs flex items-start gap-2">
+                <span className="text-green-400 mt-0.5">✓</span>
+                <span>{explicationPeriodeEssai}</span>
+              </p>
+            </div>
+          )}
+          {!periodeEssaiAuto && (
+            <p className="text-white/50 text-xs mt-1">
+              ⚠️ Mode manuel : vérifiez la conformité légale
+            </p>
+          )}
         </div>
 
         {/* Base horaire */}
@@ -373,8 +471,8 @@ export function Step4Conditions({ data, pays, region, onChange, lang = 'fr' }: S
         {data.repas.type === 'panier' && (
           <div className="bg-green-500/10 border border-green-500/30 rounded-lg p-4 mt-4">
             <p className="text-green-200/80 text-sm mt-1">
-              {region && getPanierRepasByPays(pays, region) > 0
-                ? t.step4.repas.montantInfo.replace('{montant}', formaterMontant(getPanierRepasByPays(pays, region)))
+              {region && montantPanierJour > 0
+                ? t.step4.repas.montantInfo.replace('{montant}', formaterMontant(montantPanierJour))
                 : t.step4.repas.montantNonDefini}
             </p>
             {/* ❌ SUPPRIMÉ : Le panier repas n'est pas un supplément horaire */}

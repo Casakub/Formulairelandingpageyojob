@@ -411,6 +411,7 @@ export default function DemandeDevis() {
             data={formData.conditions}
             pays={formData.entreprise.pays}
             region={formData.entreprise.region}
+            postes={formData.postes}
             onChange={(data) => updateFormData('conditions', data)}
             lang={lang}
           />
