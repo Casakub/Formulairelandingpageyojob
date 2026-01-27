@@ -1,7 +1,7 @@
 import { Input } from '../ui/input';
 import { Label } from '../ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select';
-import { REGIONS, PAYS_EUROPEENS } from '../../data/devis-data';
+import { REGIONS, PAYS_EUROPEENS } from '../../data/config/constants';
 import { validerSIRET } from '../../utils/devis-calculations';
 import { useState, useEffect } from 'react';
 import { useDevisTranslationStatic } from '../../hooks/useDevisTranslation';

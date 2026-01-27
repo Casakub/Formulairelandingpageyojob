@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { SECTEURS, REGIONS } from '../data/devis-data';
+import { SECTEURS, REGIONS } from '../data/config/constants';
 import { configData } from '../data/config/index';
 
 // Types pour les données de configuration

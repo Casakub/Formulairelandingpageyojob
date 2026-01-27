@@ -1,9 +1,10 @@
-import { Input } from '../ui/input';
 import { Label } from '../ui/label';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select';
+import { Input } from '../ui/input';
+import { Textarea } from '../ui/textarea';
 import { Switch } from '../ui/switch';
 import { Checkbox } from '../ui/checkbox';
-import { NIVEAUX_LANGUE, LANGUES, EPIS } from '../../data/devis-data';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select';
+import { NIVEAUX_LANGUE, LANGUES, EPIS } from '../../data/config/constants';
 import { useDevisTranslationStatic } from '../../hooks/useDevisTranslation';
 import { translateLanguageName, translateLanguageLevel, translateEPI } from '../../utils/step5-translations';
 import type { DevisLanguage } from '../../src/i18n/devis/types';

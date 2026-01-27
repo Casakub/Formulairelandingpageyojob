@@ -1,7 +1,7 @@
 // Utilitaires de calcul pour les devis YOJOB
 
-import { COEFFICIENTS, SUPPLEMENTS } from '../data/devis-data';
-import { getPanierRepasByPays } from '../data/devis-data-pays';
+import { COEFFICIENTS, SUPPLEMENTS } from '../data/config/constants';
+import { getPanierRepas } from '../data/config/helpers';
 
 interface PosteData {
   secteur: string;
@@ -271,7 +271,7 @@ export function calculerRecapitulatif(
     // 🆕 Calculer les suppléments individuels
     const supplementHebergement = !poste.hebergementEU ? SUPPLEMENTS.hebergement : 0;
     const supplementTransport = poste.transportETT ? SUPPLEMENTS.transport : 0;
-    const montantPanierJour = poste.panierRepas ? getPanierRepasByPays(poste.pays || 'France') : 0;
+    const montantPanierJour = poste.panierRepas ? getPanierRepas(poste.pays || 'France') : 0;
     const supplementPanierRepas = montantPanierJour > 0 ? montantPanierJour / 7 : 0;
     
     // 🆕 Calculer le coefficient final si disponible

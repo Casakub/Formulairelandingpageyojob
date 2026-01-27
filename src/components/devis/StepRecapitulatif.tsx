@@ -1,21 +1,40 @@
-import { Card, CardContent, CardHeader, CardTitle } from '../ui/card';
+import { useState } from 'react';
+import { 
+  Check, AlertCircle, Edit2, ChevronDown, ChevronUp, Package, Users, 
+  Globe, Calendar, DollarSign, Building2, Clock, User, Briefcase, 
+  FileText, CheckCircle, ArrowRight, Plus 
+} from 'lucide-react';
 import { Button } from '../ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '../ui/card';
 import { Checkbox } from '../ui/checkbox';
 import { Label } from '../ui/label';
-import { useState } from 'react';
-import { ArrowRight, Download, CheckCircle, Building2, User, Briefcase, FileText, Clock, Edit2, Plus, ArrowLeft } from 'lucide-react';
-import { DevisFormData } from '../../DemandeDevis';
+import type { DevisFormData } from '../../types/devis';
 import { 
-  calculerRecapitulatif, 
+  calculerTauxHoraireBrut, 
+  calculerTauxETTAvecPays, 
   formaterMontant, 
   calculerCoutAvecHeuresSup, 
   calculerPanierRepasMensuel,
   calculerTauxETTComplet
 } from '../../utils/devis-calculations';
-import { getPanierRepasByPays } from '../../data/devis-data-pays';
+import { getPanierRepas } from '../../data/config/helpers';
 import { useDevisTranslationStatic } from '../../hooks/useDevisTranslation';
 import { translateSecteur, translatePoste, translateClassification, translatePays } from '../../utils/recapitulatif-translations';
 import type { DevisLanguage } from '../../src/i18n/devis/types';
+
+// 🔑 Mapping entre clés techniques et labels français pour compatibilité
+const SECTEUR_KEY_TO_LABEL: Record<string, string> = {
+  batiment: 'Bâtiment',
+  metallurgie: 'Métallurgie',
+  tp: 'TP',
+  hotellerie: 'Hôtellerie',
+  restauration: 'Restauration',
+  plasturgie: 'Plasturgie',
+  automobile_carrosserie: 'Automobile Carrosserie',
+  sylviculture: 'Sylviculture',
+  cartonnerie: 'Cartonnerie',
+  autre: 'Autre',
+};
 
 interface StepRecapitulatifProps {
   formData: DevisFormData;
@@ -58,8 +77,9 @@ export function StepRecapitulatif({ formData, onSubmit, isSubmitting, lang = 'fr
       );
       
       // Panier repas mensuel séparé
+      const secteurLabel = SECTEUR_KEY_TO_LABEL[poste.secteur] || poste.secteur;
       const montantPanierJour = formData.conditions.repas.type === 'panier'
-        ? getPanierRepasByPays(formData.entreprise.pays)
+        ? getPanierRepas(formData.entreprise.region, secteurLabel)
         : 0;
       const panierMensuel = calculerPanierRepasMensuel(
         montantPanierJour,
@@ -88,31 +108,6 @@ export function StepRecapitulatif({ formData, onSubmit, isSubmitting, lang = 'fr
   
   const dureeMission = calculerDuree(formData.conditions.dateDebut, formData.conditions.dateFin);
   const totalMission = Math.round(totalHT * dureeMission * 100) / 100;
-
-  // Calculer le récapitulatif complet (pour compatibilité)
-  const postesAvecDetails = formData.postes.map(poste => ({
-    ...poste,
-    secteur: poste.secteur,
-    poste: poste.poste,
-    classification: poste.classification,
-    quantite: poste.quantite,
-    salaireBrut: poste.salaireBrut,
-    baseHoraire: formData.conditions.baseHoraire,
-    hebergementEU: formData.conditions.hebergement.chargeEU,
-    transportETT: formData.conditions.transportLocal.chargeETT,
-    panierRepas: formData.conditions.repas.type === 'panier',
-    region: formData.entreprise.region,
-    // 🆕 Passer les détails du coefficient
-    coeffBase: poste.coeffBase,
-    facteurPays: poste.facteurPays,
-    labelPays: poste.labelPays,
-  }));
-
-  const recap = calculerRecapitulatif(
-    postesAvecDetails,
-    formData.conditions.dateDebut,
-    formData.conditions.dateFin
-  );
 
   const handleSubmit = () => {
     if (!accepteConditions) {
@@ -292,8 +287,9 @@ export function StepRecapitulatif({ formData, onSubmit, isSubmitting, lang = 'fr
             );
             
             // Panier repas mensuel (séparé)
+            const secteurLabel = SECTEUR_KEY_TO_LABEL[poste.secteur] || poste.secteur;
             const montantPanierJour = formData.conditions.repas.type === 'panier' 
-              ? getPanierRepasByPays(formData.entreprise.pays)
+              ? getPanierRepas(formData.entreprise.region, secteurLabel)
               : 0;
             const panierMensuel = calculerPanierRepasMensuel(
               montantPanierJour,
@@ -483,7 +479,7 @@ export function StepRecapitulatif({ formData, onSubmit, isSubmitting, lang = 'fr
             )}
             <div>
               <p className="text-white/60 text-sm">{t.recapitulatif.conditions.dureeEstimee}</p>
-              <p className="text-white">{recap.dureeMission} {t.recapitulatif.conditions.mois}</p>
+              <p className="text-white">{dureeMission} {t.recapitulatif.conditions.mois}</p>
             </div>
             <div>
               <p className="text-white/60 text-sm">{t.recapitulatif.conditions.lieuMission}</p>

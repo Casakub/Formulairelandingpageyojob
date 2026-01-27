@@ -1,13 +1,13 @@
-import { useState } from 'react';
-import { Input } from '../ui/input';
 import { Label } from '../ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select';
+import { Input } from '../ui/input';
+import { Textarea } from '../ui/textarea';
 import { Button } from '../ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '../ui/card';
 import { Plus, Trash2 } from 'lucide-react';
-import { SECTEURS } from '../../data/devis-data';
+import { SECTEURS } from '../../data/config/constants';
 import { SECTEURS_DATA, getPostesForSecteur, getClassificationsForSecteur, getConventionForSecteur } from '../../data/secteurs-keys';
-import { getSalairesByPaysRegion, getCoefficientByPays } from '../../data/devis-data-pays';
+import { getSalairesByPaysRegion, getCoefficientByPays } from '../../data/config/helpers';
 import { calculerTauxHoraireBrut, calculerTauxETTAvecPays, formaterMontant, calculerCoutMensuelProfil } from '../../utils/devis-calculations';
 import { useDevisConfig } from '../../hooks/useDevisConfig';
 import { useDevisTranslationStatic } from '../../hooks/useDevisTranslation';
@@ -137,8 +137,12 @@ export function Step3Besoins({ data, pays, region, onChange, lang = 'fr' }: Step
           const secteurLabelFr = SECTEUR_KEY_TO_LABEL[updated.secteur] || updated.secteur;
           const classificationLabelFr = CLASSIFICATION_KEY_TO_LABEL[updated.secteur]?.[value] || value;
           
-          const salaires = getSalairesByPaysRegion(pays, secteurLabelFr, region);
-          updated.salaireBrut = salaires[classificationLabelFr] || 0;
+          const salairesRegion = getSalairesByPaysRegion(pays, region);
+          if (salairesRegion && salairesRegion[secteurLabelFr]) {
+            updated.salaireBrut = salairesRegion[secteurLabelFr][classificationLabelFr] || 0;
+          } else {
+            updated.salaireBrut = 0;
+          }
           
           console.log('💶 [Step3Besoins] Calcul salaire:', {
             secteurKey: updated.secteur,
