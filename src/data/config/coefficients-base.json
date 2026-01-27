@@ -144,8 +144,8 @@
     }
   },
   "metadata": {
-    "version": "1.0.0",
-    "derniere_modification": "2024-12-20",
+    "version": "1.1.0",
+    "derniere_modification": "2026-01-28",
     "modifie_par": "Initialisation système",
     "description": "Coefficients de base par secteur et classification. Ces coefficients sont multipliés par le facteur pays pour obtenir le coefficient final appliqué au taux horaire brut.",
     "note": "Le mapping_anciennes_classifications permet la rétrocompatibilité avec les anciennes dénominations de classifications présentes dans devis-data.ts"
