@@ -3,7 +3,7 @@
     "RO": {
       "code": "RO",
       "label": "Roumanie",
-      "facteur": 1.00,
+      "facteur": 1.02,
       "description": "Coefficient de référence"
     },
     "PL": {
@@ -15,7 +15,7 @@
     "PT": {
       "code": "PT",
       "label": "Portugal",
-      "facteur": 1.05,
+      "facteur": 1.07,
       "description": "Majoration standard pour pays d'Europe du Sud"
     },
     "ES": {
@@ -27,7 +27,7 @@
     "BG": {
       "code": "BG",
       "label": "Bulgarie",
-      "facteur": 0.98,
+      "facteur": 1.00,
       "description": "Légère réduction liée aux coûts de détachement"
     },
     "HU": {
@@ -63,7 +63,7 @@
   },
   "metadata": {
     "version": "1.0.0",
-    "derniere_modification": "2024-12-20",
+    "derniere_modification": "2026-01-27",
     "modifie_par": "Initialisation système",
     "description": "Facteurs multiplicateurs par pays appliqués aux coefficients de base. Formule : Coefficient final = Coefficient base × Facteur pays"
   }
