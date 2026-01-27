@@ -137,11 +137,11 @@ export default function NosSecteurs() {
               {t.hero.badge}
             </Badge>
 
-            <h1 className="text-white mb-6 max-w-3xl mx-auto">
+            <h1 className="text-white mb-6 max-w-3xl mx-auto text-[20px] font-bold">
               {t.hero.title}
             </h1>
 
-            <p className="text-white/80 text-xl max-w-2xl mx-auto mb-8">
+            <p className="text-white/80 text-xl max-w-2xl mx-auto mb-8 text-[16px]">
               {t.hero.subtitle}
             </p>
 
@@ -263,8 +263,8 @@ export default function NosSecteurs() {
             <Badge className="mb-4 px-6 py-2 bg-white/10 border-white/20 text-white backdrop-blur-sm">
               {t.process.badge}
             </Badge>
-            <h2 className="text-white mb-4">{t.process.title}</h2>
-            <p className="text-white/70 text-lg max-w-2xl mx-auto">
+            <h2 className="text-white mb-4 text-[20px] font-bold">{t.process.title}</h2>
+            <p className="text-white/70 text-lg max-w-2xl mx-auto text-[16px]">
               {t.process.subtitle}
             </p>
           </motion.div>
@@ -312,8 +312,8 @@ export default function NosSecteurs() {
             <Badge className="mb-4 px-6 py-2 bg-white/10 border-white/20 text-white backdrop-blur-sm">
               {t.cta.badge}
             </Badge>
-            <h2 className="text-white mb-4">{t.cta.title}</h2>
-            <p className="text-white/80 text-lg mb-8 max-w-2xl mx-auto">
+            <h2 className="text-white mb-4 text-[20px] font-bold">{t.cta.title}</h2>
+            <p className="text-white/80 text-lg mb-8 max-w-2xl mx-auto text-[16px]">
               {t.cta.subtitle}
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
