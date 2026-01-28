@@ -35,6 +35,12 @@ import { getSuggestedLanguage, AVAILABLE_LANGUAGES } from './src/i18n/devis';
 import type { DevisLanguage } from './src/i18n/devis/types';
 import { useDevisTranslationStatic } from './hooks/useDevisTranslation';
 import { useLanguageManager } from './hooks/useLanguageManager';
+import { 
+  calculerTauxHoraireBrut, 
+  calculerTauxETTComplet, 
+  calculerMajorationsDevis, 
+  appliquerMajorationTaux 
+} from './utils/devis-calculations';
 
 // 🎯 Import du système SEO optimisé
 import { SEOHead } from './components/SEOHead';
@@ -77,6 +83,7 @@ export interface DevisFormData {
     salaireBrut: number;
     tauxHoraireBrut: number;
     tauxETT: number;
+    tauxETTMajore?: number;
     // 🆕 Détails du coefficient pour affichage
     coeffBase: number;
     facteurPays: number;
@@ -334,6 +341,37 @@ export default function DemandeDevis() {
     setIsSubmitting(true);
     
     try {
+      const majorations = calculerMajorationsDevis({
+        delaiPaiement: formData.conditions.delaiPaiement,
+        experience: formData.candidats.experience,
+        permis: formData.candidats.permis,
+        langues: formData.candidats.langues,
+        outillage: formData.candidats.outillage,
+      });
+
+      const postesMajores = formData.postes.map((poste) => {
+        const tauxHoraireBrut = poste.tauxHoraireBrut || calculerTauxHoraireBrut(poste.salaireBrut, 151.67);
+        const tauxETTBase = calculerTauxETTComplet(
+          tauxHoraireBrut,
+          poste.coeffBase || 1.92,
+          poste.facteurPays || 1.00,
+          3.50,
+          1.50,
+          {
+            hebergementNonFourni: !formData.conditions.hebergement.chargeEU,
+            transportETT: formData.conditions.transportLocal.chargeETT
+          }
+        );
+        const tauxETTMajore = appliquerMajorationTaux(tauxETTBase, majorations.total);
+        return { ...poste, tauxHoraireBrut, tauxETTMajore };
+      });
+
+      const payload = {
+        ...formData,
+        postes: postesMajores,
+        majorations,
+      };
+
       // Envoyer les données au backend
       const response = await fetch(`https://${projectId}.supabase.co/functions/v1/make-server-10092a63/devis`, {
         method: 'POST',
@@ -341,7 +379,7 @@ export default function DemandeDevis() {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${publicAnonKey}`
         },
-        body: JSON.stringify(formData)
+        body: JSON.stringify(payload)
       });
 
       if (!response.ok) {

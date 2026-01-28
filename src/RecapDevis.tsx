@@ -28,7 +28,12 @@ import { LogoSvg } from './imports/YojobLogoComplete';
 import { toast } from 'sonner@2.0.3';
 import { projectId, publicAnonKey } from './utils/supabase/info';
 import SignatureCanvas from 'react-signature-canvas';
-import { formaterMontant } from './utils/devis-calculations';
+import { 
+  formaterMontant, 
+  calculerTauxETTComplet, 
+  calculerMajorationsDevis, 
+  appliquerMajorationTaux 
+} from './utils/devis-calculations';
 import { useDevisTranslationStatic } from './hooks/useDevisTranslation';
 import { translateSecteur, translatePoste, translateClassification, translatePays } from './utils/recapitulatif-translations';
 import type { DevisLanguage } from './src/i18n/devis/types';
@@ -268,6 +273,13 @@ export default function RecapDevis() {
   }
 
   const isSigned = devisData.statut === 'signe';
+  const majorations = calculerMajorationsDevis({
+    delaiPaiement: devisData.conditions?.delaiPaiement,
+    experience: devisData.candidats?.experience,
+    permis: devisData.candidats?.permis,
+    langues: devisData.candidats?.langues,
+    outillage: devisData.candidats?.outillage,
+  });
 
   return (
     <>
@@ -514,15 +526,30 @@ export default function RecapDevis() {
             colorClass="bg-green-500/10"
           >
             <div className="space-y-4">
-              {devisData.postes?.map((poste: any, index: number) => (
-                <div 
-                  key={index}
-                  className="p-4 rounded-xl bg-white/10 backdrop-blur-sm border border-white/20"
-                >
+              {devisData.postes?.map((poste: any, index: number) => {
+                const tauxHoraireBrut = poste.tauxHoraireBrut ?? (poste.salaireBrut ? poste.salaireBrut / 151.67 : 0);
+                const tauxETTBase = calculerTauxETTComplet(
+                  tauxHoraireBrut,
+                  poste.coeffBase || 1.92,
+                  poste.facteurPays || 1.00,
+                  3.50,
+                  1.50,
+                  {
+                    hebergementNonFourni: !devisData.conditions?.hebergement?.chargeEU,
+                    transportETT: devisData.conditions?.transportLocal?.chargeETT
+                  }
+                );
+                const tauxETTMajore = appliquerMajorationTaux(tauxETTBase, majorations.total);
+
+                return (
+                  <div 
+                    key={index}
+                    className="p-4 rounded-xl bg-white/10 backdrop-blur-sm border border-white/20"
+                  >
                   <div className="flex items-start justify-between mb-3">
                     <div>
-                      <h4 className="text-white font-medium text-lg">{translatePoste(poste.poste, lang)}</h4>
-                      <p className="text-white/70 text-sm">{translateSecteur(poste.secteur, lang)} • {translateClassification(poste.classification, lang)}</p>
+                      <h4 className="text-white font-medium text-lg">{translatePoste(poste.secteur, poste.poste, lang)}</h4>
+                      <p className="text-white/70 text-sm">{translateSecteur(poste.secteur, lang)} • {translateClassification(poste.secteur, poste.classification, lang)}</p>
                       {poste.labelPays && (
                         <p className="text-cyan-300/80 text-sm mt-1">
                           📍 {t.pageRecap.postes.nationalite}: {translatePays(poste.labelPays, lang)}
@@ -541,7 +568,7 @@ export default function RecapDevis() {
                     </div>
                     <div>
                       <p className="text-white/60 mb-1">{t.pageRecap.postes.tauxHoraireBrut}</p>
-                      <p className="text-white font-medium">{formaterMontant(poste.tauxHoraireBrut)}/h</p>
+                      <p className="text-white font-medium">{formaterMontant(tauxHoraireBrut)}/h</p>
                     </div>
                     <div>
                       <p className="text-white/60 mb-1">{t.pageRecap.postes.coefficientETT}</p>
@@ -549,11 +576,12 @@ export default function RecapDevis() {
                     </div>
                     <div>
                       <p className="text-white/60 mb-1">{t.pageRecap.postes.tauxETT}</p>
-                      <p className="text-green-400 font-medium">{formaterMontant(poste.tauxETT)}/h</p>
+                      <p className="text-green-400 font-medium">{formaterMontant(tauxETTMajore)}/h</p>
                     </div>
                   </div>
                 </div>
-              ))}
+                );
+              })}
             </div>
           </Accordion>
 
@@ -983,12 +1011,27 @@ export default function RecapDevis() {
                   <h2 className="text-xl text-white print:text-gray-900">{t.pageRecap.postes.title}</h2>
                 </div>
                 <div className="space-y-4">
-                  {devisData.postes?.map((poste: any, index: number) => (
-                    <div key={index} className="bg-white/5 border border-white/10 rounded-xl p-5 print:bg-transparent print:border-gray-200 print:px-4 print:py-4">
+                  {devisData.postes?.map((poste: any, index: number) => {
+                    const tauxHoraireBrut = poste.tauxHoraireBrut ?? (poste.salaireBrut ? poste.salaireBrut / 151.67 : 0);
+                    const tauxETTBase = calculerTauxETTComplet(
+                      tauxHoraireBrut,
+                      poste.coeffBase || 1.92,
+                      poste.facteurPays || 1.00,
+                      3.50,
+                      1.50,
+                      {
+                        hebergementNonFourni: !devisData.conditions?.hebergement?.chargeEU,
+                        transportETT: devisData.conditions?.transportLocal?.chargeETT
+                      }
+                    );
+                    const tauxETTMajore = appliquerMajorationTaux(tauxETTBase, majorations.total);
+
+                    return (
+                      <div key={index} className="bg-white/5 border border-white/10 rounded-xl p-5 print:bg-transparent print:border-gray-200 print:px-4 print:py-4">
                       <div className="flex items-start justify-between mb-4">
                         <div>
-                          <h3 className="text-white text-lg mb-1 print:text-gray-900">{translatePoste(poste.poste, lang)}</h3>
-                          <p className="text-sm text-cyan-300 print:text-gray-600">{translateSecteur(poste.secteur, lang)} • {translateClassification(poste.classification, lang)}</p>
+                          <h3 className="text-white text-lg mb-1 print:text-gray-900">{translatePoste(poste.secteur, poste.poste, lang)}</h3>
+                          <p className="text-sm text-cyan-300 print:text-gray-600">{translateSecteur(poste.secteur, lang)} • {translateClassification(poste.secteur, poste.classification, lang)}</p>
                           {poste.labelPays && (
                             <div className="flex items-center gap-2 mt-2">
                               <MapPin className="w-4 h-4 text-blue-400 print:text-blue-600" />
@@ -1009,7 +1052,7 @@ export default function RecapDevis() {
                         </div>
                         <div>
                           <p className="text-cyan-300 mb-2 print:text-gray-600">{t.pageRecap.postes.tauxHoraireBrut}</p>
-                          <p className="text-white print:text-gray-900">{formaterMontant(poste.tauxHoraireBrut)}/h</p>
+                          <p className="text-white print:text-gray-900">{formaterMontant(tauxHoraireBrut)}/h</p>
                         </div>
                         <div>
                           <p className="text-cyan-300 mb-2 print:text-gray-600">{t.pageRecap.postes.coefficientETT}</p>
@@ -1017,11 +1060,12 @@ export default function RecapDevis() {
                         </div>
                         <div>
                           <p className="text-cyan-300 mb-2 print:text-gray-600">{t.pageRecap.postes.tauxETT}</p>
-                          <p className="text-green-300 print:text-green-700">{formaterMontant(poste.tauxETT)}/h</p>
+                          <p className="text-green-300 print:text-green-700">{formaterMontant(tauxETTMajore)}/h</p>
                         </div>
                       </div>
                     </div>
-                  ))}
+                    );
+                  })}
                 </div>
               </div>
 

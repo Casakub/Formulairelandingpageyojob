@@ -10,12 +10,12 @@ import { Checkbox } from '../ui/checkbox';
 import { Label } from '../ui/label';
 import type { DevisFormData } from '../../types/devis';
 import { 
-  calculerTauxHoraireBrut, 
-  calculerTauxETTAvecPays, 
   formaterMontant, 
   calculerCoutAvecHeuresSup, 
   calculerPanierRepasMensuel,
-  calculerTauxETTComplet
+  calculerTauxETTComplet,
+  calculerMajorationsDevis,
+  appliquerMajorationTaux
 } from '../../utils/devis-calculations';
 import { getPanierRepas } from '../../data/config/helpers';
 import { useDevisTranslationStatic } from '../../hooks/useDevisTranslation';
@@ -48,6 +48,61 @@ export function StepRecapitulatif({ formData, onSubmit, isSubmitting, lang = 'fr
   const { t, isLoading: isLoadingTranslations } = useDevisTranslationStatic(lang);
   const [accepteConditions, setAccepteConditions] = useState(false);
 
+  const majorations = calculerMajorationsDevis({
+    delaiPaiement: formData.conditions.delaiPaiement,
+    experience: formData.candidats.experience,
+    permis: formData.candidats.permis,
+    langues: formData.candidats.langues,
+    outillage: formData.candidats.outillage,
+  });
+
+  const majorationsTexts: Record<string, { title: string; total: string; notSet: string }> = {
+    fr: { title: 'Majorations appliquées', total: 'Total majorations', notSet: 'Non défini' },
+    en: { title: 'Applied adjustments', total: 'Total adjustments', notSet: 'Not specified' },
+  };
+  const majorationsCopy = majorationsTexts[lang] || majorationsTexts.en;
+
+  const formatPercent = (value: number) => {
+    if (!value) return '0%';
+    const sign = value > 0 ? '+' : '';
+    return `${sign}${Math.round(value * 100)}%`;
+  };
+
+  const delaiKey = formData.conditions.delaiPaiement as keyof typeof t.step4.fields.delaiPaiement.options | undefined;
+  const delaiPaiementLabel = delaiKey
+    ? t.step4.fields.delaiPaiement.options[delaiKey]
+    : majorationsCopy.notSet;
+
+  const yesNoLabels: Record<string, { yes: string; no: string }> = {
+    fr: { yes: 'Oui', no: 'Non' },
+    en: { yes: 'Yes', no: 'No' },
+  };
+  const yesNo = yesNoLabels[lang] || yesNoLabels.en;
+
+  const yearsUnit = t.common.year || (lang === 'fr' ? 'ans' : 'years');
+  const experienceDetail = formData.candidats.experience.obligatoire
+    ? (formData.candidats.experience.annees ? `${formData.candidats.experience.annees} ${yearsUnit}` : yesNo.yes)
+    : yesNo.no;
+
+  const getLangueMajorationLabel = () => {
+    const langues = formData.candidats.langues || {};
+    let bestLevel = '';
+    let bestValue = 0;
+    Object.values(langues).forEach((niveau) => {
+      const normalized = (niveau || '').toUpperCase();
+      const value = normalized === 'B1' ? 0.03
+        : normalized === 'B2' ? 0.04
+        : normalized === 'C1' ? 0.05
+        : normalized === 'C2' ? 0.07
+        : 0;
+      if (value > bestValue) {
+        bestValue = value;
+        bestLevel = normalized;
+      }
+    });
+    return bestLevel ? bestLevel : majorationsCopy.notSet;
+  };
+
   // 🆕 Recalcul complet avec nouvelles fonctions
   const calculerTotalCorrect = () => {
     let totalMensuel = 0;
@@ -57,7 +112,7 @@ export function StepRecapitulatif({ formData, onSubmit, isSubmitting, lang = 'fr
       const tauxHoraireBrut = poste.salaireBrut / 151.67;
       
       // Taux ETT avec suppléments horaires (sans panier)
-      const tauxETTAvecSupplements = calculerTauxETTComplet(
+      const tauxETTBase = calculerTauxETTComplet(
         tauxHoraireBrut,
         poste.coeffBase || 1.92,
         poste.facteurPays || 1.00,
@@ -68,10 +123,13 @@ export function StepRecapitulatif({ formData, onSubmit, isSubmitting, lang = 'fr
           transportETT: formData.conditions.transportLocal.chargeETT
         }
       );
+
+      // 🆕 Appliquer les majorations (délai paiement, expérience, permis, langues, outillage)
+      const tauxETTMajore = appliquerMajorationTaux(tauxETTBase, majorations.total);
       
       // Coût main d'œuvre avec heures sup
       const detailHeures = calculerCoutAvecHeuresSup(
-        tauxETTAvecSupplements,
+        tauxETTMajore,
         baseHoraire,
         poste.quantite
       );
@@ -267,7 +325,7 @@ export function StepRecapitulatif({ formData, onSubmit, isSubmitting, lang = 'fr
             const tauxHoraireBrut = poste.salaireBrut / 151.67; // Toujours sur base légale
             
             // Taux ETT avec suppléments horaires uniquement (sans panier)
-            const tauxETTAvecSupplements = calculerTauxETTComplet(
+            const tauxETTBase = calculerTauxETTComplet(
               tauxHoraireBrut,
               poste.coeffBase || 1.92,
               poste.facteurPays || 1.00,
@@ -278,10 +336,13 @@ export function StepRecapitulatif({ formData, onSubmit, isSubmitting, lang = 'fr
                 transportETT: formData.conditions.transportLocal.chargeETT
               }
             );
+
+            // 🆕 Appliquer les majorations (délai paiement, expérience, permis, langues, outillage)
+            const tauxETTMajore = appliquerMajorationTaux(tauxETTBase, majorations.total);
             
             // Détail des heures supplémentaires
             const detailHeures = calculerCoutAvecHeuresSup(
-              tauxETTAvecSupplements,
+              tauxETTMajore,
               baseHoraire,
               poste.quantite
             );
@@ -389,7 +450,7 @@ export function StepRecapitulatif({ formData, onSubmit, isSubmitting, lang = 'fr
                       {/* Heures normales */}
                       <div className="flex items-center justify-between">
                         <span className="text-white/70">
-                          {t.recapitulatif.postes.heuresNormales} : {detailHeures.heuresNormales}h × {formaterMontant(tauxETTAvecSupplements)}/h
+                          {t.recapitulatif.postes.heuresNormales} : {detailHeures.heuresNormales}h × {formaterMontant(tauxETTMajore)}/h
                         </span>
                         <span className="text-white font-medium">
                           {formaterMontant(detailHeures.coutHeuresNormales)}
@@ -400,7 +461,7 @@ export function StepRecapitulatif({ formData, onSubmit, isSubmitting, lang = 'fr
                       {detailHeures.heures25 > 0 && (
                         <div className="flex items-center justify-between">
                           <span className="text-white/70">
-                            {t.recapitulatif.postes.heuresSup25} : {detailHeures.heures25}h × {formaterMontant(tauxETTAvecSupplements * 1.25)}/h
+                            {t.recapitulatif.postes.heuresSup25} : {detailHeures.heures25}h × {formaterMontant(tauxETTMajore * 1.25)}/h
                           </span>
                           <span className="text-orange-400 font-medium">
                             {formaterMontant(detailHeures.coutHeures25)}
@@ -412,7 +473,7 @@ export function StepRecapitulatif({ formData, onSubmit, isSubmitting, lang = 'fr
                       {detailHeures.heures50 > 0 && (
                         <div className="flex items-center justify-between">
                           <span className="text-white/70">
-                            {t.recapitulatif.postes.heuresSup50} : {detailHeures.heures50}h × {formaterMontant(tauxETTAvecSupplements * 1.50)}/h
+                            {t.recapitulatif.postes.heuresSup50} : {detailHeures.heures50}h × {formaterMontant(tauxETTMajore * 1.50)}/h
                           </span>
                           <span className="text-red-400 font-medium">
                             {formaterMontant(detailHeures.coutHeures50)}
@@ -441,7 +502,7 @@ export function StepRecapitulatif({ formData, onSubmit, isSubmitting, lang = 'fr
                     </div>
                     <div>
                       <p className="text-white/60">{t.recapitulatif.postes.tauxETTFinal}</p>
-                      <p className="text-white font-medium">{formaterMontant(tauxETTAvecSupplements)}/h</p>
+                      <p className="text-white font-medium">{formaterMontant(tauxETTMajore)}/h</p>
                     </div>
                     <div>
                       <p className="text-white/60">{t.recapitulatif.postes.coutMensuel}</p>
@@ -485,6 +546,69 @@ export function StepRecapitulatif({ formData, onSubmit, isSubmitting, lang = 'fr
               <p className="text-white/60 text-sm">{t.recapitulatif.conditions.lieuMission}</p>
               <p className="text-white">{formData.conditions.lieuxMission}</p>
             </div>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Majorations appliquées */}
+      <Card className="border border-white/10 bg-white/5 backdrop-blur-sm">
+        <CardHeader>
+          <CardTitle className="text-white flex items-center gap-2">
+            <DollarSign className="w-5 h-5 text-orange-400" />
+            {majorationsCopy.title}
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-2 text-sm">
+          <div className="flex items-center justify-between">
+            <span className="text-white/70">
+              {t.step4.fields.delaiPaiement.label}
+              <span className="text-white/50"> • {delaiPaiementLabel}</span>
+            </span>
+            <span className={majorations.delaiPaiement < 0 ? 'text-emerald-400 font-medium' : majorations.delaiPaiement > 0 ? 'text-orange-300 font-medium' : 'text-white/70'}>
+              {formatPercent(majorations.delaiPaiement)}
+            </span>
+          </div>
+          <div className="flex items-center justify-between">
+            <span className="text-white/70">
+              {t.step5.sections.experience.obligatoire.label}
+              <span className="text-white/50"> • {experienceDetail}</span>
+            </span>
+            <span className={majorations.experience > 0 ? 'text-orange-300 font-medium' : 'text-white/70'}>
+              {formatPercent(majorations.experience)}
+            </span>
+          </div>
+          <div className="flex items-center justify-between">
+            <span className="text-white/70">
+              {t.step5.sections.permis.requis.label}
+              <span className="text-white/50"> • {formData.candidats.permis.requis ? yesNo.yes : yesNo.no}</span>
+            </span>
+            <span className={majorations.permis > 0 ? 'text-orange-300 font-medium' : 'text-white/70'}>
+              {formatPercent(majorations.permis)}
+            </span>
+          </div>
+          <div className="flex items-center justify-between">
+            <span className="text-white/70">
+              {t.step5.sections.langues.title}
+              <span className="text-white/50"> • {getLangueMajorationLabel()}</span>
+            </span>
+            <span className={majorations.langues > 0 ? 'text-orange-300 font-medium' : 'text-white/70'}>
+              {formatPercent(majorations.langues)}
+            </span>
+          </div>
+          <div className="flex items-center justify-between">
+            <span className="text-white/70">
+              {t.step5.sections.outillage.requis.label}
+              <span className="text-white/50"> • {formData.candidats.outillage.requis ? yesNo.yes : yesNo.no}</span>
+            </span>
+            <span className={majorations.outillage > 0 ? 'text-orange-300 font-medium' : 'text-white/70'}>
+              {formatPercent(majorations.outillage)}
+            </span>
+          </div>
+          <div className="flex items-center justify-between border-t border-white/10 pt-2 mt-2">
+            <span className="text-white font-medium">{majorationsCopy.total}</span>
+            <span className={majorations.total < 0 ? 'text-emerald-400 font-bold' : majorations.total > 0 ? 'text-cyan-400 font-bold' : 'text-white/70'}>
+              {formatPercent(majorations.total)}
+            </span>
           </div>
         </CardContent>
       </Card>

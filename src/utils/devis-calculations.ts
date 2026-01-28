@@ -1,6 +1,6 @@
 // Utilitaires de calcul pour les devis YOJOB
 
-import { COEFFICIENTS, SUPPLEMENTS } from '../data/config/constants';
+import { COEFFICIENTS, SUPPLEMENTS, MAJORATIONS_TAUX } from '../data/config/constants';
 import { getPanierRepas } from '../data/config/helpers';
 
 interface PosteData {
@@ -453,6 +453,90 @@ export function calculerPanierRepasMensuel(
   const montantMensuel = montantPanierJour * joursParMois * quantite;
   
   return Math.round(montantMensuel * 100) / 100;
+}
+
+// ============================================
+// 🧮 MAJORATIONS DU TAUX HORAIRE AGENCE
+// ============================================
+
+export interface MajorationBreakdown {
+  delaiPaiement: number;
+  experience: number;
+  permis: number;
+  langues: number;
+  outillage: number;
+  total: number;
+}
+
+export function calculerMajorationDelaiPaiement(delaiPaiement?: string): number {
+  if (!delaiPaiement) return 0;
+  const mapping = MAJORATIONS_TAUX.delaiPaiement as Record<string, number>;
+  return mapping[delaiPaiement] ?? 0;
+}
+
+export function calculerMajorationExperience(experience?: { obligatoire?: boolean; annees?: number }): number {
+  if (!experience?.obligatoire || !experience.annees) return 0;
+  const annees = experience.annees;
+  if (annees >= 4 && annees <= 6) return MAJORATIONS_TAUX.experience.entre_4_6;
+  if (annees >= 7 && annees <= 10) return MAJORATIONS_TAUX.experience.entre_7_10;
+  if (annees > 10) return MAJORATIONS_TAUX.experience.plus_10;
+  return 0;
+}
+
+export function calculerMajorationPermis(permis?: { requis?: boolean }): number {
+  return permis?.requis ? MAJORATIONS_TAUX.permis : 0;
+}
+
+export function calculerMajorationOutillage(outillage?: { requis?: boolean }): number {
+  return outillage?.requis ? MAJORATIONS_TAUX.outillage : 0;
+}
+
+export function calculerMajorationLangues(langues?: Record<string, string>): number {
+  if (!langues) return 0;
+  let maxMajoration = 0;
+  const mapping = MAJORATIONS_TAUX.langues as Record<string, number>;
+
+  Object.values(langues).forEach((niveau) => {
+    if (!niveau) return;
+    const normalized = niveau.toUpperCase();
+    const majoration = mapping[normalized] ?? 0;
+    if (majoration > maxMajoration) {
+      maxMajoration = majoration;
+    }
+  });
+
+  return maxMajoration;
+}
+
+export function calculerMajorationsDevis(params: {
+  delaiPaiement?: string;
+  experience?: { obligatoire?: boolean; annees?: number };
+  permis?: { requis?: boolean };
+  langues?: Record<string, string>;
+  outillage?: { requis?: boolean };
+}): MajorationBreakdown {
+  const delaiPaiement = calculerMajorationDelaiPaiement(params.delaiPaiement);
+  const experience = calculerMajorationExperience(params.experience);
+  const permis = calculerMajorationPermis(params.permis);
+  const langues = calculerMajorationLangues(params.langues);
+  const outillage = calculerMajorationOutillage(params.outillage);
+
+  const total = delaiPaiement + experience + permis + langues + outillage;
+
+  return {
+    delaiPaiement,
+    experience,
+    permis,
+    langues,
+    outillage,
+    total,
+  };
+}
+
+export function appliquerMajorationTaux(taux: number, pourcentage: number): number {
+  if (!taux) return 0;
+  const tauxMajore = taux * (1 + pourcentage);
+  return Math.round(tauxMajore * 100) / 100;
 }
 
 /**

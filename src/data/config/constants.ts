@@ -219,6 +219,33 @@ export const SUPPLEMENTS = {
 };
 
 // ==========================================
+// 📈 MAJORATIONS TAUX HORAIRE AGENCE
+// ==========================================
+
+export const MAJORATIONS_TAUX = {
+  delaiPaiement: {
+    reception: 0,
+    reception_facture: -0.10, // Remise 10% si paiement à réception de facture
+    j30: 0.15,
+    j45: 0.20,
+    j60: 0.25,
+  },
+  experience: {
+    entre_4_6: 0.03,
+    entre_7_10: 0.05,
+    plus_10: 0.07,
+  },
+  permis: 0.01,
+  outillage: 0.05,
+  langues: {
+    B1: 0.03,
+    B2: 0.04,
+    C1: 0.05,
+    C2: 0.07,
+  },
+} as const;
+
+// ==========================================
 // 🗣️ NIVEAUX DE LANGUE
 // ==========================================
 
