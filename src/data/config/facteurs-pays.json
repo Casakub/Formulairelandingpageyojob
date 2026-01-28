@@ -59,6 +59,126 @@
       "label": "Slovénie",
       "facteur": 1.04,
       "description": "Majoration liée aux coûts de détachement"
+    },
+    "FR": {
+      "code": "FR",
+      "label": "France",
+      "facteur": 1.00,
+      "description": "Coefficient provisoire (à ajuster)"
+    },
+    "DE": {
+      "code": "DE",
+      "label": "Allemagne",
+      "facteur": 1.00,
+      "description": "Coefficient provisoire (à ajuster)"
+    },
+    "AT": {
+      "code": "AT",
+      "label": "Autriche",
+      "facteur": 1.00,
+      "description": "Coefficient provisoire (à ajuster)"
+    },
+    "BE": {
+      "code": "BE",
+      "label": "Belgique",
+      "facteur": 1.00,
+      "description": "Coefficient provisoire (à ajuster)"
+    },
+    "CY": {
+      "code": "CY",
+      "label": "Chypre",
+      "facteur": 1.00,
+      "description": "Coefficient provisoire (à ajuster)"
+    },
+    "DK": {
+      "code": "DK",
+      "label": "Danemark",
+      "facteur": 1.00,
+      "description": "Coefficient provisoire (à ajuster)"
+    },
+    "EE": {
+      "code": "EE",
+      "label": "Estonie",
+      "facteur": 1.00,
+      "description": "Coefficient provisoire (à ajuster)"
+    },
+    "FI": {
+      "code": "FI",
+      "label": "Finlande",
+      "facteur": 1.00,
+      "description": "Coefficient provisoire (à ajuster)"
+    },
+    "GR": {
+      "code": "GR",
+      "label": "Grèce",
+      "facteur": 1.00,
+      "description": "Coefficient provisoire (à ajuster)"
+    },
+    "IE": {
+      "code": "IE",
+      "label": "Irlande",
+      "facteur": 1.00,
+      "description": "Coefficient provisoire (à ajuster)"
+    },
+    "IT": {
+      "code": "IT",
+      "label": "Italie",
+      "facteur": 1.00,
+      "description": "Coefficient provisoire (à ajuster)"
+    },
+    "LV": {
+      "code": "LV",
+      "label": "Lettonie",
+      "facteur": 1.00,
+      "description": "Coefficient provisoire (à ajuster)"
+    },
+    "LT": {
+      "code": "LT",
+      "label": "Lituanie",
+      "facteur": 1.00,
+      "description": "Coefficient provisoire (à ajuster)"
+    },
+    "LU": {
+      "code": "LU",
+      "label": "Luxembourg",
+      "facteur": 1.00,
+      "description": "Coefficient provisoire (à ajuster)"
+    },
+    "MT": {
+      "code": "MT",
+      "label": "Malte",
+      "facteur": 1.00,
+      "description": "Coefficient provisoire (à ajuster)"
+    },
+    "NL": {
+      "code": "NL",
+      "label": "Pays-Bas",
+      "facteur": 1.00,
+      "description": "Coefficient provisoire (à ajuster)"
+    },
+    "SE": {
+      "code": "SE",
+      "label": "Suède",
+      "facteur": 1.00,
+      "description": "Coefficient provisoire (à ajuster)"
+    },
+    "NO": {
+      "code": "NO",
+      "label": "Norvège",
+      "facteur": 1.00,
+      "description": "Coefficient provisoire (à ajuster)"
+    },
+    "CH": {
+      "code": "CH",
+      "label": "Suisse",
+      "facteur": 1.00,
+      "description": "Coefficient provisoire (à ajuster)"
+    },
+    "GB": {
+      "code": "GB",
+      "label": "Royaume-Uni",
+      "facteur": 1.00,
+      "description": "Coefficient provisoire (à ajuster)"
     }
   },
   "metadata": {

@@ -69,6 +69,146 @@
       "flag": "🇸🇮",
       "actif": true,
       "ordre": 10
+    },
+    {
+      "code": "FR",
+      "label": "France",
+      "flag": "🇫🇷",
+      "actif": true,
+      "ordre": 11
+    },
+    {
+      "code": "DE",
+      "label": "Allemagne",
+      "flag": "🇩🇪",
+      "actif": true,
+      "ordre": 12
+    },
+    {
+      "code": "AT",
+      "label": "Autriche",
+      "flag": "🇦🇹",
+      "actif": true,
+      "ordre": 13
+    },
+    {
+      "code": "BE",
+      "label": "Belgique",
+      "flag": "🇧🇪",
+      "actif": true,
+      "ordre": 14
+    },
+    {
+      "code": "CY",
+      "label": "Chypre",
+      "flag": "🇨🇾",
+      "actif": true,
+      "ordre": 15
+    },
+    {
+      "code": "DK",
+      "label": "Danemark",
+      "flag": "🇩🇰",
+      "actif": true,
+      "ordre": 16
+    },
+    {
+      "code": "EE",
+      "label": "Estonie",
+      "flag": "🇪🇪",
+      "actif": true,
+      "ordre": 17
+    },
+    {
+      "code": "FI",
+      "label": "Finlande",
+      "flag": "🇫🇮",
+      "actif": true,
+      "ordre": 18
+    },
+    {
+      "code": "GR",
+      "label": "Grèce",
+      "flag": "🇬🇷",
+      "actif": true,
+      "ordre": 19
+    },
+    {
+      "code": "IE",
+      "label": "Irlande",
+      "flag": "🇮🇪",
+      "actif": true,
+      "ordre": 20
+    },
+    {
+      "code": "IT",
+      "label": "Italie",
+      "flag": "🇮🇹",
+      "actif": true,
+      "ordre": 21
+    },
+    {
+      "code": "LV",
+      "label": "Lettonie",
+      "flag": "🇱🇻",
+      "actif": true,
+      "ordre": 22
+    },
+    {
+      "code": "LT",
+      "label": "Lituanie",
+      "flag": "🇱🇹",
+      "actif": true,
+      "ordre": 23
+    },
+    {
+      "code": "LU",
+      "label": "Luxembourg",
+      "flag": "🇱🇺",
+      "actif": true,
+      "ordre": 24
+    },
+    {
+      "code": "MT",
+      "label": "Malte",
+      "flag": "🇲🇹",
+      "actif": true,
+      "ordre": 25
+    },
+    {
+      "code": "NL",
+      "label": "Pays-Bas",
+      "flag": "🇳🇱",
+      "actif": true,
+      "ordre": 26
+    },
+    {
+      "code": "SE",
+      "label": "Suède",
+      "flag": "🇸🇪",
+      "actif": true,
+      "ordre": 27
+    },
+    {
+      "code": "NO",
+      "label": "Norvège",
+      "flag": "🇳🇴",
+      "actif": true,
+      "ordre": 28
+    },
+    {
+      "code": "CH",
+      "label": "Suisse",
+      "flag": "🇨🇭",
+      "actif": true,
+      "ordre": 29
+    },
+    {
+      "code": "GB",
+      "label": "Royaume-Uni",
+      "flag": "🇬🇧",
+      "actif": true,
+      "ordre": 30
     }
   ],
   "metadata": {

@@ -533,7 +533,12 @@ export function StepRecapitulatif({ formData, onSubmit, isSubmitting, lang = 'fr
         <div className="flex-1">
           <Label htmlFor="conditions" className="text-white cursor-pointer">
             {t.recapitulatif.acceptConditions.text}{' '}
-            <a href="/privacy" className="text-cyan-400 hover:underline">
+            <a 
+              href="/privacy" 
+              target="_blank" 
+              rel="noopener noreferrer"
+              className="text-cyan-400 hover:underline"
+            >
               {t.recapitulatif.acceptConditions.lien}
             </a>
           </Label>
