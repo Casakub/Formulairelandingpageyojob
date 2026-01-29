@@ -334,9 +334,9 @@ export const daLandingPage: LandingPageContent = {
       copyright: "© 2026 YOJOB. Alle rettigheder forbeholdt.",
       madeWith: "Lavet med ❤️ for at lette europæisk rekruttering",
       legalLinks: [
-        { label: "Juridisk information", href: "/juridisk-information" },
+        { label: "Juridisk information", href: "/legal" },
         { label: "Vilkår", href: "/cgv" },
-        { label: "Privatlivspolitik", href: "/privatliv" }
+        { label: "Privatlivspolitik", href: "/privacy" }
       ]
     }
   }

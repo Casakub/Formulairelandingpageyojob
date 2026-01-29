@@ -334,9 +334,9 @@ export const ltLandingPage: LandingPageContent = {
       copyright: "© 2026 YOJOB. Visos teisės saugomos.",
       madeWith: "Sukurta su ❤️ Europos įdarbinimo palengvinimui",
       legalLinks: [
-        { label: "Teisinė informacija", href: "/teisine-informacija" },
+        { label: "Teisinė informacija", href: "/legal" },
         { label: "BS", href: "/cgv" },
-        { label: "Privatumo politika", href: "/privatumas" }
+        { label: "Privatumo politika", href: "/privacy" }
       ]
     }
   }

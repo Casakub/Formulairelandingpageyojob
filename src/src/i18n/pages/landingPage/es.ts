@@ -334,9 +334,9 @@ export const esLandingPage: LandingPageContent = {
       copyright: "© 2026 YOJOB. Todos los derechos reservados.",
       madeWith: "Hecho con ❤️ para facilitar el reclutamiento europeo",
       legalLinks: [
-        { label: "Aviso legal", href: "/aviso-legal" },
+        { label: "Aviso legal", href: "/legal" },
         { label: "CGV", href: "/cgv" },
-        { label: "Política de privacidad", href: "/privacidad" }
+        { label: "Política de privacidad", href: "/privacy" }
       ]
     }
   }

@@ -334,9 +334,9 @@ export const huLandingPage: LandingPageContent = {
       copyright: "© 2026 YOJOB. Minden jog fenntartva.",
       madeWith: "❤️-tel készült az európai toborzás megkönnyítésére",
       legalLinks: [
-        { label: "Jogi nyilatkozat", href: "/jogi-nyilatkozat" },
+        { label: "Jogi nyilatkozat", href: "/legal" },
         { label: "ÁSZF", href: "/cgv" },
-        { label: "Adatvédelmi irányelvek", href: "/adatvedelem" }
+        { label: "Adatvédelmi irányelvek", href: "/privacy" }
       ]
     }
   }

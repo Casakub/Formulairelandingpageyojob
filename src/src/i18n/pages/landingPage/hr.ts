@@ -334,9 +334,9 @@ export const hrLandingPage: LandingPageContent = {
       copyright: "© 2026 YOJOB. Sva prava pridržana.",
       madeWith: "Izrađeno s ❤️ kako bi se olakšalo europsko zapošljavanje",
       legalLinks: [
-        { label: "Pravne napomene", href: "/pravne-napomene" },
+        { label: "Pravne napomene", href: "/legal" },
         { label: "OUP", href: "/cgv" },
-        { label: "Politika privatnosti", href: "/privatnost" }
+        { label: "Politika privatnosti", href: "/privacy" }
       ]
     }
   }

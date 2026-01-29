@@ -334,9 +334,9 @@ export const csLandingPage: LandingPageContent = {
       copyright: "© 2026 YOJOB. Všechna práva vyhrazena.",
       madeWith: "Vytvořeno s ❤️ pro usnadnění evropského náboru",
       legalLinks: [
-        { label: "Právní upozornění", href: "/pravni-upozorneni" },
+        { label: "Právní upozornění", href: "/legal" },
         { label: "VOP", href: "/cgv" },
-        { label: "Zásady ochrany osobních údajů", href: "/soukromi" }
+        { label: "Zásady ochrany osobních údajů", href: "/privacy" }
       ]
     }
   }

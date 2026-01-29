@@ -334,9 +334,9 @@ export const elLandingPage: LandingPageContent = {
       copyright: "© 2026 YOJOB. Όλα τα δικαιώματα διατηρούνται.",
       madeWith: "Δημιουργήθηκε με ❤️ για να διευκολύνει την Ευρωπαϊκή πρόσληψη",
       legalLinks: [
-        { label: "Νομικές πληροφορίες", href: "/nomikes-pliroforles" },
+        { label: "Νομικές πληροφορίες", href: "/legal" },
         { label: "ΓΟΣ", href: "/cgv" },
-        { label: "Πολιτική απορρήτου", href: "/aporreto" }
+        { label: "Πολιτική απορρήτου", href: "/privacy" }
       ]
     }
   }

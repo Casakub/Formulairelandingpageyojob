@@ -334,9 +334,9 @@ export const lvLandingPage: LandingPageContent = {
       copyright: "© 2026 YOJOB. Visas tiesības aizsargātas.",
       madeWith: "Izveidots ar ❤️, lai atvieglotu Eiropas personāla atlasi",
       legalLinks: [
-        { label: "Juridiskā informācija", href: "/juridiska-informacija" },
+        { label: "Juridiskā informācija", href: "/legal" },
         { label: "VN", href: "/cgv" },
-        { label: "Konfidencialitātes politika", href: "/konfidencialitate" }
+        { label: "Konfidencialitātes politika", href: "/privacy" }
       ]
     }
   }

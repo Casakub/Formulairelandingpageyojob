@@ -334,9 +334,9 @@ export const etLandingPage: LandingPageContent = {
       copyright: "© 2026 YOJOB. Kõik õigused kaitstud.",
       madeWith: "Tehtud ❤️-ga Euroopa värbamise hõlbustamiseks",
       legalLinks: [
-        { label: "Juriidiline teave", href: "/juriidiline-teave" },
+        { label: "Juriidiline teave", href: "/legal" },
         { label: "ÜT", href: "/cgv" },
-        { label: "Privaatsuspoliitika", href: "/privaatsus" }
+        { label: "Privaatsuspoliitika", href: "/privacy" }
       ]
     }
   }

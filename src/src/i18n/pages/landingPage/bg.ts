@@ -334,9 +334,9 @@ export const bgLandingPage: LandingPageContent = {
       copyright: "© 2026 YOJOB. Всички права запазени.",
       madeWith: "Създадено с ❤️ за улесняване на европейското набиране",
       legalLinks: [
-        { label: "Правна информация", href: "/pravna-informatsia" },
+        { label: "Правна информация", href: "/legal" },
         { label: "ОУ", href: "/cgv" },
-        { label: "Политика за поверителност", href: "/poveritelnost" }
+        { label: "Политика за поверителност", href: "/privacy" }
       ]
     }
   }

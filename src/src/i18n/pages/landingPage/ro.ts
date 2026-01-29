@@ -334,9 +334,9 @@ export const roLandingPage: LandingPageContent = {
       copyright: "© 2026 YOJOB. Toate drepturile rezervate.",
       madeWith: "Creat cu ❤️ pentru a facilita recrutarea europeană",
       legalLinks: [
-        { label: "Mențiuni legale", href: "/mentiuni-legale" },
+        { label: "Mențiuni legale", href: "/legal" },
         { label: "CGV", href: "/cgv" },
-        { label: "Politica de confidențialitate", href: "/confidentialitate" }
+        { label: "Politica de confidențialitate", href: "/privacy" }
       ]
     }
   }

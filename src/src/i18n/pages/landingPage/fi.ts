@@ -334,9 +334,9 @@ export const fiLandingPage: LandingPageContent = {
       copyright: "© 2026 YOJOB. Kaikki oikeudet pidätetään.",
       madeWith: "Tehty ❤️:lla eurooppalaisen rekrytoinnin helpottamiseksi",
       legalLinks: [
-        { label: "Oikeudelliset tiedot", href: "/oikeudelliset-tiedot" },
+        { label: "Oikeudelliset tiedot", href: "/legal" },
         { label: "Ehdot", href: "/cgv" },
-        { label: "Tietosuojakäytäntö", href: "/tietosuoja" }
+        { label: "Tietosuojakäytäntö", href: "/privacy" }
       ]
     }
   }

@@ -324,9 +324,9 @@ export const deLandingPage: LandingPageContent = {
       copyright: "© 2026 YOJOB. Alle Rechte vorbehalten.",
       madeWith: "Mit ❤️ gemacht, um europäische Personalbeschaffung zu erleichtern",
       legalLinks: [
-        { label: "Impressum", href: "/mentions-legales" },
+        { label: "Impressum", href: "/legal" },
         { label: "AGB", href: "/cgv" },
-        { label: "Datenschutzrichtlinie", href: "/confidentialite" }
+        { label: "Datenschutzrichtlinie", href: "/privacy" }
       ]
     }
   }

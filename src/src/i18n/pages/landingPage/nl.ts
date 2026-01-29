@@ -334,7 +334,7 @@ export const nlLandingPage: LandingPageContent = {
       copyright: "© 2026 YOJOB. Alle rechten voorbehouden.",
       madeWith: "Gemaakt met ❤️ om Europese werving te vergemakkelijken",
       legalLinks: [
-        { label: "Juridische vermeldingen", href: "/juridische-vermeldingen" },
+        { label: "Juridische vermeldingen", href: "/legal" },
         { label: "AVV", href: "/cgv" },
         { label: "Privacybeleid", href: "/privacy" }
       ]

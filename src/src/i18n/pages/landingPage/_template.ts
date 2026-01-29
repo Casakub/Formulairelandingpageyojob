@@ -322,9 +322,9 @@ export const [LANGUAGE_CODE]LandingPage: LandingPageContent = {
       copyright: "© 2026 YOJOB. [Traduire] Tous droits réservés.",
       madeWith: "[Traduire] Fait avec ❤️ pour faciliter le recrutement européen",
       legalLinks: [
-        { label: "[Traduire] Mentions légales", href: "/mentions-legales" },
+        { label: "[Traduire] Mentions légales", href: "/legal" },
         { label: "[Traduire] CGV", href: "/cgv" },
-        { label: "[Traduire] Politique de confidentialité", href: "/confidentialite" }
+        { label: "[Traduire] Politique de confidentialité", href: "/privacy" }
       ]
     }
   }
