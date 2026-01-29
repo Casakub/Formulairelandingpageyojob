@@ -723,41 +723,41 @@ export interface DevisTranslations {
       lieuxMission: string;
       motifRecours: string;
     };
-    exigences: {
+    candidats: {
       title: string;
       experience: string;
-      competences: string;
-      langues: string;
+      ansMinimum: string;
+      formation: string;
       permis: string;
-      epi: string;
-    };
-    calculs: {
-      title: string;
-      salaireBrut: string;
-      coefficientETT: string;
-      tauxHoraireBrut: string;
-      tauxETT: string;
-      baseHoraire: string;
-      coutMensuel: string;
-      duree: string;
-      coutTotal: string;
+      langues: string;
     };
     signature: {
       title: string;
-      intro: string;
-      nomComplet: {
-        label: string;
-        placeholder: string;
-      };
-      email: {
-        label: string;
-        placeholder: string;
-      };
-      checkbox: string;
-      boutonSigner: string;
-      enCours: string;
-      succes: string;
-      erreur: string;
+      subtitle: string;
+      commencer: string;
+      identiteSignataire: string;
+      nomComplet: string;
+      fonction: string;
+      email: string;
+      entreprise: string;
+      siret: string;
+      signataire: string;
+      tracabilite: string;
+      dateHeure: string;
+      adresseIP: string;
+      navigateur: string;
+      signatureManuscrite: string;
+      infoLegale: string;
+      dessinerSignature: string;
+      effacer: string;
+      accepteCGV: string;
+      cgvLien: string;
+      accepteCGVSuite: string;
+      annuler: string;
+      validerSigner: string;
+      signatureEnCours: string;
+      erreurSignatureVide: string;
+      erreurCGV: string;
     };
     actions: {
       modifier: string;

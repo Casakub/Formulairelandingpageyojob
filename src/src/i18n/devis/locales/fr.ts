@@ -829,6 +829,7 @@ export const fr: DevisTranslations = {
     header: {
       title: "Récapitulatif de devis",
       exportPDF: "Export PDF",
+      apercuImpression: "Aperçu & Impression",
       loading: "Chargement du devis...",
       notFound: "Devis non trouvé",
     },
@@ -841,6 +842,26 @@ export const fr: DevisTranslations = {
       a: "à",
       signeLe: "Signé le",
       derniereModification: "Dernière modification :",
+    },
+    tooltips: {
+      signezPourPDF: "Signez votre devis pour débloquer le PDF officiel",
+      signezMaintenant: "Signez maintenant pour recevoir votre PDF officiel",
+      documentDisponible: "Le document sera disponible immédiatement après signature",
+      pdfDebloque: "PDF débloqué !",
+      telechargerPDF: "Vous pouvez maintenant télécharger votre devis officiel en haut de page",
+    },
+    modales: {
+      apercu: {
+        title: "Aperçu du devis",
+        imprimer: "Imprimer / Enregistrer PDF",
+      },
+      cgv: {
+        title: "Conditions Générales de Vente",
+      },
+    },
+    print: {
+      courtage: "Courtage en recrutement européen",
+      documentGenere: "Document généré le",
     },
     entreprise: {
       title: "Informations entreprise",
@@ -895,7 +916,12 @@ export const fr: DevisTranslations = {
       email: "Email",
       entreprise: "Entreprise",
       siret: "SIRET",
+      signataire: "Signataire",
+      tracabilite: "Traçabilité technique",
+      dateHeure: "Date et heure",
       adresseIP: "Adresse IP",
+      navigateur: "Navigateur",
+      signatureManuscrite: "Signature manuscrite",
       infoLegale: "🔒 Ces informations seront enregistrées dans le certificat de signature électronique pour garantir la traçabilité et la conformité légale selon le règlement eIDAS (UE) n°910/2014.",
       dessinerSignature: "Dessinez votre signature ci-dessous",
       effacer: "Effacer",

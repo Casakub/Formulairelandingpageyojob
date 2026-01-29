@@ -828,6 +828,7 @@ export const ro: DevisTranslations = {
     header: {
       title: "Recapitulare ofertă",
       exportPDF: "Export PDF",
+      apercuImpression: "Previzualizare & Imprimare",
       loading: "Se încarcă oferta...",
       notFound: "Oferta nu a fost găsită",
     },
@@ -840,6 +841,26 @@ export const ro: DevisTranslations = {
       a: "la",
       signeLe: "Semnat la",
       derniereModification: "Ultima modificare:",
+    },
+    tooltips: {
+      signezPourPDF: "Semnați pentru a debloca PDF-ul oficial",
+      signezMaintenant: "Semnați acum pentru a primi PDF-ul oficial",
+      documentDisponible: "Documentul va fi disponibil imediat după semnare",
+      pdfDebloque: "PDF deblocat!",
+      telechargerPDF: "Puteți descărca acum oferta oficială în partea de sus",
+    },
+    modales: {
+      apercu: {
+        title: "Previzualizare ofertă",
+        imprimer: "Imprimare / Salvare PDF",
+      },
+      cgv: {
+        title: "Condiții Generale de Vânzare",
+      },
+    },
+    print: {
+      courtage: "Recrutare europeană",
+      documentGenere: "Document generat la",
     },
     entreprise: {
       title: "Informații companie",
@@ -894,7 +915,12 @@ export const ro: DevisTranslations = {
       email: "Email",
       entreprise: "Companie",
       siret: "SIRET",
+      signataire: "Semnatar",
+      tracabilite: "Trasabilitate tehnică",
+      dateHeure: "Data și ora",
       adresseIP: "Adresă IP",
+      navigateur: "Browser",
+      signatureManuscrite: "Semnătură manuscrisă",
       infoLegale: "🔒 Aceste informații vor fi înregistrate în certificatul de semnătură electronică pentru a garanta trasabilitatea și conformitatea legală conform regulamentului eIDAS (UE) nr. 910/2014.",
       dessinerSignature: "Desenați semnătura dvs. mai jos",
       effacer: "Șterge",

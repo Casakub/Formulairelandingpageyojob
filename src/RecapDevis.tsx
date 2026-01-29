@@ -15,7 +15,8 @@ import {
   Loader2,
   PenTool,
   X,
-  Printer
+  Printer,
+  ArrowLeft
 } from 'lucide-react';
 import { Button } from './components/ui/button';
 import { Card, CardContent } from './components/ui/card';
@@ -25,6 +26,8 @@ import { Checkbox } from './components/ui/checkbox';
 import { Label } from './components/ui/label';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from './components/ui/dialog';
 import { LogoSvg } from './imports/YojobLogoComplete';
+import { LanguageSelector } from './components/shared/LanguageSelector';
+import { RECAP_COMPLETE_LANGUAGES } from './src/i18n/devis/languages';
 import { toast } from 'sonner@2.0.3';
 import { projectId, publicAnonKey } from './utils/supabase/info';
 import SignatureCanvas from 'react-signature-canvas';
@@ -114,7 +117,15 @@ export default function RecapDevis() {
   // Initialiser la langue sélectionnée quand le devis est chargé
   useEffect(() => {
     if (devisData?.language) {
-      setSelectedLang(devisData.language as DevisLanguage);
+      // Vérifier si la langue du devis est complète pour RecapDevis
+      const devisLang = devisData.language as DevisLanguage;
+      if (RECAP_COMPLETE_LANGUAGES.includes(devisLang)) {
+        setSelectedLang(devisLang);
+      } else {
+        // Si la langue n'est pas complète, utiliser français par défaut
+        console.warn(`⚠️ Langue ${devisLang} non complète pour RecapDevis. Utilisation du français.`);
+        setSelectedLang('fr');
+      }
     }
   }, [devisData]);
 
@@ -251,12 +262,12 @@ export default function RecapDevis() {
     signatureRef.current?.clear();
   };
 
-  if (isLoading) {
+  if (isLoading || isLoadingTranslations) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-blue-900 via-violet-900 to-cyan-900 flex items-center justify-center">
         <div className="text-center">
           <Loader2 className="w-12 h-12 text-cyan-400 animate-spin mx-auto mb-4" />
-          <p className="text-white/70">Chargement du devis...</p>
+          <p className="text-white/70">{isLoadingTranslations ? 'Chargement des traductions...' : 'Chargement du devis...'}</p>
         </div>
       </div>
     );
@@ -267,6 +278,77 @@ export default function RecapDevis() {
       <div className="min-h-screen bg-gradient-to-br from-blue-900 via-violet-900 to-cyan-900 flex items-center justify-center">
         <Card className="bg-white/10 backdrop-blur-md border-white/20 p-8">
           <p className="text-white text-center">Devis non trouvé</p>
+        </Card>
+      </div>
+    );
+  }
+
+  // Vérifier que les traductions sont complètes avant de rendre
+  if (!t.pageRecap || !t.pageRecap.header) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-blue-900 via-violet-900 to-cyan-900 flex items-center justify-center">
+        <div className="text-center">
+          <Loader2 className="w-12 h-12 text-cyan-400 animate-spin mx-auto mb-4" />
+          <p className="text-white/70">Chargement des traductions...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Vérifier que toutes les sections critiques existent
+  const sectionsRequises = [
+    t.pageRecap.header,
+    t.pageRecap.entreprise,
+    t.pageRecap.contact,
+    t.pageRecap.postes,
+    t.pageRecap.conditions,
+    t.pageRecap.candidats,
+    t.pageRecap.signature,
+    t.pageRecap.statut,
+    t.pageRecap.dates
+  ];
+
+  const sectionsManquantes = sectionsRequises.some(section => !section);
+  
+  if (sectionsManquantes) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-blue-900 via-violet-900 to-cyan-900 flex items-center justify-center p-4">
+        <Card className="bg-white/10 backdrop-blur-md border-white/20 p-8 max-w-lg w-full mx-4">
+          <div className="text-center mb-6">
+            <p className="text-white text-xl mb-4">⚠️ Traductions incomplètes pour cette langue</p>
+            <p className="text-white/70 text-sm mb-8">
+              Certaines sections ne sont pas encore disponibles. Veuillez utiliser le français, l'anglais, l'allemand, l'espagnol, l'italien, le polonais ou le roumain.
+            </p>
+          </div>
+          
+          {/* Bouton Retour */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.2 }}
+            className="flex justify-center"
+          >
+            <Button
+              onClick={() => window.history.back()}
+              className="group relative overflow-hidden bg-white/10 hover:bg-white/20 border border-white/20 
+                         hover:border-white/40 backdrop-blur-md text-white px-6 py-3 rounded-full 
+                         transition-all duration-300 shadow-lg hover:shadow-white/20"
+            >
+              <motion.div
+                className="flex items-center gap-2"
+                whileHover={{ x: -4 }}
+                transition={{ duration: 0.2 }}
+              >
+                <ArrowLeft className="w-5 h-5" />
+                <span>{t.navigation.back}</span>
+              </motion.div>
+              
+              {/* Effet shimmer au hover */}
+              <div className="absolute inset-0 -translate-x-full group-hover:translate-x-full 
+                              transition-transform duration-700 bg-gradient-to-r from-transparent 
+                              via-white/20 to-transparent" />
+            </Button>
+          </motion.div>
         </Card>
       </div>
     );
@@ -295,41 +377,45 @@ export default function RecapDevis() {
           <div className="container mx-auto px-4 py-4">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-4">
+                {/* Bouton Retour */}
+                <motion.button
+                  onClick={() => window.history.back()}
+                  whileHover={{ scale: 1.05, x: -3 }}
+                  whileTap={{ scale: 0.95 }}
+                  className="flex items-center gap-2 px-4 py-2 rounded-full bg-white/10 hover:bg-white/20 backdrop-blur-sm border border-white/20 hover:border-cyan-400/50 transition-all duration-300 shadow-lg hover:shadow-cyan-500/30 group"
+                >
+                  <ArrowLeft className="w-4 h-4 text-white/70 group-hover:text-cyan-400 transition-colors" />
+                  <span className="text-white/70 group-hover:text-white text-sm hidden sm:inline transition-colors">
+                    {lang === 'fr' ? 'Retour' : 
+                     lang === 'en' ? 'Back' : 
+                     lang === 'de' ? 'Zurück' : 
+                     lang === 'es' ? 'Volver' : 
+                     lang === 'it' ? 'Indietro' : 
+                     lang === 'pl' ? 'Powrót' : 
+                     lang === 'ro' ? 'Înapoi' : 'Retour'}
+                  </span>
+                </motion.button>
+
                 <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-[#1E3A8A] via-[#06B6D4] to-[#7C3AED] p-0.5 shadow-lg">
                   <div className="w-full h-full rounded-[10px] bg-white/95 backdrop-blur-sm flex items-center justify-center">
                     <LogoSvg className="w-8 h-8" />
                   </div>
                 </div>
-                <div>
+                <div className="hidden md:block">
                   <h1 className="text-white text-xl">YOJOB</h1>
                   <p className="text-white/60 text-sm">{t.pageRecap.header.title}</p>
                 </div>
               </div>
 
               <div className="flex items-center gap-3">
-                {/* Sélecteur de langue */}
-                <div className="flex items-center gap-2 p-1 rounded-full bg-white/10 backdrop-blur-sm border border-white/20">
-                  <button
-                    onClick={() => setSelectedLang('fr')}
-                    className={`px-3 py-1.5 rounded-full text-sm transition-all duration-300 ${
-                      selectedLang === 'fr'
-                        ? 'bg-gradient-to-r from-blue-500 to-cyan-500 text-white shadow-lg shadow-cyan-500/50'
-                        : 'text-white/70 hover:text-white hover:bg-white/10'
-                    }`}
-                  >
-                    🇫🇷 FR
-                  </button>
-                  <button
-                    onClick={() => setSelectedLang('ro')}
-                    className={`px-3 py-1.5 rounded-full text-sm transition-all duration-300 ${
-                      selectedLang === 'ro'
-                        ? 'bg-gradient-to-r from-violet-500 to-purple-500 text-white shadow-lg shadow-purple-500/50'
-                        : 'text-white/70 hover:text-white hover:bg-white/10'
-                    }`}
-                  >
-                    🇷🇴 RO
-                  </button>
-                </div>
+                {/* Sélecteur de langue unifié */}
+                <LanguageSelector
+                  currentLanguage={selectedLang}
+                  onLanguageChange={(lang) => setSelectedLang(lang as DevisLanguage)}
+                  availableLanguages={RECAP_COMPLETE_LANGUAGES}
+                  variant="default"
+                  languageSource="devis"
+                />
 
                 <div className="relative group">
                   <Button

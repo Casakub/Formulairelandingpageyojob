@@ -56,6 +56,21 @@ export const MVP_LANGUAGES: DevisLanguage[] = ['fr', 'en', 'de', 'es', 'pl', 'ro
 export const AVAILABLE_LANGUAGES: DevisLanguage[] = ['fr', 'en', 'de', 'es', 'pl', 'ro', 'it', 'pt', 'nl', 'bg', 'hu', 'cs', 'sk', 'hr', 'sl', 'et', 'lt', 'lv', 'el', 'fi', 'sv', 'da'];
 
 /**
+ * Langues avec traductions complètes pour la page RecapDevis (pageRecap)
+ * Ces langues incluent toutes les sections : header, statut, dates, entreprise, 
+ * contact, postes, conditions, candidats, signature, tooltips, modales, print, etc.
+ * 
+ * ✅ TOUTES LES 22 LANGUES EUROPÉENNES SONT COMPLÈTES !
+ */
+export const RECAP_COMPLETE_LANGUAGES: DevisLanguage[] = [
+  'fr', 'en', 'de', 'es', 'it', 'pl', 'ro',  // Phase 1-2
+  'pt', 'nl', 'bg', 'hu',                     // Phase 2-3
+  'cs', 'sk', 'hr', 'sl',                     // Phase 3
+  'et', 'lt', 'lv',                           // Phase 5 (Baltes)
+  'el', 'fi', 'sv', 'da'                      // Phase 4 (Sud + Nordiques)
+];
+
+/**
  * Langue par défaut
  */
 export const DEFAULT_LANGUAGE: DevisLanguage = 'fr';
