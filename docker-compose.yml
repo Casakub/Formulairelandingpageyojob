@@ -1,6 +1,6 @@
 # =============================================================================
 # DOCKER COMPOSE - YoJob Landing Page
-# Configuration pour déploiement Hostinger avec support Figma Make
+# Configuration pour déploiement Hostinger derrière Traefik
 # =============================================================================
 
 services:
@@ -8,38 +8,71 @@ services:
   # Service principal : Application web
   # ---------------------------------------------------------------------------
   yojob-landing:
-    # Nom du container
     container_name: yojob-landing-page
-
-    # Build depuis une image locale
     image: yojob-landing:latest
+
+    # Build configuration
     build:
       context: .
       dockerfile: Dockerfile
-      # Arguments passés au Dockerfile pour le build Vite
       args:
         - VITE_SUPABASE_URL=${VITE_SUPABASE_URL}
         - VITE_SUPABASE_ANON_KEY=${VITE_SUPABASE_ANON_KEY}
         - VITE_APP_ENV=${VITE_APP_ENV:-production}
-
-    # Port mapping : port_hote:port_container
-    ports:
-      - "3000:80"
+    pull_policy: build
 
     # Variables d'environnement runtime
     environment:
       - NODE_ENV=production
       - TZ=Europe/Paris
+      - APP_URL=https://yojob.fr
 
-    # Politique de redémarrage
     restart: unless-stopped
 
-    # Labels pour identification et mise à jour
+    # -------------------------------------------------------------------------
+    # Traefik Configuration
+    # -------------------------------------------------------------------------
     labels:
-      - "app.name=yojob-landing"
-      - "app.source=figma-make"
-      - "app.branch=claude/docker-compose-setup-R4UoP"
-      - "app.repo=https://github.com/Casakub/Formulairelandingpageyojob"
+      # Activer Traefik pour ce service
+      - traefik.enable=true
+
+      # Règle de routage : domaines yojob.fr et www.yojob.fr
+      - traefik.http.routers.yojob.rule=Host(`yojob.fr`) || Host(`www.yojob.fr`)
+      - traefik.http.routers.yojob.entrypoints=websecure
+      - traefik.http.routers.yojob.tls=true
+      - traefik.http.routers.yojob.tls.certresolver=mytlschallenge
+
+      # Port du service (nginx écoute sur 80)
+      - traefik.http.services.yojob.loadbalancer.server.port=80
+
+      # Réseau Docker pour Traefik
+      - traefik.docker.network=n8n-network
+
+      # Redirection www vers non-www (optionnel)
+      - traefik.http.middlewares.yojob-redirect-www.redirectregex.regex=^https://www\.yojob\.fr/(.*)
+      - traefik.http.middlewares.yojob-redirect-www.redirectregex.replacement=https://yojob.fr/$${1}
+      - traefik.http.middlewares.yojob-redirect-www.redirectregex.permanent=true
+
+      # Headers de sécurité
+      - traefik.http.middlewares.yojob-headers.headers.stsSeconds=31536000
+      - traefik.http.middlewares.yojob-headers.headers.stsIncludeSubdomains=true
+      - traefik.http.middlewares.yojob-headers.headers.stsPreload=true
+
+      # Appliquer les middlewares
+      - traefik.http.routers.yojob.middlewares=yojob-headers
+
+      # Labels informatifs
+      - app.name=yojob-landing
+      - app.source=figma-make
+      - app.branch=claude/docker-compose-setup-R4UoP
+
+    # Healthcheck
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:80/"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
 
     # Limites de ressources
     deploy:
@@ -51,14 +84,6 @@ services:
           cpus: '0.25'
           memory: 128M
 
-    # Healthcheck
-    healthcheck:
-      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:80/"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-      start_period: 10s
-
     # Logging
     logging:
       driver: "json-file"
@@ -66,10 +91,13 @@ services:
         max-size: "10m"
         max-file: "3"
 
+    # Réseau partagé avec Traefik
+    networks:
+      - n8n-network
+
 # =============================================================================
 # NETWORKS
 # =============================================================================
 networks:
-  default:
-    name: yojob-network
-    driver: bridge
+  n8n-network:
+    external: true
