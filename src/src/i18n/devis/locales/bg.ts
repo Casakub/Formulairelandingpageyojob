@@ -622,6 +622,11 @@ export const bg: DevisTranslations = {
       lieuMission: "Място на мисията",
       mois: "месеца",
     },
+    majorations: {
+      title: "Тарифни корекции на мисията",
+      total: "Общо корекции",
+      notSet: "Няма зададени корекции",
+    },
     totaux: {
       mensuelHT: "Общо месечно без ДДС",
       mensuelTTC: "Общо месечно с ДДС",

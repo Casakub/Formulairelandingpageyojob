@@ -558,6 +558,11 @@ export const ro: DevisTranslations = {
       lieuMission: "Locul misiunii",
       mois: "luni",
     },
+    majorations: {
+      title: "Ajustări tarifare ale misiunii",
+      total: "Total ajustări",
+      notSet: "Nedefinit",
+    },
     totaux: {
       mensuelHT: "Total Lunar (fără TVA)",
       mensuelTTC: "Total Lunar (cu TVA)",

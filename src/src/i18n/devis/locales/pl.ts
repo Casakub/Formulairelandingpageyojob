@@ -247,6 +247,7 @@ export const pl: DevisTranslations = {
   step4: {
     title: "Warunki Pracy",
     subtitle: "Określ warunki zatrudnienia i oferowane świadczenia.",
+    dateError: "Data zakończenia musi być po dacie rozpoczęcia",
     fields: {
       dateDebut: {
         label: "Pożądana Data Rozpoczęcia",
@@ -266,6 +267,67 @@ export const pl: DevisTranslations = {
         label: "Miejsca Wykonywania Zadania",
         placeholder: "np. Paryż 15., Lyon 3., Marsylia...",
       },
+      periodeEssai: {
+        label: "Okres Próbny",
+        placeholder: "Wybierz czas trwania",
+        options: {
+          '2': '2 dni',
+          '3': '3 dni',
+          '5': '5 dni',
+          '15': '15 dni',
+        },
+      },
+      motifRecours: {
+        label: "Powód Korzystania z Pracy Tymczasowej",
+        placeholder: "Wybierz powód",
+        options: {
+          accroissement: "Tymczasowy wzrost aktywności",
+          remplacement: "Zastępstwo nieobecnego pracownika",
+          saisonnier: "Prace sezonowe",
+          exportation: "Wyjątkowe zamówienie eksportowe",
+          autre: "Inne (proszę określić)",
+        },
+      },
+      delaiPaiement: {
+        label: "Pożądany Termin Płatności",
+        placeholder: "Wybierz termin płatności",
+        options: {
+          reception: "Płatność przy odbiorze",
+          j30: "30 dni",
+          j45: "45 dni",
+          j60: "60 dni",
+        },
+      },
+    },
+    hebergement: {
+      title: "Zakwaterowanie",
+      chargeEU: {
+        label: "Zakwaterowanie zapewnione przez firmę klienta",
+        helper: "Jeśli NIE: dodatek godzinowy +3,50 €/godz zostanie naliczony przez agencję",
+      },
+      supplementWarning: "⚠️ Dodatek +3,50 €/godz zostanie zastosowany, ponieważ zakwaterowanie nie jest zapewnione",
+      commentaire: {
+        label: "Szczegóły dotyczące zakwaterowania",
+        placeholder: "Rodzaj zakwaterowania, adres, szczególne warunki...",
+      },
+    },
+    transport: {
+      title: "Transport Lokalny",
+      chargeETT: {
+        label: "Transport lokalny zapewniony przez agencję",
+        helper: "Jeśli TAK: dodatek godzinowy +1,50 €/godz zostanie naliczony",
+      },
+      supplementInfo: "✓ Dodatek +1,50 €/godz zostanie zastosowany na pokrycie kosztów transportu lokalnego",
+    },
+    repas: {
+      title: "Posiłki",
+      options: {
+        restaurant: "Stołówka firmowa / Bony żywieniowe",
+        panier: "Pakowane posiłki (rozliczane dziennie)",
+        nonConcerne: "Nie dotyczy",
+      },
+      montantInfo: "📋 Kwota pakowanego posiłku: {montant} / dzień pracy (rozliczane osobno)",
+      montantNonDefini: "⚠️ Kwota niezdefiniowana dla tego kraju/regionu",
     },
     sections: {
       hebergement: {
@@ -375,6 +437,9 @@ export const pl: DevisTranslations = {
     sections: {
       experience: {
         title: "Doświadczenie Zawodowe",
+        obligatoire: {
+          label: "Wymagane Doświadczenie",
+        },
         annees: {
           label: "Minimalne Lata Doświadczenia",
           placeholder: "Wybierz poziom",
@@ -388,6 +453,16 @@ export const pl: DevisTranslations = {
         competences: {
           label: "Wymagane Umiejętności Techniczne",
           placeholder: "np. Murarstwo, szalowanie, czytanie planów, spawanie TIG...",
+        },
+      },
+      formation: {
+        title: "Szkolenie",
+        obligatoire: {
+          label: "Wymagane Szkolenie",
+        },
+        type: {
+          label: "Rodzaj Szkolenia",
+          placeholder: "np. Certyfikat murarza, uprawnienia na wózek widłowy...",
         },
       },
       langues: {
@@ -539,6 +614,11 @@ export const pl: DevisTranslations = {
       dureeEstimee: "Szacowany czas trwania",
       lieuMission: "Miejsce wykonywania zadania",
       mois: "miesiące",
+    },
+    majorations: {
+      title: "Korekty taryfowe zlecenia",
+      total: "Suma korekt",
+      notSet: "Nie zdefiniowano",
     },
     totaux: {
       mensuelHT: "Suma Miesięczna (netto)",

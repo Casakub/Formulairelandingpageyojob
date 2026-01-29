@@ -622,6 +622,11 @@ export const nl: DevisTranslations = {
       lieuMission: "Opdrachtslocatie",
       mois: "maanden",
     },
+    majorations: {
+      title: "Tariefaanpassingen van de opdracht",
+      total: "Totaal aanpassingen",
+      notSet: "Niet gedefinieerd",
+    },
     totaux: {
       mensuelHT: "Maandtotaal excl. btw",
       mensuelTTC: "Maandtotaal incl. btw",

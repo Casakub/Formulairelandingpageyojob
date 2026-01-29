@@ -622,6 +622,11 @@ export const hu: DevisTranslations = {
       lieuMission: "Kiküldetés helyszíne",
       mois: "hónap",
     },
+    majorations: {
+      title: "A megbízás árkorrekciói",
+      total: "Összes korrekció",
+      notSet: "Nincsenek beállított korrekciók",
+    },
     totaux: {
       mensuelHT: "Havi összesen ÁFA nélkül",
       mensuelTTC: "Havi összesen ÁFÁ-val",

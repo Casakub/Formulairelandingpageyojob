@@ -242,6 +242,7 @@ export const de: DevisTranslations = {
   step4: {
     title: "Arbeitsbedingungen",
     subtitle: "Geben Sie die Arbeitsbedingungen und angebotenen Leistungen an.",
+    dateError: "Das Enddatum muss nach dem Startdatum liegen",
     fields: {
       dateDebut: {
         label: "Gewünschtes Startdatum",
@@ -261,6 +262,67 @@ export const de: DevisTranslations = {
         label: "Einsatzorte",
         placeholder: "z.B. Paris 15., Lyon 3., Marseille...",
       },
+      periodeEssai: {
+        label: "Probezeit",
+        placeholder: "Wählen Sie eine Dauer",
+        options: {
+          '2': '2 Tage',
+          '3': '3 Tage',
+          '5': '5 Tage',
+          '15': '15 Tage',
+        },
+      },
+      motifRecours: {
+        label: "Grund für Zeitarbeit",
+        placeholder: "Wählen Sie einen Grund",
+        options: {
+          accroissement: "Vorübergehende Aktivitätssteigerung",
+          remplacement: "Ersatz für abwesenden Mitarbeiter",
+          saisonnier: "Saisonarbeiten",
+          exportation: "Außergewöhnlicher Exportauftrag",
+          autre: "Andere (bitte angeben)",
+        },
+      },
+      delaiPaiement: {
+        label: "Gewünschte Zahlungsfrist",
+        placeholder: "Wählen Sie eine Zahlungsfrist",
+        options: {
+          reception: "Zahlung bei Erhalt",
+          j30: "30 Tage",
+          j45: "45 Tage",
+          j60: "60 Tage",
+        },
+      },
+    },
+    hebergement: {
+      title: "Unterkunft",
+      chargeEU: {
+        label: "Unterkunft vom Kundenunternehmen bereitgestellt",
+        helper: "Wenn NEIN: Stundenzuschlag von +3,50 €/Std wird von der Agentur berechnet",
+      },
+      supplementWarning: "⚠️ Ein Zuschlag von +3,50 €/Std wird angewendet, da die Unterkunft nicht bereitgestellt wird",
+      commentaire: {
+        label: "Details zur Unterkunft",
+        placeholder: "Art der Unterkunft, Adresse, besondere Bedingungen...",
+      },
+    },
+    transport: {
+      title: "Lokaler Transport",
+      chargeETT: {
+        label: "Lokaler Transport von der Agentur bereitgestellt",
+        helper: "Wenn JA: Stundenzuschlag von +1,50 €/Std wird berechnet",
+      },
+      supplementInfo: "✓ Ein Zuschlag von +1,50 €/Std wird zur Deckung der lokalen Transportkosten angewendet",
+    },
+    repas: {
+      title: "Mahlzeiten",
+      options: {
+        restaurant: "Betriebskantine / Essensgutscheine",
+        panier: "Lunchpaket (tageweise abgerechnet)",
+        nonConcerne: "Nicht zutreffend",
+      },
+      montantInfo: "📋 Lunchpaket-Betrag: {montant} / Arbeitstag (separat abgerechnet)",
+      montantNonDefini: "⚠️ Betrag für dieses Land/Region nicht definiert",
     },
     sections: {
       hebergement: {
@@ -370,6 +432,9 @@ export const de: DevisTranslations = {
     sections: {
       experience: {
         title: "Berufserfahrung",
+        obligatoire: {
+          label: "Erforderliche Erfahrung",
+        },
         annees: {
           label: "Mindestjahre Erfahrung",
           placeholder: "Wählen Sie ein Niveau",
@@ -383,6 +448,16 @@ export const de: DevisTranslations = {
         competences: {
           label: "Erforderliche technische Fähigkeiten",
           placeholder: "z.B. Maurerarbeiten, Schalungsarbeiten, Planlesung, WIG-Schweißen...",
+        },
+      },
+      formation: {
+        title: "Ausbildung",
+        obligatoire: {
+          label: "Erforderliche Ausbildung",
+        },
+        type: {
+          label: "Art der Ausbildung",
+          placeholder: "z.B. Maurerausbildung, Gabelstaplerführerschein...",
         },
       },
       langues: {
@@ -534,6 +609,11 @@ export const de: DevisTranslations = {
       dureeEstimee: "Geschätzte Dauer",
       lieuMission: "Einsatzort",
       mois: "Monate",
+    },
+    majorations: {
+      title: "Angewandte Anpassungen",
+      total: "Gesamtanpassungen",
+      notSet: "Nicht angegeben",
     },
     totaux: {
       mensuelHT: "Monatssumme (netto)",

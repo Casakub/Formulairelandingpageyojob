@@ -620,7 +620,12 @@ export const lt: DevisTranslations = {
       dateFin: "Pabaigos data",
       dureeEstimee: "Numatoma trukmė",
       lieuMission: "Misijos vieta",
-      mois: "mėnesių",
+      mois: "mėn.",
+    },
+    majorations: {
+      title: "Misijos tarifinės pataisos",
+      total: "Iš viso pataisų",
+      notSet: "Nėra nustatytų pataisų",
     },
     totaux: {
       mensuelHT: "Viso per mėnesį be PVM",

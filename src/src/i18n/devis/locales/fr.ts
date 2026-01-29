@@ -559,6 +559,11 @@ export const fr: DevisTranslations = {
       lieuMission: "Lieu de mission",
       mois: "mois",
     },
+    majorations: {
+      title: "Ajustements tarifaires de la mission",
+      total: "Total ajustements",
+      notSet: "Non défini",
+    },
     totaux: {
       mensuelHT: "Total mensuel HT",
       mensuelTTC: "Total mensuel TTC",

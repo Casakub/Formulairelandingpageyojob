@@ -622,6 +622,11 @@ export const et: DevisTranslations = {
       lieuMission: "Missiooni asukoht",
       mois: "kuud",
     },
+    majorations: {
+      title: "Missiooni tariifikohandused",
+      total: "Kohandused kokku",
+      notSet: "Kohandusi ei ole määratud",
+    },
     totaux: {
       mensuelHT: "Kokku kuus ilma KM-ta",
       mensuelTTC: "Kokku kuus koos KM-ga",

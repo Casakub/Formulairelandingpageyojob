@@ -48,6 +48,40 @@ export function StepRecapitulatif({ formData, onSubmit, isSubmitting, lang = 'fr
   const { t, isLoading: isLoadingTranslations } = useDevisTranslationStatic(lang);
   const [accepteConditions, setAccepteConditions] = useState(false);
 
+  // 🔒 Protection : Afficher le loader si les traductions ne sont pas chargées
+  if (isLoadingTranslations) {
+    return (
+      <div className="flex items-center justify-center py-12">
+        <div className="text-center">
+          <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-cyan-400 mb-4"></div>
+          <div className="text-white/70 text-lg">Chargement des traductions...</div>
+        </div>
+      </div>
+    );
+  }
+
+  // 🔒 Vérification complète : toutes les structures de traduction nécessaires
+  if (!t || 
+      !t.common || 
+      !t.recapitulatif || 
+      !t.recapitulatif.majorations ||
+      !t.step3?.fields?.nationalite ||
+      !t.step4?.fields?.delaiPaiement?.options ||
+      !t.step5?.sections?.experience?.obligatoire ||
+      !t.step5?.sections?.formation?.obligatoire ||
+      !t.step5?.sections?.permis?.requis ||
+      !t.step5?.sections?.langues ||
+      !t.step5?.sections?.outillage?.requis) {
+    return (
+      <div className="flex items-center justify-center py-12">
+        <div className="text-center">
+          <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-cyan-400 mb-4"></div>
+          <div className="text-white/70 text-lg">Chargement des traductions...</div>
+        </div>
+      </div>
+    );
+  }
+
   const majorations = calculerMajorationsDevis({
     delaiPaiement: formData.conditions.delaiPaiement,
     experience: formData.candidats.experience,
@@ -55,12 +89,6 @@ export function StepRecapitulatif({ formData, onSubmit, isSubmitting, lang = 'fr
     langues: formData.candidats.langues,
     outillage: formData.candidats.outillage,
   });
-
-  const majorationsTexts: Record<string, { title: string; total: string; notSet: string }> = {
-    fr: { title: 'Majorations appliquées', total: 'Total majorations', notSet: 'Non défini' },
-    en: { title: 'Applied adjustments', total: 'Total adjustments', notSet: 'Not specified' },
-  };
-  const majorationsCopy = majorationsTexts[lang] || majorationsTexts.en;
 
   const formatPercent = (value: number) => {
     if (!value) return '0%';
@@ -71,7 +99,7 @@ export function StepRecapitulatif({ formData, onSubmit, isSubmitting, lang = 'fr
   const delaiKey = formData.conditions.delaiPaiement as keyof typeof t.step4.fields.delaiPaiement.options | undefined;
   const delaiPaiementLabel = delaiKey
     ? t.step4.fields.delaiPaiement.options[delaiKey]
-    : majorationsCopy.notSet;
+    : t.recapitulatif.majorations.notSet;
 
   const yesNoLabels: Record<string, { yes: string; no: string }> = {
     fr: { yes: 'Oui', no: 'Non' },
@@ -100,7 +128,7 @@ export function StepRecapitulatif({ formData, onSubmit, isSubmitting, lang = 'fr
         bestLevel = normalized;
       }
     });
-    return bestLevel ? bestLevel : majorationsCopy.notSet;
+    return bestLevel ? bestLevel : t.recapitulatif.majorations.notSet;
   };
 
   // 🆕 Recalcul complet avec nouvelles fonctions
@@ -174,14 +202,6 @@ export function StepRecapitulatif({ formData, onSubmit, isSubmitting, lang = 'fr
     }
     onSubmit();
   };
-
-  if (isLoadingTranslations) {
-    return (
-      <div className="flex items-center justify-center py-12">
-        <div className="text-white/70">{t.common.loading}</div>
-      </div>
-    );
-  }
 
   return (
     <div className="space-y-6">
@@ -427,10 +447,10 @@ export function StepRecapitulatif({ formData, onSubmit, isSubmitting, lang = 'fr
                     <div className="text-sm space-y-1">
                       <div className="flex items-center justify-between text-white/70">
                         <span>
-                          {formaterMontant(montantPanierJour)}/jour × {joursParMois} jours × {poste.quantite} pers.
+                          {formaterMontant(montantPanierJour)}{t.common.perDay} × {joursParMois} {t.common.days} × {poste.quantite} {t.common.persons}
                         </span>
                         <span className="text-green-400 font-medium">
-                          {formaterMontant(panierMensuel)}/mois
+                          {formaterMontant(panierMensuel)}{t.common.perMonth}
                         </span>
                       </div>
                     </div>
@@ -555,7 +575,7 @@ export function StepRecapitulatif({ formData, onSubmit, isSubmitting, lang = 'fr
         <CardHeader>
           <CardTitle className="text-white flex items-center gap-2">
             <DollarSign className="w-5 h-5 text-orange-400" />
-            {majorationsCopy.title}
+            {t.recapitulatif.majorations.title}
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-2 text-sm">
@@ -605,7 +625,7 @@ export function StepRecapitulatif({ formData, onSubmit, isSubmitting, lang = 'fr
             </span>
           </div>
           <div className="flex items-center justify-between border-t border-white/10 pt-2 mt-2">
-            <span className="text-white font-medium">{majorationsCopy.total}</span>
+            <span className="text-white font-medium">{t.recapitulatif.majorations.total}</span>
             <span className={majorations.total < 0 ? 'text-emerald-400 font-bold' : majorations.total > 0 ? 'text-cyan-400 font-bold' : 'text-white/70'}>
               {formatPercent(majorations.total)}
             </span>

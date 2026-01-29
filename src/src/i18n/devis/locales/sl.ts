@@ -622,6 +622,11 @@ export const sl: DevisTranslations = {
       lieuMission: "Lokacija misije",
       mois: "mesecev",
     },
+    majorations: {
+      title: "Tarifne prilagoditve misije",
+      total: "Skupne prilagoditve",
+      notSet: "Ni nastavljenih prilagoditev",
+    },
     totaux: {
       mensuelHT: "Skupaj mesečno brez DDV",
       mensuelTTC: "Skupaj mesečno z DDV",

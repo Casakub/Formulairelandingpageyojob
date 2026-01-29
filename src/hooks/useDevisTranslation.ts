@@ -199,19 +199,24 @@ export function useDevisTranslation(initialLang: DevisLanguage = DEFAULT_LANGUAG
  */
 export function useDevisTranslationStatic(lang: DevisLanguage = DEFAULT_LANGUAGE) {
   const [translations, setTranslations] = useState<DevisTranslations>(LOCAL_TRANSLATIONS[lang] || fr);
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(true); // Commencer à true
 
   useEffect(() => {
     // Si la langue est dans le cache local, l'utiliser directement
     if (LOCAL_TRANSLATIONS[lang]) {
-      setTranslations(LOCAL_TRANSLATIONS[lang]);
-      setIsLoading(false);
+      console.log(`✅ [useDevisTranslationStatic] Traductions ${lang} chargées depuis le cache local`);
+      
+      // 🔄 Utiliser setTimeout pour permettre à React de terminer le cycle de rendu
+      setTimeout(() => {
+        setTranslations(LOCAL_TRANSLATIONS[lang]);
+        setIsLoading(false);
+      }, 0);
+      
       return;
     }
 
     // Sinon, tenter de charger depuis le backend
     let isMounted = true;
-    setIsLoading(true);
 
     const loadTranslations = async () => {
       try {

@@ -553,6 +553,11 @@ export const it: DevisTranslations = {
       lieuMission: "Luogo della missione",
       mois: "mesi",
     },
+    majorations: {
+      title: "Adeguamenti applicati",
+      total: "Totale adeguamenti",
+      notSet: "Non specificato",
+    },
     totaux: {
       mensuelHT: "Totale mensile IVA esclusa",
       mensuelTTC: "Totale mensile IVA inclusa",

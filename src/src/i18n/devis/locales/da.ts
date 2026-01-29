@@ -622,6 +622,11 @@ export const da: DevisTranslations = {
       lieuMission: "Opdragssted",
       mois: "måneder",
     },
+    majorations: {
+      title: "Opdragstarif justeringer",
+      total: "I alt justeringer",
+      notSet: "Ikke defineret",
+    },
     totaux: {
       mensuelHT: "I alt pr. måned ekskl. moms",
       mensuelTTC: "I alt pr. måned inkl. moms",

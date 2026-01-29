@@ -622,6 +622,11 @@ export const lv: DevisTranslations = {
       lieuMission: "Misijas vieta",
       mois: "mēneši",
     },
+    majorations: {
+      title: "Misijas tarifu korekcijas",
+      total: "Korekcijas kopā",
+      notSet: "Nav iestatītu korekciju",
+    },
     totaux: {
       mensuelHT: "Kopā mēnesī bez PVN",
       mensuelTTC: "Kopā mēnesī ar PVN",

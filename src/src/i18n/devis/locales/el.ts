@@ -622,6 +622,11 @@ export const el: DevisTranslations = {
       lieuMission: "Τοποθεσία αποστολής",
       mois: "μήνες",
     },
+    majorations: {
+      title: "Τιμολογιακές προσαρμογές αποστολής",
+      total: "Σύνολο προσαρμογών",
+      notSet: "Δεν έχουν οριστεί προσαρμογές",
+    },
     totaux: {
       mensuelHT: "Σύνολο μηνιαίως χωρίς ΦΠΑ",
       mensuelTTC: "Σύνολο μηνιαίως με ΦΠΑ",

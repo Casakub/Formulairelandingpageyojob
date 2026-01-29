@@ -622,6 +622,11 @@ export const pt: DevisTranslations = {
       lieuMission: "Local da missão",
       mois: "meses",
     },
+    majorations: {
+      title: "Ajustamentos tarifários da missão",
+      total: "Total de ajustamentos",
+      notSet: "Não definido",
+    },
     totaux: {
       mensuelHT: "Total mensal s/IVA",
       mensuelTTC: "Total mensal c/IVA",
@@ -753,7 +758,7 @@ export const pt: DevisTranslations = {
       postes: {
         cuisinier: "Cozinheiro",
         commis_cuisine: "Ajudante de cozinha",
-        chef_partie: "Chef de partie",
+        chef_partie: "Chef de parte",
         serveur: "Empregado de mesa",
         barman: "Barman",
         plongeur: "Lavador de loiça",

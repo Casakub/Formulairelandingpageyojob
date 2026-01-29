@@ -622,6 +622,11 @@ export const sk: DevisTranslations = {
       lieuMission: "Miesto misie",
       mois: "mesiacov",
     },
+    majorations: {
+      title: "Tarifné úpravy zákazky",
+      total: "Celkom úpravy",
+      notSet: "Nie je definované",
+    },
     totaux: {
       mensuelHT: "Celkom mesačne bez DPH",
       mensuelTTC: "Celkom mesačne s DPH",

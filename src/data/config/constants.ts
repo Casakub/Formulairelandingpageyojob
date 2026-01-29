@@ -225,23 +225,23 @@ export const SUPPLEMENTS = {
 export const MAJORATIONS_TAUX = {
   delaiPaiement: {
     reception: 0,
-    reception_facture: -0.10, // Remise 10% si paiement à réception de facture
-    j30: 0.15,
-    j45: 0.20,
-    j60: 0.25,
+    reception_facture: -0.03, // Remise 3% si paiement à réception de facture
+    j30: 0.03,
+    j45: 0.05,
+    j60: 0.07,
   },
   experience: {
-    entre_4_6: 0.03,
-    entre_7_10: 0.05,
-    plus_10: 0.07,
+    entre_4_6: 0.01,
+    entre_7_10: 0.02,
+    plus_10: 0.03,
   },
   permis: 0.01,
-  outillage: 0.05,
+  outillage: 0.01,
   langues: {
-    B1: 0.03,
-    B2: 0.04,
-    C1: 0.05,
-    C2: 0.07,
+    B1: 0.01,
+    B2: 0.015,
+    C1: 0.018,
+    C2: 0.02,
   },
 } as const;
 

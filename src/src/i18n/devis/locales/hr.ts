@@ -622,6 +622,11 @@ export const hr: DevisTranslations = {
       lieuMission: "Mjesto misije",
       mois: "mjeseci",
     },
+    majorations: {
+      title: "Tarifne prilagodbe misije",
+      total: "Ukupne prilagodbe",
+      notSet: "Nije definirano",
+    },
     totaux: {
       mensuelHT: "Ukupno mjesečno bez PDV-a",
       mensuelTTC: "Ukupno mjesečno s PDV-om",

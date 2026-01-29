@@ -622,6 +622,11 @@ export const fi: DevisTranslations = {
       lieuMission: "Työpaikan sijainti",
       mois: "kuukautta",
     },
+    majorations: {
+      title: "Toimeksiannon hinnoittelumuutokset",
+      total: "Muutokset yhteensä",
+      notSet: "Ei asetettuja muutoksia",
+    },
     totaux: {
       mensuelHT: "Yhteensä kuukaudessa alv 0%",
       mensuelTTC: "Yhteensä kuukaudessa sis. alv",

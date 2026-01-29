@@ -242,6 +242,7 @@ export const es: DevisTranslations = {
   step4: {
     title: "Condiciones de Trabajo",
     subtitle: "Especifique las condiciones de empleo y beneficios ofrecidos.",
+    dateError: "La fecha de fin debe ser posterior a la fecha de inicio",
     fields: {
       dateDebut: {
         label: "Fecha de Inicio Deseada",
@@ -261,6 +262,67 @@ export const es: DevisTranslations = {
         label: "Lugares de Misión",
         placeholder: "ej. París 15, Lyon 3, Marsella...",
       },
+      periodeEssai: {
+        label: "Período de Prueba",
+        placeholder: "Seleccione una duración",
+        options: {
+          '2': '2 días',
+          '3': '3 días',
+          '5': '5 días',
+          '15': '15 días',
+        },
+      },
+      motifRecours: {
+        label: "Motivo del Recurso al Trabajo Temporal",
+        placeholder: "Seleccione un motivo",
+        options: {
+          accroissement: "Aumento temporal de actividad",
+          remplacement: "Reemplazo de empleado ausente",
+          saisonnier: "Trabajos estacionales",
+          exportation: "Pedido excepcional de exportación",
+          autre: "Otro (por favor especificar)",
+        },
+      },
+      delaiPaiement: {
+        label: "Plazo de Pago Deseado",
+        placeholder: "Seleccione un plazo de pago",
+        options: {
+          reception: "Pago al recibir",
+          j30: "30 días",
+          j45: "45 días",
+          j60: "60 días",
+        },
+      },
+    },
+    hebergement: {
+      title: "Alojamiento",
+      chargeEU: {
+        label: "Alojamiento proporcionado por la empresa cliente",
+        helper: "Si NO: se cobrará un suplemento por hora de +3,50 €/h por parte de la agencia",
+      },
+      supplementWarning: "⚠️ Se aplicará un suplemento de +3,50 €/h ya que el alojamiento no está proporcionado",
+      commentaire: {
+        label: "Detalles sobre el alojamiento",
+        placeholder: "Tipo de alojamiento, dirección, condiciones especiales...",
+      },
+    },
+    transport: {
+      title: "Transporte Local",
+      chargeETT: {
+        label: "Transporte local proporcionado por la agencia",
+        helper: "Si SÍ: se cobrará un suplemento por hora de +1,50 €/h",
+      },
+      supplementInfo: "✓ Se aplicará un suplemento de +1,50 €/h para cubrir los costes de transporte local",
+    },
+    repas: {
+      title: "Comidas",
+      options: {
+        restaurant: "Restaurante de empresa / Vales de comida",
+        panier: "Cesta de comida (facturado por día)",
+        nonConcerne: "No aplicable",
+      },
+      montantInfo: "📋 Importe de la cesta de comida: {montant} / día trabajado (facturado por separado)",
+      montantNonDefini: "⚠️ Importe no definido para este país/región",
     },
     sections: {
       hebergement: {
@@ -370,6 +432,9 @@ export const es: DevisTranslations = {
     sections: {
       experience: {
         title: "Experiencia Profesional",
+        obligatoire: {
+          label: "Experiencia Requerida",
+        },
         annees: {
           label: "Años Mínimos de Experiencia",
           placeholder: "Seleccione un nivel",
@@ -383,6 +448,16 @@ export const es: DevisTranslations = {
         competences: {
           label: "Habilidades Técnicas Requeridas",
           placeholder: "ej. Albañilería, encofrado, lectura de planos, soldadura TIG...",
+        },
+      },
+      formation: {
+        title: "Formación",
+        obligatoire: {
+          label: "Formación Requerida",
+        },
+        type: {
+          label: "Tipo de Formación",
+          placeholder: "ej. Certificado de Albañilería, Licencia de Carretilla Elevadora...",
         },
       },
       langues: {
@@ -534,6 +609,11 @@ export const es: DevisTranslations = {
       dureeEstimee: "Duración estimada",
       lieuMission: "Lugar de la misión",
       mois: "meses",
+    },
+    majorations: {
+      title: "Ajustes Aplicados",
+      total: "Total de Ajustes",
+      notSet: "No especificado",
     },
     totaux: {
       mensuelHT: "Total Mensual (sin IVA)",
