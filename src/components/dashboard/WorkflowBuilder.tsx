@@ -84,7 +84,11 @@ export function WorkflowBuilder({ open, onClose, onSave, editingWorkflow }: Work
       setWorkflowName(editingWorkflow.name);
       setWorkflowDescription(editingWorkflow.description);
       setTrigger(editingWorkflow.trigger);
-      setConditions(editingWorkflow.conditions || []);
+      const normalizedConditions = (editingWorkflow.conditions || []).map((condition: any) => ({
+        ...condition,
+        type: condition.type || condition.field || 'prospect_type',
+      }));
+      setConditions(normalizedConditions);
       setSteps(editingWorkflow.steps || []);
       setCurrentStep(1);
     } else {
@@ -138,14 +142,14 @@ export function WorkflowBuilder({ open, onClose, onSave, editingWorkflow }: Work
     setConditions(conditions.filter((_, i) => i !== index));
   };
 
-  const handleSave = () => {
+  const handleSave = (desiredStatus: 'draft' | 'active' = 'draft') => {
     const workflow: Partial<AutomationWorkflow> = {
       name: workflowName,
       description: workflowDescription,
       trigger,
       conditions,
       steps,
-      status: 'draft',
+      status: desiredStatus,
     };
     
     // Ajouter l'ID si on édite un workflow existant
@@ -627,7 +631,7 @@ export function WorkflowBuilder({ open, onClose, onSave, editingWorkflow }: Work
                   <Button
                     variant="outline"
                     onClick={() => {
-                      handleSave();
+                      handleSave('draft');
                     }}
                     disabled={!isStepValid()}
                   >
@@ -636,7 +640,7 @@ export function WorkflowBuilder({ open, onClose, onSave, editingWorkflow }: Work
                   </Button>
                   <Button
                     onClick={() => {
-                      handleSave();
+                      handleSave('active');
                     }}
                     disabled={!isStepValid()}
                     className="bg-gradient-to-r from-green-500 to-emerald-500 text-white"

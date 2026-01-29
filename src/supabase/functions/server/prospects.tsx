@@ -424,6 +424,26 @@ app.patch("/:id/status", async (c) => {
         user_name: 'Admin',
       }]);
 
+    // 🔥 Déclencher automatiquement les workflows status_changed (non bloquant)
+    try {
+      const supabaseUrl = Deno.env.get("SUPABASE_URL");
+      const anonKey = Deno.env.get("SUPABASE_ANON_KEY");
+      if (supabaseUrl && anonKey) {
+        fetch(`${supabaseUrl}/functions/v1/make-server-10092a63/workflow-engine/trigger/status_changed`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${anonKey}`,
+          },
+          body: JSON.stringify({ prospect_id: id, status_from: prospect.status, status_to: status }),
+        }).catch(err => {
+          console.error('⚠️ Erreur trigger status_changed (non-bloquant):', err);
+        });
+      }
+    } catch (error: any) {
+      console.error('⚠️ Erreur déclenchement workflows status_changed:', error);
+    }
+
     return c.json({
       success: true,
       prospect: updatedProspect,

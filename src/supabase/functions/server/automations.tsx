@@ -1,16 +1,59 @@
 import { Hono } from "npm:hono@4";
+import { createClient } from "npm:@supabase/supabase-js@2.39.3";
 import { 
   MOCK_WORKFLOWS, 
   MOCK_AUTOMATION_RUNS, 
   MOCK_EMAIL_TEMPLATES,
   MOCK_AUTOMATION_LOGS,
-  WORKFLOW_TEMPLATES,
-  MOCK_SMTP_SETTINGS 
+  WORKFLOW_TEMPLATES 
 } from "./automations-data.ts";
-import { emailService, sendTemplateEmail, addUnsubscribeLink } from "./email-service.tsx";
+import * as kv from "./kv_store.tsx";
+import { sendEmailWithConfig } from "./email-service.tsx";
 import { getApiKey, getSelectedModel } from "./settings.tsx";
 
 const app = new Hono();
+
+// Helper pour obtenir le client Supabase
+function getSupabaseClient() {
+  const supabaseUrl = Deno.env.get("SUPABASE_URL");
+  const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
+
+  if (!supabaseUrl || !supabaseServiceKey) {
+    throw new Error("Missing Supabase credentials");
+  }
+
+  return createClient(supabaseUrl, supabaseServiceKey);
+}
+
+// Détecte si la table automations_workflows existe (sinon on fallback sur les mocks)
+async function isAutomationsDbReady(supabase: any): Promise<boolean> {
+  try {
+    const { error } = await supabase
+      .from("automations_workflows")
+      .select("id")
+      .limit(1);
+
+    if (error) {
+      const message = (error as any)?.message || "";
+      const code = (error as any)?.code || "";
+      if (
+        code === "PGRST205" ||
+        message.includes("schema cache") ||
+        message.includes("does not exist") ||
+        message.includes("relation")
+      ) {
+        return false;
+      }
+      console.error("Automations DB check failed:", error);
+      return false;
+    }
+
+    return true;
+  } catch (err) {
+    console.error("Automations DB check error:", err);
+    return false;
+  }
+}
 
 /**
  * GET /workflows
@@ -21,17 +64,50 @@ app.get("/workflows", (c) => {
     const { searchParams } = new URL(c.req.url);
     const status = searchParams.get("status"); // 'active', 'draft', 'paused'
 
-    let workflows = MOCK_WORKFLOWS;
+    return (async () => {
+      let workflows = MOCK_WORKFLOWS;
 
-    if (status) {
-      workflows = workflows.filter(w => w.status === status);
-    }
+      try {
+        const supabase = getSupabaseClient();
+        const dbReady = await isAutomationsDbReady(supabase);
 
-    return c.json({
-      success: true,
-      workflows,
-      total: workflows.length,
-    });
+        if (dbReady) {
+          let query = supabase
+            .from("automations_workflows")
+            .select("*", { count: "exact" })
+            .order("updated_at", { ascending: false });
+
+          if (status) {
+            query = query.eq("status", status);
+          }
+
+          const { data, error, count } = await query;
+
+          if (error) {
+            console.error("Error fetching workflows from DB:", error);
+            return c.json({ success: false, error: error.message }, 500);
+          }
+
+          return c.json({
+            success: true,
+            workflows: data || [],
+            total: count || 0,
+          });
+        }
+      } catch (err) {
+        console.error("Error in GET /workflows (DB):", err);
+      }
+
+      if (status) {
+        workflows = workflows.filter(w => w.status === status);
+      }
+
+      return c.json({
+        success: true,
+        workflows,
+        total: workflows.length,
+      });
+    })();
   } catch (error: any) {
     console.error("Error fetching workflows:", error);
     return c.json({ success: false, error: error.message }, 500);
@@ -45,16 +121,42 @@ app.get("/workflows", (c) => {
 app.get("/workflows/:id", (c) => {
   try {
     const { id } = c.req.param();
-    const workflow = MOCK_WORKFLOWS.find(w => w.id === id);
+    return (async () => {
+      try {
+        const supabase = getSupabaseClient();
+        const dbReady = await isAutomationsDbReady(supabase);
 
-    if (!workflow) {
-      return c.json({ success: false, error: "Workflow not found" }, 404);
-    }
+        if (dbReady) {
+          const { data, error } = await supabase
+            .from("automations_workflows")
+            .select("*")
+            .eq("id", id)
+            .single();
 
-    return c.json({
-      success: true,
-      workflow,
-    });
+          if (error || !data) {
+            return c.json({ success: false, error: "Workflow not found" }, 404);
+          }
+
+          return c.json({
+            success: true,
+            workflow: data,
+          });
+        }
+      } catch (err) {
+        console.error("Error fetching workflow from DB:", err);
+      }
+
+      const workflow = MOCK_WORKFLOWS.find(w => w.id === id);
+
+      if (!workflow) {
+        return c.json({ success: false, error: "Workflow not found" }, 404);
+      }
+
+      return c.json({
+        success: true,
+        workflow,
+      });
+    })();
   } catch (error: any) {
     console.error("Error fetching workflow:", error);
     return c.json({ success: false, error: error.message }, 500);
@@ -89,7 +191,34 @@ app.post("/workflows", async (c) => {
       created_by: 'admin',
       version: 1,
       version_history: [],
+      metadata: body.metadata || {},
     };
+
+    try {
+      const supabase = getSupabaseClient();
+      const dbReady = await isAutomationsDbReady(supabase);
+
+      if (dbReady) {
+        const { data, error } = await supabase
+          .from("automations_workflows")
+          .insert([newWorkflow])
+          .select()
+          .single();
+
+        if (error) {
+          console.error("Error creating workflow in DB:", error);
+          return c.json({ success: false, error: error.message }, 500);
+        }
+
+        return c.json({
+          success: true,
+          message: "Workflow créé avec succès",
+          workflow: data,
+        });
+      }
+    } catch (err) {
+      console.error("Error creating workflow (DB):", err);
+    }
 
     MOCK_WORKFLOWS.push(newWorkflow);
 
@@ -113,6 +242,32 @@ app.patch("/workflows/:id/status", async (c) => {
     const { id } = c.req.param();
     const body = await c.req.json();
     const { status } = body;
+
+    try {
+      const supabase = getSupabaseClient();
+      const dbReady = await isAutomationsDbReady(supabase);
+
+      if (dbReady) {
+        const { data, error } = await supabase
+          .from("automations_workflows")
+          .update({ status, updated_at: new Date().toISOString() })
+          .eq("id", id)
+          .select()
+          .single();
+
+        if (error || !data) {
+          return c.json({ success: false, error: "Workflow not found" }, 404);
+        }
+
+        return c.json({
+          success: true,
+          message: `Workflow ${status === 'active' ? 'activé' : status === 'paused' ? 'mis en pause' : 'archivé'}`,
+          workflow: data,
+        });
+      }
+    } catch (err) {
+      console.error("Error updating workflow status (DB):", err);
+    }
 
     const workflow = MOCK_WORKFLOWS.find(w => w.id === id);
     if (!workflow) {
@@ -140,18 +295,44 @@ app.patch("/workflows/:id/status", async (c) => {
 app.delete("/workflows/:id", (c) => {
   try {
     const { id } = c.req.param();
-    const index = MOCK_WORKFLOWS.findIndex(w => w.id === id);
+    return (async () => {
+      try {
+        const supabase = getSupabaseClient();
+        const dbReady = await isAutomationsDbReady(supabase);
 
-    if (index === -1) {
-      return c.json({ success: false, error: "Workflow not found" }, 404);
-    }
+        if (dbReady) {
+          const { error } = await supabase
+            .from("automations_workflows")
+            .delete()
+            .eq("id", id);
 
-    MOCK_WORKFLOWS.splice(index, 1);
+          if (error) {
+            console.error("Error deleting workflow from DB:", error);
+            return c.json({ success: false, error: error.message }, 500);
+          }
 
-    return c.json({
-      success: true,
-      message: "Workflow supprimé",
-    });
+          return c.json({
+            success: true,
+            message: "Workflow supprimé",
+          });
+        }
+      } catch (err) {
+        console.error("Error deleting workflow (DB):", err);
+      }
+
+      const index = MOCK_WORKFLOWS.findIndex(w => w.id === id);
+
+      if (index === -1) {
+        return c.json({ success: false, error: "Workflow not found" }, 404);
+      }
+
+      MOCK_WORKFLOWS.splice(index, 1);
+
+      return c.json({
+        success: true,
+        message: "Workflow supprimé",
+      });
+    })();
   } catch (error: any) {
     console.error("Error deleting workflow:", error);
     return c.json({ success: false, error: error.message }, 500);
@@ -167,6 +348,75 @@ app.patch("/workflows/:id", async (c) => {
     const { id } = c.req.param();
     const body = await c.req.json();
     const { name, description, trigger, conditions, steps, status, change_note } = body;
+
+    try {
+      const supabase = getSupabaseClient();
+      const dbReady = await isAutomationsDbReady(supabase);
+
+      if (dbReady) {
+        const { data: workflow, error: fetchError } = await supabase
+          .from("automations_workflows")
+          .select("*")
+          .eq("id", id)
+          .single();
+
+        if (fetchError || !workflow) {
+          return c.json({ success: false, error: "Workflow not found" }, 404);
+        }
+
+        // Créer une nouvelle version dans l'historique
+        const currentVersion = workflow.version || 1;
+        const newVersion = currentVersion + 1;
+        
+        const previousVersion = {
+          version: currentVersion,
+          name: workflow.name,
+          description: workflow.description,
+          trigger: workflow.trigger,
+          conditions: workflow.conditions,
+          steps: workflow.steps,
+          created_at: new Date().toISOString(),
+          created_by: 'admin',
+          change_note: change_note || 'Mise à jour du workflow',
+        };
+
+        const versionHistory = Array.isArray(workflow.version_history)
+          ? [...workflow.version_history, previousVersion]
+          : [previousVersion];
+
+        const updatedWorkflow = {
+          name: name !== undefined ? name : workflow.name,
+          description: description !== undefined ? description : workflow.description,
+          trigger: trigger !== undefined ? trigger : workflow.trigger,
+          conditions: conditions !== undefined ? conditions : workflow.conditions,
+          steps: steps !== undefined ? steps : workflow.steps,
+          status: status !== undefined ? status : workflow.status,
+          version: newVersion,
+          version_history: versionHistory,
+          updated_at: new Date().toISOString(),
+        };
+
+        const { data, error } = await supabase
+          .from("automations_workflows")
+          .update(updatedWorkflow)
+          .eq("id", id)
+          .select()
+          .single();
+
+        if (error) {
+          console.error("Error updating workflow in DB:", error);
+          return c.json({ success: false, error: error.message }, 500);
+        }
+
+        return c.json({
+          success: true,
+          message: `Workflow mis à jour avec succès (v${newVersion})`,
+          workflow: data,
+        });
+      }
+    } catch (err) {
+      console.error("Error updating workflow (DB):", err);
+    }
 
     const workflow = MOCK_WORKFLOWS.find(w => w.id === id);
     if (!workflow) {
@@ -491,6 +741,32 @@ app.post("/workflow-templates/:id/instantiate", async (c) => {
       created_by: 'admin',
     };
 
+    try {
+      const supabase = getSupabaseClient();
+      const dbReady = await isAutomationsDbReady(supabase);
+
+      if (dbReady) {
+        const { data, error } = await supabase
+          .from("automations_workflows")
+          .insert([newWorkflow])
+          .select()
+          .single();
+
+        if (error) {
+          console.error("Error instantiating template in DB:", error);
+          return c.json({ success: false, error: error.message }, 500);
+        }
+
+        return c.json({
+          success: true,
+          message: "Workflow créé à partir du template",
+          workflow: data,
+        });
+      }
+    } catch (err) {
+      console.error("Error instantiating template (DB):", err);
+    }
+
     MOCK_WORKFLOWS.push(newWorkflow);
 
     return c.json({
@@ -510,10 +786,26 @@ app.post("/workflow-templates/:id/instantiate", async (c) => {
  */
 app.get("/smtp-settings", (c) => {
   try {
-    return c.json({
-      success: true,
-      settings: MOCK_SMTP_SETTINGS,
-    });
+    return (async () => {
+      const config = await kv.get('settings:smtp');
+      return c.json({
+        success: true,
+        settings: config || {
+          host: '',
+          port: 587,
+          secure: true,
+          username: '',
+          password: '',
+          from_email: '',
+          from_name: 'YOJOB',
+          provider: 'smtp',
+          provider_api_key: '',
+          provider_domain: '',
+          reply_to: '',
+          test_email: '',
+        },
+      });
+    })();
   } catch (error: any) {
     console.error("Error fetching SMTP settings:", error);
     return c.json({ success: false, error: error.message }, 500);
@@ -528,12 +820,36 @@ app.patch("/smtp-settings", async (c) => {
   try {
     const body = await c.req.json();
 
-    Object.assign(MOCK_SMTP_SETTINGS, body);
+    const provider = (body.provider || 'smtp').toString().toLowerCase();
+    if (!body.from_email) {
+      return c.json({ success: false, error: 'Email expéditeur requis (from_email)' }, 400);
+    }
+
+    if (provider === 'smtp') {
+      if (!body.host || !body.username) {
+        return c.json({
+          success: false,
+          error: 'Champs obligatoires manquants (host, username)',
+        }, 400);
+      }
+    } else if (provider === 'sendgrid') {
+      if (!body.provider_api_key) {
+        return c.json({ success: false, error: 'Clé API SendGrid requise' }, 400);
+      }
+    } else if (provider === 'mailgun') {
+      if (!body.provider_api_key || !body.provider_domain) {
+        return c.json({ success: false, error: 'Clé API + domaine Mailgun requis' }, 400);
+      }
+    } else {
+      return c.json({ success: false, error: 'Provider SMTP invalide' }, 400);
+    }
+
+    await kv.set('settings:smtp', body);
 
     return c.json({
       success: true,
       message: "Configuration SMTP mise à jour",
-      settings: MOCK_SMTP_SETTINGS,
+      settings: body,
     });
   } catch (error: any) {
     console.error("Error updating SMTP settings:", error);
@@ -550,17 +866,32 @@ app.post("/smtp-settings/test", async (c) => {
     const body = await c.req.json();
     const { test_email } = body;
 
-    // Simulation d'envoi de test
-    MOCK_SMTP_SETTINGS.last_test_at = new Date().toISOString();
-    MOCK_SMTP_SETTINGS.last_test_status = 'success';
+    const storedConfig = await kv.get('settings:smtp');
+    const config = storedConfig || body;
+
+    if (!config || !(config as any).from_email) {
+      return c.json({ success: false, error: 'Aucune configuration SMTP trouvée' }, 400);
+    }
+
+    const to = test_email || (config as any).username || (config as any).from_email;
+    const result = await sendEmailWithConfig(config as any, {
+      to,
+      subject: '✅ Test SMTP YOJOB',
+      body: 'Ceci est un email de test SMTP envoyé depuis YOJOB.',
+      html: '<p>Ceci est un email de test SMTP envoyé depuis <strong>YOJOB</strong>.</p>',
+    });
+
+    if (!result.success) {
+      return c.json({ success: false, error: result.message }, 400);
+    }
 
     return c.json({
       success: true,
-      message: `Email de test envoyé avec succès à ${test_email}`,
+      message: `Email de test envoyé avec succès à ${to}`,
+      messageId: result.messageId,
     });
   } catch (error: any) {
     console.error("Error testing SMTP:", error);
-    MOCK_SMTP_SETTINGS.last_test_status = 'failed';
     return c.json({ success: false, error: error.message }, 500);
   }
 });
@@ -571,32 +902,55 @@ app.post("/smtp-settings/test", async (c) => {
  */
 app.get("/stats", (c) => {
   try {
-    const total_workflows = MOCK_WORKFLOWS.length;
-    const active_workflows = MOCK_WORKFLOWS.filter(w => w.status === 'active').length;
-    const total_runs = MOCK_AUTOMATION_RUNS.length;
-    const running_now = MOCK_AUTOMATION_RUNS.filter(r => r.status === 'running').length;
-    const success_rate = total_runs > 0 
-      ? Math.round((MOCK_AUTOMATION_RUNS.filter(r => r.status === 'completed').length / total_runs) * 100)
-      : 0;
+    return (async () => {
+      let total_workflows = MOCK_WORKFLOWS.length;
+      let active_workflows = MOCK_WORKFLOWS.filter(w => w.status === 'active').length;
 
-    const total_emails_sent = MOCK_AUTOMATION_RUNS.reduce((sum, run) => sum + run.metadata.emails_sent, 0);
-    const total_tasks_created = MOCK_AUTOMATION_RUNS.reduce((sum, run) => sum + run.metadata.tasks_created, 0);
+      try {
+        const supabase = getSupabaseClient();
+        const dbReady = await isAutomationsDbReady(supabase);
 
-    const recent_errors = MOCK_AUTOMATION_LOGS.filter(l => l.status === 'error').slice(0, 5);
+        if (dbReady) {
+          const { count: totalCount, error: totalError } = await supabase
+            .from("automations_workflows")
+            .select("id", { count: "exact", head: true });
+          const { count: activeCount, error: activeError } = await supabase
+            .from("automations_workflows")
+            .select("id", { count: "exact", head: true })
+            .eq("status", "active");
 
-    return c.json({
-      success: true,
-      stats: {
-        total_workflows,
-        active_workflows,
-        total_runs,
-        running_now,
-        success_rate,
-        total_emails_sent,
-        total_tasks_created,
-        recent_errors: recent_errors.length,
-      },
-    });
+          if (!totalError && totalCount !== null) total_workflows = totalCount;
+          if (!activeError && activeCount !== null) active_workflows = activeCount;
+        }
+      } catch (err) {
+        console.error("Error fetching stats from DB:", err);
+      }
+
+      const total_runs = MOCK_AUTOMATION_RUNS.length;
+      const running_now = MOCK_AUTOMATION_RUNS.filter(r => r.status === 'running').length;
+      const success_rate = total_runs > 0 
+        ? Math.round((MOCK_AUTOMATION_RUNS.filter(r => r.status === 'completed').length / total_runs) * 100)
+        : 0;
+
+      const total_emails_sent = MOCK_AUTOMATION_RUNS.reduce((sum, run) => sum + run.metadata.emails_sent, 0);
+      const total_tasks_created = MOCK_AUTOMATION_RUNS.reduce((sum, run) => sum + run.metadata.tasks_created, 0);
+
+      const recent_errors = MOCK_AUTOMATION_LOGS.filter(l => l.status === 'error').slice(0, 5);
+
+      return c.json({
+        success: true,
+        stats: {
+          total_workflows,
+          active_workflows,
+          total_runs,
+          running_now,
+          success_rate,
+          total_emails_sent,
+          total_tasks_created,
+          recent_errors: recent_errors.length,
+        },
+      });
+    })();
   } catch (error: any) {
     console.error("Error fetching stats:", error);
     return c.json({ success: false, error: error.message }, 500);

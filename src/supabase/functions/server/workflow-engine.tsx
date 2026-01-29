@@ -1,6 +1,7 @@
 import { Hono } from "npm:hono@4";
 import { createClient } from "npm:@supabase/supabase-js@2.39.3";
 import { MOCK_WORKFLOWS, MOCK_EMAIL_TEMPLATES, MOCK_AUTOMATION_RUNS, MOCK_AUTOMATION_LOGS, detectProspectLanguage } from "./automations-data.ts";
+import { emailService } from "./email-service.tsx";
 import type { AutomationWorkflow } from "../../types/automations.ts";
 
 const app = new Hono();
@@ -25,6 +26,87 @@ function getSupabaseClient() {
   }
 
   return createClient(supabaseUrl, supabaseServiceKey);
+}
+
+// Détecte si la table automations_workflows existe (sinon on fallback sur les mocks)
+async function isAutomationsDbReady(supabase: any): Promise<boolean> {
+  try {
+    const { error } = await supabase
+      .from("automations_workflows")
+      .select("id")
+      .limit(1);
+
+    if (error) {
+      const message = (error as any)?.message || "";
+      const code = (error as any)?.code || "";
+      if (
+        code === "PGRST205" ||
+        message.includes("schema cache") ||
+        message.includes("does not exist") ||
+        message.includes("relation")
+      ) {
+        return false;
+      }
+      console.error("Automations DB check failed:", error);
+      return false;
+    }
+
+    return true;
+  } catch (err) {
+    console.error("Automations DB check error:", err);
+    return false;
+  }
+}
+
+async function loadWorkflows(supabase: any, dbReady: boolean): Promise<any[]> {
+  if (dbReady) {
+    const { data, error } = await supabase
+      .from("automations_workflows")
+      .select("*");
+
+    if (error) {
+      console.error("Error loading workflows from DB:", error);
+      return MOCK_WORKFLOWS;
+    }
+
+    return data || [];
+  }
+
+  return MOCK_WORKFLOWS;
+}
+
+async function loadWorkflowById(supabase: any, dbReady: boolean, workflowId: string): Promise<any | null> {
+  if (dbReady) {
+    const { data, error } = await supabase
+      .from("automations_workflows")
+      .select("*")
+      .eq("id", workflowId)
+      .single();
+
+    if (error) {
+      return null;
+    }
+
+    return data;
+  }
+
+  return MOCK_WORKFLOWS.find(w => w.id === workflowId) || null;
+}
+
+async function persistWorkflowStats(supabase: any, dbReady: boolean, workflow: any) {
+  if (!dbReady) return;
+
+  try {
+    await supabase
+      .from("automations_workflows")
+      .update({
+        stats: workflow.stats,
+        updated_at: new Date().toISOString(),
+      })
+      .eq("id", workflow.id);
+  } catch (error) {
+    console.error("Error persisting workflow stats:", error);
+  }
 }
 
 /**
@@ -150,30 +232,73 @@ function replaceVariables(text: string, prospectData: any): string {
 }
 
 /**
+ * Résout la valeur du prospect pour une condition (compatibilité field/type)
+ */
+function getProspectValueForCondition(condition: any, prospect: any) {
+  const rawField = condition?.field || condition?.type || '';
+
+  switch (rawField) {
+    case 'prospect_type':
+      return prospect.type ?? prospect.prospect_type;
+    case 'country':
+      return prospect.country ?? prospect.country_code;
+    case 'status':
+      return prospect.status;
+    case 'source':
+      return prospect.source;
+    case 'industry_sector':
+      return prospect.industry_sector ?? prospect.sector;
+    case 'sector':
+      return prospect.sector ?? prospect.industry_sector;
+    case 'tag_has':
+    case 'tags':
+      return prospect.tags ?? [];
+    default:
+      return prospect[rawField];
+  }
+}
+
+/**
  * Évalue si un prospect correspond aux conditions d'un workflow
  */
 function evaluateConditions(prospect: any, conditions: any[]): boolean {
   if (!conditions || conditions.length === 0) return true;
 
   return conditions.every(condition => {
-    const { field, operator, value } = condition;
-    const prospectValue = prospect[field];
+    const { operator, value } = condition;
+    const prospectValue = getProspectValueForCondition(condition, prospect);
+    const valueArray = Array.isArray(value) ? value : null;
+    const prospectArray = Array.isArray(prospectValue) ? prospectValue : null;
 
     switch (operator) {
       case 'equals':
-        return prospectValue === value;
+        if (prospectArray) {
+          return valueArray ? valueArray.some(v => prospectArray.includes(v)) : prospectArray.includes(value);
+        }
+        return valueArray ? valueArray.includes(prospectValue) : prospectValue === value;
       case 'not_equals':
-        return prospectValue !== value;
+        if (prospectArray) {
+          return valueArray ? valueArray.every(v => !prospectArray.includes(v)) : !prospectArray.includes(value);
+        }
+        return valueArray ? !valueArray.includes(prospectValue) : prospectValue !== value;
       case 'contains':
+        if (prospectArray) {
+          return valueArray ? valueArray.some(v => prospectArray.includes(v)) : prospectArray.includes(value);
+        }
         return String(prospectValue || '').toLowerCase().includes(String(value).toLowerCase());
       case 'greater_than':
         return Number(prospectValue) > Number(value);
       case 'less_than':
         return Number(prospectValue) < Number(value);
+      case 'in':
+        if (valueArray) {
+          return prospectArray ? prospectArray.some(v => valueArray.includes(v)) : valueArray.includes(prospectValue);
+        }
+        return false;
       case 'is_empty':
-        return !prospectValue || prospectValue === '';
+        return prospectArray ? prospectArray.length === 0 : !prospectValue || prospectValue === '';
       case 'is_not_empty':
-        return !!prospectValue && prospectValue !== '';
+        return prospectArray ? prospectArray.length > 0 : !!prospectValue && prospectValue !== '';
       default:
         return true;
     }
@@ -202,22 +327,47 @@ async function executeStep(step: any, prospect: any, workflow: AutomationWorkflo
 
     switch (step.type) {
       case 'send_email': {
-        // Récupérer le template
-        const template = getLocalizedTemplate(step.config.template_id, prospect);
-        if (!template) {
-          throw new Error(`Template email non trouvé: ${step.config.template_id}`);
+        const templateId = step.config.template_id;
+        const inlineSubject = step.config.subject;
+        const inlineBodyHtml = step.config.body_html || step.config.body;
+        const inlineBodyText = step.config.body_text;
+
+        let template = null;
+        if (templateId) {
+          template = getLocalizedTemplate(templateId, prospect);
+          if (!template && !inlineSubject && !inlineBodyHtml) {
+            throw new Error(`Template email non trouvé: ${templateId}`);
+          }
+        }
+
+        const subjectSource = inlineSubject || template?.subject || '';
+        const bodyHtmlSource = inlineBodyHtml || template?.body_html || '';
+        const bodyTextSource = inlineBodyText || template?.body_text || (bodyHtmlSource ? bodyHtmlSource.replace(/<[^>]*>/g, '') : '');
+
+        if (!subjectSource && !bodyHtmlSource) {
+          throw new Error('Email sans contenu (template_id ou subject/body requis)');
         }
 
         // Remplacer les variables
-        const subject = replaceVariables(template.subject, prospect);
-        const body_html = replaceVariables(template.body_html, prospect);
-        const body_text = replaceVariables(template.body_text || '', prospect);
+        const subject = replaceVariables(subjectSource, prospect);
+        const body_html = replaceVariables(bodyHtmlSource, prospect);
+        const body_text = replaceVariables(bodyTextSource || '', prospect);
 
-        // Log de l'email (simulation d'envoi)
-        console.log('📧 Email simulé envoyé:');
-        console.log('To:', prospect.email);
-        console.log('Subject:', subject);
-        console.log('Body HTML:', body_html.substring(0, 100) + '...');
+        if (!prospect.email) {
+          throw new Error('Email du prospect manquant');
+        }
+
+        // Envoi réel via SMTP/provider configuré
+        const sendResult = await emailService.sendEmail({
+          to: prospect.email,
+          subject,
+          body: body_text || body_html.replace(/<[^>]*>/g, ''),
+          html: body_html,
+        });
+
+        if (!sendResult.success) {
+          throw new Error(sendResult.message || 'Erreur envoi email');
+        }
 
         // Log de succès
         MOCK_AUTOMATION_LOGS.push({
@@ -231,8 +381,10 @@ async function executeStep(step: any, prospect: any, workflow: AutomationWorkflo
           message: `Email envoyé: "${subject}" à ${prospect.email}`,
           metadata: {
             subject,
-            template_id: template.id,
-            template_name: template.name,
+            template_id: template?.id || null,
+            template_name: template?.name || null,
+            inline: !template,
+            message_id: sendResult.messageId || null,
           },
           timestamp: new Date().toISOString(),
         });
@@ -241,8 +393,8 @@ async function executeStep(step: any, prospect: any, workflow: AutomationWorkflo
       }
 
       case 'create_task': {
-        const taskTitle = replaceVariables(step.config.title || 'Nouvelle tâche', prospect);
-        const taskDescription = replaceVariables(step.config.description || '', prospect);
+        const taskTitle = replaceVariables(step.config.title || step.config.task_title || 'Nouvelle tâche', prospect);
+        const taskDescription = replaceVariables(step.config.description || step.config.task_description || '', prospect);
 
         // Créer une vraie tâche dans Supabase
         const { data: task, error } = await supabase
@@ -284,7 +436,10 @@ async function executeStep(step: any, prospect: any, workflow: AutomationWorkflo
       }
 
       case 'add_tag': {
-        const tagToAdd = step.config.tag;
+        const tagToAdd = step.config.tag || step.config.tag_name;
+        if (!tagToAdd) {
+          throw new Error('Tag manquant dans la configuration');
+        }
         const currentTags = prospect.tags || [];
         
         if (!currentTags.includes(tagToAdd)) {
@@ -296,6 +451,22 @@ async function executeStep(step: any, prospect: any, workflow: AutomationWorkflo
             .eq('id', prospect.id);
 
           if (error) throw error;
+
+          // Déclencher les workflows tag_added (non bloquant)
+          const supabaseUrl = Deno.env.get("SUPABASE_URL");
+          const anonKey = Deno.env.get("SUPABASE_ANON_KEY");
+          if (supabaseUrl && anonKey) {
+            fetch(`${supabaseUrl}/functions/v1/make-server-10092a63/workflow-engine/trigger/tag_added`, {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${anonKey}`,
+              },
+              body: JSON.stringify({ prospect_id: prospect.id, tag_name: tagToAdd }),
+            }).catch(err => {
+              console.error('⚠️ Erreur trigger tag_added (non-bloquant):', err);
+            });
+          }
         }
 
         MOCK_AUTOMATION_LOGS.push({
@@ -315,7 +486,10 @@ async function executeStep(step: any, prospect: any, workflow: AutomationWorkflo
       }
 
       case 'change_status': {
-        const newStatus = step.config.status;
+        const newStatus = step.config.status || step.config.new_status;
+        if (!newStatus) {
+          throw new Error('Nouveau statut manquant dans la configuration');
+        }
 
         const { error } = await supabase
           .from('prospects')
@@ -325,6 +499,22 @@ async function executeStep(step: any, prospect: any, workflow: AutomationWorkflo
           .eq('id', prospect.id);
 
         if (error) throw error;
+
+        // Déclencher les workflows status_changed (non bloquant)
+        const supabaseUrl = Deno.env.get("SUPABASE_URL");
+        const anonKey = Deno.env.get("SUPABASE_ANON_KEY");
+        if (supabaseUrl && anonKey) {
+          fetch(`${supabaseUrl}/functions/v1/make-server-10092a63/workflow-engine/trigger/status_changed`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${anonKey}`,
+            },
+            body: JSON.stringify({ prospect_id: prospect.id, status_from: prospect.status, status_to: newStatus }),
+          }).catch(err => {
+            console.error('⚠️ Erreur trigger status_changed (non-bloquant):', err);
+          });
+        }
 
         MOCK_AUTOMATION_LOGS.push({
           id: `log-${Date.now()}-${Math.random()}`,
@@ -420,11 +610,16 @@ app.post("/execute/:workflow_id/:prospect_id", async (c) => {
   try {
     const { workflow_id, prospect_id } = c.req.param();
     const supabase = getSupabaseClient();
+    const dbReady = await isAutomationsDbReady(supabase);
 
     // 1. Récupérer le workflow
-    const workflow = MOCK_WORKFLOWS.find(w => w.id === workflow_id);
+    const workflow = await loadWorkflowById(supabase, dbReady, workflow_id);
     if (!workflow) {
       return c.json({ success: false, error: "Workflow non trouvé" }, 404);
+    }
+
+    if (!workflow.stats) {
+      workflow.stats = { total_runs: 0, success_runs: 0, failed_runs: 0, conversion_rate: 0 };
     }
 
     if (workflow.status !== 'active') {
@@ -457,12 +652,18 @@ app.post("/execute/:workflow_id/:prospect_id", async (c) => {
     const run = {
       id: runId,
       workflow_id: workflow.id,
+      workflow_name: workflow.name,
       prospect_id: prospect.id,
+      prospect_name: prospect.name || prospect.contact_name,
+      prospect_email: prospect.email,
       status: 'running' as const,
       started_at: new Date().toISOString(),
       completed_at: null,
       steps_completed: 0,
       steps_total: workflow.steps.length,
+      current_step: 0,
+      total_steps: workflow.steps.length,
+      error_message: null,
       metadata: {
         emails_sent: 0,
         tasks_created: 0,
@@ -491,6 +692,8 @@ app.post("/execute/:workflow_id/:prospect_id", async (c) => {
 
         const result = await executeStep(step, prospect, workflow, runId);
         stepsCompleted++;
+        run.current_step = stepsCompleted;
+        run.steps_completed = stepsCompleted;
 
         // Compter les actions
         if (step.type === 'send_email') emailsSent++;
@@ -503,10 +706,15 @@ app.post("/execute/:workflow_id/:prospect_id", async (c) => {
         run.status = 'failed';
         run.completed_at = new Date().toISOString();
         run.steps_completed = stepsCompleted;
+        run.current_step = stepsCompleted;
+        run.error_message = error.message;
         run.metadata.error = error.message;
         
         // Update stats
+        workflow.stats.total_runs++;
         workflow.stats.failed_runs++;
+        workflow.stats.conversion_rate = Math.round((workflow.stats.success_runs / workflow.stats.total_runs) * 100);
+        await persistWorkflowStats(supabase, dbReady, workflow);
         
         return c.json({ 
           success: false, 
@@ -520,6 +728,7 @@ app.post("/execute/:workflow_id/:prospect_id", async (c) => {
     run.status = 'completed';
     run.completed_at = new Date().toISOString();
     run.steps_completed = stepsCompleted;
+    run.current_step = stepsCompleted;
     run.metadata.emails_sent = emailsSent;
     run.metadata.tasks_created = tasksCreated;
     run.metadata.tags_added = tagsAdded;
@@ -528,6 +737,7 @@ app.post("/execute/:workflow_id/:prospect_id", async (c) => {
     workflow.stats.total_runs++;
     workflow.stats.success_runs++;
     workflow.stats.conversion_rate = Math.round((workflow.stats.success_runs / workflow.stats.total_runs) * 100);
+    await persistWorkflowStats(supabase, dbReady, workflow);
 
     return c.json({
       success: true,
@@ -555,16 +765,36 @@ app.post("/trigger/:trigger_type", async (c) => {
   try {
     const { trigger_type } = c.req.param();
     const body = await c.req.json();
-    const { prospect_id } = body;
+    const { prospect_id, tag_name, status_from, status_to } = body;
 
     if (!prospect_id) {
       return c.json({ success: false, error: "prospect_id requis" }, 400);
     }
 
     // Trouver tous les workflows actifs avec ce trigger
-    const matchingWorkflows = MOCK_WORKFLOWS.filter(
-      w => w.status === 'active' && w.trigger.type === trigger_type
-    );
+    const supabase = getSupabaseClient();
+    const dbReady = await isAutomationsDbReady(supabase);
+    const allWorkflows = await loadWorkflows(supabase, dbReady);
+
+    const matchingWorkflows = allWorkflows.filter(w => {
+      if (w.status !== 'active' || w.trigger.type !== trigger_type) return false;
+
+      if (trigger_type === 'tag_added') {
+        const requiredTag = w.trigger?.config?.tag_name;
+        if (requiredTag) {
+          return tag_name ? requiredTag === tag_name : false;
+        }
+      }
+
+      if (trigger_type === 'status_changed') {
+        const requiredTo = w.trigger?.config?.status_to;
+        const requiredFrom = w.trigger?.config?.status_from;
+        if (requiredTo && requiredTo !== status_to) return false;
+        if (requiredFrom && requiredFrom !== status_from) return false;
+      }
+
+      return true;
+    });
 
     if (matchingWorkflows.length === 0) {
       return c.json({ 
@@ -574,8 +804,6 @@ app.post("/trigger/:trigger_type", async (c) => {
       });
     }
 
-    const supabase = getSupabaseClient();
-    
     // Récupérer le prospect
     const { data: prospect, error: prospectError } = await supabase
       .from('prospects')
@@ -651,8 +879,10 @@ app.post("/trigger/:trigger_type", async (c) => {
 app.post("/test/:workflow_id", async (c) => {
   try {
     const { workflow_id } = c.req.param();
-    
-    const workflow = MOCK_WORKFLOWS.find(w => w.id === workflow_id);
+
+    const supabase = getSupabaseClient();
+    const dbReady = await isAutomationsDbReady(supabase);
+    const workflow = await loadWorkflowById(supabase, dbReady, workflow_id);
     if (!workflow) {
       return c.json({ success: false, error: "Workflow non trouvé" }, 404);
     }
@@ -680,7 +910,7 @@ app.post("/test/:workflow_id", async (c) => {
 
     for (const step of workflow.steps) {
       try {
-        const result = await executeStep(testProspect, testProspect, workflow, runId);
+        const result = await executeStep(step, testProspect, workflow, runId);
         results.push({
           step_id: step.id,
           step_type: step.type,

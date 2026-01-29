@@ -483,6 +483,11 @@ interface SMTPConfig {
   password: string;
   from_email: string;
   from_name: string;
+  provider?: 'smtp' | 'sendgrid' | 'mailgun';
+  provider_api_key?: string;
+  provider_domain?: string;
+  reply_to?: string;
+  test_email?: string;
 }
 
 /**
@@ -504,13 +509,17 @@ export async function getSMTPConfig(): Promise<SMTPConfig | null> {
 export async function isSMTPConfigured(): Promise<boolean> {
   try {
     const config = await getSMTPConfig();
-    return !!(
-      config &&
-      config.host &&
-      config.username &&
-      config.password &&
-      config.from_email
-    );
+    if (!config) return false;
+
+    const provider = config.provider || 'smtp';
+    if (provider === 'sendgrid') {
+      return !!(config.provider_api_key && config.from_email);
+    }
+    if (provider === 'mailgun') {
+      return !!(config.provider_api_key && config.provider_domain && config.from_email);
+    }
+
+    return !!(config.host && config.username && config.password && config.from_email);
   } catch (error) {
     console.error("Error checking SMTP configuration:", error);
     return false;

@@ -24,6 +24,36 @@ function getSupabaseClient() {
   return createClient(supabaseUrl, supabaseServiceKey);
 }
 
+// Détecte si la table automations_workflows existe (sinon on fallback sur les mocks)
+async function isAutomationsDbReady(supabase: any): Promise<boolean> {
+  try {
+    const { error } = await supabase
+      .from("automations_workflows")
+      .select("id")
+      .limit(1);
+
+    if (error) {
+      const message = (error as any)?.message || "";
+      const code = (error as any)?.code || "";
+      if (
+        code === "PGRST205" ||
+        message.includes("schema cache") ||
+        message.includes("does not exist") ||
+        message.includes("relation")
+      ) {
+        return false;
+      }
+      console.error("Automations DB check failed:", error);
+      return false;
+    }
+
+    return true;
+  } catch (err) {
+    console.error("Automations DB check error:", err);
+    return false;
+  }
+}
+
 /**
  * Collecter le contexte de l'application pour l'analyse IA
  */
@@ -374,6 +404,7 @@ app.post("/implement/:suggestionIndex", async (c) => {
       status: 'draft' as const, // Créé en brouillon pour validation manuelle
       trigger: {
         type: suggestion.trigger.type,
+        config: {},
         description: suggestion.trigger.description,
       },
       conditions: suggestion.conditions || [],
@@ -403,7 +434,34 @@ app.post("/implement/:suggestionIndex", async (c) => {
       },
     };
 
-    // Ajouter aux workflows existants
+    // Ajouter aux workflows existants (DB si dispo, sinon mocks)
+    try {
+      const supabase = getSupabaseClient();
+      const dbReady = await isAutomationsDbReady(supabase);
+
+      if (dbReady) {
+        const { data, error } = await supabase
+          .from("automations_workflows")
+          .insert([newWorkflow])
+          .select()
+          .single();
+
+        if (error) {
+          console.error("Error creating AI workflow in DB:", error);
+          return c.json({ success: false, error: error.message }, 500);
+        }
+
+        return c.json({
+          success: true,
+          message: `Workflow "${suggestion.name}" créé avec succès en mode brouillon`,
+          workflow: data,
+          implementationNotes: suggestion.implementation_notes,
+        });
+      }
+    } catch (err) {
+      console.error("Error creating AI workflow (DB):", err);
+    }
+
     MOCK_WORKFLOWS.push(newWorkflow);
 
     console.log(`✅ Workflow IA créé : ${newWorkflow.name}`);

@@ -1,5 +1,6 @@
 import { Hono } from 'npm:hono@4.0.2';
 import * as kv from './kv_store.tsx';
+import { sendEmailWithConfig } from './email-service.tsx';
 
 const app = new Hono();
 
@@ -12,7 +13,60 @@ const DEFAULT_SMTP_CONFIG = {
   password: '',
   from_email: '',
   from_name: 'YOJOB',
+  provider: 'smtp',
+  provider_api_key: '',
+  provider_domain: '',
+  reply_to: '',
+  test_email: '',
 };
+
+function validateSMTPConfig(config: any): string | null {
+  if (!config) {
+    return 'Configuration SMTP manquante';
+  }
+
+  const provider = (config.provider || 'smtp').toString().toLowerCase();
+
+  if (!config.from_email || !config.from_email.includes('@')) {
+    return 'Email d\'expédition invalide';
+  }
+
+  if (provider === 'smtp') {
+    if (!config.host || config.host.length < 3) {
+      return 'Serveur SMTP invalide';
+    }
+    const port = Number(config.port);
+    if (!Number.isFinite(port) || port < 1 || port > 65535) {
+      return 'Port SMTP invalide (1-65535)';
+    }
+    if (!config.username || !config.username.includes('@')) {
+      return 'Nom d\'utilisateur SMTP invalide (email requis)';
+    }
+    if (!config.password || config.password.length < 4) {
+      return 'Mot de passe SMTP requis';
+    }
+    return null;
+  }
+
+  if (provider === 'sendgrid') {
+    if (!config.provider_api_key || config.provider_api_key.length < 10) {
+      return 'Clé API SendGrid requise';
+    }
+    return null;
+  }
+
+  if (provider === 'mailgun') {
+    if (!config.provider_api_key || config.provider_api_key.length < 10) {
+      return 'Clé API Mailgun requise';
+    }
+    if (!config.provider_domain || config.provider_domain.length < 3) {
+      return 'Domaine Mailgun requis';
+    }
+    return null;
+  }
+
+  return 'Provider SMTP invalide';
+}
 
 // Paramètres de conformité par défaut
 const DEFAULT_COMPLIANCE_SETTINGS = {
@@ -53,12 +107,9 @@ app.put('/smtp', async (c) => {
   try {
     const config = await c.req.json();
     
-    // Validation basique
-    if (!config.host || !config.username || !config.from_email) {
-      return c.json({
-        success: false,
-        error: 'Champs obligatoires manquants (host, username, from_email)',
-      }, 400);
+    const validationError = validateSMTPConfig(config);
+    if (validationError) {
+      return c.json({ success: false, error: validationError }, 400);
     }
 
     await kv.set('settings:smtp', config);
@@ -81,12 +132,9 @@ app.post('/smtp', async (c) => {
   try {
     const config = await c.req.json();
     
-    // Validation basique
-    if (!config.host || !config.username || !config.from_email) {
-      return c.json({
-        success: false,
-        error: 'Champs obligatoires manquants (host, username, from_email)',
-      }, 400);
+    const validationError = validateSMTPConfig(config);
+    if (validationError) {
+      return c.json({ success: false, error: validationError }, 400);
     }
 
     await kv.set('settings:smtp', config);
@@ -111,11 +159,9 @@ app.post('/smtp/test', async (c) => {
     const config = await c.req.json();
 
     // Validation basique
-    if (!config.host || !config.username || !config.password) {
-      return c.json({
-        success: false,
-        message: 'Configuration SMTP incomplète',
-      }, 400);
+    const validationError = validateSMTPConfig(config);
+    if (validationError) {
+      return c.json({ success: false, message: validationError }, 400);
     }
 
     console.log('🧪 Test connexion SMTP:', {
@@ -126,29 +172,27 @@ app.post('/smtp/test', async (c) => {
       secure: config.secure,
     });
 
-    // Test réel de connexion SMTP
-    try {
-      const testResult = await testSMTPConnection(config);
-      
-      if (testResult.success) {
-        return c.json({
-          success: true,
-          message: `✅ Connexion réussie à ${config.host}:${config.port}`,
-          details: testResult.details,
-        });
-      } else {
-        return c.json({
-          success: false,
-          message: `❌ ${testResult.error}`,
-        });
-      }
-    } catch (error: any) {
-      console.error('❌ Erreur test SMTP:', error);
+    // Envoi réel d'un email de test
+    const testEmail = config.test_email || config.username || config.from_email;
+    const sendResult = await sendEmailWithConfig(config, {
+      to: testEmail,
+      subject: '✅ Test SMTP YOJOB',
+      body: 'Ceci est un email de test SMTP envoyé depuis YOJOB.',
+      html: '<p>Ceci est un email de test SMTP envoyé depuis <strong>YOJOB</strong>.</p>',
+    });
+
+    if (sendResult.success) {
       return c.json({
-        success: false,
-        message: `❌ Erreur de connexion: ${error.message}`,
+        success: true,
+        message: `✅ Email de test envoyé à ${testEmail}`,
+        messageId: sendResult.messageId,
       });
     }
+
+    return c.json({
+      success: false,
+      message: `❌ ${sendResult.message}`,
+    }, 400);
   } catch (error: any) {
     console.error('Erreur test SMTP:', error);
     return c.json({
@@ -175,28 +219,118 @@ app.post('/test-smtp', async (c) => {
       host: (storedConfig as any).host,
       port: (storedConfig as any).port,
       username: (storedConfig as any).username,
+      provider: (storedConfig as any).provider,
     });
 
-    const testResult = await testSMTPConnection(storedConfig);
-    
-    if (testResult.success) {
+    const validationError = validateSMTPConfig(storedConfig);
+    if (validationError) {
+      return c.json({ success: false, message: validationError }, 400);
+    }
+
+    const testEmail = (storedConfig as any).test_email || (storedConfig as any).username || (storedConfig as any).from_email;
+    const sendResult = await sendEmailWithConfig(storedConfig as any, {
+      to: testEmail,
+      subject: '✅ Test SMTP YOJOB',
+      body: 'Ceci est un email de test SMTP envoyé depuis YOJOB.',
+      html: '<p>Ceci est un email de test SMTP envoyé depuis <strong>YOJOB</strong>.</p>',
+    });
+
+    if (sendResult.success) {
       return c.json({
         success: true,
-        message: `✅ Connexion réussie à ${(storedConfig as any).host}:${(storedConfig as any).port}`,
-        details: testResult.details,
-      });
-    } else {
-      return c.json({
-        success: false,
-        message: `❌ ${testResult.error}`,
+        message: `✅ Email de test envoyé à ${testEmail}`,
+        messageId: sendResult.messageId,
       });
     }
+
+    return c.json({
+      success: false,
+      message: `❌ ${sendResult.message}`,
+    }, 400);
   } catch (error: any) {
     console.error('Erreur test SMTP:', error);
     return c.json({
       success: false,
       message: `Erreur: ${error.message}`,
     }, 500);
+  }
+});
+
+// POST /settings/smtp/dry-run - Prévisualiser un envoi sans envoyer réellement
+app.post('/smtp/dry-run', async (c) => {
+  try {
+    const body = await c.req.json();
+    const storedConfig = await kv.get('settings:smtp');
+    const config = storedConfig || body;
+
+    if (!config) {
+      return c.json({ success: false, message: 'Aucune configuration SMTP trouvée' }, 400);
+    }
+
+    const validationError = validateSMTPConfig(config);
+    if (validationError) {
+      return c.json({ success: false, message: validationError }, 400);
+    }
+
+    const testEmail = (config as any).test_email || (config as any).username || (config as any).from_email;
+    const subject = '🧪 Dry-run SMTP YOJOB';
+    const html = '<p><strong>Dry-run</strong> : aucun email réel n’a été envoyé.</p>';
+    const text = 'Dry-run : aucun email réel n’a été envoyé.';
+
+    return c.json({
+      success: true,
+      message: 'Dry-run OK (aucun email envoyé)',
+      preview: {
+        to: testEmail,
+        subject,
+        text,
+        html,
+        note: 'Aucun email réel n’a été envoyé.',
+        provider: (config as any).provider || 'smtp',
+      },
+    });
+  } catch (error: any) {
+    console.error('Erreur dry-run SMTP:', error);
+    return c.json({ success: false, message: `Erreur: ${error.message}` }, 500);
+  }
+});
+
+// POST /settings/dry-run-smtp - Alias compatibilité
+app.post('/dry-run-smtp', async (c) => {
+  try {
+    const body = await c.req.json().catch(() => ({}));
+    const storedConfig = await kv.get('settings:smtp');
+    const config = storedConfig || body;
+
+    if (!config) {
+      return c.json({ success: false, message: 'Aucune configuration SMTP trouvée' }, 400);
+    }
+
+    const validationError = validateSMTPConfig(config);
+    if (validationError) {
+      return c.json({ success: false, message: validationError }, 400);
+    }
+
+    const testEmail = (config as any).test_email || (config as any).username || (config as any).from_email;
+    const subject = '🧪 Dry-run SMTP YOJOB';
+    const html = '<p><strong>Dry-run</strong> : aucun email réel n’a été envoyé.</p>';
+    const text = 'Dry-run : aucun email réel n’a été envoyé.';
+
+    return c.json({
+      success: true,
+      message: 'Dry-run OK (aucun email envoyé)',
+      preview: {
+        to: testEmail,
+        subject,
+        text,
+        html,
+        note: 'Aucun email réel n’a été envoyé.',
+        provider: (config as any).provider || 'smtp',
+      },
+    });
+  } catch (error: any) {
+    console.error('Erreur dry-run SMTP (alias):', error);
+    return c.json({ success: false, message: `Erreur: ${error.message}` }, 500);
   }
 });
 

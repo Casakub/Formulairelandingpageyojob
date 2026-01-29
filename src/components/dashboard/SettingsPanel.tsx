@@ -36,6 +36,7 @@ import { Button } from '../ui/button';
 import { Badge } from '../ui/badge';
 import { Switch } from '../ui/switch';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../ui/tabs';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select';
 import { MigrateLandingToSupabase } from './MigrateLandingToSupabase';
 import { QuickDiagnostic } from './QuickDiagnostic';
 import { ClaudeModelSelector } from './ClaudeModelSelector';
@@ -48,6 +49,11 @@ interface SMTPConfig {
   password: string;
   from_email: string;
   from_name: string;
+  provider: 'smtp' | 'sendgrid' | 'mailgun';
+  provider_api_key: string;
+  provider_domain: string;
+  reply_to: string;
+  test_email: string;
 }
 
 interface ComplianceSettings {
@@ -85,6 +91,11 @@ export function SettingsPanel() {
     password: '',
     from_email: '',
     from_name: 'YOJOB',
+    provider: 'smtp',
+    provider_api_key: '',
+    provider_domain: '',
+    reply_to: '',
+    test_email: '',
   });
 
   const [complianceSettings, setComplianceSettings] = useState<ComplianceSettings>({
@@ -106,8 +117,10 @@ export function SettingsPanel() {
   const [isSavingSMTP, setIsSavingSMTP] = useState(false);
   const [isSavingCompliance, setIsSavingCompliance] = useState(false);
   const [isTestingSMTP, setIsTestingSMTP] = useState(false);
+  const [isDryRunSMTP, setIsDryRunSMTP] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [smtpTestResult, setSMTPTestResult] = useState<{ success: boolean; message: string } | null>(null);
+  const [smtpDryRunResult, setSMTPDryRunResult] = useState<{ success: boolean; message: string; preview?: any } | null>(null);
   const [isLoadingDiagnostic, setIsLoadingDiagnostic] = useState(false);
   const [diagnosticResult, setDiagnosticResult] = useState<{ healthy: boolean; message: string } | null>(null);
 
@@ -116,6 +129,15 @@ export function SettingsPanel() {
     loadSMTPSettings();
     loadComplianceSettings();
   }, []);
+
+  const smtpProvider = smtpConfig.provider || 'smtp';
+  const smtpIsValid = smtpProvider === 'smtp'
+    ? !!(smtpConfig.host && smtpConfig.username && smtpConfig.password && smtpConfig.from_email)
+    : smtpProvider === 'sendgrid'
+      ? !!(smtpConfig.provider_api_key && smtpConfig.from_email)
+      : smtpProvider === 'mailgun'
+        ? !!(smtpConfig.provider_api_key && smtpConfig.provider_domain && smtpConfig.from_email)
+        : false;
 
   const loadApiKey = async () => {
     setIsLoading(true);
@@ -391,7 +413,14 @@ export function SettingsPanel() {
 
       if (response.ok) {
         const result = await response.json();
-        setSMTPConfig(result);
+        const config = result?.config || result?.settings || result;
+        if (config && typeof config === 'object') {
+          setSMTPConfig((prev) => ({
+            ...prev,
+            ...config,
+            provider: (config.provider || prev.provider) as SMTPConfig['provider'],
+          }));
+        }
       }
     } catch (error) {
       console.error('Error loading SMTP settings:', error);
@@ -465,8 +494,14 @@ export function SettingsPanel() {
       }
 
       const result = await response.json();
-      
-      setSMTPConfig(result);
+      const config = result?.config || result?.settings || result;
+      if (config && typeof config === 'object') {
+        setSMTPConfig((prev) => ({
+          ...prev,
+          ...config,
+          provider: (config.provider || prev.provider) as SMTPConfig['provider'],
+        }));
+      }
       
       toast.success('✅ Paramètres SMTP sauvegardés avec succès !');
       
@@ -484,12 +519,14 @@ export function SettingsPanel() {
       const { projectId, publicAnonKey } = await import('../../utils/supabase/info');
       
       const response = await fetch(
-        `https://${projectId}.supabase.co/functions/v1/make-server-10092a63/settings/test-smtp`,
+        `https://${projectId}.supabase.co/functions/v1/make-server-10092a63/settings/smtp/test`,
         {
           method: 'POST',
           headers: {
+            'Content-Type': 'application/json',
             'Authorization': `Bearer ${publicAnonKey}`
-          }
+          },
+          body: JSON.stringify(smtpConfig)
         }
       );
 
@@ -497,13 +534,13 @@ export function SettingsPanel() {
 
       if (result.success) {
         toast.success('✅ Connexion SMTP réussie !', {
-          description: `Email envoyé à ${result.email}`,
+          description: result.message || 'Email de test envoyé',
           duration: 5000
         });
         setSMTPTestResult(result);
       } else {
         toast.error('❌ Test SMTP échoué', {
-          description: result.error || 'Erreur inconnue',
+          description: result.message || result.error || 'Erreur inconnue',
           duration: 6000
         });
         setSMTPTestResult(result);
@@ -514,6 +551,46 @@ export function SettingsPanel() {
       toast.error('❌ Erreur lors du test de connexion SMTP');
     } finally {
       setIsTestingSMTP(false);
+    }
+  };
+
+  const dryRunSMTPSettings = async () => {
+    setIsDryRunSMTP(true);
+    try {
+      const { projectId, publicAnonKey } = await import('../../utils/supabase/info');
+
+      const response = await fetch(
+        `https://${projectId}.supabase.co/functions/v1/make-server-10092a63/settings/smtp/dry-run`,
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${publicAnonKey}`
+          },
+          body: JSON.stringify(smtpConfig)
+        }
+      );
+
+      const result = await response.json();
+
+      if (result.success) {
+        toast.success('🧪 Dry-run SMTP OK', {
+          description: result.preview ? `À: ${result.preview.to} • Sujet: ${result.preview.subject}` : result.message,
+          duration: 5000
+        });
+        setSMTPDryRunResult(result);
+      } else {
+        toast.error('❌ Dry-run SMTP échoué', {
+          description: result.message || result.error || 'Erreur inconnue',
+          duration: 6000
+        });
+        setSMTPDryRunResult(result);
+      }
+    } catch (error) {
+      console.error('Error dry-run SMTP settings:', error);
+      toast.error('❌ Erreur lors du dry-run SMTP');
+    } finally {
+      setIsDryRunSMTP(false);
     }
   };
 
@@ -948,76 +1025,194 @@ export function SettingsPanel() {
                   </motion.div>
                 )}
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div>
-                    <Label htmlFor="smtpHost">Serveur SMTP *</Label>
-                    <Input
-                      id="smtpHost"
-                      type="text"
-                      placeholder="smtp.gmail.com"
-                      value={smtpConfig.host}
-                      onChange={(e) => setSMTPConfig({ ...smtpConfig, host: e.target.value })}
-                      className="mt-1 bg-white border-slate-200 text-slate-900 placeholder:text-slate-400 focus:border-cyan-400 focus:ring-cyan-400/20"
-                    />
-                  </div>
-                  
-                  <div>
-                    <Label htmlFor="smtpPort">Port *</Label>
-                    <Input
-                      id="smtpPort"
-                      type="number"
-                      placeholder="587"
-                      value={smtpConfig.port}
-                      onChange={(e) => setSMTPConfig({ ...smtpConfig, port: parseInt(e.target.value) || 0 })}
-                      className="mt-1 bg-white border-slate-200 text-slate-900 placeholder:text-slate-400 focus:border-cyan-400 focus:ring-cyan-400/20"
-                    />
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div>
-                    <Label htmlFor="smtpUsername">Nom d'utilisateur / Email *</Label>
-                    <Input
-                      id="smtpUsername"
-                      type="text"
-                      placeholder="votre@email.com"
-                      value={smtpConfig.username}
-                      onChange={(e) => setSMTPConfig({ ...smtpConfig, username: e.target.value })}
-                      className="mt-1 bg-white border-slate-200 text-slate-900 placeholder:text-slate-400 focus:border-cyan-400 focus:ring-cyan-400/20"
-                    />
-                  </div>
-                  
-                  <div>
-                    <Label htmlFor="smtpPassword">Mot de passe *</Label>
-                    <Input
-                      id="smtpPassword"
-                      type="password"
-                      placeholder="•••••••••"
-                      value={smtpConfig.password}
-                      onChange={(e) => setSMTPConfig({ ...smtpConfig, password: e.target.value })}
-                      className="mt-1 bg-white border-slate-200 text-slate-900 placeholder:text-slate-400 focus:border-cyan-400 focus:ring-cyan-400/20"
-                    />
-                  </div>
-                </div>
+                {smtpDryRunResult && (
+                  <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
+                    <div className="p-4 rounded-xl bg-blue-50 border border-blue-200">
+                      <div className="flex items-center gap-2">
+                        <Info className="w-5 h-5 text-blue-600" />
+                        <p className="text-sm text-blue-700">{smtpDryRunResult.message}</p>
+                      </div>
+                      {smtpDryRunResult.preview && (
+                        <p className="text-xs text-blue-700 mt-2">
+                          À: {smtpDryRunResult.preview.to} • Sujet: {smtpDryRunResult.preview.subject}
+                        </p>
+                      )}
+                    </div>
+                  </motion.div>
+                )}
 
                 <div>
-                  <Label htmlFor="smtpFromEmail">Email d'expédition *</Label>
-                  <Input
-                    id="smtpFromEmail"
-                    type="email"
-                    placeholder="noreply@yojob.com"
-                    value={smtpConfig.from_email}
-                    onChange={(e) => setSMTPConfig({ ...smtpConfig, from_email: e.target.value })}
-                    className="mt-1 bg-white border-slate-200 text-slate-900 placeholder:text-slate-400 focus:border-cyan-400 focus:ring-cyan-400/20"
-                  />
-                  <p className="text-xs text-slate-500 mt-1">L'adresse email qui apparaîtra comme expéditeur</p>
+                  <Label htmlFor="smtpProvider">Provider *</Label>
+                  <Select
+                    value={smtpProvider}
+                    onValueChange={(value) => setSMTPConfig({ ...smtpConfig, provider: value as SMTPConfig['provider'] })}
+                  >
+                    <SelectTrigger id="smtpProvider" className="mt-1 bg-white border-slate-200 text-slate-900">
+                      <SelectValue placeholder="Choisir un provider" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="smtp">SMTP</SelectItem>
+                      <SelectItem value="sendgrid">SendGrid</SelectItem>
+                      <SelectItem value="mailgun">Mailgun</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  <p className="text-xs text-slate-500 mt-1">Choisissez SMTP classique ou un provider avec API.</p>
                 </div>
 
-                <div className="flex gap-3">
+                {smtpProvider === 'smtp' && (
+                  <>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div>
+                        <Label htmlFor="smtpHost">Serveur SMTP *</Label>
+                        <Input
+                          id="smtpHost"
+                          type="text"
+                          placeholder="smtp.gmail.com"
+                          value={smtpConfig.host}
+                          onChange={(e) => setSMTPConfig({ ...smtpConfig, host: e.target.value })}
+                          className="mt-1 bg-white border-slate-200 text-slate-900 placeholder:text-slate-400 focus:border-cyan-400 focus:ring-cyan-400/20"
+                        />
+                      </div>
+                      
+                      <div>
+                        <Label htmlFor="smtpPort">Port *</Label>
+                        <Input
+                          id="smtpPort"
+                          type="number"
+                          placeholder="587"
+                          value={smtpConfig.port}
+                          onChange={(e) => setSMTPConfig({ ...smtpConfig, port: parseInt(e.target.value) || 0 })}
+                          className="mt-1 bg-white border-slate-200 text-slate-900 placeholder:text-slate-400 focus:border-cyan-400 focus:ring-cyan-400/20"
+                        />
+                      </div>
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div>
+                        <Label htmlFor="smtpUsername">Nom d'utilisateur / Email *</Label>
+                        <Input
+                          id="smtpUsername"
+                          type="text"
+                          placeholder="votre@email.com"
+                          value={smtpConfig.username}
+                          onChange={(e) => setSMTPConfig({ ...smtpConfig, username: e.target.value })}
+                          className="mt-1 bg-white border-slate-200 text-slate-900 placeholder:text-slate-400 focus:border-cyan-400 focus:ring-cyan-400/20"
+                        />
+                      </div>
+                      
+                      <div>
+                        <Label htmlFor="smtpPassword">Mot de passe *</Label>
+                        <Input
+                          id="smtpPassword"
+                          type="password"
+                          placeholder="•••••••••"
+                          value={smtpConfig.password}
+                          onChange={(e) => setSMTPConfig({ ...smtpConfig, password: e.target.value })}
+                          className="mt-1 bg-white border-slate-200 text-slate-900 placeholder:text-slate-400 focus:border-cyan-400 focus:ring-cyan-400/20"
+                        />
+                      </div>
+                    </div>
+                  </>
+                )}
+
+                {smtpProvider === 'sendgrid' && (
+                  <div>
+                    <Label htmlFor="sendgridKey">Clé API SendGrid *</Label>
+                    <Input
+                      id="sendgridKey"
+                      type="password"
+                      placeholder="SG.xxxxxx"
+                      value={smtpConfig.provider_api_key}
+                      onChange={(e) => setSMTPConfig({ ...smtpConfig, provider_api_key: e.target.value })}
+                      className="mt-1 bg-white border-slate-200 text-slate-900 placeholder:text-slate-400 focus:border-cyan-400 focus:ring-cyan-400/20"
+                    />
+                  </div>
+                )}
+
+                {smtpProvider === 'mailgun' && (
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <Label htmlFor="mailgunKey">Clé API Mailgun *</Label>
+                      <Input
+                        id="mailgunKey"
+                        type="password"
+                        placeholder="key-xxxxxxxx"
+                        value={smtpConfig.provider_api_key}
+                        onChange={(e) => setSMTPConfig({ ...smtpConfig, provider_api_key: e.target.value })}
+                        className="mt-1 bg-white border-slate-200 text-slate-900 placeholder:text-slate-400 focus:border-cyan-400 focus:ring-cyan-400/20"
+                      />
+                    </div>
+                    <div>
+                      <Label htmlFor="mailgunDomain">Domaine Mailgun *</Label>
+                      <Input
+                        id="mailgunDomain"
+                        type="text"
+                        placeholder="mg.votredomaine.com"
+                        value={smtpConfig.provider_domain}
+                        onChange={(e) => setSMTPConfig({ ...smtpConfig, provider_domain: e.target.value })}
+                        className="mt-1 bg-white border-slate-200 text-slate-900 placeholder:text-slate-400 focus:border-cyan-400 focus:ring-cyan-400/20"
+                      />
+                    </div>
+                  </div>
+                )}
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <Label htmlFor="smtpFromEmail">Email d'expédition *</Label>
+                    <Input
+                      id="smtpFromEmail"
+                      type="email"
+                      placeholder="noreply@yojob.com"
+                      value={smtpConfig.from_email}
+                      onChange={(e) => setSMTPConfig({ ...smtpConfig, from_email: e.target.value })}
+                      className="mt-1 bg-white border-slate-200 text-slate-900 placeholder:text-slate-400 focus:border-cyan-400 focus:ring-cyan-400/20"
+                    />
+                    <p className="text-xs text-slate-500 mt-1">Adresse affichée comme expéditeur</p>
+                  </div>
+                  <div>
+                    <Label htmlFor="smtpFromName">Nom expéditeur</Label>
+                    <Input
+                      id="smtpFromName"
+                      type="text"
+                      placeholder="YOJOB"
+                      value={smtpConfig.from_name}
+                      onChange={(e) => setSMTPConfig({ ...smtpConfig, from_name: e.target.value })}
+                      className="mt-1 bg-white border-slate-200 text-slate-900 placeholder:text-slate-400 focus:border-cyan-400 focus:ring-cyan-400/20"
+                    />
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <Label htmlFor="smtpReplyTo">Reply-To</Label>
+                    <Input
+                      id="smtpReplyTo"
+                      type="email"
+                      placeholder="support@yojob.com"
+                      value={smtpConfig.reply_to}
+                      onChange={(e) => setSMTPConfig({ ...smtpConfig, reply_to: e.target.value })}
+                      className="mt-1 bg-white border-slate-200 text-slate-900 placeholder:text-slate-400 focus:border-cyan-400 focus:ring-cyan-400/20"
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="smtpTestEmail">Email de test</Label>
+                    <Input
+                      id="smtpTestEmail"
+                      type="email"
+                      placeholder="vous@entreprise.com"
+                      value={smtpConfig.test_email}
+                      onChange={(e) => setSMTPConfig({ ...smtpConfig, test_email: e.target.value })}
+                      className="mt-1 bg-white border-slate-200 text-slate-900 placeholder:text-slate-400 focus:border-cyan-400 focus:ring-cyan-400/20"
+                    />
+                    <p className="text-xs text-slate-500 mt-1">Utilisé pour l’envoi du test</p>
+                  </div>
+                </div>
+
+                <div className="flex flex-col gap-3 sm:flex-row">
                   <Button
                     onClick={saveSMTPSettings}
-                    disabled={isSavingSMTP || !smtpConfig.host || !smtpConfig.username}
-                    className="flex-1 bg-gradient-to-r from-violet-500 to-cyan-500 hover:from-violet-600 hover:to-cyan-600 text-white shadow-lg shadow-violet-500/30"
+                    disabled={isSavingSMTP || !smtpIsValid}
+                    className="sm:flex-1 bg-gradient-to-r from-violet-500 to-cyan-500 hover:from-violet-600 hover:to-cyan-600 text-white shadow-lg shadow-violet-500/30"
                     size="lg"
                   >
                     {isSavingSMTP ? (
@@ -1036,8 +1231,8 @@ export function SettingsPanel() {
                   <Button
                     variant="outline"
                     onClick={testSMTPSettings}
-                    disabled={isTestingSMTP || !smtpConfig.host || !smtpConfig.username}
-                    className="flex-1"
+                    disabled={isTestingSMTP || !smtpIsValid}
+                    className="sm:flex-1"
                     size="lg"
                   >
                     {isTestingSMTP ? (
@@ -1052,11 +1247,43 @@ export function SettingsPanel() {
                       </>
                     )}
                   </Button>
+
+                  <Button
+                    variant="outline"
+                    onClick={dryRunSMTPSettings}
+                    disabled={isDryRunSMTP || !smtpIsValid}
+                    className="sm:flex-1"
+                    size="lg"
+                  >
+                    {isDryRunSMTP ? (
+                      <>
+                        <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                        Prévisualisation...
+                      </>
+                    ) : (
+                      <>
+                        <Eye className="w-4 h-4 mr-2" />
+                        Dry-run
+                      </>
+                    )}
+                  </Button>
                 </div>
 
-                <div className="text-xs text-slate-500 p-3 bg-blue-50 rounded-lg border border-blue-200">
-                  <strong>💡 Conseil:</strong> Pour Gmail, utilisez smtp.gmail.com:587 et activez "Autoriser les applications moins sécurisées" ou créez un mot de passe d'application.
-                </div>
+                {smtpProvider === 'smtp' && (
+                  <div className="text-xs text-slate-500 p-3 bg-blue-50 rounded-lg border border-blue-200">
+                    <strong>💡 Conseil:</strong> Pour Gmail, utilisez smtp.gmail.com:587 et créez un mot de passe d'application.
+                  </div>
+                )}
+                {smtpProvider === 'sendgrid' && (
+                  <div className="text-xs text-slate-500 p-3 bg-blue-50 rounded-lg border border-blue-200">
+                    <strong>💡 Conseil:</strong> Générez une clé API SendGrid avec permissions "Mail Send".
+                  </div>
+                )}
+                {smtpProvider === 'mailgun' && (
+                  <div className="text-xs text-slate-500 p-3 bg-blue-50 rounded-lg border border-blue-200">
+                    <strong>💡 Conseil:</strong> Utilisez le domaine validé Mailgun et une clé API privée.
+                  </div>
+                )}
               </CardContent>
             </Card>
           </motion.div>

@@ -1,5 +1,7 @@
 import * as kv from './kv_store.tsx';
 import { getSMTPConfig, getComplianceSettings } from './settings.tsx';
+import { createClient } from "npm:@supabase/supabase-js@2.39.3";
+import nodemailer from "npm:nodemailer@6.9.13";
 
 interface EmailOptions {
   to: string;
@@ -16,6 +18,60 @@ interface SMTPConfig {
   password: string;
   from_email: string;
   from_name: string;
+  // Optionnel: provider HTTP (ex: sendgrid/mailgun)
+  provider?: 'smtp' | 'sendgrid' | 'mailgun';
+  provider_api_key?: string;
+  provider_domain?: string;
+  reply_to?: string;
+}
+
+// Helper pour obtenir le client Supabase
+function getSupabaseClient() {
+  const supabaseUrl = Deno.env.get("SUPABASE_URL");
+  const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
+
+  if (!supabaseUrl || !supabaseServiceKey) {
+    throw new Error("Missing Supabase credentials");
+  }
+
+  return createClient(supabaseUrl, supabaseServiceKey);
+}
+
+let emailLogsDbReady: boolean | null = null;
+
+async function isEmailLogsDbReady(supabase: any): Promise<boolean> {
+  if (emailLogsDbReady !== null) return emailLogsDbReady;
+
+  try {
+    const { error } = await supabase
+      .from("email_logs")
+      .select("id")
+      .limit(1);
+
+    if (error) {
+      const message = (error as any)?.message || "";
+      const code = (error as any)?.code || "";
+      if (
+        code === "PGRST205" ||
+        message.includes("schema cache") ||
+        message.includes("does not exist") ||
+        message.includes("relation")
+      ) {
+        emailLogsDbReady = false;
+        return false;
+      }
+      console.error("Email logs DB check failed:", error);
+      emailLogsDbReady = false;
+      return false;
+    }
+
+    emailLogsDbReady = true;
+    return true;
+  } catch (err) {
+    console.error("Email logs DB check error:", err);
+    emailLogsDbReady = false;
+    return false;
+  }
 }
 
 /**
@@ -45,8 +101,18 @@ export class EmailService {
    * Vérifie si le service est configuré
    */
   isConfigured(): boolean {
+    if (!this.config) return false;
+    const provider = this.config.provider || 'smtp';
+
+    if (provider === 'sendgrid') {
+      return !!(this.config.provider_api_key && this.config.from_email);
+    }
+
+    if (provider === 'mailgun') {
+      return !!(this.config.provider_api_key && this.config.provider_domain && this.config.from_email);
+    }
+
     return !!(
-      this.config &&
       this.config.host &&
       this.config.username &&
       this.config.password &&
@@ -79,86 +145,7 @@ export class EmailService {
       };
     }
 
-    try {
-      console.log('📧 Envoi email via SMTP:', {
-        from: `${this.config!.from_name} <${this.config!.from_email}>`,
-        to: options.to,
-        subject: options.subject,
-        host: this.config!.host,
-        port: this.config!.port,
-      });
-
-      // SIMULATION D'ENVOI
-      // Dans un vrai système, vous utiliseriez:
-      // 1. nodemailer avec SMTP
-      // 2. ou un service tiers (SendGrid API, AWS SES SDK, Mailgun API, etc.)
-      
-      /*
-      // Exemple avec nodemailer (non disponible dans Deno par défaut):
-      const transporter = nodemailer.createTransport({
-        host: this.config!.host,
-        port: this.config!.port,
-        secure: this.config!.secure,
-        auth: {
-          user: this.config!.username,
-          pass: this.config!.password,
-        },
-      });
-
-      const info = await transporter.sendMail({
-        from: `${this.config!.from_name} <${this.config!.from_email}>`,
-        to: options.to,
-        subject: options.subject,
-        text: options.body,
-        html: options.html || options.body,
-      });
-
-      return {
-        success: true,
-        message: 'Email envoyé avec succès',
-        messageId: info.messageId,
-      };
-      */
-
-      // SIMULATION POUR LE DÉVELOPPEMENT
-      const messageId = `<${Date.now()}.${Math.random().toString(36).slice(2)}@yojob.com>`;
-      
-      // Log l'email envoyé (pour debug)
-      await this.logSentEmail({
-        messageId,
-        to: options.to,
-        subject: options.subject,
-        body: options.body,
-        timestamp: new Date().toISOString(),
-        status: 'sent',
-      });
-
-      console.log('✅ Email simulé envoyé avec succès:', messageId);
-
-      return {
-        success: true,
-        message: 'Email envoyé avec succès (simulé)',
-        messageId,
-      };
-    } catch (error: any) {
-      console.error('❌ Erreur envoi email:', error);
-      
-      // Log l'erreur
-      await this.logSentEmail({
-        messageId: `error-${Date.now()}`,
-        to: options.to,
-        subject: options.subject,
-        body: options.body,
-        timestamp: new Date().toISOString(),
-        status: 'failed',
-        error: error.message,
-      });
-
-      return {
-        success: false,
-        message: `Erreur d'envoi: ${error.message}`,
-      };
-    }
+    return await sendEmailWithConfig(this.config!, options);
   }
 
   /**
@@ -205,12 +192,7 @@ export class EmailService {
    * Enregistre l'historique des emails envoyés
    */
   private async logSentEmail(log: any): Promise<void> {
-    try {
-      const key = `email_log:${log.messageId}`;
-      await kv.set(key, log);
-    } catch (error) {
-      console.error('Erreur log email:', error);
-    }
+    await logEmailResult(log);
   }
 
   /**
@@ -218,6 +200,25 @@ export class EmailService {
    */
   async getEmailLogs(limit: number = 50): Promise<any[]> {
     try {
+      try {
+        const supabase = getSupabaseClient();
+        const dbReady = await isEmailLogsDbReady(supabase);
+
+        if (dbReady) {
+          const { data, error } = await supabase
+            .from("email_logs")
+            .select("*")
+            .order("created_at", { ascending: false })
+            .limit(limit);
+
+          if (!error && data) {
+            return data;
+          }
+        }
+      } catch (err) {
+        console.error("Error fetching email logs from DB:", err);
+      }
+
       const logs = await kv.getByPrefix('email_log:');
       return logs
         .sort((a, b) => new Date(b.value.timestamp).getTime() - new Date(a.value.timestamp).getTime())
@@ -232,6 +233,242 @@ export class EmailService {
 
 // Export singleton instance
 export const emailService = new EmailService();
+
+/**
+ * Envoi réel d'email avec une config fournie (SMTP ou provider HTTP)
+ */
+export async function sendEmailWithConfig(
+  config: SMTPConfig,
+  options: EmailOptions
+): Promise<{ success: boolean; message: string; messageId?: string }> {
+  try {
+    const compliance = await getComplianceSettings();
+    const shouldAddUnsubscribe = !compliance || compliance.unsubscribe_link !== false;
+
+    const htmlBody = options.html || options.body;
+    const finalHtml = shouldAddUnsubscribe ? addUnsubscribeLink(htmlBody, options.to) : htmlBody;
+    const finalText = shouldAddUnsubscribe
+      ? `${options.body}\n\n---\nSe désinscrire: https://app.yojob.com/unsubscribe?email=${encodeURIComponent(options.to)}`
+      : options.body;
+
+    if (config.provider === 'sendgrid') {
+      if (!config.provider_api_key) {
+        throw new Error('Clé API SendGrid manquante');
+      }
+      return await sendViaSendGrid(config, options, finalText, finalHtml);
+    }
+
+    if (config.provider === 'mailgun') {
+      if (!config.provider_api_key || !config.provider_domain) {
+        throw new Error('Clé API ou domaine Mailgun manquant');
+      }
+      return await sendViaMailgun(config, options, finalText, finalHtml);
+    }
+
+    if (!config.host || !config.username || !config.password) {
+      throw new Error('Configuration SMTP incomplète');
+    }
+
+    return await sendViaSMTP(config, options, finalText, finalHtml);
+  } catch (error: any) {
+    console.error('❌ Erreur envoi email:', error);
+    await logEmailResult({
+      messageId: `error-${Date.now()}`,
+      to: options.to,
+      subject: options.subject,
+      body: options.body,
+      timestamp: new Date().toISOString(),
+      status: 'failed',
+      provider: config.provider || 'smtp',
+      error: error.message,
+    });
+    return {
+      success: false,
+      message: `Erreur d'envoi: ${error.message}`,
+    };
+  }
+}
+
+async function sendViaSMTP(
+  config: SMTPConfig,
+  options: EmailOptions,
+  textBody: string,
+  htmlBody: string
+): Promise<{ success: boolean; message: string; messageId?: string }> {
+  console.log('📧 Envoi email via SMTP:', {
+    from: `${config.from_name} <${config.from_email}>`,
+    to: options.to,
+    subject: options.subject,
+    host: config.host,
+    port: config.port,
+  });
+
+  const transporter = nodemailer.createTransport({
+    host: config.host,
+    port: config.port,
+    secure: config.secure,
+    auth: {
+      user: config.username,
+      pass: config.password,
+    },
+  });
+
+  const info = await transporter.sendMail({
+    from: `${config.from_name} <${config.from_email}>`,
+    to: options.to,
+    subject: options.subject,
+    text: textBody,
+    html: htmlBody,
+    replyTo: config.reply_to,
+  });
+
+  const messageId = info?.messageId || `<${Date.now()}.${Math.random().toString(36).slice(2)}@yojob.com>`;
+  await logEmailResult({
+    messageId,
+    to: options.to,
+    subject: options.subject,
+    body: textBody,
+    timestamp: new Date().toISOString(),
+    status: 'sent',
+    provider: config.provider || 'smtp',
+  });
+
+  return {
+    success: true,
+    message: 'Email envoyé avec succès',
+    messageId,
+  };
+}
+
+async function sendViaSendGrid(
+  config: SMTPConfig,
+  options: EmailOptions,
+  textBody: string,
+  htmlBody: string
+): Promise<{ success: boolean; message: string; messageId?: string }> {
+  const response = await fetch("https://api.sendgrid.com/v3/mail/send", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "Authorization": `Bearer ${config.provider_api_key}`,
+    },
+    body: JSON.stringify({
+      personalizations: [{ to: [{ email: options.to }] }],
+      from: { email: config.from_email, name: config.from_name },
+      ...(config.reply_to ? { reply_to: { email: config.reply_to } } : {}),
+      subject: options.subject,
+      content: [
+        { type: "text/plain", value: textBody },
+        { type: "text/html", value: htmlBody },
+      ],
+    }),
+  });
+
+  if (!response.ok) {
+    const errorText = await response.text();
+    throw new Error(`SendGrid error: ${response.status} - ${errorText}`);
+  }
+
+  const messageId = `<sg.${Date.now()}.${Math.random().toString(36).slice(2)}@yojob.com>`;
+  await logEmailResult({
+    messageId,
+    to: options.to,
+    subject: options.subject,
+    body: textBody,
+    timestamp: new Date().toISOString(),
+    status: 'sent',
+    provider: 'sendgrid',
+  });
+
+  return {
+    success: true,
+    message: 'Email envoyé avec succès (SendGrid)',
+    messageId,
+  };
+}
+
+async function sendViaMailgun(
+  config: SMTPConfig,
+  options: EmailOptions,
+  textBody: string,
+  htmlBody: string
+): Promise<{ success: boolean; message: string; messageId?: string }> {
+  const url = `https://api.mailgun.net/v3/${config.provider_domain}/messages`;
+  const form = new URLSearchParams();
+  form.set("from", `${config.from_name} <${config.from_email}>`);
+  form.set("to", options.to);
+  form.set("subject", options.subject);
+  form.set("text", textBody);
+  form.set("html", htmlBody);
+  if (config.reply_to) {
+    form.set("h:Reply-To", config.reply_to);
+  }
+
+  const auth = btoa(`api:${config.provider_api_key}`);
+  const response = await fetch(url, {
+    method: "POST",
+    headers: {
+      "Authorization": `Basic ${auth}`,
+      "Content-Type": "application/x-www-form-urlencoded",
+    },
+    body: form.toString(),
+  });
+
+  if (!response.ok) {
+    const errorText = await response.text();
+    throw new Error(`Mailgun error: ${response.status} - ${errorText}`);
+  }
+
+  const messageId = `<mg.${Date.now()}.${Math.random().toString(36).slice(2)}@yojob.com>`;
+  await logEmailResult({
+    messageId,
+    to: options.to,
+    subject: options.subject,
+    body: textBody,
+    timestamp: new Date().toISOString(),
+    status: 'sent',
+    provider: 'mailgun',
+  });
+
+  return {
+    success: true,
+    message: 'Email envoyé avec succès (Mailgun)',
+    messageId,
+  };
+}
+
+async function logEmailResult(log: any): Promise<void> {
+  try {
+    try {
+      const supabase = getSupabaseClient();
+      const dbReady = await isEmailLogsDbReady(supabase);
+
+      if (dbReady) {
+        await supabase
+          .from("email_logs")
+          .insert([{
+            message_id: log.messageId,
+            to_email: log.to,
+            subject: log.subject,
+            body: log.body,
+            status: log.status,
+            provider: log.provider || 'smtp',
+            error: log.error || null,
+            metadata: log.metadata || {},
+            created_at: log.timestamp || new Date().toISOString(),
+          }]);
+        return;
+      }
+    } catch (dbError) {
+      console.error('Erreur log email (DB):', dbError);
+    }
+
+    const key = `email_log:${log.messageId}`;
+    await kv.set(key, log);
+  } catch (error) {
+    console.error('Erreur log email:', error);
+  }
+}
 
 /**
  * Helper pour envoyer un email de template

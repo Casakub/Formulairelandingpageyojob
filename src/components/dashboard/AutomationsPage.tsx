@@ -477,7 +477,10 @@ export function AutomationsPage() {
                 <p className="text-slate-600 text-sm mb-4">
                   Créez votre premier workflow automatique ou utilisez un template pré-configuré
                 </p>
-                <Button className="bg-gradient-to-r from-blue-500 to-cyan-500 text-white">
+                <Button
+                  className="bg-gradient-to-r from-blue-500 to-cyan-500 text-white"
+                  onClick={() => setWorkflowBuilderOpen(true)}
+                >
                   <Plus className="w-4 h-4 mr-2" />
                   Créer un workflow
                 </Button>
@@ -704,6 +707,12 @@ export function AutomationsPage() {
               ) : (
                 <div className="space-y-3">
                   {runs.map(run => {
+                    const currentStep = (run as any).current_step ?? (run as any).steps_completed ?? 0;
+                    const totalSteps = (run as any).total_steps ?? (run as any).steps_total ?? 0;
+                    const progressPercent = totalSteps > 0 ? Math.round((currentStep / totalSteps) * 100) : 0;
+                    const workflowName = (run as any).workflow_name || (run as any).workflow_id || 'Workflow';
+                    const prospectName = (run as any).prospect_name || (run as any)?.metadata?.prospect_name || 'Prospect';
+                    const prospectEmail = (run as any).prospect_email || (run as any)?.metadata?.prospect_email || '';
                     const statusBadge = RUN_STATUS_BADGES[run.status];
                     const StatusIcon = statusBadge.icon;
 
@@ -715,10 +724,10 @@ export function AutomationsPage() {
                         <div className="flex items-start justify-between mb-3">
                           <div>
                             <div className="text-sm text-slate-900 mb-1">
-                              {run.workflow_name}
+                              {workflowName}
                             </div>
                             <div className="text-xs text-slate-600">
-                              {run.prospect_name} ({run.prospect_email})
+                              {prospectName}{prospectEmail ? ` (${prospectEmail})` : ''}
                             </div>
                           </div>
                           <Badge
@@ -733,20 +742,20 @@ export function AutomationsPage() {
                         {/* Progress bar */}
                         <div className="mb-3">
                           <div className="flex items-center justify-between text-xs text-slate-600 mb-1">
-                            <span>Étape {run.current_step} / {run.total_steps}</span>
-                            <span>{Math.round((run.current_step / run.total_steps) * 100)}%</span>
+                            <span>Étape {currentStep} / {totalSteps}</span>
+                            <span>{progressPercent}%</span>
                           </div>
                           <div className="h-2 bg-slate-200 rounded-full overflow-hidden">
                             <div
                               className="h-full bg-gradient-to-r from-blue-500 to-cyan-500 rounded-full transition-all"
-                              style={{ width: `${(run.current_step / run.total_steps) * 100}%` }}
+                              style={{ width: `${progressPercent}%` }}
                             />
                           </div>
                         </div>
 
                         <div className="flex items-center gap-4 text-xs text-slate-600">
-                          <span>📧 {run.metadata.emails_sent} emails</span>
-                          <span>✅ {run.metadata.tasks_created} tâches</span>
+                          <span>📧 {run.metadata?.emails_sent || 0} emails</span>
+                          <span>✅ {run.metadata?.tasks_created || 0} tâches</span>
                           <span className="ml-auto">
                             {new Date(run.started_at).toLocaleString('fr-FR')}
                           </span>
