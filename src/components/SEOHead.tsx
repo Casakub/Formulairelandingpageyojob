@@ -187,6 +187,79 @@ export function SEOHead(props: SEOHeadProps) {
     // ========================================================================
     document.documentElement.lang = currentLang;
     
+    // ========================================================================
+    // FAVICON LINKS
+    // ========================================================================
+    // Favicon ICO (fallback)
+    let faviconIco = document.querySelector('link[rel="icon"][type="image/x-icon"]');
+    if (!faviconIco) {
+      faviconIco = document.createElement('link');
+      faviconIco.setAttribute('rel', 'icon');
+      faviconIco.setAttribute('type', 'image/x-icon');
+      faviconIco.setAttribute('href', '/favicon.ico');
+      document.head.appendChild(faviconIco);
+    }
+    
+    // Favicon SVG (modern browsers)
+    let faviconSvg = document.querySelector('link[rel="icon"][type="image/svg+xml"]');
+    if (!faviconSvg) {
+      faviconSvg = document.createElement('link');
+      faviconSvg.setAttribute('rel', 'icon');
+      faviconSvg.setAttribute('type', 'image/svg+xml');
+      faviconSvg.setAttribute('href', '/favicon.svg');
+      document.head.appendChild(faviconSvg);
+    }
+    
+    // Favicon 16x16
+    let favicon16 = document.querySelector('link[rel="icon"][sizes="16x16"]');
+    if (!favicon16) {
+      favicon16 = document.createElement('link');
+      favicon16.setAttribute('rel', 'icon');
+      favicon16.setAttribute('type', 'image/png');
+      favicon16.setAttribute('sizes', '16x16');
+      favicon16.setAttribute('href', '/favicon-16x16.png');
+      document.head.appendChild(favicon16);
+    }
+    
+    // Favicon 32x32
+    let favicon32 = document.querySelector('link[rel="icon"][sizes="32x32"]');
+    if (!favicon32) {
+      favicon32 = document.createElement('link');
+      favicon32.setAttribute('rel', 'icon');
+      favicon32.setAttribute('type', 'image/png');
+      favicon32.setAttribute('sizes', '32x32');
+      favicon32.setAttribute('href', '/favicon-32x32.png');
+      document.head.appendChild(favicon32);
+    }
+    
+    // Apple Touch Icon
+    let appleTouchIcon = document.querySelector('link[rel="apple-touch-icon"]');
+    if (!appleTouchIcon) {
+      appleTouchIcon = document.createElement('link');
+      appleTouchIcon.setAttribute('rel', 'apple-touch-icon');
+      appleTouchIcon.setAttribute('sizes', '180x180');
+      appleTouchIcon.setAttribute('href', '/apple-touch-icon.png');
+      document.head.appendChild(appleTouchIcon);
+    }
+    
+    // Web Manifest
+    let manifest = document.querySelector('link[rel="manifest"]');
+    if (!manifest) {
+      manifest = document.createElement('link');
+      manifest.setAttribute('rel', 'manifest');
+      manifest.setAttribute('href', '/site.webmanifest');
+      document.head.appendChild(manifest);
+    }
+    
+    // Theme Color (pour mobile)
+    let themeColor = document.querySelector('meta[name="theme-color"]');
+    if (!themeColor) {
+      themeColor = document.createElement('meta');
+      themeColor.setAttribute('name', 'theme-color');
+      themeColor.setAttribute('content', '#1E3A8A');
+      document.head.appendChild(themeColor);
+    }
+    
   }, [props]);
   
   // Ce composant n'affiche rien visuellement
