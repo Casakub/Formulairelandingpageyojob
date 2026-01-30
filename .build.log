@@ -1,13 +1,13 @@
-2026-01-29T15:59:42.774345 Project directory: /docker/yojob
-2026-01-29T15:59:42.774660 Pulling project images
-2026-01-29T15:59:42.775339 ------------------------------
-2026-01-29T15:59:42.844613  yojob-landing Skipped 
-2026-01-29T15:59:42.848917 ------------------------------
-2026-01-29T15:59:42.849023 Deploying project
-2026-01-29T15:59:42.849526 ------------------------------
-2026-01-29T15:59:42.948388  Container yojob-landing-page  Recreate
-2026-01-29T15:59:43.154346  Container yojob-landing-page  Recreated
-2026-01-29T15:59:43.155215  Container yojob-landing-page  Starting
-2026-01-29T15:59:43.351642  Container yojob-landing-page  Started
-2026-01-29T15:59:43.362384 ------------------------------
-2026-01-29T15:59:43.362436 Project deployed successfully
+2026-01-30T13:45:43.862485 Project directory: /docker/yojob
+2026-01-30T13:45:43.864809 Pulling project images
+2026-01-30T13:45:43.865491 ------------------------------
+2026-01-30T13:45:43.954850  yojob-landing Skipped 
+2026-01-30T13:45:43.959846 ------------------------------
+2026-01-30T13:45:43.960029 Deploying project
+2026-01-30T13:45:43.960727 ------------------------------
+2026-01-30T13:45:44.047603  Container yojob-landing-page  Recreate
+2026-01-30T13:45:44.389878  Container yojob-landing-page  Recreated
+2026-01-30T13:45:44.391624  Container yojob-landing-page  Starting
+2026-01-30T13:45:44.614300  Container yojob-landing-page  Started
+2026-01-30T13:45:44.625944 ------------------------------
+2026-01-30T13:45:44.626014 Project deployed successfully

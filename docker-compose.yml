@@ -19,6 +19,7 @@ services:
         - VITE_SUPABASE_URL=${VITE_SUPABASE_URL}
         - VITE_SUPABASE_ANON_KEY=${VITE_SUPABASE_ANON_KEY}
         - VITE_APP_ENV=${VITE_APP_ENV:-production}
+        - VITE_MATOMO_TAG_MANAGER_URL=${VITE_MATOMO_TAG_MANAGER_URL}
     pull_policy: build
 
     # Variables d'environnement runtime
