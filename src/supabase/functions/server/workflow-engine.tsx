@@ -169,6 +169,11 @@ function getLocalizedTemplate(templateId: string, prospect: any): any {
  */
 function replaceVariables(text: string, prospectData: any): string {
   let result = text;
+
+  const customFields = prospectData?.custom_fields || {};
+  const customContact = customFields?.contact || {};
+  const customEntreprise = customFields?.entreprise || {};
+  const customConditions = customFields?.conditions || {};
   
   // Calculer deadline_time (maintenant + 4h)
   const deadline4h = new Date();
@@ -177,26 +182,39 @@ function replaceVariables(text: string, prospectData: any): string {
   const deadline4hStr = deadline4h.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
   
   // Variables disponibles
+  const fallbackName = [customContact.prenom, customContact.nom].filter(Boolean).join(' ').trim();
+  const fallbackCompany = customEntreprise.raisonSociale || customFields.company || customFields.company_name || '';
+  const fallbackEmail = customContact.email || customFields.email || '';
+  const fallbackPhone = customContact.telephonePortable || customContact.telephoneFixe || customFields.phone || '';
+  const fallbackCountry = customEntreprise.pays || customFields.country || customFields.country_code || '';
+  const fallbackIndustry = customFields.industry_sector || customFields.industry || customFields.sector || '';
+  const fallbackWorkers = customFields.workers_count ?? customFields.workers ?? '';
+  const fallbackProjectDescription =
+    customFields.project_description ||
+    customConditions.motifRecours ||
+    customConditions.lieuxMission ||
+    '';
+
   const variables: Record<string, string> = {
     // Variables prospect de base
-    '{{name}}': prospectData.name || prospectData.contact_name || 'Client',
-    '{{email}}': prospectData.email || '',
-    '{{company}}': prospectData.company_name || prospectData.company || '',
-    '{{phone}}': prospectData.phone || '',
-    '{{country}}': prospectData.country || '',
+    '{{name}}': prospectData.name || prospectData.contact_name || fallbackName || 'Client',
+    '{{email}}': prospectData.email || fallbackEmail || '',
+    '{{company}}': prospectData.company_name || prospectData.company || fallbackCompany || '',
+    '{{phone}}': prospectData.phone || fallbackPhone || '',
+    '{{country}}': prospectData.country || fallbackCountry || '',
     '{{status}}': prospectData.status || '',
     
     // Variables projet
-    '{{industry}}': prospectData.industry_sector || prospectData.industry || '',
-    '{{workers_count}}': String(prospectData.workers_count || ''),
-    '{{project_description}}': prospectData.project_description || '',
+    '{{industry}}': prospectData.industry_sector || prospectData.industry || fallbackIndustry || '',
+    '{{workers_count}}': String(prospectData.workers_count ?? fallbackWorkers ?? ''),
+    '{{project_description}}': prospectData.project_description || fallbackProjectDescription || '',
     '{{classification}}': prospectData.classification || 'Standard',
     '{{duration}}': prospectData.duration || '6 mois',
     '{{quote_amount}}': prospectData.quote_amount ? `${prospectData.quote_amount}` : 'Sur devis',
     
     // Variables technique
     '{{prospect_id}}': prospectData.id || '',
-    '{{quote_id}}': prospectData.quote_id || `q-${prospectData.id || Math.random().toString(36).substr(2, 9)}`,
+    '{{quote_id}}': prospectData.quote_id || customFields.devis_numero || customFields.devis_id || `q-${prospectData.id || Math.random().toString(36).substr(2, 9)}`,
     
     // Variables temporelles
     '{{deadline_time}}': deadlineTime,
@@ -212,15 +230,15 @@ function replaceVariables(text: string, prospectData: any): string {
     '{{company_phone}}': '+33 1 23 45 67 89',
     
     // Rétrocompatibilité avec prospect. prefix
-    '{{prospect.name}}': prospectData.name || prospectData.contact_name || '',
-    '{{prospect.email}}': prospectData.email || '',
-    '{{prospect.company}}': prospectData.company_name || '',
-    '{{prospect.phone}}': prospectData.phone || '',
-    '{{prospect.country}}': prospectData.country || '',
+    '{{prospect.name}}': prospectData.name || prospectData.contact_name || fallbackName || '',
+    '{{prospect.email}}': prospectData.email || fallbackEmail || '',
+    '{{prospect.company}}': prospectData.company_name || prospectData.company || fallbackCompany || '',
+    '{{prospect.phone}}': prospectData.phone || fallbackPhone || '',
+    '{{prospect.country}}': prospectData.country || fallbackCountry || '',
     '{{prospect.status}}': prospectData.status || '',
-    '{{prospect.industry}}': prospectData.industry_sector || '',
-    '{{prospect.workers_count}}': String(prospectData.workers_count || ''),
-    '{{prospect.project_description}}': prospectData.project_description || '',
+    '{{prospect.industry}}': prospectData.industry_sector || fallbackIndustry || '',
+    '{{prospect.workers_count}}': String(prospectData.workers_count ?? fallbackWorkers ?? ''),
+    '{{prospect.project_description}}': prospectData.project_description || fallbackProjectDescription || '',
   };
 
   // Remplacer toutes les variables
@@ -236,23 +254,25 @@ function replaceVariables(text: string, prospectData: any): string {
  */
 function getProspectValueForCondition(condition: any, prospect: any) {
   const rawField = condition?.field || condition?.type || '';
+  const customFields = prospect?.custom_fields || {};
+  const customEntreprise = customFields?.entreprise || {};
 
   switch (rawField) {
     case 'prospect_type':
       return prospect.type ?? prospect.prospect_type;
     case 'country':
-      return prospect.country ?? prospect.country_code;
+      return prospect.country ?? prospect.country_code ?? customFields.country ?? customFields.country_code ?? customEntreprise.pays;
     case 'status':
       return prospect.status;
     case 'source':
       return prospect.source;
     case 'industry_sector':
-      return prospect.industry_sector ?? prospect.sector;
+      return prospect.industry_sector ?? prospect.sector ?? customFields.industry_sector ?? customFields.sector;
     case 'sector':
-      return prospect.sector ?? prospect.industry_sector;
+      return prospect.sector ?? prospect.industry_sector ?? customFields.sector ?? customFields.industry_sector;
     case 'tag_has':
     case 'tags':
-      return prospect.tags ?? [];
+      return prospect.tags ?? customFields.tags ?? [];
     default:
       return prospect[rawField];
   }

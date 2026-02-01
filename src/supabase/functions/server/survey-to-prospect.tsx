@@ -40,6 +40,30 @@ function getSupabaseClient() {
   return createClient(supabaseUrl, supabaseServiceKey);
 }
 
+async function triggerWorkflow(
+  triggerType: 'prospect_created' | 'status_changed',
+  payload: Record<string, any>
+) {
+  try {
+    const supabaseUrl = Deno.env.get("SUPABASE_URL");
+    const anonKey = Deno.env.get("SUPABASE_ANON_KEY");
+    if (!supabaseUrl || !anonKey) return;
+
+    fetch(`${supabaseUrl}/functions/v1/make-server-10092a63/workflow-engine/trigger/${triggerType}`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${anonKey}`,
+      },
+      body: JSON.stringify(payload),
+    }).catch(err => {
+      console.error(`⚠️ Erreur trigger ${triggerType} (non-bloquant):`, err);
+    });
+  } catch (error) {
+    console.error(`⚠️ Erreur déclenchement workflow ${triggerType}:`, error);
+  }
+}
+
 /**
  * Extraire les données pertinentes de la réponse d'enquête
  */
@@ -172,7 +196,7 @@ export async function syncSurveyToProspect(surveyResponse: any) {
     // Vérifier si un prospect existe déjà avec cet email
     const { data: existingProspect, error: searchError } = await supabase
       .from('prospects')
-      .select('id, email')
+      .select('id, email, status, custom_fields')
       .eq('email', prospectData.email)
       .maybeSingle();
     
@@ -274,6 +298,21 @@ export async function syncSurveyToProspect(surveyResponse: any) {
     });
     
     console.log('✅ [SYNC] Synchronisation terminée avec succès');
+
+    // 🔥 Déclencher workflows automatiques (SMTP)
+    try {
+      await triggerWorkflow('prospect_created', { prospect_id: prospectId });
+
+      if (existingProspect?.status && existingProspect.status !== status) {
+        await triggerWorkflow('status_changed', {
+          prospect_id: prospectId,
+          status_from: existingProspect.status,
+          status_to: status,
+        });
+      }
+    } catch (workflowError) {
+      console.error('⚠️ Erreur déclenchement workflows survey (non-bloquant):', workflowError);
+    }
     
     return {
       success: true,
