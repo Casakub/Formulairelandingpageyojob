@@ -7,7 +7,7 @@
 
 import { createClient } from "npm:@supabase/supabase-js@2.39.3";
 import { emailService } from "./email-service.tsx";
-import type { RespondentType } from "../../types/survey.ts";
+import type { RespondentType } from "./types.ts";
 
 /**
  * Mapping des types de répondants vers les types de prospects
