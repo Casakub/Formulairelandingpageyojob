@@ -2,7 +2,7 @@ import { Hono } from "npm:hono@4";
 import { createClient } from "npm:@supabase/supabase-js@2.39.3";
 import { MOCK_WORKFLOWS, MOCK_EMAIL_TEMPLATES, MOCK_AUTOMATION_RUNS, MOCK_AUTOMATION_LOGS, detectProspectLanguage } from "./automations-data.ts";
 import { emailService } from "./email-service.tsx";
-import type { AutomationWorkflow } from "../../types/automations.ts";
+import type { AutomationWorkflow } from "./types.ts";
 
 const app = new Hono();
 
