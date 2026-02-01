@@ -97,20 +97,31 @@ async function generateDevisPdfBytes(prospect: any, inclureCGV: boolean): Promis
   const pdfDoc = await PDFDocument.create();
   const fontRegular = await pdfDoc.embedFont(StandardFonts.Helvetica);
   const fontBold = await pdfDoc.embedFont(StandardFonts.HelveticaBold);
+
   const pageWidth = 595.28;
   const pageHeight = 841.89;
-  const margin = 40;
-  const gutter = 16;
-  const headerHeight = 72;
+  const margin = 36;
+  const contentWidth = pageWidth - margin * 2;
+  const gap = 14;
+  const headerHeight = 56;
 
   const colors = {
-    brand: rgb(0.12, 0.24, 0.55),
-    accent: rgb(0.02, 0.72, 0.83),
+    brand: rgb(0.12, 0.23, 0.55),
+    brandLight: rgb(0.88, 0.92, 0.98),
     text: rgb(0.12, 0.12, 0.12),
-    muted: rgb(0.4, 0.4, 0.4),
-    light: rgb(0.96, 0.97, 0.99),
-    border: rgb(0.82, 0.84, 0.88),
+    muted: rgb(0.42, 0.46, 0.52),
+    border: rgb(0.86, 0.88, 0.92),
     white: rgb(1, 1, 1),
+    blue: rgb(0.16, 0.39, 0.92),
+    blueBg: rgb(0.93, 0.96, 1),
+    purple: rgb(0.48, 0.23, 0.93),
+    purpleBg: rgb(0.96, 0.93, 1),
+    green: rgb(0.06, 0.62, 0.47),
+    greenBg: rgb(0.92, 0.98, 0.95),
+    orange: rgb(0.94, 0.6, 0.14),
+    orangeBg: rgb(0.99, 0.96, 0.9),
+    pink: rgb(0.92, 0.28, 0.6),
+    pinkBg: rgb(0.99, 0.93, 0.96),
   };
 
   let page = pdfDoc.addPage([pageWidth, pageHeight]);
@@ -124,329 +135,359 @@ async function generateDevisPdfBytes(prospect: any, inclureCGV: boolean): Promis
       height: headerHeight,
       color: colors.brand,
     });
-    page.drawText('YOJOB', { x: margin, y: pageHeight - 40, size: 22, font: fontBold, color: colors.white });
-    page.drawText('Courtage en recrutement européen', {
+    page.drawText('YOJOB', { x: margin, y: pageHeight - 38, size: 20, font: fontBold, color: colors.white });
+    page.drawText('Courtage en recrutement europeen', {
       x: margin,
-      y: pageHeight - 58,
+      y: pageHeight - 52,
       size: 9,
       font: fontRegular,
-      color: rgb(0.85, 0.93, 0.98),
+      color: colors.brandLight,
     });
 
     const infoX = pageWidth - margin - 190;
-    page.drawText('DEVIS', { x: infoX, y: pageHeight - 32, size: 9, font: fontBold, color: colors.white });
-    page.drawText(prospect.numero || '-', { x: infoX, y: pageHeight - 46, size: 12, font: fontBold, color: colors.white });
-    page.drawText(`Date : ${formatDateForPdf(prospect.createdAt) || '-'}`, {
+    page.drawText('DEVIS', { x: infoX, y: pageHeight - 30, size: 9, font: fontBold, color: colors.white });
+    page.drawText(prospect.numero || '-', { x: infoX, y: pageHeight - 44, size: 12, font: fontBold, color: colors.white });
+    page.drawText(`Cree le : ${formatDateForPdf(prospect.createdAt) || '-'}`, {
       x: infoX,
-      y: pageHeight - 60,
+      y: pageHeight - 58,
       size: 8,
       font: fontRegular,
-      color: rgb(0.88, 0.94, 1),
+      color: colors.brandLight,
     });
     page.drawText(`Statut : ${prospect.statut || '-'}`, {
       x: infoX,
-      y: pageHeight - 72,
+      y: pageHeight - 70,
       size: 8,
       font: fontRegular,
-      color: rgb(0.88, 0.94, 1),
+      color: colors.brandLight,
     });
 
-    y = pageHeight - headerHeight - 20;
+    y = pageHeight - headerHeight - 18;
   };
 
-  const drawMiniHeader = () => {
-    page.drawText(`Devis ${prospect.numero || ''}`, {
-      x: margin,
-      y: pageHeight - margin,
-      size: 12,
-      font: fontBold,
-      color: colors.brand,
-    });
-    y = pageHeight - margin - 18;
+  const newPage = () => {
+    page = pdfDoc.addPage([pageWidth, pageHeight]);
+    drawHeader();
   };
 
   const ensureSpace = (needed: number) => {
     if (y - needed < margin) {
-      page = pdfDoc.addPage([pageWidth, pageHeight]);
-      drawMiniHeader();
+      newPage();
     }
   };
 
-  const drawSectionTitle = (text: string) => {
+  const drawSectionHeader = (title: string, color: any, bg: any) => {
     ensureSpace(26);
-    page.drawText(text, { x: margin, y, size: 13, font: fontBold, color: colors.brand });
-    y -= 18;
+    page.drawRectangle({
+      x: margin,
+      y: y - 18,
+      width: contentWidth,
+      height: 18,
+      color: bg,
+    });
+    page.drawRectangle({
+      x: margin,
+      y: y - 18,
+      width: 4,
+      height: 18,
+      color,
+    });
+    page.drawText(title, { x: margin + 10, y: y - 13, size: 10.5, font: fontBold, color });
+    y -= 26;
   };
 
-  const drawBox = (title: string, lines: string[], x: number, boxWidth: number) => {
-    const padding = 10;
-    const fontSize = 10;
-    const titleSize = 11;
-    const lineGap = 4;
-    const boxHeight = padding * 2 + titleSize + 6 + lines.length * (fontSize + lineGap);
-    ensureSpace(boxHeight + 8);
+  const wrapValue = (value: string, width: number, fontSize: number) =>
+    wrapTextForPdf(value, fontRegular, fontSize, width);
+
+  const drawKeyValueGrid = (entries: Array<{ label: string; value: string }>, columns = 2) => {
+    const filtered = entries.filter((entry) => entry.value);
+    if (!filtered.length) return;
+    const columnWidth = (contentWidth - gap * (columns - 1)) / columns;
+    const labelSize = 8;
+    const valueSize = 10;
+    const rowGap = 10;
+
+    for (let i = 0; i < filtered.length; i += columns) {
+      const rowEntries = filtered.slice(i, i + columns);
+      const heights = rowEntries.map((entry) => {
+        const lines = wrapValue(entry.value, columnWidth, valueSize);
+        return labelSize + 4 + lines.length * (valueSize + 2);
+      });
+      const rowHeight = Math.max(...heights);
+      ensureSpace(rowHeight + rowGap);
+      rowEntries.forEach((entry, index) => {
+        const x = margin + index * (columnWidth + gap);
+        page.drawText(entry.label, { x, y, size: labelSize, font: fontBold, color: colors.muted });
+        const lines = wrapValue(entry.value, columnWidth, valueSize);
+        let lineY = y - labelSize - 4;
+        lines.forEach((line) => {
+          page.drawText(line, { x, y: lineY, size: valueSize, font: fontRegular, color: colors.text });
+          lineY -= valueSize + 2;
+        });
+      });
+      y -= rowHeight + rowGap;
+    }
+  };
+
+  const drawSummaryBar = (postesCount: number, candidatsCount: number, secteur: string) => {
+    const height = 30;
+    ensureSpace(height + 10);
+    page.drawRectangle({
+      x: margin,
+      y: y - height,
+      width: contentWidth,
+      height,
+      color: colors.brandLight,
+    });
+    const columnWidth = contentWidth / 3;
+    page.drawText(`Postes : ${postesCount}`, { x: margin + 12, y: y - 19, size: 9.5, font: fontBold, color: colors.brand });
+    page.drawText(`Candidats : ${candidatsCount}`, {
+      x: margin + columnWidth + 12,
+      y: y - 19,
+      size: 9.5,
+      font: fontBold,
+      color: colors.brand,
+    });
+    page.drawText(`Secteur : ${secteur || '-'}`, {
+      x: margin + columnWidth * 2 + 12,
+      y: y - 19,
+      size: 9.5,
+      font: fontBold,
+      color: colors.brand,
+    });
+    y -= height + 16;
+  };
+
+  const drawPosteCard = (poste: any, index: number, conditions: any) => {
+    const cardPadding = 10;
+    const title = poste.poste || `Poste ${index + 1}`;
+    const secteurLabel = mapDevisSector(poste.secteur) || '-';
+    const classification = poste.classification || '-';
+    const quantite = poste.quantite ? String(poste.quantite) : '-';
+    const salaireBrut = Number.isFinite(poste.salaireBrut) ? formatCurrency(poste.salaireBrut) : '-';
+    const tauxETT = Number.isFinite(poste.tauxETT) ? `${formatCurrency(poste.tauxETT)}/h` : '-';
+    const baseHoraire = conditions?.baseHoraire ? `${conditions.baseHoraire}h/mois` : '-';
+    const periode = conditions?.dateDebut
+      ? `${formatDateForPdf(conditions.dateDebut)}${conditions.dateFin ? ` -> ${formatDateForPdf(conditions.dateFin)}` : ''}`
+      : '-';
+    const nationalite = poste.labelPays || poste.nationalite || '';
+    const lieu = conditions?.lieuxMission || '';
+
+    const rawLines = [
+      `Secteur : ${secteurLabel}  •  Classification : ${classification}`,
+      `Quantite : ${quantite}  •  Salaire brut : ${salaireBrut}`,
+      `Taux ETT : ${tauxETT}  •  Heures/mois : ${baseHoraire}`,
+      nationalite ? `Nationalite : ${nationalite}` : '',
+      lieu ? `Lieu de mission : ${lieu}` : '',
+      periode !== '-' ? `Periode : ${periode}` : '',
+    ].filter(Boolean);
+
+    const lines = rawLines.flatMap((line) => wrapTextForPdf(line, fontRegular, 9.5, contentWidth - cardPadding * 2));
+    const cardHeight = cardPadding * 2 + 14 + lines.length * 12;
+    ensureSpace(cardHeight + 10);
 
     page.drawRectangle({
-      x,
-      y: y - boxHeight,
-      width: boxWidth,
-      height: boxHeight,
-      color: colors.light,
+      x: margin,
+      y: y - cardHeight,
+      width: contentWidth,
+      height: cardHeight,
+      color: colors.greenBg,
       borderColor: colors.border,
       borderWidth: 1,
     });
 
     page.drawText(title, {
-      x: x + padding,
-      y: y - padding - titleSize,
-      size: titleSize,
+      x: margin + cardPadding,
+      y: y - 16,
+      size: 11,
       font: fontBold,
       color: colors.brand,
     });
 
-    let currentY = y - padding - titleSize - 8;
-    for (const line of lines) {
+    let lineY = y - 30;
+    lines.forEach((line) => {
       page.drawText(line, {
-        x: x + padding,
-        y: currentY,
-        size: fontSize,
+        x: margin + cardPadding,
+        y: lineY,
+        size: 9.5,
         font: fontRegular,
         color: colors.text,
       });
-      currentY -= fontSize + lineGap;
-    }
+      lineY -= 12;
+    });
 
-    return boxHeight;
+    y -= cardHeight + 10;
   };
 
-  const buildBoxLines = (entries: Array<[string, string]>, maxWidth: number) => {
-    const lines: string[] = [];
-    for (const [label, value] of entries) {
-      if (!value) continue;
-      const content = `${label} : ${value}`;
-      const wrapped = wrapTextForPdf(content, fontRegular, 10, maxWidth);
-      lines.push(...wrapped);
-    }
-    return lines;
+  const drawBulletList = (lines: string[]) => {
+    const bulletGap = 12;
+    lines.forEach((line) => {
+      const wrapped = wrapTextForPdf(line, fontRegular, 9.5, contentWidth - 16);
+      wrapped.forEach((wrappedLine, idx) => {
+        ensureSpace(bulletGap + 4);
+        page.drawText(idx === 0 ? '•' : ' ', { x: margin + 2, y, size: 10, font: fontBold, color: colors.muted });
+        page.drawText(wrappedLine, { x: margin + 14, y, size: 9.5, font: fontRegular, color: colors.text });
+        y -= bulletGap;
+      });
+    });
   };
 
   drawHeader();
 
-  const boxWidth = (pageWidth - margin * 2 - gutter) / 2;
-  const companyLines = buildBoxLines(
-    [
-      ['Raison sociale', prospect.entreprise?.raisonSociale || ''],
-      ['SIRET', prospect.entreprise?.siret || ''],
-      ['Code APE', prospect.entreprise?.codeAPE || ''],
-      ['TVA', prospect.entreprise?.tvaIntracommunautaire || ''],
-      ['Adresse', [
+  drawSectionHeader('Informations entreprise', colors.blue, colors.blueBg);
+  drawKeyValueGrid([
+    { label: 'Raison sociale', value: prospect.entreprise?.raisonSociale || '' },
+    { label: 'Pays', value: prospect.entreprise?.pays || '' },
+    { label: 'SIRET', value: prospect.entreprise?.siret || '' },
+    { label: 'Code APE', value: prospect.entreprise?.codeAPE || '' },
+    { label: 'TVA', value: prospect.entreprise?.tvaIntracommunautaire || '' },
+    { label: 'Site web', value: prospect.entreprise?.siteInternet || '' },
+    {
+      label: 'Adresse',
+      value: [
         prospect.entreprise?.adresse,
         prospect.entreprise?.codePostal,
         prospect.entreprise?.ville,
         prospect.entreprise?.region,
         prospect.entreprise?.pays,
-      ].filter(Boolean).join(' ')],
-      ['Site web', prospect.entreprise?.siteInternet || ''],
-    ],
-    boxWidth - 20
-  );
-  const contactLines = buildBoxLines(
-    [
-      ['Nom', [prospect.contact?.prenom, prospect.contact?.nom].filter(Boolean).join(' ')],
-      ['Fonction', prospect.contact?.fonction || ''],
-      ['Email', prospect.contact?.email || ''],
-      ['Téléphone', prospect.contact?.telephonePortable || prospect.contact?.telephoneFixe || ''],
-    ],
-    boxWidth - 20
-  );
+      ].filter(Boolean).join(' '),
+    },
+  ]);
 
-  const boxHeight = Math.max(
-    drawBox('Entreprise', companyLines, margin, boxWidth),
-    drawBox('Contact', contactLines, margin + boxWidth + gutter, boxWidth)
-  );
-  y -= boxHeight + 18;
+  drawSectionHeader('Personne de contact', colors.purple, colors.purpleBg);
+  drawKeyValueGrid([
+    { label: 'Nom complet', value: [prospect.contact?.prenom, prospect.contact?.nom].filter(Boolean).join(' ') },
+    { label: 'Fonction', value: prospect.contact?.fonction || '' },
+    { label: 'Email', value: prospect.contact?.email || '' },
+    { label: 'Telephone', value: prospect.contact?.telephonePortable || prospect.contact?.telephoneFixe || '' },
+  ]);
 
   const postes = Array.isArray(prospect.postes) ? prospect.postes : [];
   const totalCandidats = postes.reduce((sum: number, poste: any) => sum + (Number(poste?.quantite) || 0), 0);
-  const secteurPrincipal = postes[0]?.secteur ? mapDevisSector(postes[0].secteur) : '-';
+  const secteurPrincipal = postes[0]?.secteur ? mapDevisSector(postes[0].secteur) : '';
 
-  const summaryHeight = 46;
-  ensureSpace(summaryHeight + 8);
-  page.drawRectangle({
-    x: margin,
-    y: y - summaryHeight,
-    width: pageWidth - margin * 2,
-    height: summaryHeight,
-    color: colors.white,
-    borderColor: colors.border,
-    borderWidth: 1,
-  });
-  const summaryY = y - 30;
-  const summaryColumn = (pageWidth - margin * 2) / 3;
-  page.drawText(`Postes : ${postes.length}`, { x: margin + 12, y: summaryY, size: 10, font: fontBold, color: colors.brand });
-  page.drawText(`Candidats : ${totalCandidats}`, {
-    x: margin + summaryColumn + 12,
-    y: summaryY,
-    size: 10,
-    font: fontBold,
-    color: colors.brand,
-  });
-  page.drawText(`Secteur : ${secteurPrincipal || '-'}`, {
-    x: margin + summaryColumn * 2 + 12,
-    y: summaryY,
-    size: 10,
-    font: fontBold,
-    color: colors.brand,
-  });
-  y -= summaryHeight + 20;
+  drawSummaryBar(postes.length, totalCandidats, secteurPrincipal || '-');
 
-  drawSectionTitle('Postes demandés');
-
-  const tableX = margin;
-  const tableWidth = pageWidth - margin * 2;
-  const columnDefs = [
-    { label: 'Poste', width: 170 },
-    { label: 'Secteur', width: 90 },
-    { label: 'Classification', width: 90 },
-    { label: 'Qté', width: 30 },
-    { label: 'Salaire brut', width: 70 },
-    { label: 'Taux ETT', width: 70 },
-  ];
-
-  const drawTableHeader = () => {
-    const headerHeight = 20;
-    ensureSpace(headerHeight + 8);
-    page.drawRectangle({
-      x: tableX,
-      y: y - headerHeight,
-      width: tableWidth,
-      height: headerHeight,
-      color: colors.brand,
-    });
-    let currentX = tableX + 6;
-    columnDefs.forEach((col) => {
-      page.drawText(col.label, {
-        x: currentX,
-        y: y - 14,
-        size: 9,
-        font: fontBold,
-        color: colors.white,
-      });
-      currentX += col.width;
-    });
-    y -= headerHeight + 4;
-  };
-
-  drawTableHeader();
-
-  if (postes.length === 0) {
+  drawSectionHeader('Postes a pourvoir', colors.green, colors.greenBg);
+  if (!postes.length) {
     ensureSpace(16);
-    page.drawText('Aucun poste renseigné.', { x: tableX, y, size: 10, font: fontRegular, color: colors.muted });
+    page.drawText('Aucun poste renseigne.', { x: margin, y, size: 10, font: fontRegular, color: colors.muted });
     y -= 16;
   } else {
     postes.forEach((poste: any, index: number) => {
-      const rowValues = [
-        poste.poste || `Poste ${index + 1}`,
-        mapDevisSector(poste.secteur) || '',
-        poste.classification || '',
-        poste.quantite ? String(poste.quantite) : '',
-        Number.isFinite(poste.salaireBrut) ? formatCurrency(poste.salaireBrut) : '',
-        Number.isFinite(poste.tauxETT) ? formatCurrency(poste.tauxETT) : '',
-      ];
-
-      const rowLines = rowValues.map((value, colIndex) =>
-        wrapTextForPdf(value, fontRegular, 9, columnDefs[colIndex].width - 6)
-      );
-      const maxLines = Math.max(...rowLines.map((lines) => lines.length), 1);
-      const rowHeight = maxLines * 12 + 6;
-
-      if (y - rowHeight < margin) {
-        page = pdfDoc.addPage([pageWidth, pageHeight]);
-        drawMiniHeader();
-        drawTableHeader();
-      }
-
-      if (index % 2 === 0) {
-        page.drawRectangle({
-          x: tableX,
-          y: y - rowHeight + 2,
-          width: tableWidth,
-          height: rowHeight,
-          color: colors.light,
-        });
-      }
-
-      let currentX = tableX + 6;
-      rowLines.forEach((lines, colIndex) => {
-        let lineY = y - 12;
-        lines.forEach((line) => {
-          page.drawText(line, {
-            x: currentX,
-            y: lineY,
-            size: 9,
-            font: fontRegular,
-            color: colors.text,
-          });
-          lineY -= 12;
-        });
-        currentX += columnDefs[colIndex].width;
-      });
-
-      y -= rowHeight;
+      drawPosteCard(poste, index, prospect.conditions || {});
     });
   }
 
-  y -= 8;
-  drawSectionTitle('Conditions');
+  drawSectionHeader('Conditions de travail', colors.orange, colors.orangeBg);
   const conditions = prospect.conditions || {};
-  const conditionsLines = [
-    `Motif : ${conditions.motifRecours || '-'}`,
-    `Lieu(x) de mission : ${conditions.lieuxMission || '-'}`,
-    `Date de début : ${formatDateForPdf(conditions.dateDebut) || '-'}`,
-    `Date de fin : ${formatDateForPdf(conditions.dateFin) || '-'}`,
-    `Durée estimée : ${conditions.dureeMission ? `${conditions.dureeMission} mois` : '-'}`,
-    `Base horaire : ${conditions.baseHoraire ? `${conditions.baseHoraire}h/mois` : '-'}`,
-    `Délai de paiement : ${conditions.delaiPaiement || '-'}`,
-    `Période d’essai : ${conditions.periodeEssai ? `${conditions.periodeEssai} mois` : '-'}`,
+  const hebergement = conditions.hebergement?.chargeEU ? 'Pris en charge' : 'Non pris en charge';
+  const hebergementComment = conditions.hebergement?.commentaire ? ` (${conditions.hebergement.commentaire})` : '';
+  const transport = conditions.transportLocal?.chargeETT ? 'Pris en charge' : 'Non pris en charge';
+  const repasLabel = conditions.repas?.type
+    ? `${conditions.repas.type}${conditions.repas?.montant ? ` (${formatCurrency(conditions.repas.montant)})` : ''}`
+    : '';
+
+  drawKeyValueGrid([
+    { label: 'Date de debut', value: formatDateForPdf(conditions.dateDebut) || '' },
+    { label: 'Date de fin', value: formatDateForPdf(conditions.dateFin) || '' },
+    { label: "Periode d'essai", value: conditions.periodeEssai ? `${conditions.periodeEssai} mois` : '' },
+    { label: 'Base horaire', value: conditions.baseHoraire ? `${conditions.baseHoraire} h/mois` : '' },
+    { label: 'Lieu(x) de mission', value: conditions.lieuxMission || '' },
+    { label: 'Motif de recours', value: conditions.motifRecours || '' },
+    { label: 'Delai de paiement', value: conditions.delaiPaiement || '' },
+    { label: 'Hebergement', value: hebergement ? `${hebergement}${hebergementComment}` : '' },
+    { label: 'Transport local', value: transport },
+    { label: 'Repas', value: repasLabel },
+  ]);
+
+  const candidats = prospect.candidats || {};
+  const languesEntries = candidats.langues
+    ? Object.entries(candidats.langues).map(([langue, niveau]) => `${langue}: ${niveau}`)
+    : [];
+  const episEntries = Array.isArray(candidats.epis) ? candidats.epis : [];
+
+  drawSectionHeader('Profil des candidats recherches', colors.pink, colors.pinkBg);
+  const candidatsLines = [
+    candidats.experience?.obligatoire
+      ? `Experience requise : ${candidats.experience.annees ? `${candidats.experience.annees} ans` : 'Oui'}`
+      : 'Experience requise : Non',
+    candidats.formation?.obligatoire
+      ? `Formation : ${candidats.formation.type || 'Obligatoire'}`
+      : 'Formation : Non requise',
+    candidats.travailRisque?.active
+      ? `Travail a risque : Oui${candidats.travailRisque.precisions ? ` (${candidats.travailRisque.precisions})` : ''}`
+      : 'Travail a risque : Non',
+    candidats.permis?.requis
+      ? `Permis : ${candidats.permis.categorie || 'Requis'}`
+      : 'Permis : Non requis',
+    candidats.outillage?.requis
+      ? `Outillage : ${candidats.outillage.type || 'Requis'}`
+      : 'Outillage : Non requis',
+    languesEntries.length ? `Langues : ${languesEntries.join(', ')}` : 'Langues : Non requises',
+    episEntries.length ? `EPI requis : ${episEntries.join(', ')}` : 'EPI requis : Aucun',
   ];
+  drawBulletList(candidatsLines);
 
-  conditionsLines.forEach((line) => {
-    ensureSpace(14);
-    page.drawText(line, { x: margin, y, size: 10, font: fontRegular, color: colors.text });
-    y -= 14;
-  });
-
+  drawSectionHeader('Certificat de signature electronique', colors.green, colors.greenBg);
   if (prospect.signature) {
-    y -= 6;
-    drawSectionTitle('Signature électronique');
-    const signatureLines = [
-      `Signataire : ${[prospect.signature.signataire?.prenom, prospect.signature.signataire?.nom].filter(Boolean).join(' ') || '-'}`,
-      `Email : ${prospect.signature.signataire?.email || '-'}`,
-      `Date : ${prospect.signature.metadata?.timestampReadable || formatDateForPdf(prospect.signature.metadata?.timestamp) || '-'}`,
-      `Hash document : ${prospect.signature.integrite?.documentHash || '-'}`,
-    ];
-    signatureLines.forEach((line) => {
-      ensureSpace(14);
-      page.drawText(line, { x: margin, y, size: 10, font: fontRegular, color: colors.text });
-      y -= 14;
-    });
+    drawKeyValueGrid([
+      {
+        label: 'Signataire',
+        value: [prospect.signature.signataire?.prenom, prospect.signature.signataire?.nom].filter(Boolean).join(' '),
+      },
+      { label: 'Fonction', value: prospect.signature.signataire?.fonction || '' },
+      { label: 'Email', value: prospect.signature.signataire?.email || '' },
+      { label: 'Entreprise', value: prospect.signature.signataire?.entreprise || '' },
+      { label: 'SIRET', value: prospect.signature.signataire?.siret || '' },
+      { label: 'Horodatage', value: prospect.signature.metadata?.timestampReadable || '' },
+      { label: 'Adresse IP', value: prospect.signature.metadata?.ipAddress || '' },
+      { label: 'Hash document', value: prospect.signature.integrite?.documentHash || '' },
+    ]);
+
+    const signatureImage = prospect.signature?.image;
+    if (signatureImage && typeof signatureImage === 'string' && signatureImage.startsWith('data:image')) {
+      try {
+        const base64 = signatureImage.split(',')[1];
+        const bytes = Uint8Array.from(atob(base64), (c) => c.charCodeAt(0));
+        const image = await pdfDoc.embedPng(bytes);
+        const imgScale = Math.min(220 / image.width, 70 / image.height);
+        const imgWidth = image.width * imgScale;
+        const imgHeight = image.height * imgScale;
+        ensureSpace(imgHeight + 20);
+        page.drawRectangle({
+          x: margin,
+          y: y - imgHeight - 12,
+          width: imgWidth + 16,
+          height: imgHeight + 16,
+          color: colors.white,
+          borderColor: colors.border,
+          borderWidth: 1,
+        });
+        page.drawImage(image, {
+          x: margin + 8,
+          y: y - imgHeight - 4,
+          width: imgWidth,
+          height: imgHeight,
+        });
+        y -= imgHeight + 28;
+      } catch (error) {
+        console.error('⚠️ Erreur embed signature image:', error);
+      }
+    }
+  } else {
+    ensureSpace(14);
+    page.drawText('Ce devis n est pas encore signe.', { x: margin, y, size: 10, font: fontRegular, color: colors.muted });
+    y -= 14;
   }
 
   if (inclureCGV) {
-    y -= 6;
-    drawSectionTitle('Conditions générales');
+    drawSectionHeader('Conditions generales', colors.brand, colors.brandLight);
     const cgvLines = [
-      'Le signataire certifie avoir lu et accepté les Conditions Générales de Vente.',
-      'Cette signature électronique a la même valeur légale qu’une signature manuscrite (eIDAS UE).',
+      'Le signataire certifie avoir lu et accepte les Conditions Generales de Vente.',
+      'Cette signature electronique a la meme valeur legale qu une signature manuscrite (eIDAS UE).',
     ];
-    cgvLines.forEach((line) => {
-      const wrapped = wrapTextForPdf(line, fontRegular, 9, pageWidth - margin * 2);
-      wrapped.forEach((wrappedLine) => {
-        ensureSpace(12);
-        page.drawText(wrappedLine, { x: margin, y, size: 9, font: fontRegular, color: colors.muted });
-        y -= 12;
-      });
-    });
+    drawBulletList(cgvLines);
   }
 
   const footerY = margin - 10;
