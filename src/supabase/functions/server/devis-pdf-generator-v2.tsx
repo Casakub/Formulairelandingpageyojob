@@ -358,8 +358,12 @@ function drawKeyValue(
 ): number {
   if (!value) return 0;
 
+  // Sanitize label and value
+  const safeLabel = toPdfText(label);
+  const safeValue = toPdfText(value);
+
   // Label en gris
-  page.drawText(label, {
+  page.drawText(safeLabel, {
     x,
     y,
     size: 7,
@@ -369,7 +373,7 @@ function drawKeyValue(
 
   // Valeur en noir (avec wrap si nécessaire)
   if (maxWidth) {
-    const lines = wrapText(value, fonts.regular, 9, maxWidth);
+    const lines = wrapText(safeValue, fonts.regular, 9, maxWidth);
     let currentY = y - 10;
     
     lines.forEach((line) => {
@@ -385,7 +389,7 @@ function drawKeyValue(
     
     return lines.length * 11 + 14;
   } else {
-    page.drawText(value, {
+    page.drawText(safeValue, {
       x,
       y: y - 10,
       size: 9,
@@ -673,7 +677,8 @@ export async function generateModernDevisPdf(prospect: any, inclureCGV: boolean)
     });
 
     // Titre du poste
-    page.drawText(`POSTE #${index + 1} - ${posteLabel.toUpperCase()}`, {
+    const safePosteLabel = toPdfText(posteLabel.toUpperCase());
+    page.drawText(`POSTE #${index + 1} - ${safePosteLabel}`, {
       x: config.margin + 14,
       y: y - 16,
       size: 10,
@@ -842,7 +847,8 @@ export async function generateModernDevisPdf(prospect: any, inclureCGV: boolean)
           color: colors.navy,
         });
 
-        page.drawText(item, {
+        const safeItem = toPdfText(item);
+        page.drawText(safeItem, {
           x: config.margin + 24,
           y: contentY,
           size: 8,
