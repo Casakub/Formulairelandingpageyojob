@@ -793,7 +793,7 @@ app.get("/smtp-settings", (c) => {
         settings: config || {
           host: '',
           port: 587,
-          secure: true,
+          secure: false,
           username: '',
           password: '',
           from_email: '',

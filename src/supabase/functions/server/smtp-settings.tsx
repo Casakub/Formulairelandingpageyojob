@@ -8,7 +8,7 @@ const app = new Hono();
 const DEFAULT_SMTP_CONFIG = {
   host: '',
   port: 587,
-  secure: true,
+  secure: false,
   username: '',
   password: '',
   from_email: '',

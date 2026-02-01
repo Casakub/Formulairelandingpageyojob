@@ -588,7 +588,7 @@ export const WORKFLOW_TEMPLATES: WorkflowTemplate[] = [
 export const MOCK_SMTP_SETTINGS: SMTPSettings = {
   host: 'smtp.gmail.com',
   port: 587,
-  secure: true,
+  secure: false,
   user: 'contact@yojob.eu',
   password_encrypted: '••••••••••••',
   from_name: 'YoJob Team',

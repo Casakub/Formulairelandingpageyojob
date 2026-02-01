@@ -49,7 +49,7 @@ export function SettingsPage() {
   const [smtpConfig, setSMTPConfig] = useState<SMTPConfig>({
     host: '',
     port: 587,
-    secure: true,
+    secure: false,
     username: '',
     password: '',
     from_email: '',
@@ -110,9 +110,13 @@ export function SettingsPage() {
       if (smtpData.success) {
         const config = smtpData.config || smtpData.settings || smtpData;
         if (config && typeof config === 'object') {
+          const normalizedSecure = typeof config.secure === 'boolean'
+            ? config.secure
+            : Number(config.port) === 465;
           setSMTPConfig((prev) => ({
             ...prev,
             ...config,
+            secure: normalizedSecure,
             provider: (config.provider || prev.provider) as SMTPConfig['provider'],
           }));
         }
