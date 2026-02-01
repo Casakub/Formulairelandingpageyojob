@@ -191,13 +191,13 @@ async function generateDevisPdfBytes(prospect: any, inclureCGV: boolean): Promis
   const headerBandHeight = 52;
   const headerInfoHeight = 18;
   const headerHeight = headerBandHeight + headerInfoHeight + 10;
-  const footerHeight = 32;
+  const footerHeight = 28;
   const contentWidth = pageWidth - marginX * 2;
   const columnGap = 16;
-  const cardRadius = 12;
-  const cardPadding = 12;
-  const sectionGap = 14;
-  const sectionGapLarge = 16;
+  const cardRadius = 10;
+  const cardPadding = 10;
+  const sectionGap = 10;
+  const sectionGapLarge = 12;
 
   const hexToRgb = (hex: string) => {
     const cleaned = hex.replace('#', '').trim();
@@ -314,26 +314,20 @@ async function generateDevisPdfBytes(prospect: any, inclureCGV: boolean): Promis
       borderWidth: 1,
     });
     if (title) {
-      const accentHeight = 2;
+      const accentHeight = 3;
       const accentInset = 1;
+      // Barre d'accent simple et moderne
       page.drawRectangle({
         x: x + accentInset,
         y: yTop - accentHeight - accentInset,
         width: width - accentInset * 2,
         height: accentHeight,
-        color: toPdfColor(tint(accent, 0.7)),
-      });
-      page.drawRectangle({
-        x: x + accentInset,
-        y: yTop - accentHeight - accentInset,
-        width: Math.min(width - accentInset * 2, 140),
-        height: accentHeight,
         color: toPdfColor(accent),
       });
       drawTextSafe(title, {
         x: x + cardPadding,
-        y: yTop - cardPadding - 1,
-        size: 11.5,
+        y: yTop - cardPadding - 2,
+        size: 11,
         font: fontBold,
         color: toPdfColor(accent),
       });
@@ -677,7 +671,7 @@ async function generateDevisPdfBytes(prospect: any, inclureCGV: boolean): Promis
       color: toPdfColor(colors.muted),
     });
 
-    y = pageHeight - headerHeight - 8;
+    y = pageHeight - headerHeight - 6;
   };
 
   const newPage = () => {
@@ -716,9 +710,9 @@ async function generateDevisPdfBytes(prospect: any, inclureCGV: boolean): Promis
   const entrepriseHeight =
     cardPadding * 2 +
     columnTitleSize +
-    4 +
+    3 +
     Math.max(entrepriseLeftHeight, entrepriseRightHeight) +
-    6;
+    4;
 
   const contactLeft = [
     { label: 'Nom', value: [contact.prenom, contact.nom].filter(Boolean).join(' ') },
@@ -733,16 +727,16 @@ async function generateDevisPdfBytes(prospect: any, inclureCGV: boolean): Promis
   const contactHeight =
     cardPadding * 2 +
     columnTitleSize +
-    4 +
+    3 +
     Math.max(contactLeftHeight, contactRightHeight) +
-    6;
+    4;
 
   const topCardsHeight = Math.max(entrepriseHeight, contactHeight);
   ensureSpace(topCardsHeight + 12);
   drawCard(marginX, y, infoCardWidth, topCardsHeight, 'Client (Entreprise)', colors.primary);
   drawCard(marginX + infoCardWidth + columnGap, y, infoCardWidth, topCardsHeight, 'Contact', colors.secondary);
 
-  const entrepriseContentTop = y - cardPadding - 14;
+  const entrepriseContentTop = y - cardPadding - 12;
   drawTextSafe('IDENTITE', {
     x: marginX + cardPadding,
     y: entrepriseContentTop,
@@ -784,7 +778,7 @@ async function generateDevisPdfBytes(prospect: any, inclureCGV: boolean): Promis
     toPdfColor(colors.text)
   );
 
-  const contactContentTop = y - cardPadding - 14;
+  const contactContentTop = y - cardPadding - 12;
   drawTextSafe('IDENTITE', {
     x: marginX + infoCardWidth + columnGap + cardPadding,
     y: contactContentTop,
@@ -826,7 +820,7 @@ async function generateDevisPdfBytes(prospect: any, inclureCGV: boolean): Promis
     toPdfColor(colors.text)
   );
 
-  y -= topCardsHeight + 18;
+  y -= topCardsHeight + 12;
 
   // Carte synthese
   const periodeSynthese = conditions.dateDebut || conditions.dateFin
@@ -839,24 +833,25 @@ async function generateDevisPdfBytes(prospect: any, inclureCGV: boolean): Promis
     { label: 'Lieu', value: conditions.lieuxMission || conditions.lieu || '' },
     { label: 'Periode', value: periodeSynthese || '' },
   ].filter((entry) => entry.value);
-  const synthColumns = 3;
-  const synthHeight = cardPadding * 2 + 14 + measureKeyValueGrid(syntheseEntries, contentWidth - cardPadding * 2, synthColumns, labelSize, valueSize, 6, 8);
-  ensureSpace(synthHeight + 10);
+  // Colonnes dynamiques selon le nombre d'entrées (max 5 pour garder la lisibilité)
+  const synthColumns = Math.min(syntheseEntries.length, 5);
+  const synthHeight = cardPadding * 2 + 12 + measureKeyValueGrid(syntheseEntries, contentWidth - cardPadding * 2, synthColumns, labelSize, valueSize, 4, 10);
+  ensureSpace(synthHeight + 8);
   drawCard(marginX, y, contentWidth, synthHeight, 'Synthese', colors.primary);
   drawKeyValueGrid(
     syntheseEntries,
     marginX + cardPadding,
-    y - cardPadding - 14,
+    y - cardPadding - 12,
     contentWidth - cardPadding * 2,
     synthColumns,
     labelSize,
     valueSize,
-    6,
-    8,
+    4,
+    10,
     toPdfColor(colors.muted),
     toPdfColor(colors.text)
   );
-  y -= synthHeight + 18;
+  y -= synthHeight + 10;
 
   // Cartes postes
   postes.forEach((poste: any, index: number) => {
@@ -894,12 +889,12 @@ async function generateDevisPdfBytes(prospect: any, inclureCGV: boolean): Promis
     ].filter((entry) => entry.value);
 
     const posteColumnWidth = (contentWidth - cardPadding * 2 - columnGap) / 2;
-    const missionHeight = measureKeyValueGrid(missionEntries, posteColumnWidth, 1, labelSize, valueSize, 6, 0);
-    const remunerationHeight = measureKeyValueGrid(remunerationEntries, posteColumnWidth, 1, labelSize, valueSize, 6, 0);
-    const posteContentHeight = Math.max(missionHeight, remunerationHeight) + 16;
-    const posteHeight = cardPadding * 2 + 18 + posteContentHeight;
+    const missionHeight = measureKeyValueGrid(missionEntries, posteColumnWidth, 1, labelSize, valueSize, 5, 0);
+    const remunerationHeight = measureKeyValueGrid(remunerationEntries, posteColumnWidth, 1, labelSize, valueSize, 5, 0);
+    const posteContentHeight = Math.max(missionHeight, remunerationHeight) + 12;
+    const posteHeight = cardPadding * 2 + 16 + posteContentHeight;
 
-    ensureSpace(posteHeight + 12);
+    ensureSpace(posteHeight + 10);
     drawCard(marginX, y, contentWidth, posteHeight, `Poste #${index + 1} - ${(posteLabel || 'Poste').toUpperCase()}`, colors.secondary);
 
     if (prixHeader) {
@@ -913,26 +908,26 @@ async function generateDevisPdfBytes(prospect: any, inclureCGV: boolean): Promis
       });
     }
     if (secteurLabel) {
-      drawBadge(secteurLabel, colors.primary, marginX + cardPadding, y - cardPadding - 20);
+      drawBadge(secteurLabel, colors.primary, marginX + cardPadding, y - cardPadding - 18);
     }
 
-    const columnTitleSizeSmall = 8.4;
+    const columnTitleSizeSmall = 8;
     drawTextSafe('MISSION', {
       x: marginX + cardPadding,
-      y: y - cardPadding - 24,
+      y: y - cardPadding - 22,
       size: columnTitleSizeSmall,
       font: fontBold,
       color: toPdfColor(colors.muted),
     });
     drawTextSafe('REMUNERATION', {
       x: marginX + cardPadding + posteColumnWidth + columnGap,
-      y: y - cardPadding - 24,
+      y: y - cardPadding - 22,
       size: columnTitleSizeSmall,
       font: fontBold,
       color: toPdfColor(colors.muted),
     });
 
-    const posteEntriesTop = y - cardPadding - 24 - columnTitleSizeSmall - 4;
+    const posteEntriesTop = y - cardPadding - 22 - columnTitleSizeSmall - 3;
     drawKeyValueGrid(
       missionEntries,
       marginX + cardPadding,
@@ -941,7 +936,7 @@ async function generateDevisPdfBytes(prospect: any, inclureCGV: boolean): Promis
       1,
       labelSize,
       valueSize,
-      6,
+      5,
       0,
       toPdfColor(colors.muted),
       toPdfColor(colors.text)
@@ -954,13 +949,13 @@ async function generateDevisPdfBytes(prospect: any, inclureCGV: boolean): Promis
       1,
       labelSize,
       valueSize,
-      6,
+      5,
       0,
       toPdfColor(colors.muted),
       toPdfColor(colors.text)
     );
 
-    y -= posteHeight + 14;
+    y -= posteHeight + 10;
   });
 
   // Conditions de travail
@@ -988,21 +983,21 @@ async function generateDevisPdfBytes(prospect: any, inclureCGV: boolean): Promis
   ].filter(Boolean);
 
   const conditionsColumnWidth = (contentWidth - cardPadding * 2 - columnGap) / 2;
-  const conditionsLeftHeight = measureKeyValueGrid(conditionsEntriesLeft, conditionsColumnWidth, 1, labelSize, valueSize, 6, 0);
-  const conditionsRightHeight = measureKeyValueGrid(conditionsEntriesRight, conditionsColumnWidth, 1, labelSize, valueSize, 6, 0);
+  const conditionsLeftHeight = measureKeyValueGrid(conditionsEntriesLeft, conditionsColumnWidth, 1, labelSize, valueSize, 5, 0);
+  const conditionsRightHeight = measureKeyValueGrid(conditionsEntriesRight, conditionsColumnWidth, 1, labelSize, valueSize, 5, 0);
   const logisticsText = logistics.map((line) => `• ${line}`).join('\n');
   const logisticsHeight = logisticsText
-    ? measureParagraph(logisticsText, contentWidth - cardPadding * 2, 9.2, 2.6)
+    ? measureParagraph(logisticsText, contentWidth - cardPadding * 2, 9, 2.2)
     : 0;
   const conditionsHeight =
     cardPadding * 2 +
-    14 +
+    12 +
     Math.max(conditionsLeftHeight, conditionsRightHeight) +
-    (logisticsHeight ? logisticsHeight + 8 : 0);
+    (logisticsHeight ? logisticsHeight + 6 : 0);
 
-  ensureSpace(conditionsHeight + 12);
+  ensureSpace(conditionsHeight + 10);
   drawCard(marginX, y, contentWidth, conditionsHeight, 'Conditions de travail', colors.primary);
-  const conditionsTop = y - cardPadding - 14;
+  const conditionsTop = y - cardPadding - 12;
   drawKeyValueGrid(
     conditionsEntriesLeft,
     marginX + cardPadding,
@@ -1030,10 +1025,10 @@ async function generateDevisPdfBytes(prospect: any, inclureCGV: boolean): Promis
     toPdfColor(colors.text)
   );
   if (logisticsHeight) {
-    const logisticsY = conditionsTop - Math.max(conditionsLeftHeight, conditionsRightHeight) - 6;
-    drawParagraph(logisticsText, marginX + cardPadding, logisticsY, contentWidth - cardPadding * 2, 9.2, 2.6, toPdfColor(colors.text));
+    const logisticsY = conditionsTop - Math.max(conditionsLeftHeight, conditionsRightHeight) - 5;
+    drawParagraph(logisticsText, marginX + cardPadding, logisticsY, contentWidth - cardPadding * 2, 9, 2.2, toPdfColor(colors.text));
   }
-  y -= conditionsHeight + 14;
+  y -= conditionsHeight + 10;
 
   // Profil candidats
   const profileLines = [
@@ -1067,38 +1062,38 @@ async function generateDevisPdfBytes(prospect: any, inclureCGV: boolean): Promis
   const episEntries = Array.isArray(candidats.epis) ? candidats.epis.map((epi: string) => getTextValue(epi)) : [];
 
   const profileText = profileLines.map((line) => `• ${line}`).join('\n');
-  const profileTextHeight = measureParagraph(profileText, contentWidth - cardPadding * 2, 9.2, 2.6);
-  const episHeight = episEntries.length ? measureChecklist(episEntries, contentWidth - cardPadding * 2, 9, 2.4) + 12 : 0;
+  const profileTextHeight = measureParagraph(profileText, contentWidth - cardPadding * 2, 9, 2.2);
+  const episHeight = episEntries.length ? measureChecklist(episEntries, contentWidth - cardPadding * 2, 8.5, 2) + 10 : 0;
   const profileHeight =
     cardPadding * 2 +
-    14 +
+    12 +
     profileTextHeight +
-    (episHeight ? episHeight + 8 : 0);
+    (episHeight ? episHeight + 6 : 0);
 
-  ensureSpace(profileHeight + 12);
+  ensureSpace(profileHeight + 10);
   drawCard(marginX, y, contentWidth, profileHeight, 'Profil des candidats recherches', colors.secondary);
-  const profileTop = y - cardPadding - 14;
-  drawParagraph(profileText, marginX + cardPadding, profileTop, contentWidth - cardPadding * 2, 9.2, 2.6, toPdfColor(colors.text));
+  const profileTop = y - cardPadding - 12;
+  drawParagraph(profileText, marginX + cardPadding, profileTop, contentWidth - cardPadding * 2, 9, 2.2, toPdfColor(colors.text));
   if (episEntries.length) {
-    const episTitleY = profileTop - profileTextHeight - 6;
+    const episTitleY = profileTop - profileTextHeight - 5;
     drawTextSafe('EPI requis:', {
       x: marginX + cardPadding,
       y: episTitleY,
-      size: 9.2,
+      size: 9,
       font: fontBold,
       color: toPdfColor(colors.muted),
     });
     drawChecklist(
       episEntries,
       marginX + cardPadding,
-      episTitleY - 12,
+      episTitleY - 10,
       contentWidth - cardPadding * 2,
-      9,
-      2.4,
+      8.5,
+      2,
       toPdfColor(colors.text)
     );
   }
-  y -= profileHeight + 16;
+  y -= profileHeight + 10;
 
   // Signature electronique
   const signatureEntries = [
@@ -1117,8 +1112,8 @@ async function generateDevisPdfBytes(prospect: any, inclureCGV: boolean): Promis
   const signatureRightHeight = measureKeyValueGrid(signatureMetaEntries, signatureColumnWidth, 1, 8, 10, 6, 0);
   const signatureGridHeight = Math.max(signatureLeftHeight, signatureRightHeight);
 
-  const signatureBoxWidth = 160;
-  const signatureBoxHeight = 70;
+  const signatureBoxWidth = 140;
+  const signatureBoxHeight = isSigned ? 60 : 45;
   const consentMentions = prospect.signature?.consentement?.mentions || '';
   const consentDate = prospect.signature?.consentement?.dateAcceptation
     ? new Date(prospect.signature.consentement.dateAcceptation).toLocaleString('fr-FR', {
@@ -1128,20 +1123,20 @@ async function generateDevisPdfBytes(prospect: any, inclureCGV: boolean): Promis
       })
     : '';
   const consentTextHeight = consentMentions
-    ? measureParagraph(consentMentions, contentWidth - cardPadding * 2 - signatureBoxWidth - 12, 8.4, 2.4)
+    ? measureParagraph(consentMentions, contentWidth - cardPadding * 2 - signatureBoxWidth - 10, 8, 2)
     : 0;
   const signatureHeight =
     cardPadding * 2 +
-    14 +
+    12 +
     signatureGridHeight +
-    8 +
+    6 +
     signatureBoxHeight +
-    (consentTextHeight ? consentTextHeight + (consentDate ? 12 : 0) : 0) +
-    6;
+    (consentTextHeight ? consentTextHeight + (consentDate ? 10 : 0) : 0) +
+    4;
 
-  ensureSpace(signatureHeight + 12);
+  ensureSpace(signatureHeight + 10);
   drawCard(marginX, y, contentWidth, signatureHeight, 'Signature electronique', isSigned ? colors.success : colors.warning);
-  const signatureTop = y - cardPadding - 14;
+  const signatureTop = y - cardPadding - 12;
   drawKeyValueGrid(
     signatureEntries,
     marginX + cardPadding,
@@ -1169,7 +1164,7 @@ async function generateDevisPdfBytes(prospect: any, inclureCGV: boolean): Promis
     toPdfColor(colors.text)
   );
 
-  const signatureBoxY = signatureTop - signatureGridHeight - 8;
+  const signatureBoxY = signatureTop - signatureGridHeight - 6;
   drawRoundedRect(marginX + cardPadding, signatureBoxY - signatureBoxHeight, signatureBoxWidth, signatureBoxHeight, 8, {
     color: toPdfColor(colors.white),
     borderColor: toPdfColor(borderColor),
@@ -1218,7 +1213,7 @@ async function generateDevisPdfBytes(prospect: any, inclureCGV: boolean): Promis
     }
   }
 
-  y -= signatureHeight + 14;
+  y -= signatureHeight + 10;
 
   // Preuve integrite / details techniques
   const signatureHashEntries = [
@@ -1227,22 +1222,25 @@ async function generateDevisPdfBytes(prospect: any, inclureCGV: boolean): Promis
     { label: 'Algorithme', value: prospect.signature?.integrite?.hashAlgorithm || '' },
   ].filter((entry) => entry.value);
   const signatureHash = prospect.signature?.integrite?.documentHash || '';
+  // Limiter le hash à 2 lignes pour compacité
   const signatureHashFormatted = signatureHash
-    ? (signatureHash.match(/.{1,48}/g) || [signatureHash]).join(' ')
+    ? (signatureHash.length > 64
+        ? signatureHash.slice(0, 32) + ' ' + signatureHash.slice(32, 64) + ' ' + signatureHash.slice(64)
+        : signatureHash)
     : '';
-  const hashGridHeight = measureKeyValueGrid(signatureHashEntries, contentWidth - cardPadding * 2, 1, 8, 9.5, 6, 0);
+  const hashGridHeight = measureKeyValueGrid(signatureHashEntries, contentWidth - cardPadding * 2, 1, 8, 9, 5, 0);
   const hashTextHeight = signatureHashFormatted
-    ? measureParagraph(signatureHashFormatted, contentWidth - cardPadding * 2, 8.2, 2.4, fontMono)
+    ? measureParagraph(signatureHashFormatted, contentWidth - cardPadding * 2, 7.5, 2, fontMono)
     : 0;
   const technicalHeight =
     cardPadding * 2 +
-    14 +
+    12 +
     hashGridHeight +
-    (hashTextHeight ? hashTextHeight + 10 : 0);
+    (hashTextHeight ? hashTextHeight + 8 : 0);
 
-  ensureSpace(technicalHeight + 12);
+  ensureSpace(technicalHeight + 10);
   drawCard(marginX, y, contentWidth, technicalHeight, 'Details techniques (preuve integrite)', colors.navy);
-  const technicalTop = y - cardPadding - 14;
+  const technicalTop = y - cardPadding - 12;
   drawKeyValueGrid(
     signatureHashEntries,
     marginX + cardPadding,
@@ -1267,7 +1265,7 @@ async function generateDevisPdfBytes(prospect: any, inclureCGV: boolean): Promis
     });
     drawParagraph(signatureHashFormatted, marginX + cardPadding, hashY - 10, contentWidth - cardPadding * 2, 8.2, 2.4, toPdfColor(colors.text), fontMono);
   }
-  y -= technicalHeight + 14;
+  y -= technicalHeight + 10;
 
   // Conditions generales & mentions legales
   if (inclureCGV) {
@@ -1292,25 +1290,25 @@ async function generateDevisPdfBytes(prospect: any, inclureCGV: boolean): Promis
 
     const legalText = legalSummaryLines.join('\n');
     const legalFooterText = legalFooterLines.join('\n');
-    const legalTextHeight = measureParagraph(legalText, contentWidth - cardPadding * 2, 8.4, 2.4);
+    const legalTextHeight = measureParagraph(legalText, contentWidth - cardPadding * 2, 8, 2);
     const legalFooterHeight = legalFooterText
-      ? measureParagraph(legalFooterText, contentWidth - cardPadding * 2, 7.8, 2.4)
+      ? measureParagraph(legalFooterText, contentWidth - cardPadding * 2, 7.5, 2)
       : 0;
     const legalHeight =
       cardPadding * 2 +
-      14 +
+      12 +
       legalTextHeight +
-      (legalFooterHeight ? legalFooterHeight + 8 : 0);
+      (legalFooterHeight ? legalFooterHeight + 6 : 0);
 
-    ensureSpace(legalHeight + 12);
+    ensureSpace(legalHeight + 10);
     drawCard(marginX, y, contentWidth, legalHeight, 'Conditions generales & mentions legales', colors.primary);
-    const legalTop = y - cardPadding - 14;
-    drawParagraph(legalText, marginX + cardPadding, legalTop, contentWidth - cardPadding * 2, 8.4, 2.4, toPdfColor(colors.text));
+    const legalTop = y - cardPadding - 12;
+    drawParagraph(legalText, marginX + cardPadding, legalTop, contentWidth - cardPadding * 2, 8, 2, toPdfColor(colors.text));
     if (legalFooterText) {
-      const legalFooterY = legalTop - legalTextHeight - 6;
-      drawParagraph(legalFooterText, marginX + cardPadding, legalFooterY, contentWidth - cardPadding * 2, 7.8, 2.4, toPdfColor(colors.muted));
+      const legalFooterY = legalTop - legalTextHeight - 5;
+      drawParagraph(legalFooterText, marginX + cardPadding, legalFooterY, contentWidth - cardPadding * 2, 7.5, 2, toPdfColor(colors.muted));
     }
-    y -= legalHeight + 14;
+    y -= legalHeight + 10;
   }
 
   // Footer
