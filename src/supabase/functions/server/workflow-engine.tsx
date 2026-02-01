@@ -174,6 +174,7 @@ function replaceVariables(text: string, prospectData: any): string {
   const customContact = customFields?.contact || {};
   const customEntreprise = customFields?.entreprise || {};
   const customConditions = customFields?.conditions || {};
+  const customPostes = Array.isArray(customFields?.postes) ? customFields.postes : [];
   
   // Calculer deadline_time (maintenant + 4h)
   const deadline4h = new Date();
@@ -182,6 +183,8 @@ function replaceVariables(text: string, prospectData: any): string {
   const deadline4hStr = deadline4h.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
   
   // Variables disponibles
+  const fallbackFirstName = customContact.prenom || customFields.contact_firstname || '';
+  const fallbackLastName = customContact.nom || customFields.contact_lastname || '';
   const fallbackName = [customContact.prenom, customContact.nom].filter(Boolean).join(' ').trim();
   const fallbackCompany = customEntreprise.raisonSociale || customFields.company || customFields.company_name || '';
   const fallbackEmail = customContact.email || customFields.email || '';
@@ -194,6 +197,11 @@ function replaceVariables(text: string, prospectData: any): string {
     customConditions.motifRecours ||
     customConditions.lieuxMission ||
     '';
+  const fallbackQuoteNumber = customFields.devis_numero || customFields.quote_number || customFields.devis_id || '';
+  const fallbackSignatureUrl = customFields.signature_url || customFields.signatureUrl || '';
+  const fallbackSignatureDate = customFields.signature_date || customFields.signed_at || '';
+  const fallbackPositionsCount = customFields.positions_count ?? customPostes.length ?? '';
+  const fallbackCandidatesCount = customFields.candidates_count ?? fallbackWorkers ?? '';
 
   const variables: Record<string, string> = {
     // Variables prospect de base
@@ -208,13 +216,21 @@ function replaceVariables(text: string, prospectData: any): string {
     '{{industry}}': prospectData.industry_sector || prospectData.industry || fallbackIndustry || '',
     '{{workers_count}}': String(prospectData.workers_count ?? fallbackWorkers ?? ''),
     '{{project_description}}': prospectData.project_description || fallbackProjectDescription || '',
+    '{{need_type}}': prospectData.need_type || customFields.need_type || '',
     '{{classification}}': prospectData.classification || 'Standard',
     '{{duration}}': prospectData.duration || '6 mois',
     '{{quote_amount}}': prospectData.quote_amount ? `${prospectData.quote_amount}` : 'Sur devis',
+    '{{quote_date}}': customFields.devis_created_at || prospectData.created_at || '',
     
     // Variables technique
     '{{prospect_id}}': prospectData.id || '',
     '{{quote_id}}': prospectData.quote_id || customFields.devis_numero || customFields.devis_id || `q-${prospectData.id || Math.random().toString(36).substr(2, 9)}`,
+    '{{quote_number}}': fallbackQuoteNumber || (prospectData.quote_id || ''),
+    '{{signature_url}}': fallbackSignatureUrl,
+    '{{signature_date}}': fallbackSignatureDate,
+    '{{positions_count}}': String(fallbackPositionsCount ?? ''),
+    '{{candidates_count}}': String(fallbackCandidatesCount ?? ''),
+    '{{sector}}': fallbackIndustry || '',
     
     // Variables temporelles
     '{{deadline_time}}': deadlineTime,
@@ -228,7 +244,35 @@ function replaceVariables(text: string, prospectData: any): string {
     '{{company_name}}': 'YOJOB',
     '{{company_email}}': 'contact@yojob.com',
     '{{company_phone}}': '+33 1 23 45 67 89',
-    
+
+    // Variables devis / signature (format explicite)
+    '{{contact_firstname}}': fallbackFirstName,
+    '{{contact_lastname}}': fallbackLastName,
+    '{{contact_email}}': fallbackEmail,
+    '{{signature_url}}': fallbackSignatureUrl,
+    '{{signature_date}}': fallbackSignatureDate,
+    '{{quote_number}}': fallbackQuoteNumber,
+    '{{positions_count}}': String(fallbackPositionsCount ?? ''),
+    '{{candidates_count}}': String(fallbackCandidatesCount ?? ''),
+    '{{sector}}': fallbackIndustry || '',
+    '{{country}}': fallbackCountry || '',
+
+    // Variables devis (format objet)
+    '{{contact.prenom}}': fallbackFirstName,
+    '{{contact.nom}}': fallbackLastName,
+    '{{contact.email}}': fallbackEmail,
+    '{{contact.telephonePortable}}': customContact.telephonePortable || '',
+    '{{contact.telephoneFixe}}': customContact.telephoneFixe || '',
+    '{{entreprise.raisonSociale}}': customEntreprise.raisonSociale || '',
+    '{{entreprise.pays}}': customEntreprise.pays || '',
+    '{{numero}}': fallbackQuoteNumber,
+    '{{signatureUrl}}': fallbackSignatureUrl,
+    '{{signatureLinkGeneratedAt}}': customFields.signature_link_generated_at || '',
+    '{{signatureLinkExpiresAt}}': customFields.signature_link_expires_at || '',
+    '{{postes.length}}': String(customPostes.length),
+    '{{totalCandidats}}': String(fallbackCandidatesCount ?? ''),
+    '{{postes[0].secteur}}': customPostes[0]?.secteur || '',
+
     // Rétrocompatibilité avec prospect. prefix
     '{{prospect.name}}': prospectData.name || prospectData.contact_name || fallbackName || '',
     '{{prospect.email}}': prospectData.email || fallbackEmail || '',
@@ -264,12 +308,23 @@ function getProspectValueForCondition(condition: any, prospect: any) {
       return prospect.country ?? prospect.country_code ?? customFields.country ?? customFields.country_code ?? customEntreprise.pays;
     case 'status':
       return prospect.status;
+    case 'statut':
+      return customFields.devis_status ?? customFields.statut ?? prospect.statut;
     case 'source':
       return prospect.source;
     case 'industry_sector':
       return prospect.industry_sector ?? prospect.sector ?? customFields.industry_sector ?? customFields.sector;
     case 'sector':
       return prospect.sector ?? prospect.industry_sector ?? customFields.sector ?? customFields.industry_sector;
+    case 'signatureToken':
+    case 'signature_token':
+      return customFields.signature_token ?? customFields.signatureToken ?? customFields.signature_token;
+    case 'signatureLinkGeneratedAt':
+      return customFields.signature_link_generated_at ?? customFields.signatureLinkGeneratedAt;
+    case 'signatureLinkExpiresAt':
+      return customFields.signature_link_expires_at ?? customFields.signatureLinkExpiresAt;
+    case 'signatureUrl':
+      return customFields.signature_url ?? customFields.signatureUrl;
     case 'tag_has':
     case 'tags':
       return prospect.tags ?? customFields.tags ?? [];
@@ -283,6 +338,19 @@ function getProspectValueForCondition(condition: any, prospect: any) {
  */
 function evaluateConditions(prospect: any, conditions: any[]): boolean {
   if (!conditions || conditions.length === 0) return true;
+
+  const parseDuration = (input: string): number | null => {
+    if (!input || typeof input !== 'string') return null;
+    const match = input.trim().match(/^(\d+)\s*(minutes?|mins?|m|hours?|h|days?|d)$/i);
+    if (!match) return null;
+    const amount = Number(match[1]);
+    const unit = match[2].toLowerCase();
+    if (Number.isNaN(amount)) return null;
+    if (unit.startsWith('m')) return amount * 60 * 1000;
+    if (unit.startsWith('h')) return amount * 60 * 60 * 1000;
+    if (unit.startsWith('d')) return amount * 24 * 60 * 60 * 1000;
+    return null;
+  };
 
   return conditions.every(condition => {
     const { operator, value } = condition;
@@ -315,6 +383,16 @@ function evaluateConditions(prospect: any, conditions: any[]): boolean {
           return prospectArray ? prospectArray.some(v => valueArray.includes(v)) : valueArray.includes(prospectValue);
         }
         return false;
+      case 'exists':
+        return prospectArray ? prospectArray.length > 0 : prospectValue !== null && prospectValue !== undefined && String(prospectValue) !== '';
+      case 'older_than': {
+        const durationMs = parseDuration(String(value || ''));
+        if (!durationMs) return false;
+        const dateValue = prospectValue ? new Date(prospectValue) : null;
+        if (!dateValue || Number.isNaN(dateValue.getTime())) return false;
+        const threshold = Date.now() - durationMs;
+        return dateValue.getTime() < threshold;
+      }
       case 'is_empty':
         return prospectArray ? prospectArray.length === 0 : !prospectValue || prospectValue === '';
       case 'is_not_empty':
@@ -373,13 +451,21 @@ async function executeStep(step: any, prospect: any, workflow: AutomationWorkflo
         const body_html = replaceVariables(bodyHtmlSource, prospect);
         const body_text = replaceVariables(bodyTextSource || '', prospect);
 
-        if (!prospect.email) {
-          throw new Error('Email du prospect manquant');
+        const to = replaceVariables(step.config.to || prospect.email || '', prospect);
+        const cc = step.config.cc ? replaceVariables(step.config.cc, prospect) : undefined;
+        const bcc = step.config.bcc ? replaceVariables(step.config.bcc, prospect) : undefined;
+        const replyTo = step.config.reply_to ? replaceVariables(step.config.reply_to, prospect) : undefined;
+
+        if (!to) {
+          throw new Error('Email destinataire manquant');
         }
 
         // Envoi réel via SMTP/provider configuré
         const sendResult = await emailService.sendEmail({
-          to: prospect.email,
+          to,
+          ...(cc ? { cc } : {}),
+          ...(bcc ? { bcc } : {}),
+          ...(replyTo ? { replyTo } : {}),
           subject,
           body: body_text || body_html.replace(/<[^>]*>/g, ''),
           html: body_html,
@@ -398,7 +484,7 @@ async function executeStep(step: any, prospect: any, workflow: AutomationWorkflo
           prospect_id: prospect.id,
           status: 'success',
           action_type: 'send_email',
-          message: `Email envoyé: "${subject}" à ${prospect.email}`,
+          message: `Email envoyé: "${subject}" à ${to}`,
           metadata: {
             subject,
             template_id: template?.id || null,

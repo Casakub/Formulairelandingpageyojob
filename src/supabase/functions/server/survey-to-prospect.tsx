@@ -6,6 +6,7 @@
  */
 
 import { createClient } from "npm:@supabase/supabase-js@2.39.3";
+import { emailService } from "./email-service.tsx";
 import type { RespondentType } from "../../types/survey.ts";
 
 /**
@@ -159,7 +160,10 @@ function determineProspectStatus(score: number): string {
 /**
  * 🎯 FONCTION PRINCIPALE : Synchroniser une enquête vers le CRM
  */
-export async function syncSurveyToProspect(surveyResponse: any) {
+export async function syncSurveyToProspect(
+  surveyResponse: any,
+  options: { sendNotifications?: boolean } = {}
+) {
   try {
     console.log('🔗 [SYNC] Démarrage synchronisation enquête → prospect CRM');
     console.log('   → Survey Response ID:', surveyResponse.response_id || surveyResponse.id);
@@ -299,6 +303,70 @@ export async function syncSurveyToProspect(surveyResponse: any) {
     
     console.log('✅ [SYNC] Synchronisation terminée avec succès');
 
+    const shouldNotify = options.sendNotifications !== false;
+    if (shouldNotify) {
+      try {
+        const respondentName = prospectData.name || 'Bonjour';
+        const subjectClient = '✅ Merci pour votre participation à l’enquête YOJOB';
+        const textClient = `Bonjour ${respondentName},
+
+Merci pour votre participation à notre enquête. Votre réponse a bien été enregistrée.
+
+Nous reviendrons vers vous si besoin.
+
+L'équipe YOJOB`;
+
+        const htmlClient = `
+          <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+            <h2>Merci pour votre participation ✅</h2>
+            <p>Bonjour <strong>${respondentName}</strong>,</p>
+            <p>Votre réponse a bien été enregistrée. Merci pour votre temps.</p>
+            <p>L'équipe YOJOB</p>
+          </div>
+        `;
+
+        await emailService.sendEmail({
+          to: prospectData.email,
+          subject: subjectClient,
+          body: textClient,
+          html: htmlClient,
+        });
+
+        const subjectAdmin = '📥 Nouvelle enquête complétée';
+        const textAdmin = `Nouvelle enquête complétée
+
+Email : ${prospectData.email}
+Nom : ${prospectData.name || 'Non précisé'}
+Type : ${respondentType}
+Score : ${qualificationScore}/100
+Source : ${source}
+`;
+
+        const htmlAdmin = `
+          <div style="font-family: Arial, sans-serif; max-width: 700px; margin: 0 auto;">
+            <h2>📥 Nouvelle enquête complétée</h2>
+            <ul>
+              <li><strong>Email :</strong> ${prospectData.email}</li>
+              <li><strong>Nom :</strong> ${prospectData.name || 'Non précisé'}</li>
+              <li><strong>Type :</strong> ${respondentType}</li>
+              <li><strong>Score :</strong> ${qualificationScore}/100</li>
+              <li><strong>Source :</strong> ${source}</li>
+            </ul>
+          </div>
+        `;
+
+        await emailService.sendEmail({
+          to: 'contact@yojob.fr',
+          subject: subjectAdmin,
+          body: textAdmin,
+          html: htmlAdmin,
+          replyTo: prospectData.email,
+        });
+      } catch (notifyError) {
+        console.error('⚠️ Erreur envoi emails enquête (non-bloquant):', notifyError);
+      }
+    }
+
     // 🔥 Déclencher workflows automatiques (SMTP)
     try {
       await triggerWorkflow('prospect_created', { prospect_id: prospectId });
@@ -371,7 +439,7 @@ export async function batchSyncSurveysToProspects(limit = 100) {
     };
     
     for (const survey of surveys) {
-      const result = await syncSurveyToProspect(survey);
+      const result = await syncSurveyToProspect(survey, { sendNotifications: false });
       
       if (result.success) {
         results.synced++;

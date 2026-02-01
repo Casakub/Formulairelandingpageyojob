@@ -8,6 +8,9 @@ interface EmailOptions {
   subject: string;
   body: string;
   html?: string;
+  cc?: string | string[];
+  bcc?: string | string[];
+  replyTo?: string;
 }
 
 interface SMTPConfig {
@@ -322,10 +325,12 @@ async function sendViaSMTP(
     return await transporter.sendMail({
       from: `${config.from_name} <${config.from_email}>`,
       to: options.to,
+      ...(options.cc ? { cc: options.cc } : {}),
+      ...(options.bcc ? { bcc: options.bcc } : {}),
       subject: options.subject,
       text: textBody,
       html: htmlBody,
-      replyTo: config.reply_to,
+      replyTo: options.replyTo || config.reply_to,
     });
   };
 
@@ -370,6 +375,10 @@ async function sendViaSendGrid(
   textBody: string,
   htmlBody: string
 ): Promise<{ success: boolean; message: string; messageId?: string }> {
+  const toList = [options.to];
+  const ccList = options.cc ? (Array.isArray(options.cc) ? options.cc : [options.cc]) : [];
+  const bccList = options.bcc ? (Array.isArray(options.bcc) ? options.bcc : [options.bcc]) : [];
+
   const response = await fetch("https://api.sendgrid.com/v3/mail/send", {
     method: "POST",
     headers: {
@@ -377,9 +386,13 @@ async function sendViaSendGrid(
       "Authorization": `Bearer ${config.provider_api_key}`,
     },
     body: JSON.stringify({
-      personalizations: [{ to: [{ email: options.to }] }],
+      personalizations: [{
+        to: toList.map((email) => ({ email })),
+        ...(ccList.length ? { cc: ccList.map((email) => ({ email })) } : {}),
+        ...(bccList.length ? { bcc: bccList.map((email) => ({ email })) } : {}),
+      }],
       from: { email: config.from_email, name: config.from_name },
-      ...(config.reply_to ? { reply_to: { email: config.reply_to } } : {}),
+      ...((options.replyTo || config.reply_to) ? { reply_to: { email: options.replyTo || config.reply_to } } : {}),
       subject: options.subject,
       content: [
         { type: "text/plain", value: textBody },
@@ -421,11 +434,17 @@ async function sendViaMailgun(
   const form = new URLSearchParams();
   form.set("from", `${config.from_name} <${config.from_email}>`);
   form.set("to", options.to);
+  if (options.cc) {
+    form.set("cc", Array.isArray(options.cc) ? options.cc.join(",") : options.cc);
+  }
+  if (options.bcc) {
+    form.set("bcc", Array.isArray(options.bcc) ? options.bcc.join(",") : options.bcc);
+  }
   form.set("subject", options.subject);
   form.set("text", textBody);
   form.set("html", htmlBody);
-  if (config.reply_to) {
-    form.set("h:Reply-To", config.reply_to);
+  if (options.replyTo || config.reply_to) {
+    form.set("h:Reply-To", options.replyTo || config.reply_to);
   }
 
   const auth = btoa(`api:${config.provider_api_key}`);
