@@ -6,6 +6,7 @@ import * as kv from './kv_store.tsx';
 import { emailService } from './email-service.tsx';
 import { SIGNATURE_EMAIL_TEMPLATES } from './signature-email-templates.ts';
 import { cgvFR } from './cgv-data.ts';
+import { generateModernDevisPdf } from './devis-pdf-generator-v2.tsx';
 
 const devis = new Hono();
 
@@ -150,7 +151,11 @@ function wrapTextForPdf(text: string, font: any, fontSize: number, maxWidth: num
   return lines;
 }
 
-
+/**
+ * ⚠️ ANCIENNE VERSION - CONSERVÉE POUR RÉFÉRENCE
+ * Cette fonction est remplacée par generateModernDevisPdf() dans devis-pdf-generator-v2.tsx
+ * Ne pas utiliser directement
+ */
 async function generateDevisPdfBytes(prospect: any, inclureCGV: boolean): Promise<Uint8Array> {
   const pdfDoc = await PDFDocument.create();
   pdfDoc.registerFontkit(fontkit);
@@ -1365,7 +1370,8 @@ async function generateAndStorePdf(
   inclureCGV: boolean
 ): Promise<{ pdfUrl: string; pdfPath: string; pdfBytes: Uint8Array; prospectUpdated: any } | null> {
   try {
-    const pdfBytes = await generateDevisPdfBytes(prospect, inclureCGV);
+    // Utiliser le nouveau générateur PDF moderne v2
+    const pdfBytes = await generateModernDevisPdf(prospect, inclureCGV);
     const supabase = getSupabaseClient();
     const bucketReady = await ensureDevisPdfBucket(supabase);
     if (!bucketReady) {
