@@ -1,14 +1,17 @@
 /**
- * 🎨 GÉNÉRATEUR PDF MODERNE - VERSION 3.0 
+ * 🎨 GÉNÉRATEUR PDF MODERNE - VERSION 4.0
  * 
  * Design complet aligné sur le dashboard avec TOUS les champs
- * - Logo YOJOB intégré
- * - Sections complètes (entreprise, contact, postes, conditions, candidats)
- * - Certificat de signature électronique détaillé
+ * - Logo YOJOB stylisé (fond noir/dark)
+ * - Sections complètes
+ * - Postes sans bordure (uniquement barre verte à gauche)
+ * - Image de signature du client si signée
+ * - Pages CGV en fin de document
  * - Design épuré et professionnel
  */
 
-import { PDFDocument, StandardFonts, rgb, PDFPage, PDFFont } from "npm:pdf-lib@1.17.1";
+import { PDFDocument, StandardFonts, rgb, PDFPage, PDFFont, PDFImage } from "npm:pdf-lib@1.17.1";
+import { cgvFR } from './cgv-data.ts';
 
 // ========================================
 // 🎨 TYPES ET CONSTANTES
@@ -23,10 +26,12 @@ interface PDFColors {
   orange: ReturnType<typeof rgb>;
   pink: ReturnType<typeof rgb>;
   navy: ReturnType<typeof rgb>;
+  darkBlue: ReturnType<typeof rgb>;
   gray: ReturnType<typeof rgb>;
   lightGray: ReturnType<typeof rgb>;
   white: ReturnType<typeof rgb>;
   background: ReturnType<typeof rgb>;
+  black: ReturnType<typeof rgb>;
 }
 
 interface PDFConfig {
@@ -188,28 +193,38 @@ function drawHeader(
   const { pageWidth, pageHeight } = config;
   const headerHeight = 70;
 
-  // Background gradient bleu → cyan
-  const gradientSteps = 40;
-  const stepWidth = pageWidth / gradientSteps;
-  
-  for (let i = 0; i < gradientSteps; i++) {
-    const ratio = i / (gradientSteps - 1);
-    const r = 0.12 + (0.03 - 0.12) * ratio; // #1E3A8A → #06B6D4
-    const g = 0.23 + (0.71 - 0.23) * ratio;
-    const b = 0.54 + (0.83 - 0.54) * ratio;
-    
-    page.drawRectangle({
-      x: i * stepWidth,
-      y: pageHeight - headerHeight,
-      width: stepWidth + 1,
-      height: headerHeight,
-      color: rgb(r, g, b),
-    });
-  }
+  // Background dark bleu-cyan foncé
+  page.drawRectangle({
+    x: 0,
+    y: pageHeight - headerHeight,
+    width: pageWidth,
+    height: headerHeight,
+    color: rgb(0.09, 0.13, 0.28), // Bleu très foncé (proche de #172136)
+  });
 
-  // Logo YOJOB stylisé
+  // Logo YOJOB stylisé simplifié avec cercle
+  // Fond cercle glassmorphism
+  page.drawCircle({
+    x: 60,
+    y: pageHeight - 35,
+    size: 30,
+    color: rgb(0.15, 0.20, 0.35),
+    borderColor: colors.cyan,
+    borderWidth: 2,
+  });
+
+  // Initiales YJ dans le cercle
+  page.drawText('YJ', {
+    x: 48,
+    y: pageHeight - 40,
+    size: 20,
+    font: fonts.bold,
+    color: colors.cyan,
+  });
+  
+  // Texte YOJOB à côté
   page.drawText('YO', {
-    x: 30,
+    x: 100,
     y: pageHeight - 32,
     size: 24,
     font: fonts.bold,
@@ -217,7 +232,7 @@ function drawHeader(
   });
   
   page.drawText('JOB', {
-    x: 60,
+    x: 140,
     y: pageHeight - 32,
     size: 24,
     font: fonts.bold,
@@ -225,11 +240,11 @@ function drawHeader(
   });
 
   page.drawText('Courtage en recrutement europeen', {
-    x: 30,
+    x: 100,
     y: pageHeight - 48,
     size: 8,
     font: fonts.regular,
-    color: rgb(1, 1, 1, 0.85),
+    color: rgb(0.7, 0.7, 0.7),
   });
 
   // Numéro de devis
@@ -329,40 +344,30 @@ function drawSectionHeader(
   // Rectangle de fond
   page.drawRectangle({
     x,
-    y: y - 36,
+    y: y - 30,
     width,
-    height: 36,
+    height: 30,
     color: bgColor,
-  });
-
-  // Icône (carré coloré simple au lieu d'emoji)
-  const iconColor = rgb(bgColor.red * 0.6, bgColor.green * 0.6, bgColor.blue * 0.6);
-  page.drawRectangle({
-    x: x + 12,
-    y: y - 26,
-    width: 16,
-    height: 16,
-    color: iconColor,
   });
 
   // Titre
   page.drawText(toPdfText(title), {
-    x: x + 36,
-    y: y - 21,
-    size: 11,
+    x: x + 12,
+    y: y - 18,
+    size: 10,
     font: fonts.bold,
     color: colors.navy,
   });
 
   // Bordure inférieure
   page.drawLine({
-    start: { x, y: y - 36 },
-    end: { x: x + width, y: y - 36 },
-    thickness: 2,
-    color: rgb(bgColor.red * 0.7, bgColor.green * 0.7, bgColor.blue * 0.7),
+    start: { x, y: y - 30 },
+    end: { x: x + width, y: y - 30 },
+    thickness: 3,
+    color: rgb(bgColor.red * 0.6, bgColor.green * 0.6, bgColor.blue * 0.6),
   });
 
-  return y - 44; // Position Y pour le contenu
+  return y - 38; // Position Y pour le contenu
 }
 
 function drawKeyValue(
@@ -447,6 +452,7 @@ export async function generateModernDevisPdf(prospect: any, inclureCGV: boolean)
     violet: rgb(0.49, 0.27, 0.90), // #7C3AED
     cyan: rgb(0.03, 0.71, 0.83), // #06B6D4
     blue: rgb(0.12, 0.23, 0.54), // #1E3A8A
+    darkBlue: rgb(0.09, 0.13, 0.28), // #172136
     green: rgb(0.06, 0.73, 0.51), // #10B981
     emerald: rgb(0.20, 0.83, 0.61), // #34D399
     orange: rgb(0.96, 0.62, 0.09), // #F59E0B
@@ -456,6 +462,7 @@ export async function generateModernDevisPdf(prospect: any, inclureCGV: boolean)
     lightGray: rgb(0.89, 0.91, 0.94), // #E2E8F0
     white: rgb(1, 1, 1),
     background: rgb(0.98, 0.98, 0.99),
+    black: rgb(0, 0, 0),
   };
 
   const fonts = { regular: fontRegular, bold: fontBold };
@@ -497,8 +504,8 @@ export async function generateModernDevisPdf(prospect: any, inclureCGV: boolean)
     y,
     config.contentWidth,
     'Informations entreprise',
-    '🏢',
-    rgb(0.93, 0.96, 0.99), // bleu très clair
+    '',
+    rgb(0.93, 0.96, 0.99),
     colors,
     fonts
   );
@@ -569,8 +576,8 @@ export async function generateModernDevisPdf(prospect: any, inclureCGV: boolean)
     y,
     config.contentWidth,
     'Personne de contact',
-    '👤',
-    rgb(0.96, 0.95, 0.99), // violet clair
+    '',
+    rgb(0.96, 0.95, 0.99),
     colors,
     fonts
   );
@@ -628,8 +635,8 @@ export async function generateModernDevisPdf(prospect: any, inclureCGV: boolean)
     y,
     config.contentWidth,
     `Postes a pourvoir (${postes.length})`,
-    '💼',
-    rgb(0.93, 0.99, 0.96), // vert clair
+    '',
+    rgb(0.93, 0.99, 0.96),
     colors,
     fonts
   );
@@ -637,7 +644,7 @@ export async function generateModernDevisPdf(prospect: any, inclureCGV: boolean)
   y -= 12;
 
   postes.forEach((poste: any, index: number) => {
-    if (checkNeedNewPage(y, 180, config)) {
+    if (checkNeedNewPage(y, 120, config)) {
       currentPage = pdfDoc.addPage([config.pageWidth, config.pageHeight]);
       pages.push(currentPage);
       pageNumber++;
@@ -649,18 +656,9 @@ export async function generateModernDevisPdf(prospect: any, inclureCGV: boolean)
     const posteLabel = getTextValue(poste.poste) || 'Poste';
     const salaireBrut = formatCurrency(poste.salaireBrut);
 
-    // Bordure de carte
-    const cardHeight = 120;
-    currentPage.drawRectangle({
-      x: config.margin,
-      y: y - cardHeight,
-      width: config.contentWidth,
-      height: cardHeight,
-      borderColor: colors.lightGray,
-      borderWidth: 1,
-    });
+    const cardHeight = 100;
 
-    // Bordure verte à gauche
+    // Bordure verte à gauche UNIQUEMENT (pas de bordure complète)
     currentPage.drawRectangle({
       x: config.margin,
       y: y - cardHeight,
@@ -669,26 +667,43 @@ export async function generateModernDevisPdf(prospect: any, inclureCGV: boolean)
       color: colors.emerald,
     });
 
+    // Fond gris très clair
+    currentPage.drawRectangle({
+      x: config.margin + 4,
+      y: y - cardHeight,
+      width: config.contentWidth - 4,
+      height: cardHeight,
+      color: rgb(0.98, 0.98, 0.99),
+    });
+
     // Titre du poste
-    const safePosteLabel = toPdfText(`POSTE #${index + 1} - ${posteLabel}`);
+    const safePosteLabel = toPdfText(`#${index + 1} - ${posteLabel}`);
     currentPage.drawText(safePosteLabel, {
       x: config.margin + 14,
       y: y - 18,
       size: 10,
       font: fontBold,
-      color: colors.emerald,
+      color: colors.navy,
     });
 
     // Prix à droite
     if (salaireBrut) {
-      const priceText = toPdfText(`${salaireBrut}/mois`);
-      const priceWidth = fontBold.widthOfTextAtSize(priceText, 11);
+      const priceText = toPdfText(salaireBrut);
+      const priceWidth = fontBold.widthOfTextAtSize(priceText, 12);
       currentPage.drawText(priceText, {
         x: config.pageWidth - config.margin - priceWidth - 12,
         y: y - 18,
-        size: 11,
+        size: 12,
         font: fontBold,
-        color: colors.green,
+        color: colors.emerald,
+      });
+
+      currentPage.drawText('/mois', {
+        x: config.pageWidth - config.margin - 30,
+        y: y - 28,
+        size: 7,
+        font: fontRegular,
+        color: colors.gray,
       });
     }
 
@@ -704,7 +719,7 @@ export async function generateModernDevisPdf(prospect: any, inclureCGV: boolean)
       y: badgeY - 3,
       width: secteurWidth,
       height: 14,
-      color: rgb(0.85, 0.97, 0.93),
+      color: rgb(0.90, 0.97, 0.93),
     });
     currentPage.drawText(secteurText, {
       x: badgeX + 6,
@@ -724,7 +739,7 @@ export async function generateModernDevisPdf(prospect: any, inclureCGV: boolean)
         y: badgeY - 3,
         width: classifWidth,
         height: 14,
-        color: rgb(0.85, 0.93, 0.99),
+        color: rgb(0.90, 0.93, 0.99),
       });
       currentPage.drawText(classifText, {
         x: badgeX + 6,
@@ -736,7 +751,7 @@ export async function generateModernDevisPdf(prospect: any, inclureCGV: boolean)
       badgeX += classifWidth + 6;
     }
 
-    // Badge quantité
+    // Quantité
     const qtyText = toPdfText(`Quantite: ${poste.quantite || 1}`);
     currentPage.drawText(qtyText, {
       x: badgeX,
@@ -746,50 +761,99 @@ export async function generateModernDevisPdf(prospect: any, inclureCGV: boolean)
       color: colors.gray,
     });
 
-    // Détails du poste (3 colonnes)
+    // Détails (3 colonnes)
     let detailY = y - 54;
     const colWidth = (config.contentWidth - 40) / 3;
 
-    // Colonne 1 : Rémunération
+    // Col 1 : Rémunération
     currentPage.drawText('Remuneration', {
       x: config.margin + 14,
       y: detailY,
-      size: 7.5,
+      size: 7,
       font: fontBold,
       color: colors.gray,
     });
-    detailY -= 14;
-    detailY -= drawKeyValue(currentPage, config.margin + 14, detailY, 'Salaire brut', salaireBrut, colors, fonts);
-    if (poste.tauxHoraireBrut) detailY -= drawKeyValue(currentPage, config.margin + 14, detailY, 'Taux horaire', formatCurrency(poste.tauxHoraireBrut) + '/h', colors, fonts);
-    if (poste.tauxETT) detailY -= drawKeyValue(currentPage, config.margin + 14, detailY, 'Taux ETT', formatCurrency(poste.tauxETT) + '/h', colors, fonts);
+    detailY -= 12;
+    currentPage.drawText(toPdfText(`Salaire: ${salaireBrut}`), {
+      x: config.margin + 14,
+      y: detailY,
+      size: 8,
+      font: fontRegular,
+      color: colors.navy,
+    });
+    if (poste.tauxHoraireBrut) {
+      detailY -= 11;
+      currentPage.drawText(toPdfText(`Taux: ${formatCurrency(poste.tauxHoraireBrut)}/h`), {
+        x: config.margin + 14,
+        y: detailY,
+        size: 8,
+        font: fontRegular,
+        color: colors.navy,
+      });
+    }
 
-    // Colonne 2 : Période
+    // Col 2 : Période
     detailY = y - 54;
     currentPage.drawText('Periode', {
       x: config.margin + 14 + colWidth,
       y: detailY,
-      size: 7.5,
+      size: 7,
       font: fontBold,
       color: colors.gray,
     });
-    detailY -= 14;
-    if (conditions.dateDebut) detailY -= drawKeyValue(currentPage, config.margin + 14 + colWidth, detailY, 'Debut', formatDateForPdf(conditions.dateDebut), colors, fonts);
-    if (conditions.dateFin) detailY -= drawKeyValue(currentPage, config.margin + 14 + colWidth, detailY, 'Fin', formatDateForPdf(conditions.dateFin), colors, fonts);
-    if (conditions.periodeEssai) detailY -= drawKeyValue(currentPage, config.margin + 14 + colWidth, detailY, 'Periode essai', getTextValue(conditions.periodeEssai), colors, fonts);
+    detailY -= 12;
+    if (conditions.dateDebut) {
+      currentPage.drawText(toPdfText(`Debut: ${formatDateForPdf(conditions.dateDebut)}`), {
+        x: config.margin + 14 + colWidth,
+        y: detailY,
+        size: 8,
+        font: fontRegular,
+        color: colors.navy,
+      });
+      detailY -= 11;
+    }
+    if (conditions.dateFin) {
+      currentPage.drawText(toPdfText(`Fin: ${formatDateForPdf(conditions.dateFin)}`), {
+        x: config.margin + 14 + colWidth,
+        y: detailY,
+        size: 8,
+        font: fontRegular,
+        color: colors.navy,
+      });
+    }
 
-    // Colonne 3 : Nationalité/Lieu
+    // Col 3 : Lieu
     detailY = y - 54;
     currentPage.drawText('Lieu & Nationalite', {
       x: config.margin + 14 + colWidth * 2,
       y: detailY,
-      size: 7.5,
+      size: 7,
       font: fontBold,
       color: colors.gray,
     });
-    detailY -= 14;
+    detailY -= 12;
     const nationalite = poste.labelPays || poste.nationalite || 'Non renseignee';
-    detailY -= drawKeyValue(currentPage, config.margin + 14 + colWidth * 2, detailY, 'Nationalite', nationalite, colors, fonts);
-    if (conditions.lieuxMission) detailY -= drawKeyValue(currentPage, config.margin + 14 + colWidth * 2, detailY, 'Lieu de mission', conditions.lieuxMission, colors, fonts, colWidth - 10);
+    currentPage.drawText(toPdfText(`Nat.: ${nationalite}`), {
+      x: config.margin + 14 + colWidth * 2,
+      y: detailY,
+      size: 8,
+      font: fontRegular,
+      color: colors.navy,
+    });
+    if (conditions.lieuxMission) {
+      detailY -= 11;
+      const lieuLines = wrapText(conditions.lieuxMission, fontRegular, 8, colWidth - 10);
+      lieuLines.slice(0, 2).forEach((line) => {
+        currentPage.drawText(toPdfText(line), {
+          x: config.margin + 14 + colWidth * 2,
+          y: detailY,
+          size: 8,
+          font: fontRegular,
+          color: colors.navy,
+        });
+        detailY -= 11;
+      });
+    }
 
     y -= cardHeight + 12;
   });
@@ -799,7 +863,7 @@ export async function generateModernDevisPdf(prospect: any, inclureCGV: boolean)
   // ========================================
 
   if (conditions && Object.keys(conditions).length > 0) {
-    if (checkNeedNewPage(y, 150, config)) {
+    if (checkNeedNewPage(y, 100, config)) {
       currentPage = pdfDoc.addPage([config.pageWidth, config.pageHeight]);
       pages.push(currentPage);
       pageNumber++;
@@ -814,51 +878,51 @@ export async function generateModernDevisPdf(prospect: any, inclureCGV: boolean)
       y,
       config.contentWidth,
       'Conditions de travail',
-      '📋',
-      rgb(0.99, 0.96, 0.93), // orange clair
+      '',
+      rgb(0.99, 0.96, 0.93),
       colors,
       fonts
     );
 
     y -= 12;
 
-    currentPage.drawText('•', {
-      x: config.margin + 12,
-      y: y,
-      size: 10,
-      font: fontRegular,
-      color: colors.navy,
-    });
-
     const conditionsList: string[] = [];
-    if (conditions.motifRecours) conditionsList.push(`Motif de recours: ${getTextValue(conditions.motifRecours)}`);
-    if (conditions.delaiPaiement) conditionsList.push(`Delai de paiement: ${getTextValue(conditions.delaiPaiement)}`);
-    if (conditions.baseHoraire) conditionsList.push(`Base horaire: ${conditions.baseHoraire}h/mois`);
-    if (conditions.hebergement?.chargeEU) conditionsList.push('Hebergement: Pris en charge par l\'entreprise utilisatrice');
-    if (conditions.transportLocal?.chargeETT) conditionsList.push('Transport local: Pris en charge');
+    if (conditions.motifRecours) conditionsList.push(`Motif: ${getTextValue(conditions.motifRecours)}`);
+    if (conditions.delaiPaiement) conditionsList.push(`Paiement: ${getTextValue(conditions.delaiPaiement)}`);
+    if (conditions.baseHoraire) conditionsList.push(`Base: ${conditions.baseHoraire}h/mois`);
+    if (conditions.hebergement?.chargeEU) conditionsList.push('Hebergement: EU');
+    if (conditions.transportLocal?.chargeETT) conditionsList.push('Transport: ETT');
     if (conditions.repas?.type) {
       const repasType = getTextValue(conditions.repas.type);
-      const repasMontant = conditions.repas.montant ? ` (${formatCurrency(conditions.repas.montant)}/jour)` : '';
+      const repasMontant = conditions.repas.montant ? ` (${formatCurrency(conditions.repas.montant)}/j)` : '';
       conditionsList.push(`Repas: ${repasType}${repasMontant}`);
     }
 
-    conditionsList.forEach((item) => {
-      const lines = wrapText(item, fontRegular, 8, config.contentWidth - 40);
-      lines.forEach((line) => {
-        currentPage.drawText(line, {
-          x: config.margin + 24,
+    if (conditionsList.length > 0) {
+      conditionsList.forEach((item) => {
+        currentPage.drawText('•', {
+          x: config.margin + 12,
           y: y,
-          size: 8,
+          size: 10,
           font: fontRegular,
           color: colors.navy,
         });
-        y -= 12;
-      });
-    });
 
-    if (conditionsList.length === 0) {
-      currentPage.drawText('Aucune condition specifique renseignee', {
-        x: config.margin + 24,
+        const lines = wrapText(item, fontRegular, 8, config.contentWidth - 40);
+        lines.forEach((line) => {
+          currentPage.drawText(line, {
+            x: config.margin + 24,
+            y: y,
+            size: 8,
+            font: fontRegular,
+            color: colors.navy,
+          });
+          y -= 12;
+        });
+      });
+    } else {
+      currentPage.drawText('Aucune condition specifique', {
+        x: config.margin + 12,
         y: y,
         size: 8,
         font: fontRegular,
@@ -875,7 +939,7 @@ export async function generateModernDevisPdf(prospect: any, inclureCGV: boolean)
   // ========================================
 
   if (candidats && Object.keys(candidats).length > 0) {
-    if (checkNeedNewPage(y, 150, config)) {
+    if (checkNeedNewPage(y, 100, config)) {
       currentPage = pdfDoc.addPage([config.pageWidth, config.pageHeight]);
       pages.push(currentPage);
       pageNumber++;
@@ -889,9 +953,9 @@ export async function generateModernDevisPdf(prospect: any, inclureCGV: boolean)
       config.margin,
       y,
       config.contentWidth,
-      'Profil des candidats recherches',
-      '👥',
-      rgb(0.99, 0.95, 0.97), // rose clair
+      'Profil des candidats',
+      '',
+      rgb(0.99, 0.95, 0.97),
       colors,
       fonts
     );
@@ -925,8 +989,8 @@ export async function generateModernDevisPdf(prospect: any, inclureCGV: boolean)
     }
     
     if (candidats.permis?.requis) {
-      const permisCategorie = candidats.permis.categorie ? ` - Categorie ${getTextValue(candidats.permis.categorie)}` : '';
-      candidatsList.push(`Permis de conduire: Requis${permisCategorie}`);
+      const permisCategorie = candidats.permis.categorie ? ` - Cat. ${getTextValue(candidats.permis.categorie)}` : '';
+      candidatsList.push(`Permis: Requis${permisCategorie}`);
     }
     
     if (candidats.outillage?.requis) {
@@ -936,7 +1000,7 @@ export async function generateModernDevisPdf(prospect: any, inclureCGV: boolean)
     
     if (candidats.epis && candidats.epis.length > 0) {
       const episText = candidats.epis.map((epi: any) => getTextValue(epi)).join(', ');
-      candidatsList.push(`EPIs requis: ${episText}`);
+      candidatsList.push(`EPIs: ${episText}`);
     }
 
     if (candidatsList.length > 0) {
@@ -962,7 +1026,7 @@ export async function generateModernDevisPdf(prospect: any, inclureCGV: boolean)
         });
       });
     } else {
-      currentPage.drawText('Aucun profil specifique defini', {
+      currentPage.drawText('Aucun profil specifique', {
         x: config.margin + 12,
         y: y,
         size: 8,
@@ -988,7 +1052,7 @@ export async function generateModernDevisPdf(prospect: any, inclureCGV: boolean)
     drawHeader(currentPage, config, colors, fonts, devisData);
     y -= 20;
 
-    // En-tête spécial signature avec bordure verte
+    // En-tête signature
     currentPage.drawRectangle({
       x: config.margin,
       y: y - 50,
@@ -1005,7 +1069,6 @@ export async function generateModernDevisPdf(prospect: any, inclureCGV: boolean)
       color: colors.green,
     });
 
-    // Carré vert au lieu d'emoji shield
     currentPage.drawRectangle({
       x: config.margin + 12,
       y: y - 36,
@@ -1022,7 +1085,6 @@ export async function generateModernDevisPdf(prospect: any, inclureCGV: boolean)
       color: colors.navy,
     });
 
-    // Checkmark simple au lieu d'emoji
     currentPage.drawText('[ v ] Conforme au reglement eIDAS (UE) n°910/2014', {
       x: config.margin + 42,
       y: y - 36,
@@ -1033,7 +1095,37 @@ export async function generateModernDevisPdf(prospect: any, inclureCGV: boolean)
 
     y -= 62;
 
-    // Section Identité du signataire
+    // Image de signature si disponible
+    if (signature.image) {
+      try {
+        // Extraire l'image base64
+        const base64Data = signature.image.split(',')[1] || signature.image;
+        const imageBytes = Uint8Array.from(atob(base64Data), c => c.charCodeAt(0));
+        
+        let signatureImage: PDFImage;
+        if (signature.image.includes('png')) {
+          signatureImage = await pdfDoc.embedPng(imageBytes);
+        } else {
+          signatureImage = await pdfDoc.embedJpg(imageBytes);
+        }
+
+        const imgWidth = 200;
+        const imgHeight = 80;
+
+        currentPage.drawImage(signatureImage, {
+          x: config.margin + 12,
+          y: y - imgHeight,
+          width: imgWidth,
+          height: imgHeight,
+        });
+
+        y -= imgHeight + 10;
+      } catch (error) {
+        console.error('Erreur chargement image signature:', error);
+      }
+    }
+
+    // Identité du signataire
     currentPage.drawRectangle({
       x: config.margin,
       y: y,
@@ -1042,7 +1134,7 @@ export async function generateModernDevisPdf(prospect: any, inclureCGV: boolean)
       color: colors.green,
     });
 
-    currentPage.drawText('Identite du signataire certifiee', {
+    currentPage.drawText('Identite du signataire', {
       x: config.margin + 12,
       y: y,
       size: 9,
@@ -1055,18 +1147,15 @@ export async function generateModernDevisPdf(prospect: any, inclureCGV: boolean)
     col1Y = y;
     col2Y = y;
 
-    // Colonne 1
-    col1Y -= drawKeyValue(currentPage, config.margin + 12, col1Y, 'Nom complet', `${signature.signataire.prenom} ${signature.signataire.nom}`, colors, fonts);
+    col1Y -= drawKeyValue(currentPage, config.margin + 12, col1Y, 'Nom', `${signature.signataire.prenom} ${signature.signataire.nom}`, colors, fonts);
     col1Y -= drawKeyValue(currentPage, config.margin + 12, col1Y, 'Fonction', signature.signataire.fonction || '', colors, fonts);
     col1Y -= drawKeyValue(currentPage, config.margin + 12, col1Y, 'Email', signature.signataire.email || '', colors, fonts, columnWidth - 20);
 
-    // Colonne 2
     col2Y -= drawKeyValue(currentPage, config.margin + columnWidth + 24, col2Y, 'Entreprise', signature.signataire.entreprise || '', colors, fonts);
     col2Y -= drawKeyValue(currentPage, config.margin + columnWidth + 24, col2Y, 'SIRET', signature.signataire.siret || '', colors, fonts);
 
     y = Math.min(col1Y, col2Y) - 20;
 
-    // Ligne séparatrice
     currentPage.drawLine({
       start: { x: config.margin + 12, y: y },
       end: { x: config.pageWidth - config.margin - 12, y: y },
@@ -1076,7 +1165,7 @@ export async function generateModernDevisPdf(prospect: any, inclureCGV: boolean)
 
     y -= 16;
 
-    // Section Traçabilité technique
+    // Traçabilité
     currentPage.drawRectangle({
       x: config.margin,
       y: y,
@@ -1085,7 +1174,7 @@ export async function generateModernDevisPdf(prospect: any, inclureCGV: boolean)
       color: colors.blue,
     });
 
-    currentPage.drawText('Tracabilite technique', {
+    currentPage.drawText('Tracabilite', {
       x: config.margin + 12,
       y: y,
       size: 9,
@@ -1098,26 +1187,23 @@ export async function generateModernDevisPdf(prospect: any, inclureCGV: boolean)
     col1Y = y;
     col2Y = y;
 
-    // Colonne 1
     if (signature.metadata?.timestampReadable) {
-      col1Y -= drawKeyValue(currentPage, config.margin + 12, col1Y, 'Date et heure (Paris)', signature.metadata.timestampReadable, colors, fonts);
+      col1Y -= drawKeyValue(currentPage, config.margin + 12, col1Y, 'Date/Heure', signature.metadata.timestampReadable, colors, fonts);
     }
     if (signature.metadata?.timestamp) {
-      col1Y -= drawKeyValue(currentPage, config.margin + 12, col1Y, 'Horodatage ISO 8601', signature.metadata.timestamp, colors, fonts, columnWidth - 20);
+      col1Y -= drawKeyValue(currentPage, config.margin + 12, col1Y, 'ISO 8601', signature.metadata.timestamp, colors, fonts, columnWidth - 20);
     }
 
-    // Colonne 2
     if (signature.metadata?.ipAddress) {
-      col2Y -= drawKeyValue(currentPage, config.margin + columnWidth + 24, col2Y, 'Adresse IP', signature.metadata.ipAddress, colors, fonts);
+      col2Y -= drawKeyValue(currentPage, config.margin + columnWidth + 24, col2Y, 'IP', signature.metadata.ipAddress, colors, fonts);
     }
     if (signature.metadata?.userAgent) {
-      const userAgentShort = signature.metadata.userAgent.substring(0, 60) + (signature.metadata.userAgent.length > 60 ? '...' : '');
+      const userAgentShort = signature.metadata.userAgent.substring(0, 50) + '...';
       col2Y -= drawKeyValue(currentPage, config.margin + columnWidth + 24, col2Y, 'Navigateur', userAgentShort, colors, fonts, columnWidth - 20);
     }
 
     y = Math.min(col1Y, col2Y) - 20;
 
-    // Ligne séparatrice
     currentPage.drawLine({
       start: { x: config.margin + 12, y: y },
       end: { x: config.pageWidth - config.margin - 12, y: y },
@@ -1127,7 +1213,7 @@ export async function generateModernDevisPdf(prospect: any, inclureCGV: boolean)
 
     y -= 16;
 
-    // Section Preuve d'intégrité
+    // Intégrité
     currentPage.drawRectangle({
       x: config.margin,
       y: y,
@@ -1136,7 +1222,7 @@ export async function generateModernDevisPdf(prospect: any, inclureCGV: boolean)
       color: colors.violet,
     });
 
-    currentPage.drawText("Preuve d'integrite du document", {
+    currentPage.drawText("Integrite", {
       x: config.margin + 12,
       y: y,
       size: 9,
@@ -1147,7 +1233,7 @@ export async function generateModernDevisPdf(prospect: any, inclureCGV: boolean)
     y -= 16;
 
     if (signature.integrite?.hashAlgorithm) {
-      currentPage.drawText('Algorithme de hachage', {
+      currentPage.drawText('Algorithme', {
         x: config.margin + 12,
         y: y,
         size: 8,
@@ -1177,7 +1263,7 @@ export async function generateModernDevisPdf(prospect: any, inclureCGV: boolean)
     }
 
     if (signature.integrite?.documentHash) {
-      currentPage.drawText('Empreinte numerique du devis', {
+      currentPage.drawText('Hash', {
         x: config.margin + 12,
         y: y,
         size: 8,
@@ -1187,18 +1273,16 @@ export async function generateModernDevisPdf(prospect: any, inclureCGV: boolean)
 
       y -= 14;
 
-      // Rectangle de fond pour le hash
       currentPage.drawRectangle({
         x: config.margin + 12,
-        y: y - 28,
+        y: y - 24,
         width: config.contentWidth - 24,
-        height: 30,
+        height: 26,
         color: rgb(0.98, 0.98, 0.98),
         borderColor: colors.lightGray,
         borderWidth: 0.5,
       });
 
-      // Hash sur 2 lignes
       const hashLines = wrapText(signature.integrite.documentHash, fontMono, 7, config.contentWidth - 36);
       let hashY = y - 8;
       hashLines.forEach((line) => {
@@ -1212,76 +1296,54 @@ export async function generateModernDevisPdf(prospect: any, inclureCGV: boolean)
         hashY -= 9;
       });
 
-      y -= 34;
-
-      if (signature.integrite.devisNumero) {
-        currentPage.drawText(toPdfText(`Cette empreinte garantit que le devis ${signature.integrite.devisNumero} n'a pas ete modifie depuis la signature.`), {
-          x: config.margin + 12,
-          y: y,
-          size: 7,
-          font: fontRegular,
-          color: colors.gray,
-        });
-        y -= 12;
-      }
+      y -= 30;
     }
 
     y -= 20;
 
-    // Section Consentement
+    // Consentement
     if (signature.consentement) {
       currentPage.drawRectangle({
         x: config.margin,
-        y: y - 44,
+        y: y - 36,
         width: config.contentWidth,
-        height: 44,
+        height: 36,
         color: rgb(0.93, 0.99, 0.96),
         borderColor: rgb(0.06, 0.73, 0.51),
         borderWidth: 1,
       });
 
-      // Carré vert au lieu d'emoji checkmark
       currentPage.drawRectangle({
         x: config.margin + 12,
-        y: y - 24,
-        width: 12,
-        height: 12,
+        y: y - 20,
+        width: 10,
+        height: 10,
         color: colors.green,
       });
 
-      currentPage.drawText('Consentement et acceptation', {
-        x: config.margin + 32,
-        y: y - 16,
+      currentPage.drawText('Consentement', {
+        x: config.margin + 28,
+        y: y - 14,
         size: 9,
         font: fontBold,
         color: colors.navy,
       });
 
-      const accepteText = signature.consentement.accepteCGV ? 'J\'accepte les Conditions Generales de Vente' : 'CGV non acceptees';
+      const accepteText = signature.consentement.accepteCGV ? "J'accepte les CGV" : 'CGV non acceptees';
       currentPage.drawText(toPdfText(accepteText), {
-        x: config.margin + 32,
-        y: y - 28,
+        x: config.margin + 28,
+        y: y - 26,
         size: 7.5,
         font: fontRegular,
         color: colors.navy,
       });
 
-      if (signature.consentement.dateAcceptation) {
-        currentPage.drawText(toPdfText(`Date d'acceptation: ${formatDateTimeForPdf(signature.consentement.dateAcceptation)}`), {
-          x: config.margin + 32,
-          y: y - 38,
-          size: 7,
-          font: fontRegular,
-          color: colors.gray,
-        });
-      }
-
-      y -= 50;
+      y -= 42;
     }
   }
 
   // ========================================
-  // ✅ AJOUT DES FOOTERS SUR TOUTES LES PAGES
+  // ✅ AJOUT DES FOOTERS
   // ========================================
 
   const totalPages = pages.length;
