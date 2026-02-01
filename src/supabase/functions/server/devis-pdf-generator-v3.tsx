@@ -335,12 +335,14 @@ function drawSectionHeader(
     color: bgColor,
   });
 
-  // Icône (emoji)
-  page.drawText(icon, {
+  // Icône (carré coloré simple au lieu d'emoji)
+  const iconColor = rgb(bgColor.red * 0.6, bgColor.green * 0.6, bgColor.blue * 0.6);
+  page.drawRectangle({
     x: x + 12,
-    y: y - 22,
-    size: 14,
-    font: fonts.regular,
+    y: y - 26,
+    width: 16,
+    height: 16,
+    color: iconColor,
   });
 
   // Titre
@@ -517,7 +519,7 @@ export async function generateModernDevisPdf(prospect: any, inclureCGV: boolean)
   col1Y -= 16;
 
   col1Y -= drawKeyValue(currentPage, config.margin + 12, col1Y, 'Raison sociale', entreprise.raisonSociale || '', colors, fonts, columnWidth - 20);
-  if (entreprise.pays) col1Y -= drawKeyValue(currentPage, config.margin + 12, col1Y, 'Pays', `🌍 ${entreprise.pays}`, colors, fonts);
+  if (entreprise.pays) col1Y -= drawKeyValue(currentPage, config.margin + 12, col1Y, 'Pays', entreprise.pays, colors, fonts);
   if (entreprise.formeJuridique) col1Y -= drawKeyValue(currentPage, config.margin + 12, col1Y, 'Forme juridique', entreprise.formeJuridique, colors, fonts);
   col1Y -= drawKeyValue(currentPage, config.margin + 12, col1Y, 'SIRET', entreprise.siret || '', colors, fonts);
   if (entreprise.numeroTVA) col1Y -= drawKeyValue(currentPage, config.margin + 12, col1Y, 'N° TVA', entreprise.numeroTVA, colors, fonts);
@@ -786,7 +788,7 @@ export async function generateModernDevisPdf(prospect: any, inclureCGV: boolean)
     });
     detailY -= 14;
     const nationalite = poste.labelPays || poste.nationalite || 'Non renseignee';
-    detailY -= drawKeyValue(currentPage, config.margin + 14 + colWidth * 2, detailY, 'Nationalite', `🌍 ${nationalite}`, colors, fonts);
+    detailY -= drawKeyValue(currentPage, config.margin + 14 + colWidth * 2, detailY, 'Nationalite', nationalite, colors, fonts);
     if (conditions.lieuxMission) detailY -= drawKeyValue(currentPage, config.margin + 14 + colWidth * 2, detailY, 'Lieu de mission', conditions.lieuxMission, colors, fonts, colWidth - 10);
 
     y -= cardHeight + 12;
@@ -1003,11 +1005,13 @@ export async function generateModernDevisPdf(prospect: any, inclureCGV: boolean)
       color: colors.green,
     });
 
-    currentPage.drawText('🛡️', {
+    // Carré vert au lieu d'emoji shield
+    currentPage.drawRectangle({
       x: config.margin + 12,
-      y: y - 28,
-      size: 18,
-      font: fontRegular,
+      y: y - 36,
+      width: 20,
+      height: 20,
+      color: colors.green,
     });
 
     currentPage.drawText('Certificat de Signature Electronique', {
@@ -1018,7 +1022,8 @@ export async function generateModernDevisPdf(prospect: any, inclureCGV: boolean)
       color: colors.navy,
     });
 
-    currentPage.drawText('✓ Conforme au reglement eIDAS (UE) n°910/2014', {
+    // Checkmark simple au lieu d'emoji
+    currentPage.drawText('[ v ] Conforme au reglement eIDAS (UE) n°910/2014', {
       x: config.margin + 42,
       y: y - 36,
       size: 7,
@@ -1235,11 +1240,12 @@ export async function generateModernDevisPdf(prospect: any, inclureCGV: boolean)
         borderWidth: 1,
       });
 
-      currentPage.drawText('✓', {
+      // Carré vert au lieu d'emoji checkmark
+      currentPage.drawRectangle({
         x: config.margin + 12,
-        y: y - 18,
-        size: 14,
-        font: fontBold,
+        y: y - 24,
+        width: 12,
+        height: 12,
         color: colors.green,
       });
 
