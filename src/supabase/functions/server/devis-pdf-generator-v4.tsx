@@ -195,25 +195,30 @@ function drawHeader(
   const { pageWidth, pageHeight } = config;
   const headerHeight = 70;
 
-  // Background dark bleu-cyan foncé
+  // Background dark bleu-cyan (éclairci)
   page.drawRectangle({
     x: 0,
     y: pageHeight - headerHeight,
     width: pageWidth,
     height: headerHeight,
-    color: rgb(0.09, 0.13, 0.28), // Bleu très foncé (proche de #172136)
+    color: rgb(0.11, 0.16, 0.32), // Bleu foncé légèrement éclairci
   });
 
   // Logo YOJOB réel (si disponible)
   if (logo) {
     try {
-      // Taille du logo adaptée à l'en-tête
-      const logoHeight = 45;
-      const logoWidth = 120; // Ajuster selon le ratio du logo
+      // Calculer les dimensions avec le bon ratio d'aspect
+      const logoOriginalWidth = logo.width;
+      const logoOriginalHeight = logo.height;
+      const logoRatio = logoOriginalWidth / logoOriginalHeight;
+      
+      // Hauteur fixe de 40px, largeur calculée selon le ratio
+      const logoHeight = 40;
+      const logoWidth = logoHeight * logoRatio;
       
       page.drawImage(logo, {
         x: 40,
-        y: pageHeight - 60,
+        y: pageHeight - 55,
         width: logoWidth,
         height: logoHeight,
       });
