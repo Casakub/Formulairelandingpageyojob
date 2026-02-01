@@ -116,7 +116,7 @@ function wrapText(
   fontSize: number,
   maxWidth: number
 ): string[] {
-  const safeText = toPdfText(text);
+  const safeText = toPdfText(text); // Sanitize dès le début
   if (!safeText) return [];
   
   const lines: string[] = [];
@@ -133,7 +133,7 @@ function wrapText(
 
     for (const word of words) {
       const testLine = currentLine ? `${currentLine} ${word}` : word;
-      const width = font.widthOfTextAtSize(testLine, fontSize);
+      const width = font.widthOfTextAtSize(testLine, fontSize); // Déjà sanitizé
       
       if (width <= maxWidth) {
         currentLine = testLine;
@@ -209,7 +209,7 @@ function drawHeader(
   });
 
   // Numéro de devis et statut (à droite)
-  const devisLabel = `DEVIS ${devisData.numero}`;
+  const devisLabel = toPdfText(`DEVIS ${devisData.numero}`);
   const devisWidth = fonts.bold.widthOfTextAtSize(devisLabel, 12);
   
   page.drawText(devisLabel, {
@@ -595,7 +595,7 @@ export async function generateModernDevisPdf(prospect: any, inclureCGV: boolean)
   badgeX += badge2Width + 8;
 
   // Badge Lieu
-  const lieu = conditions.lieuxMission || 'Bordeaux';
+  const lieu = toPdfText(conditions.lieuxMission || 'Bordeaux');
   const badge3Width = fontBold.widthOfTextAtSize(lieu, 8) + 14;
   page.drawRectangle({
     x: badgeX,
@@ -614,7 +614,7 @@ export async function generateModernDevisPdf(prospect: any, inclureCGV: boolean)
   badgeX += badge3Width + 8;
 
   // Badge Période
-  const periode = `${formatDateForPdf(conditions.dateDebut)} ? ${formatDateForPdf(conditions.dateFin)}`;
+  const periode = toPdfText(`${formatDateForPdf(conditions.dateDebut)} ? ${formatDateForPdf(conditions.dateFin)}`);
   const badge4Width = fontBold.widthOfTextAtSize(periode, 8) + 14;
   page.drawRectangle({
     x: badgeX,
@@ -683,7 +683,7 @@ export async function generateModernDevisPdf(prospect: any, inclureCGV: boolean)
 
     // Prix à droite
     if (salaireBrut) {
-      const priceText = `${salaireBrut}/mois`;
+      const priceText = toPdfText(`${salaireBrut}/mois`);
       const priceWidth = fontBold.widthOfTextAtSize(priceText, 10);
       page.drawText(priceText, {
         x: config.pageWidth - config.margin - priceWidth - 12,
