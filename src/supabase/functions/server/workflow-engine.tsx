@@ -109,6 +109,46 @@ async function persistWorkflowStats(supabase: any, dbReady: boolean, workflow: a
   }
 }
 
+function getWorkflowRunMarkerKey(workflowId: string): string {
+  return `workflow_last_run:${workflowId}`;
+}
+
+function hasWorkflowRun(prospect: any, workflowId: string): boolean {
+  const customFields = prospect?.custom_fields || {};
+  const automationFlags = customFields?.automation_flags || {};
+  return Boolean(automationFlags[getWorkflowRunMarkerKey(workflowId)]);
+}
+
+async function markWorkflowRun(supabase: any, prospect: any, workflowId: string) {
+  try {
+    const customFields = prospect?.custom_fields || {};
+    const automationFlags = customFields?.automation_flags || {};
+    const updatedFlags = {
+      ...automationFlags,
+      [getWorkflowRunMarkerKey(workflowId)]: new Date().toISOString(),
+    };
+
+    const updatedCustomFields = {
+      ...customFields,
+      automation_flags: updatedFlags,
+    };
+
+    const { error } = await supabase
+      .from('prospects')
+      .update({ custom_fields: updatedCustomFields })
+      .eq('id', prospect.id);
+
+    if (error) {
+      console.error('⚠️ Erreur update workflow marker:', error);
+      return;
+    }
+
+    prospect.custom_fields = updatedCustomFields;
+  } catch (error) {
+    console.error('⚠️ Erreur update workflow marker (non-bloquant):', error);
+  }
+}
+
 /**
  * 🌍 Trouve le template d'email dans la langue du prospect
  * @param templateId - ID du template de base (ex: 'tpl-waitlist-welcome')
@@ -974,6 +1014,111 @@ app.post("/trigger/:trigger_type", async (c) => {
     });
   } catch (error: any) {
     console.error("❌ Erreur trigger workflows:", error);
+    return c.json({ success: false, error: error.message }, 500);
+  }
+});
+
+/**
+ * POST /run-scheduled
+ * Exécuter les workflows "scheduled" (à appeler via Cron externe)
+ */
+app.post("/run-scheduled", async (c) => {
+  try {
+    const cronSecret = Deno.env.get("CRON_SECRET");
+    if (cronSecret) {
+      const authHeader = c.req.header("Authorization") || "";
+      const bearer = authHeader.replace("Bearer ", "").trim();
+      const headerSecret = c.req.header("x-cron-secret") || bearer;
+      if (!headerSecret || headerSecret !== cronSecret) {
+        return c.json({ success: false, error: "Unauthorized" }, 401);
+      }
+    }
+
+    const body = await c.req.json().catch(() => ({}));
+    const limit = Math.min(parseInt(body?.limit || "500"), 2000);
+    const workflowIdFilter = body?.workflow_id as string | undefined;
+
+    const supabase = getSupabaseClient();
+    const dbReady = await isAutomationsDbReady(supabase);
+    const allWorkflows = await loadWorkflows(supabase, dbReady);
+
+    const scheduledWorkflows = allWorkflows.filter(w =>
+      w.status === 'active' &&
+      w.trigger?.type === 'scheduled' &&
+      (!workflowIdFilter || w.id === workflowIdFilter)
+    );
+
+    if (scheduledWorkflows.length === 0) {
+      return c.json({
+        success: true,
+        message: 'Aucun workflow scheduled actif',
+        workflows: 0,
+      });
+    }
+
+    const { data: prospects, error: prospectsError } = await supabase
+      .from('prospects')
+      .select('*')
+      .eq('is_archived', false)
+      .order('updated_at', { ascending: false })
+      .limit(limit);
+
+    if (prospectsError) {
+      return c.json({ success: false, error: prospectsError.message }, 500);
+    }
+
+    const results: any[] = [];
+    let totalTriggered = 0;
+
+    for (const workflow of scheduledWorkflows) {
+      let workflowTriggered = 0;
+
+      for (const prospect of prospects || []) {
+        try {
+          if (hasWorkflowRun(prospect, workflow.id)) {
+            continue;
+          }
+
+          const conditionsMet = evaluateConditions(prospect, workflow.conditions || []);
+          if (!conditionsMet) {
+            continue;
+          }
+
+          const response = await fetch(
+            `${c.req.url.split('/run-scheduled')[0]}/execute/${workflow.id}/${prospect.id}`,
+            { method: 'POST', headers: { 'Content-Type': 'application/json' } }
+          );
+
+          const result = await response.json();
+          if (result?.success) {
+            workflowTriggered += 1;
+            totalTriggered += 1;
+            await markWorkflowRun(supabase, prospect, workflow.id);
+          }
+        } catch (error: any) {
+          results.push({
+            workflow_id: workflow.id,
+            prospect_id: prospect.id,
+            success: false,
+            error: error.message,
+          });
+        }
+      }
+
+      results.push({
+        workflow_id: workflow.id,
+        triggered: workflowTriggered,
+      });
+    }
+
+    return c.json({
+      success: true,
+      workflows: scheduledWorkflows.length,
+      total_triggered: totalTriggered,
+      results,
+    });
+  } catch (error: any) {
+    console.error("❌ Erreur run-scheduled:", error);
     return c.json({ success: false, error: error.message }, 500);
   }
 });
