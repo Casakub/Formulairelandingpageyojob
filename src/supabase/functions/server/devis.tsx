@@ -11,6 +11,50 @@ const devis = new Hono();
 const INTERNAL_CONTACT_EMAIL = 'contact@yojob.fr';
 const DEVIS_PDF_BUCKET = 'yojob-devis-pdfs';
 let devisPdfBucketReady: boolean | null = null;
+const PDF_SANITIZE_SPACES = /[\u00A0\u1680\u2000-\u200A\u202F\u205F\u3000]/g;
+const WIN_ANSI_EXTRA_CODES = new Set([
+  0x20AC, 0x201A, 0x0192, 0x201E, 0x2026, 0x2020, 0x2021, 0x02C6,
+  0x2030, 0x0160, 0x2039, 0x0152, 0x017D, 0x2018, 0x2019, 0x201C,
+  0x201D, 0x2022, 0x2013, 0x2014, 0x02DC, 0x2122, 0x0161, 0x203A,
+  0x0153, 0x017E, 0x0178,
+]);
+
+const isWinAnsiCodePoint = (code: number) => {
+  if (code === 0x0A || code === 0x0D || code === 0x09) return true;
+  if (code >= 0x20 && code <= 0x7E) return true;
+  if (code >= 0xA0 && code <= 0xFF) return true;
+  return WIN_ANSI_EXTRA_CODES.has(code);
+};
+
+const toPdfText = (value: unknown): string => {
+  if (value === null || value === undefined) return '';
+  const normalized = String(value)
+    .replace(PDF_SANITIZE_SPACES, ' ')
+    .replace(/\\n/g, '\n')
+    .replace(/\\r/g, '\n')
+    .replace(/\\t/g, ' ')
+    .replace(/\r\n/g, '\n')
+    .replace(/\r/g, '\n');
+
+  let out = '';
+  for (const char of normalized) {
+    const code = char.codePointAt(0);
+    if (code && isWinAnsiCodePoint(code)) {
+      out += char;
+    } else {
+      out += '?';
+    }
+  }
+  return out;
+};
+
+type PdfTemplateVersion = 'v1' | 'v2-modern';
+
+const resolvePdfTemplateVersion = (value?: string | null): PdfTemplateVersion =>
+  value === 'v2-modern' ? 'v2-modern' : 'v1';
+
+const getDefaultPdfTemplateVersion = (): PdfTemplateVersion =>
+  resolvePdfTemplateVersion(Deno.env.get('DEVIS_PDF_TEMPLATE_VERSION'));
 
 function formatDateForPdf(dateInput?: string): string {
   if (!dateInput) return '';
@@ -69,9 +113,10 @@ async function ensureDevisPdfBucket(supabase: any) {
 }
 
 function wrapTextForPdf(text: string, font: any, fontSize: number, maxWidth: number): string[] {
-  if (!text) return [];
+  const safeText = toPdfText(text);
+  if (!safeText) return [];
   const lines: string[] = [];
-  const paragraphs = text.split('\n');
+  const paragraphs = safeText.split('\n');
 
   paragraphs.forEach((paragraph, index) => {
     if (!paragraph.trim()) {
@@ -113,6 +158,17 @@ async function generateDevisPdfBytes(prospect: any, inclureCGV: boolean): Promis
   const fontRegular = await pdfDoc.embedFont(StandardFonts.Helvetica);
   const fontBold = await pdfDoc.embedFont(StandardFonts.HelveticaBold);
   const fontMono = await pdfDoc.embedFont(StandardFonts.Courier);
+
+  const measureTextWidth = (font: any, text: string, fontSize: number) =>
+    font.widthOfTextAtSize(toPdfText(text), fontSize);
+
+  const drawTextSafe = (text: string, options: any) => {
+    page.drawText(toPdfText(text), options);
+  };
+
+  const drawTextOnPage = (targetPage: any, text: string, options: any) => {
+    targetPage.drawText(toPdfText(text), options);
+  };
 
   const pageWidth = 595.28;
   const pageHeight = 841.89;
@@ -248,11 +304,11 @@ async function generateDevisPdfBytes(prospect: any, inclureCGV: boolean): Promis
       const rowHeight = Math.max(...heights);
       rowEntries.forEach((entry, index) => {
         const xPos = x + index * (columnWidth + gap);
-        page.drawText(entry.label, { x: xPos, y: yCursor, size: labelSize, font: fontBold, color: labelColor });
+        drawTextSafe(entry.label, { x: xPos, y: yCursor, size: labelSize, font: fontBold, color: labelColor });
         const lines = wrapValue(entry.value, columnWidth, valueSize);
         let lineY = yCursor - labelSize - 3;
         lines.forEach((line) => {
-          page.drawText(line, { x: xPos, y: lineY, size: valueSize, font: fontRegular, color: valueColor });
+          drawTextSafe(line, { x: xPos, y: lineY, size: valueSize, font: fontRegular, color: valueColor });
           lineY -= valueSize + 2;
         });
       });
@@ -275,7 +331,7 @@ async function generateDevisPdfBytes(prospect: any, inclureCGV: boolean): Promis
         yCursor -= fontSize + lineGap;
         return;
       }
-      page.drawText(line, { x, y: yCursor, size: fontSize, font, color });
+      drawTextSafe(line, { x, y: yCursor, size: fontSize, font, color });
       yCursor -= fontSize + lineGap;
     });
     return yTop - yCursor;
@@ -285,7 +341,7 @@ async function generateDevisPdfBytes(prospect: any, inclureCGV: boolean): Promis
     const fontSize = 9;
     const paddingX = 10;
     const paddingY = 4;
-    const textWidth = fontBold.widthOfTextAtSize(text, fontSize);
+    const textWidth = measureTextWidth(fontBold, text, fontSize);
     const badgeWidth = textWidth + paddingX * 2;
     const badgeHeight = fontSize + paddingY * 2;
     page.drawRectangle({
@@ -295,7 +351,7 @@ async function generateDevisPdfBytes(prospect: any, inclureCGV: boolean): Promis
       height: badgeHeight,
       color: toPdfColor(fill),
     });
-    page.drawText(text, {
+    drawTextSafe(text, {
       x: x + paddingX,
       y: yPos + paddingY - 1,
       size: fontSize,
@@ -330,14 +386,14 @@ async function generateDevisPdfBytes(prospect: any, inclureCGV: boolean): Promis
     const headerHeight = 80;
     drawGradientRect(0, pageHeight - headerHeight, pageWidth, headerHeight, colors.violet, colors.cyan);
 
-    page.drawText('YOJOB', {
+    drawTextSafe('YOJOB', {
       x: margin,
       y: pageHeight - 32,
       size: 20,
       font: fontBold,
       color: toPdfColor(colors.white),
     });
-    page.drawText('Courtage en recrutement europeen', {
+    drawTextSafe('Courtage en recrutement europeen', {
       x: margin,
       y: pageHeight - 48,
       size: 8.5,
@@ -346,14 +402,14 @@ async function generateDevisPdfBytes(prospect: any, inclureCGV: boolean): Promis
     });
 
     const infoX = pageWidth - margin - 220;
-    page.drawText('DEVIS', {
+    drawTextSafe('DEVIS', {
       x: infoX,
       y: pageHeight - 30,
       size: 9,
       font: fontBold,
       color: toPdfColor(colors.white),
     });
-    page.drawText(prospect.numero || '-', {
+    drawTextSafe(prospect.numero || '-', {
       x: infoX + 38,
       y: pageHeight - 30,
       size: 10,
@@ -362,7 +418,7 @@ async function generateDevisPdfBytes(prospect: any, inclureCGV: boolean): Promis
     });
 
     const badgeFontSize = 9;
-    const badgeWidth = fontBold.widthOfTextAtSize(statusLabel, badgeFontSize) + 20;
+    const badgeWidth = measureTextWidth(fontBold, statusLabel, badgeFontSize) + 20;
     const badgeHeight = badgeFontSize + 8;
     const badgeX = pageWidth - margin - badgeWidth;
     const badgeY = pageHeight - 36;
@@ -373,7 +429,7 @@ async function generateDevisPdfBytes(prospect: any, inclureCGV: boolean): Promis
       height: badgeHeight,
       color: toPdfColor(isSigned ? colors.green : colors.magenta),
     });
-    page.drawText(statusLabel, {
+    drawTextSafe(statusLabel, {
       x: badgeX + 10,
       y: badgeY + 4,
       size: badgeFontSize,
@@ -381,14 +437,14 @@ async function generateDevisPdfBytes(prospect: any, inclureCGV: boolean): Promis
       color: toPdfColor(colors.white),
     });
 
-    page.drawText(`Cree le: ${createdLabel || '-'}`, {
+    drawTextSafe(`Cree le: ${createdLabel || '-'}`, {
       x: margin,
       y: pageHeight - 66,
       size: 8,
       font: fontRegular,
       color: toPdfColor(tint(colors.white, 0.7)),
     });
-    page.drawText(`Valable jusqu'au: ${validUntilLabel || '-'}`, {
+    drawTextSafe(`Valable jusqu'au: ${validUntilLabel || '-'}`, {
       x: margin + 160,
       y: pageHeight - 66,
       size: 8,
@@ -464,7 +520,7 @@ async function generateDevisPdfBytes(prospect: any, inclureCGV: boolean): Promis
       height: 10,
       color: toPdfColor(color),
     });
-    page.drawText(title, {
+    drawTextSafe(title, {
       x: margin + 26,
       y: y - headerHeight + 7,
       size: 9.5,
@@ -473,14 +529,14 @@ async function generateDevisPdfBytes(prospect: any, inclureCGV: boolean): Promis
     });
 
     const contentTop = y - headerHeight - padding;
-    page.drawText(leftTitle, {
+    drawTextSafe(leftTitle, {
       x: margin + padding,
       y: contentTop,
       size: columnTitleSize,
       font: fontBold,
       color: toPdfColor(colors.textLight),
     });
-    page.drawText(rightTitle, {
+    drawTextSafe(rightTitle, {
       x: margin + padding + columnWidth + columnGap,
       y: contentTop,
       size: columnTitleSize,
@@ -608,7 +664,7 @@ async function generateDevisPdfBytes(prospect: any, inclureCGV: boolean): Promis
     let localY = cursorY;
     if (leftTitle || rightTitle) {
       if (leftTitle) {
-        page.drawText(leftTitle, {
+        drawTextSafe(leftTitle, {
           x: margin + sectionPadding,
           y: localY,
           size: titleSize,
@@ -617,7 +673,7 @@ async function generateDevisPdfBytes(prospect: any, inclureCGV: boolean): Promis
         });
       }
       if (rightTitle) {
-        page.drawText(rightTitle, {
+        drawTextSafe(rightTitle, {
           x: margin + sectionPadding + columnWidth + columnGap,
           y: localY,
           size: titleSize,
@@ -678,7 +734,7 @@ async function generateDevisPdfBytes(prospect: any, inclureCGV: boolean): Promis
     const prixHeader = coutTotal
       ? `${formatCurrency(coutTotal)}/mois`
       : (salaireBrutLabel ? `${salaireBrutLabel}/mois` : '');
-    const priceWidth = prixHeader ? fontBold.widthOfTextAtSize(prixHeader, 9.5) : 0;
+    const priceWidth = prixHeader ? measureTextWidth(fontBold, prixHeader, 9.5) : 0;
 
     const group1Left = [
       { label: 'Salaire brut', value: salaireBrutLabel || '' },
@@ -741,7 +797,7 @@ async function generateDevisPdfBytes(prospect: any, inclureCGV: boolean): Promis
       borderWidth: 1,
     });
 
-    page.drawText(`POSTE #${index + 1} - ${(posteLabel || 'Poste').toUpperCase()}`, {
+    drawTextSafe(`POSTE #${index + 1} - ${(posteLabel || 'Poste').toUpperCase()}`, {
       x: margin + sectionPadding,
       y: y - 20,
       size: posteHeaderFont,
@@ -749,7 +805,7 @@ async function generateDevisPdfBytes(prospect: any, inclureCGV: boolean): Promis
       color: toPdfColor(colors.violet),
     });
     if (prixHeader) {
-      page.drawText(prixHeader, {
+      drawTextSafe(prixHeader, {
         x: margin + contentWidth - sectionPadding - priceWidth,
         y: y - 20,
         size: 9.5,
@@ -761,7 +817,7 @@ async function generateDevisPdfBytes(prospect: any, inclureCGV: boolean): Promis
     const badgeText = secteurLabel || '';
     if (badgeText) {
       const badgeFontSize = 9;
-      const badgeTextWidth = fontBold.widthOfTextAtSize(badgeText, badgeFontSize);
+      const badgeTextWidth = measureTextWidth(fontBold, badgeText, badgeFontSize);
       const badgeWidth = badgeTextWidth + 20;
       const rightEdge = margin + contentWidth - sectionPadding;
       const badgeX = Math.max(margin + sectionPadding, rightEdge - (priceWidth ? priceWidth + 10 : 0) - badgeWidth);
@@ -837,7 +893,7 @@ async function generateDevisPdfBytes(prospect: any, inclureCGV: boolean): Promis
       height: conditionsHeaderHeight,
       color: toPdfColor(tint(colors.violet, 0.08)),
     });
-    page.drawText('CONDITIONS DE TRAVAIL', {
+    drawTextSafe('CONDITIONS DE TRAVAIL', {
       x: margin + conditionsPadding,
       y: y - conditionsHeaderHeight + 6,
       size: 9.5,
@@ -940,7 +996,7 @@ async function generateDevisPdfBytes(prospect: any, inclureCGV: boolean): Promis
       height: profileHeaderHeight,
       color: toPdfColor(tint(colors.magenta, 0.08)),
     });
-    page.drawText('PROFIL DES CANDIDATS RECHERCHES', {
+    drawTextSafe('PROFIL DES CANDIDATS RECHERCHES', {
       x: margin + profilePadding,
       y: y - profileHeaderHeight + 6,
       size: 9.5,
@@ -989,7 +1045,7 @@ async function generateDevisPdfBytes(prospect: any, inclureCGV: boolean): Promis
       height: recapHeaderHeight,
       color: toPdfColor(tint(colors.cyan, 0.12)),
     });
-    page.drawText('RECAPITULATIF DE LA DEMANDE', {
+    drawTextSafe('RECAPITULATIF DE LA DEMANDE', {
       x: margin + recapPadding,
       y: y - recapHeaderHeight + 6,
       size: 9.5,
@@ -1083,7 +1139,7 @@ async function generateDevisPdfBytes(prospect: any, inclureCGV: boolean): Promis
     height: signatureTitleHeight,
     color: toPdfColor(tint(signatureColor, 0.16)),
   });
-  page.drawText(isSigned ? 'CERTIFICAT DE SIGNATURE ELECTRONIQUE' : 'A SIGNER - SIGNATURE REQUISE', {
+  drawTextSafe(isSigned ? 'CERTIFICAT DE SIGNATURE ELECTRONIQUE' : 'A SIGNER - SIGNATURE REQUISE', {
     x: margin + signaturePadding,
     y: y - signatureTitleHeight + 6,
     size: 9.5,
@@ -1122,7 +1178,7 @@ async function generateDevisPdfBytes(prospect: any, inclureCGV: boolean): Promis
   signatureCursor -= Math.max(signatureIdentHeight, signatureMetaHeight) + 10;
 
   if (signatureHashEntries.length) {
-    page.drawText('PREUVE D\'INTEGRITE DU DOCUMENT', {
+    drawTextSafe('PREUVE D\'INTEGRITE DU DOCUMENT', {
       x: margin + signaturePadding,
       y: signatureCursor,
       size: 8.5,
@@ -1178,7 +1234,7 @@ async function generateDevisPdfBytes(prospect: any, inclureCGV: boolean): Promis
       console.error('⚠️ Erreur embed signature image:', error);
     }
   } else {
-    page.drawText('Espace signature', {
+    drawTextSafe('Espace signature', {
       x: margin + signaturePadding + 16,
       y: y - signatureHeight + signaturePadding + signatureBoxHeight / 2 - 4,
       size: 8.5,
@@ -1192,7 +1248,7 @@ async function generateDevisPdfBytes(prospect: any, inclureCGV: boolean): Promis
     drawParagraph(consentMentions, margin + signaturePadding, consentY, contentWidth - signaturePadding * 2, 8.5, 3, toPdfColor(colors.dark));
     if (consentDate) {
       const consentTextHeight = measureParagraph(consentMentions, contentWidth - signaturePadding * 2, 8.5, 3);
-      page.drawText(`CGV acceptees le: ${consentDate}`, {
+      drawTextSafe(`CGV acceptees le: ${consentDate}`, {
         x: margin + signaturePadding,
         y: consentY - consentTextHeight - 2,
         size: 8,
@@ -1241,7 +1297,7 @@ async function generateDevisPdfBytes(prospect: any, inclureCGV: boolean): Promis
       borderColor: toPdfColor(tint(colors.violet, 0.12)),
       borderWidth: 1,
     });
-    page.drawText('CONDITIONS GENERALES & MENTIONS LEGALES', {
+    drawTextSafe('CONDITIONS GENERALES & MENTIONS LEGALES', {
       x: margin + 12,
       y: y - 14,
       size: 9,
@@ -1277,7 +1333,7 @@ async function generateDevisPdfBytes(prospect: any, inclureCGV: boolean): Promis
       color: toPdfColor(tint(colors.violet, 0.2)),
     });
     const footerText = 'YOJOB - contact@yojob.fr - +33 1 23 45 67 89 - yojob.fr';
-    currentPage.drawText(footerText, {
+    drawTextOnPage(currentPage, footerText, {
       x: margin,
       y: 14,
       size: 8,
@@ -1285,7 +1341,7 @@ async function generateDevisPdfBytes(prospect: any, inclureCGV: boolean): Promis
       color: toPdfColor(colors.textLight),
     });
     if (generatedLabel) {
-      currentPage.drawText(`Genere le: ${generatedLabel}`, {
+      drawTextOnPage(currentPage, `Genere le: ${generatedLabel}`, {
         x: margin,
         y: 4,
         size: 7.5,
@@ -1294,8 +1350,8 @@ async function generateDevisPdfBytes(prospect: any, inclureCGV: boolean): Promis
       });
     }
     const pageLabel = `Page ${index + 1}/${totalPages}`;
-    const pageLabelWidth = fontRegular.widthOfTextAtSize(pageLabel, 8);
-    currentPage.drawText(pageLabel, {
+    const pageLabelWidth = measureTextWidth(fontRegular, pageLabel, 8);
+    drawTextOnPage(currentPage, pageLabel, {
       x: pageWidth - margin - pageLabelWidth,
       y: 14,
       size: 8,
@@ -1307,13 +1363,1119 @@ async function generateDevisPdfBytes(prospect: any, inclureCGV: boolean): Promis
   return await pdfDoc.save();
 }
 
+async function generateDevisPdfBytesV2(prospect: any, inclureCGV: boolean): Promise<Uint8Array> {
+  const pdfDoc = await PDFDocument.create();
+  const fontRegular = await pdfDoc.embedFont(StandardFonts.Helvetica);
+  const fontBold = await pdfDoc.embedFont(StandardFonts.HelveticaBold);
+  const fontMono = await pdfDoc.embedFont(StandardFonts.Courier);
+
+  const pageWidth = 595.28;
+  const pageHeight = 841.89;
+  const marginX = 42;
+  const marginBottom = 46;
+  const headerBandHeight = 54;
+  const headerInfoHeight = 18;
+  const headerHeight = headerBandHeight + headerInfoHeight + 10;
+  const footerHeight = 34;
+  const contentWidth = pageWidth - marginX * 2;
+  const columnGap = 16;
+  const cardRadius = 14;
+  const cardPadding = 12;
+
+  const hexToRgb = (hex: string) => {
+    const cleaned = hex.replace('#', '').trim();
+    const value = cleaned.length === 3
+      ? cleaned.split('').map((c) => c + c).join('')
+      : cleaned.padEnd(6, '0');
+    const num = parseInt(value, 16);
+    return {
+      r: ((num >> 16) & 255) / 255,
+      g: ((num >> 8) & 255) / 255,
+      b: (num & 255) / 255,
+    };
+  };
+
+  const mixColors = (a: any, b: any, ratio: number) => ({
+    r: a.r + (b.r - a.r) * ratio,
+    g: a.g + (b.g - a.g) * ratio,
+    b: a.b + (b.b - a.b) * ratio,
+  });
+
+  const tint = (color: any, amount: number) => mixColors({ r: 1, g: 1, b: 1 }, color, amount);
+  const toPdfColor = (color: any) => rgb(color.r, color.g, color.b);
+
+  const colors = {
+    bg: hexToRgb('#F9F9FC'),
+    primary: hexToRgb('#695EE2'),
+    secondary: hexToRgb('#6B3BD9'),
+    navy: hexToRgb('#1A2A60'),
+    success: hexToRgb('#66CE8D'),
+    warning: hexToRgb('#D6B12C'),
+    text: hexToRgb('#0F172A'),
+    muted: hexToRgb('#64748B'),
+    white: hexToRgb('#FFFFFF'),
+    shadow: hexToRgb('#E6E8F5'),
+  };
+  const borderColor = tint(colors.primary, 0.2);
+
+  const measureTextWidth = (font: any, text: string, fontSize: number) =>
+    font.widthOfTextAtSize(toPdfText(text), fontSize);
+
+  const drawTextSafe = (text: string, options: any) => {
+    page.drawText(toPdfText(text), options);
+  };
+
+  const drawTextOnPage = (targetPage: any, text: string, options: any) => {
+    targetPage.drawText(toPdfText(text), options);
+  };
+
+  const drawGradientRect = (x: number, yPos: number, width: number, height: number, from: any, to: any, steps = 36) => {
+    const stepWidth = width / steps;
+    for (let i = 0; i < steps; i += 1) {
+      const ratio = steps === 1 ? 0 : i / (steps - 1);
+      const color = mixColors(from, to, ratio);
+      page.drawRectangle({
+        x: x + i * stepWidth,
+        y: yPos,
+        width: stepWidth + 0.5,
+        height,
+        color: toPdfColor(color),
+      });
+    }
+  };
+
+  const drawRoundedRect = (x: number, yPos: number, width: number, height: number, radius: number, options: any) => {
+    const r = Math.max(0, Math.min(radius, width / 2, height / 2));
+    if (typeof (page as any).drawSvgPath !== 'function' || r === 0) {
+      page.drawRectangle({
+        x,
+        y: yPos,
+        width,
+        height,
+        color: options.color,
+        borderColor: options.borderColor,
+        borderWidth: options.borderWidth,
+      });
+      return;
+    }
+    const path = `M${r} 0 H${width - r} A${r} ${r} 0 0 1 ${width} ${r} V${height - r} A${r} ${r} 0 0 1 ${width - r} ${height} H${r} A${r} ${r} 0 0 1 0 ${height - r} V${r} A${r} ${r} 0 0 1 ${r} 0 Z`;
+    page.drawSvgPath(path, {
+      x,
+      y: yPos,
+      color: options.color,
+      borderColor: options.borderColor,
+      borderWidth: options.borderWidth,
+    });
+  };
+
+  const drawShadowRect = (x: number, yTop: number, width: number, height: number) => {
+    drawRoundedRect(x + 2, yTop - height - 2, width, height, cardRadius, {
+      color: toPdfColor(colors.shadow),
+    });
+  };
+
+  const drawCard = (x: number, yTop: number, width: number, height: number, title: string, accent: any) => {
+    drawShadowRect(x, yTop, width, height);
+    drawRoundedRect(x, yTop - height, width, height, cardRadius, {
+      color: toPdfColor(colors.white),
+      borderColor: toPdfColor(borderColor),
+      borderWidth: 1,
+    });
+    if (title) {
+      page.drawRectangle({
+        x,
+        y: yTop - 3,
+        width,
+        height: 3,
+        color: toPdfColor(tint(accent, 0.6)),
+      });
+      page.drawRectangle({
+        x,
+        y: yTop - 3,
+        width: width * 0.4,
+        height: 3,
+        color: toPdfColor(tint(accent, 0.85)),
+      });
+      drawTextSafe(title, {
+        x: x + cardPadding,
+        y: yTop - cardPadding - 2,
+        size: 11.5,
+        font: fontBold,
+        color: toPdfColor(accent),
+      });
+    }
+  };
+
+  const drawBadge = (text: string, fill: any, x: number, yPos: number) => {
+    const fontSize = 8.5;
+    const paddingX = 8;
+    const paddingY = 3;
+    const textWidth = measureTextWidth(fontBold, text, fontSize);
+    const badgeWidth = textWidth + paddingX * 2;
+    const badgeHeight = fontSize + paddingY * 2;
+    drawRoundedRect(x, yPos, badgeWidth, badgeHeight, 6, {
+      color: toPdfColor(fill),
+      borderColor: toPdfColor(fill),
+      borderWidth: 1,
+    });
+    drawTextSafe(text, {
+      x: x + paddingX,
+      y: yPos + paddingY - 1,
+      size: fontSize,
+      font: fontBold,
+      color: toPdfColor(colors.white),
+    });
+    return badgeWidth;
+  };
+
+  const wrapValue = (value: string, width: number, fontSize: number, font: any = fontRegular) =>
+    wrapTextForPdf(value, font, fontSize, width);
+
+  const measureKeyValueGrid = (
+    entries: Array<{ label: string; value: string }>,
+    width: number,
+    columns: number,
+    labelSize: number,
+    valueSize: number,
+    rowGap: number,
+    gap: number
+  ) => {
+    const filtered = entries.filter((entry) => entry.value);
+    if (!filtered.length) return 0;
+    const columnWidth = (width - gap * (columns - 1)) / columns;
+    let totalHeight = 0;
+    for (let i = 0; i < filtered.length; i += columns) {
+      const rowEntries = filtered.slice(i, i + columns);
+      const heights = rowEntries.map((entry) => {
+        const lines = wrapValue(entry.value, columnWidth, valueSize);
+        return labelSize + 4 + lines.length * (valueSize + 2);
+      });
+      totalHeight += Math.max(...heights) + rowGap;
+    }
+    return totalHeight;
+  };
+
+  const drawKeyValueGrid = (
+    entries: Array<{ label: string; value: string }>,
+    x: number,
+    yTop: number,
+    width: number,
+    columns: number,
+    labelSize: number,
+    valueSize: number,
+    rowGap: number,
+    gap: number,
+    labelColor: any,
+    valueColor: any
+  ) => {
+    const filtered = entries.filter((entry) => entry.value);
+    if (!filtered.length) return 0;
+    const columnWidth = (width - gap * (columns - 1)) / columns;
+    let yCursor = yTop;
+    let totalHeight = 0;
+    for (let i = 0; i < filtered.length; i += columns) {
+      const rowEntries = filtered.slice(i, i + columns);
+      const heights = rowEntries.map((entry) => {
+        const lines = wrapValue(entry.value, columnWidth, valueSize);
+        return labelSize + 4 + lines.length * (valueSize + 2);
+      });
+      const rowHeight = Math.max(...heights);
+      rowEntries.forEach((entry, index) => {
+        const xPos = x + index * (columnWidth + gap);
+        drawTextSafe(entry.label, { x: xPos, y: yCursor, size: labelSize, font: fontBold, color: labelColor });
+        const lines = wrapValue(entry.value, columnWidth, valueSize);
+        let lineY = yCursor - labelSize - 3;
+        lines.forEach((line) => {
+          drawTextSafe(line, { x: xPos, y: lineY, size: valueSize, font: fontRegular, color: valueColor });
+          lineY -= valueSize + 2;
+        });
+      });
+      yCursor -= rowHeight + rowGap;
+      totalHeight += rowHeight + rowGap;
+    }
+    return totalHeight;
+  };
+
+  const measureParagraph = (text: string, width: number, fontSize: number, lineGap: number, font: any = fontRegular) => {
+    const lines = wrapTextForPdf(text, font, fontSize, width);
+    return lines.length * (fontSize + lineGap);
+  };
+
+  const drawParagraph = (text: string, x: number, yTop: number, width: number, fontSize: number, lineGap: number, color: any, font: any = fontRegular) => {
+    const lines = wrapTextForPdf(text, font, fontSize, width);
+    let yCursor = yTop;
+    lines.forEach((line) => {
+      if (!line) {
+        yCursor -= fontSize + lineGap;
+        return;
+      }
+      drawTextSafe(line, { x, y: yCursor, size: fontSize, font, color });
+      yCursor -= fontSize + lineGap;
+    });
+    return yTop - yCursor;
+  };
+
+  const measureChecklist = (items: string[], width: number, fontSize: number, lineGap: number) => {
+    return items.reduce((total, item) => {
+      const lines = wrapTextForPdf(item, fontRegular, fontSize, width - 14);
+      return total + lines.length * (fontSize + lineGap) + lineGap;
+    }, 0);
+  };
+
+  const drawChecklist = (items: string[], x: number, yTop: number, width: number, fontSize: number, lineGap: number, color: any) => {
+    const boxSize = 6;
+    let yCursor = yTop;
+    items.forEach((item) => {
+      const lines = wrapTextForPdf(item, fontRegular, fontSize, width - 14);
+      if (!lines.length) return;
+      page.drawRectangle({
+        x,
+        y: yCursor - boxSize + 1,
+        width: boxSize,
+        height: boxSize,
+        borderColor: toPdfColor(borderColor),
+        borderWidth: 1,
+        color: toPdfColor(colors.white),
+      });
+      lines.forEach((line, idx) => {
+        drawTextSafe(line, {
+          x: x + boxSize + 6,
+          y: yCursor - idx * (fontSize + lineGap),
+          size: fontSize,
+          font: fontRegular,
+          color,
+        });
+      });
+      yCursor -= lines.length * (fontSize + lineGap) + lineGap;
+    });
+    return yTop - yCursor;
+  };
+
+  const getTextValue = (value: any): string => {
+    if (!value) return '';
+    if (typeof value === 'string') return value;
+    if (typeof value === 'number') return String(value);
+    if (typeof value === 'object') {
+      return value.Français || value.fr || value.French || value.label || Object.values(value)[0] || '';
+    }
+    return String(value);
+  };
+
+  const formatDateShort = (input?: string) => {
+    if (!input) return '';
+    const date = new Date(input);
+    if (Number.isNaN(date.getTime())) return '';
+    return date.toLocaleDateString('fr-FR');
+  };
+
+  const cgv = cgvFR;
+  const entreprise = prospect.entreprise || {};
+  const contact = prospect.contact || {};
+  const conditions = prospect.conditions || {};
+  const candidats = prospect.candidats || {};
+  const postes = Array.isArray(prospect.postes) ? prospect.postes : [];
+  const totalCandidats = postes.reduce((sum: number, poste: any) => sum + (Number(poste?.quantite) || 0), 0);
+  const secteurPrincipalRaw = postes[0]?.secteur ? getTextValue(postes[0].secteur) : '';
+  const secteurPrincipal = secteurPrincipalRaw ? (mapDevisSector(secteurPrincipalRaw) || secteurPrincipalRaw) : '';
+
+  const isSigned = prospect?.statut === 'signe' || Boolean(prospect?.signature);
+  const statusLabel = isSigned ? 'SIGNE' : 'A SIGNER';
+  const createdLabel = formatDateForPdf(prospect.createdAt) || '-';
+  const signatureExpiry =
+    prospect?.signatureLinkExpiresAt ||
+    prospect?.signature_link_expires_at ||
+    prospect?.custom_fields?.signature_link_expires_at;
+  let validUntilLabel = '';
+  if (signatureExpiry) {
+    validUntilLabel = formatDateForPdf(signatureExpiry) || '';
+  } else if (prospect.createdAt) {
+    const created = new Date(prospect.createdAt);
+    if (!Number.isNaN(created.getTime())) {
+      created.setDate(created.getDate() + 30);
+      validUntilLabel = formatDateForPdf(created.toISOString());
+    }
+  }
+
+  let page = pdfDoc.addPage([pageWidth, pageHeight]);
+  let y = pageHeight - headerHeight - 8;
+
+  const drawHeader = () => {
+    page.drawRectangle({
+      x: 0,
+      y: 0,
+      width: pageWidth,
+      height: pageHeight,
+      color: toPdfColor(colors.bg),
+    });
+    drawGradientRect(
+      0,
+      pageHeight - headerBandHeight,
+      pageWidth,
+      headerBandHeight,
+      tint(colors.primary, 0.85),
+      tint(colors.secondary, 0.85)
+    );
+    drawTextSafe('YOJOB', {
+      x: marginX,
+      y: pageHeight - 28,
+      size: 18,
+      font: fontBold,
+      color: toPdfColor(colors.white),
+    });
+    drawTextSafe('Courtage en recrutement europeen', {
+      x: marginX,
+      y: pageHeight - 44,
+      size: 8.5,
+      font: fontRegular,
+      color: toPdfColor(tint(colors.white, 0.8)),
+    });
+
+    const infoWidth = 190;
+    const infoHeight = 30;
+    const infoX = pageWidth - marginX - infoWidth;
+    const infoY = pageHeight - 42;
+    drawRoundedRect(infoX, infoY, infoWidth, infoHeight, 8, {
+      color: toPdfColor(tint(colors.white, 0.95)),
+      borderColor: toPdfColor(tint(colors.white, 0.7)),
+      borderWidth: 0.5,
+    });
+    drawTextSafe('DEVIS', {
+      x: infoX + 10,
+      y: infoY + 18,
+      size: 8,
+      font: fontBold,
+      color: toPdfColor(colors.navy),
+    });
+    drawTextSafe(prospect.numero || '-', {
+      x: infoX + 52,
+      y: infoY + 18,
+      size: 9.5,
+      font: fontBold,
+      color: toPdfColor(colors.navy),
+    });
+    drawBadge(statusLabel, isSigned ? colors.success : colors.warning, infoX + infoWidth - 70, infoY + 6);
+
+    const dateY = pageHeight - headerBandHeight - 10;
+    drawTextSafe(`Cree le: ${createdLabel || '-'}`, {
+      x: marginX,
+      y: dateY,
+      size: 8.5,
+      font: fontRegular,
+      color: toPdfColor(colors.muted),
+    });
+    drawTextSafe(`Valable jusqu'au: ${validUntilLabel || '-'}`, {
+      x: marginX + 180,
+      y: dateY,
+      size: 8.5,
+      font: fontRegular,
+      color: toPdfColor(colors.muted),
+    });
+
+    y = pageHeight - headerHeight - 8;
+  };
+
+  const newPage = () => {
+    page = pdfDoc.addPage([pageWidth, pageHeight]);
+    drawHeader();
+  };
+
+  const ensureSpace = (needed: number) => {
+    if (y - needed < marginBottom + footerHeight) {
+      newPage();
+    }
+  };
+
+  drawHeader();
+
+  // Carte entreprise + contact
+  const infoCardWidth = (contentWidth - columnGap) / 2;
+  const columnTitleSize = 8;
+  const labelSize = 8;
+  const valueSize = 10.2;
+  const rowGap = 6;
+  const innerColumnWidth = (infoCardWidth - cardPadding * 2 - columnGap) / 2;
+  const entrepriseLeft = [
+    { label: 'Raison sociale', value: entreprise.raisonSociale || '' },
+    { label: 'Pays', value: entreprise.pays || '' },
+    { label: 'SIRET', value: entreprise.siret || '' },
+    { label: 'Code APE', value: entreprise.codeAPE || '' },
+    { label: 'TVA', value: entreprise.tvaIntracommunautaire || '' },
+  ].filter((entry) => entry.value);
+  const entrepriseRight = [
+    { label: 'Adresse', value: [entreprise.adresse, entreprise.codePostal, entreprise.ville, entreprise.region, entreprise.pays].filter(Boolean).join(' ') },
+    { label: 'Site web', value: entreprise.siteInternet || '' },
+  ].filter((entry) => entry.value);
+  const entrepriseLeftHeight = measureKeyValueGrid(entrepriseLeft, innerColumnWidth, 1, labelSize, valueSize, rowGap, 0);
+  const entrepriseRightHeight = measureKeyValueGrid(entrepriseRight, innerColumnWidth, 1, labelSize, valueSize, rowGap, 0);
+  const entrepriseHeight =
+    cardPadding * 2 +
+    columnTitleSize +
+    4 +
+    Math.max(entrepriseLeftHeight, entrepriseRightHeight) +
+    6;
+
+  const contactLeft = [
+    { label: 'Nom', value: [contact.prenom, contact.nom].filter(Boolean).join(' ') },
+    { label: 'Fonction', value: contact.fonction || '' },
+  ].filter((entry) => entry.value);
+  const contactRight = [
+    { label: 'Email', value: contact.email || '' },
+    { label: 'Telephone', value: contact.telephonePortable || contact.telephoneFixe || '' },
+  ].filter((entry) => entry.value);
+  const contactLeftHeight = measureKeyValueGrid(contactLeft, innerColumnWidth, 1, labelSize, valueSize, rowGap, 0);
+  const contactRightHeight = measureKeyValueGrid(contactRight, innerColumnWidth, 1, labelSize, valueSize, rowGap, 0);
+  const contactHeight =
+    cardPadding * 2 +
+    columnTitleSize +
+    4 +
+    Math.max(contactLeftHeight, contactRightHeight) +
+    6;
+
+  const topCardsHeight = Math.max(entrepriseHeight, contactHeight);
+  ensureSpace(topCardsHeight + 12);
+  drawCard(marginX, y, infoCardWidth, topCardsHeight, 'Client (Entreprise)', colors.primary);
+  drawCard(marginX + infoCardWidth + columnGap, y, infoCardWidth, topCardsHeight, 'Contact', colors.secondary);
+
+  const entrepriseContentTop = y - cardPadding - 14;
+  drawTextSafe('IDENTITE', {
+    x: marginX + cardPadding,
+    y: entrepriseContentTop,
+    size: columnTitleSize,
+    font: fontBold,
+    color: toPdfColor(colors.muted),
+  });
+  drawTextSafe('COORDONNEES', {
+    x: marginX + cardPadding + innerColumnWidth + columnGap,
+    y: entrepriseContentTop,
+    size: columnTitleSize,
+    font: fontBold,
+    color: toPdfColor(colors.muted),
+  });
+  drawKeyValueGrid(
+    entrepriseLeft,
+    marginX + cardPadding,
+    entrepriseContentTop - columnTitleSize - 3,
+    innerColumnWidth,
+    1,
+    labelSize,
+    valueSize,
+    rowGap,
+    0,
+    toPdfColor(colors.muted),
+    toPdfColor(colors.text)
+  );
+  drawKeyValueGrid(
+    entrepriseRight,
+    marginX + cardPadding + innerColumnWidth + columnGap,
+    entrepriseContentTop - columnTitleSize - 3,
+    innerColumnWidth,
+    1,
+    labelSize,
+    valueSize,
+    rowGap,
+    0,
+    toPdfColor(colors.muted),
+    toPdfColor(colors.text)
+  );
+
+  const contactContentTop = y - cardPadding - 14;
+  drawTextSafe('IDENTITE', {
+    x: marginX + infoCardWidth + columnGap + cardPadding,
+    y: contactContentTop,
+    size: columnTitleSize,
+    font: fontBold,
+    color: toPdfColor(colors.muted),
+  });
+  drawTextSafe('CONTACT', {
+    x: marginX + infoCardWidth + columnGap + cardPadding + innerColumnWidth + columnGap,
+    y: contactContentTop,
+    size: columnTitleSize,
+    font: fontBold,
+    color: toPdfColor(colors.muted),
+  });
+  drawKeyValueGrid(
+    contactLeft,
+    marginX + infoCardWidth + columnGap + cardPadding,
+    contactContentTop - columnTitleSize - 3,
+    innerColumnWidth,
+    1,
+    labelSize,
+    valueSize,
+    rowGap,
+    0,
+    toPdfColor(colors.muted),
+    toPdfColor(colors.text)
+  );
+  drawKeyValueGrid(
+    contactRight,
+    marginX + infoCardWidth + columnGap + cardPadding + innerColumnWidth + columnGap,
+    contactContentTop - columnTitleSize - 3,
+    innerColumnWidth,
+    1,
+    labelSize,
+    valueSize,
+    rowGap,
+    0,
+    toPdfColor(colors.muted),
+    toPdfColor(colors.text)
+  );
+
+  y -= topCardsHeight + 18;
+
+  // Carte synthese
+  const periodeSynthese = conditions.dateDebut || conditions.dateFin
+    ? `${formatDateShort(conditions.dateDebut) || '-'} → ${formatDateShort(conditions.dateFin) || '-'}`
+    : '';
+  const syntheseEntries = [
+    { label: 'Postes', value: postes.length ? String(postes.length) : '' },
+    { label: 'Candidats', value: totalCandidats ? String(totalCandidats) : '' },
+    { label: 'Secteur', value: secteurPrincipal || '' },
+    { label: 'Lieu', value: conditions.lieuxMission || conditions.lieu || '' },
+    { label: 'Periode', value: periodeSynthese || '' },
+  ].filter((entry) => entry.value);
+  const synthColumns = 3;
+  const synthHeight = cardPadding * 2 + 14 + measureKeyValueGrid(syntheseEntries, contentWidth - cardPadding * 2, synthColumns, labelSize, valueSize, 6, 8);
+  ensureSpace(synthHeight + 10);
+  drawCard(marginX, y, contentWidth, synthHeight, 'Synthese', colors.primary);
+  drawKeyValueGrid(
+    syntheseEntries,
+    marginX + cardPadding,
+    y - cardPadding - 14,
+    contentWidth - cardPadding * 2,
+    synthColumns,
+    labelSize,
+    valueSize,
+    6,
+    8,
+    toPdfColor(colors.muted),
+    toPdfColor(colors.text)
+  );
+  y -= synthHeight + 18;
+
+  // Cartes postes
+  postes.forEach((poste: any, index: number) => {
+    const posteLabel = getTextValue(poste.poste);
+    const secteurLabelRaw = getTextValue(poste.secteur);
+    const secteurLabel = secteurLabelRaw ? (mapDevisSector(secteurLabelRaw) || secteurLabelRaw) : '';
+    const classificationLabel = getTextValue(poste.classification);
+    const salaireBrutValue = Number(poste.salaireBrut);
+    const salaireBrutLabel = formatCurrency(salaireBrutValue);
+    const panierRepas = typeof conditions.repas?.montant === 'number' ? conditions.repas.montant : Number(conditions.repas?.montant || 0);
+    const heuresMois = conditions.baseHoraire ? `${conditions.baseHoraire} h/mois` : '';
+    const periodeDebut = formatDateShort(conditions.dateDebut);
+    const periodeFin = formatDateShort(conditions.dateFin);
+    const tauxEttLabel = formatCurrency(poste.tauxETT);
+    const coutRepas = panierRepas ? panierRepas * 22 : 0;
+    const coutTotal = (Number.isFinite(salaireBrutValue) ? salaireBrutValue : 0) + coutRepas;
+    const prixHeader = coutTotal
+      ? `${formatCurrency(coutTotal)}/mois`
+      : (salaireBrutLabel ? `${salaireBrutLabel}/mois` : '');
+
+    const missionEntries = [
+      { label: 'Lieu de mission', value: conditions.lieuxMission || '' },
+      { label: 'Periode', value: periodeDebut || periodeFin ? `${periodeDebut || '-'} → ${periodeFin || '-'}` : '' },
+      { label: 'Nationalite', value: getTextValue(poste.labelPays || poste.nationalite || '') },
+      { label: 'Classification', value: classificationLabel || '' },
+      { label: 'Quantite', value: poste.quantite ? String(poste.quantite) : '' },
+    ].filter((entry) => entry.value);
+
+    const remunerationEntries = [
+      { label: 'Salaire brut', value: salaireBrutLabel || '' },
+      { label: 'Panier repas', value: panierRepas ? `${formatCurrency(panierRepas)}/jour` : '' },
+      { label: 'Heures/mois', value: heuresMois || '' },
+      { label: 'Taux ETT', value: tauxEttLabel ? `${tauxEttLabel}/h` : '' },
+      { label: 'Base horaire', value: heuresMois || '' },
+    ].filter((entry) => entry.value);
+
+    const posteColumnWidth = (contentWidth - cardPadding * 2 - columnGap) / 2;
+    const missionHeight = measureKeyValueGrid(missionEntries, posteColumnWidth, 1, labelSize, valueSize, 6, 0);
+    const remunerationHeight = measureKeyValueGrid(remunerationEntries, posteColumnWidth, 1, labelSize, valueSize, 6, 0);
+    const posteContentHeight = Math.max(missionHeight, remunerationHeight) + 16;
+    const posteHeight = cardPadding * 2 + 18 + posteContentHeight;
+
+    ensureSpace(posteHeight + 12);
+    drawCard(marginX, y, contentWidth, posteHeight, `Poste #${index + 1} - ${(posteLabel || 'Poste').toUpperCase()}`, colors.secondary);
+
+    if (prixHeader) {
+      const priceWidth = measureTextWidth(fontBold, prixHeader, 10);
+      drawTextSafe(prixHeader, {
+        x: marginX + contentWidth - cardPadding - priceWidth,
+        y: y - cardPadding - 2,
+        size: 10,
+        font: fontBold,
+        color: toPdfColor(colors.success),
+      });
+    }
+    if (secteurLabel) {
+      drawBadge(secteurLabel, colors.primary, marginX + cardPadding, y - cardPadding - 20);
+    }
+
+    const columnTitleSizeSmall = 8.5;
+    drawTextSafe('MISSION', {
+      x: marginX + cardPadding,
+      y: y - cardPadding - 24,
+      size: columnTitleSizeSmall,
+      font: fontBold,
+      color: toPdfColor(colors.muted),
+    });
+    drawTextSafe('REMUNERATION', {
+      x: marginX + cardPadding + posteColumnWidth + columnGap,
+      y: y - cardPadding - 24,
+      size: columnTitleSizeSmall,
+      font: fontBold,
+      color: toPdfColor(colors.muted),
+    });
+
+    const posteEntriesTop = y - cardPadding - 24 - columnTitleSizeSmall - 4;
+    drawKeyValueGrid(
+      missionEntries,
+      marginX + cardPadding,
+      posteEntriesTop,
+      posteColumnWidth,
+      1,
+      labelSize,
+      valueSize,
+      6,
+      0,
+      toPdfColor(colors.muted),
+      toPdfColor(colors.text)
+    );
+    drawKeyValueGrid(
+      remunerationEntries,
+      marginX + cardPadding + posteColumnWidth + columnGap,
+      posteEntriesTop,
+      posteColumnWidth,
+      1,
+      labelSize,
+      valueSize,
+      6,
+      0,
+      toPdfColor(colors.muted),
+      toPdfColor(colors.text)
+    );
+
+    y -= posteHeight + 14;
+  });
+
+  // Conditions de travail
+  const conditionsEntriesLeft = [
+    { label: 'Type de contrat', value: getTextValue(conditions.typeContrat) || '' },
+    { label: 'Periode d\'essai', value: getTextValue(conditions.periodeEssai) || '' },
+    { label: 'Motif de recours', value: getTextValue(conditions.motifRecours) || '' },
+    { label: 'Delai paiement', value: getTextValue(conditions.delaiPaiement) || '' },
+  ].filter((entry) => entry.value);
+  const conditionsEntriesRight = [
+    { label: 'Duree du contrat', value: getTextValue(conditions.dureeContrat) || '' },
+    { label: 'Lieu', value: getTextValue(conditions.lieu) || '' },
+    { label: 'Date debut souhaitee', value: conditions.dateDebutSouhaitee ? formatDateShort(conditions.dateDebutSouhaitee) : '' },
+  ].filter((entry) => entry.value);
+  const hebergementLabel = conditions.hebergement?.chargeEU ? 'Pris en charge' : 'Non pris en charge';
+  const hebergementComment = conditions.hebergement?.commentaire ? ` (${conditions.hebergement.commentaire})` : '';
+  const repasTypeLabel = conditions.repas?.type ? getTextValue(conditions.repas.type) : '';
+  const repasLabel = repasTypeLabel
+    ? `${repasTypeLabel}${conditions.repas?.montant ? ` (${formatCurrency(conditions.repas.montant)})` : ''}`
+    : '';
+  const logistics = [
+    `Hebergement: ${hebergementLabel}${hebergementComment}`,
+    conditions.transportLocal?.chargeETT ? 'Transport local: Pris en charge' : 'Transport local: Non pris en charge',
+    repasLabel ? `Repas: ${repasLabel}` : '',
+  ].filter(Boolean);
+
+  const conditionsColumnWidth = (contentWidth - cardPadding * 2 - columnGap) / 2;
+  const conditionsLeftHeight = measureKeyValueGrid(conditionsEntriesLeft, conditionsColumnWidth, 1, labelSize, valueSize, 6, 0);
+  const conditionsRightHeight = measureKeyValueGrid(conditionsEntriesRight, conditionsColumnWidth, 1, labelSize, valueSize, 6, 0);
+  const logisticsText = logistics.map((line) => `• ${line}`).join('\n');
+  const logisticsHeight = logisticsText
+    ? measureParagraph(logisticsText, contentWidth - cardPadding * 2, 9, 3)
+    : 0;
+  const conditionsHeight =
+    cardPadding * 2 +
+    14 +
+    Math.max(conditionsLeftHeight, conditionsRightHeight) +
+    (logisticsHeight ? logisticsHeight + 8 : 0);
+
+  ensureSpace(conditionsHeight + 12);
+  drawCard(marginX, y, contentWidth, conditionsHeight, 'Conditions de travail', colors.primary);
+  const conditionsTop = y - cardPadding - 14;
+  drawKeyValueGrid(
+    conditionsEntriesLeft,
+    marginX + cardPadding,
+    conditionsTop,
+    conditionsColumnWidth,
+    1,
+    labelSize,
+    valueSize,
+    6,
+    0,
+    toPdfColor(colors.muted),
+    toPdfColor(colors.text)
+  );
+  drawKeyValueGrid(
+    conditionsEntriesRight,
+    marginX + cardPadding + conditionsColumnWidth + columnGap,
+    conditionsTop,
+    conditionsColumnWidth,
+    1,
+    labelSize,
+    valueSize,
+    6,
+    0,
+    toPdfColor(colors.muted),
+    toPdfColor(colors.text)
+  );
+  if (logisticsHeight) {
+    const logisticsY = conditionsTop - Math.max(conditionsLeftHeight, conditionsRightHeight) - 6;
+    drawParagraph(logisticsText, marginX + cardPadding, logisticsY, contentWidth - cardPadding * 2, 9, 3, toPdfColor(colors.text));
+  }
+  y -= conditionsHeight + 14;
+
+  // Profil candidats
+  const profileLines = [
+    candidats.experience?.obligatoire
+      ? `Experience requise: ${candidats.experience.annees ? `${candidats.experience.annees} ans` : 'Oui'}`
+      : 'Experience requise: Non',
+    candidats.formation?.obligatoire
+      ? `Formation: ${getTextValue(candidats.formation.type) || 'Obligatoire'}`
+      : 'Formation: Non',
+    candidats.permis?.requis
+      ? `Permis de conduire: ${candidats.permis.categorie ? `Categorie ${getTextValue(candidats.permis.categorie)}` : 'Requis'}`
+      : 'Permis de conduire: Non requis',
+    candidats.outillage?.requis
+      ? `Outillage: ${getTextValue(candidats.outillage.type) || 'Requis'}`
+      : 'Outillage: Non requis',
+    candidats.travailRisque?.active
+      ? `Travail a risque: ${getTextValue(candidats.travailRisque.precisions) || 'Oui'}`
+      : '',
+  ].filter(Boolean);
+
+  const languesEntries = candidats.langues
+    ? Object.entries(candidats.langues)
+        .filter(([, niveau]) => niveau && niveau !== 'non-requis')
+        .map(([langue, niveau]) => `${getTextValue(langue)} - ${getTextValue(niveau)}`)
+    : [];
+
+  if (languesEntries.length) {
+    profileLines.push(`Langues: ${languesEntries.join(', ')}`);
+  }
+
+  const episEntries = Array.isArray(candidats.epis) ? candidats.epis.map((epi: string) => getTextValue(epi)) : [];
+
+  const profileText = profileLines.map((line) => `• ${line}`).join('\n');
+  const profileTextHeight = measureParagraph(profileText, contentWidth - cardPadding * 2, 9, 3);
+  const episHeight = episEntries.length ? measureChecklist(episEntries, contentWidth - cardPadding * 2, 9, 3) + 12 : 0;
+  const profileHeight =
+    cardPadding * 2 +
+    14 +
+    profileTextHeight +
+    (episHeight ? episHeight + 8 : 0);
+
+  ensureSpace(profileHeight + 12);
+  drawCard(marginX, y, contentWidth, profileHeight, 'Profil des candidats recherches', colors.secondary);
+  const profileTop = y - cardPadding - 14;
+  drawParagraph(profileText, marginX + cardPadding, profileTop, contentWidth - cardPadding * 2, 9, 3, toPdfColor(colors.text));
+  if (episEntries.length) {
+    const episTitleY = profileTop - profileTextHeight - 6;
+    drawTextSafe('EPI requis:', {
+      x: marginX + cardPadding,
+      y: episTitleY,
+      size: 9,
+      font: fontBold,
+      color: toPdfColor(colors.muted),
+    });
+    drawChecklist(
+      episEntries,
+      marginX + cardPadding,
+      episTitleY - 12,
+      contentWidth - cardPadding * 2,
+      9,
+      3,
+      toPdfColor(colors.text)
+    );
+  }
+  y -= profileHeight + 16;
+
+  // Signature electronique
+  const signatureEntries = [
+    { label: 'Nom complet', value: [contact.prenom, contact.nom].filter(Boolean).join(' ') },
+    { label: 'Fonction', value: contact.fonction || '' },
+    { label: 'Email', value: contact.email || '' },
+    { label: 'Entreprise', value: entreprise.raisonSociale || '' },
+    { label: 'SIRET', value: entreprise.siret || '' },
+  ].filter((entry) => entry.value);
+  const signatureMetaEntries = [
+    { label: 'Date et heure', value: prospect.signature?.metadata?.timestampReadable || '' },
+    { label: 'Horodatage ISO 8601', value: prospect.signature?.metadata?.timestamp || '' },
+  ].filter((entry) => entry.value);
+  const signatureColumnWidth = (contentWidth - cardPadding * 2 - columnGap) / 2;
+  const signatureLeftHeight = measureKeyValueGrid(signatureEntries, signatureColumnWidth, 1, 8, 10, 6, 0);
+  const signatureRightHeight = measureKeyValueGrid(signatureMetaEntries, signatureColumnWidth, 1, 8, 10, 6, 0);
+  const signatureGridHeight = Math.max(signatureLeftHeight, signatureRightHeight);
+
+  const signatureBoxWidth = 160;
+  const signatureBoxHeight = 70;
+  const consentMentions = prospect.signature?.consentement?.mentions || '';
+  const consentDate = prospect.signature?.consentement?.dateAcceptation
+    ? new Date(prospect.signature.consentement.dateAcceptation).toLocaleString('fr-FR', {
+        dateStyle: 'full',
+        timeStyle: 'short',
+        timeZone: 'Europe/Paris'
+      })
+    : '';
+  const consentTextHeight = consentMentions
+    ? measureParagraph(consentMentions, contentWidth - cardPadding * 2 - signatureBoxWidth - 12, 8.5, 3)
+    : 0;
+  const signatureHeight =
+    cardPadding * 2 +
+    14 +
+    signatureGridHeight +
+    8 +
+    signatureBoxHeight +
+    (consentTextHeight ? consentTextHeight + (consentDate ? 12 : 0) : 0) +
+    6;
+
+  ensureSpace(signatureHeight + 12);
+  drawCard(marginX, y, contentWidth, signatureHeight, 'Signature electronique', isSigned ? colors.success : colors.warning);
+  const signatureTop = y - cardPadding - 14;
+  drawKeyValueGrid(
+    signatureEntries,
+    marginX + cardPadding,
+    signatureTop,
+    signatureColumnWidth,
+    1,
+    8,
+    10,
+    6,
+    0,
+    toPdfColor(colors.muted),
+    toPdfColor(colors.text)
+  );
+  drawKeyValueGrid(
+    signatureMetaEntries,
+    marginX + cardPadding + signatureColumnWidth + columnGap,
+    signatureTop,
+    signatureColumnWidth,
+    1,
+    8,
+    10,
+    6,
+    0,
+    toPdfColor(colors.muted),
+    toPdfColor(colors.text)
+  );
+
+  const signatureBoxY = signatureTop - signatureGridHeight - 8;
+  drawRoundedRect(marginX + cardPadding, signatureBoxY - signatureBoxHeight, signatureBoxWidth, signatureBoxHeight, 8, {
+    color: toPdfColor(colors.white),
+    borderColor: toPdfColor(borderColor),
+    borderWidth: 1,
+  });
+  if (isSigned && prospect.signature?.image && typeof prospect.signature.image === 'string' && prospect.signature.image.startsWith('data:image')) {
+    try {
+      const base64 = prospect.signature.image.split(',')[1];
+      const bytes = Uint8Array.from(atob(base64), (c) => c.charCodeAt(0));
+      const image = await pdfDoc.embedPng(bytes);
+      const scale = Math.min((signatureBoxWidth - 16) / image.width, (signatureBoxHeight - 12) / image.height);
+      const imgWidth = image.width * scale;
+      const imgHeight = image.height * scale;
+      page.drawImage(image, {
+        x: marginX + cardPadding + (signatureBoxWidth - imgWidth) / 2,
+        y: signatureBoxY - signatureBoxHeight + (signatureBoxHeight - imgHeight) / 2,
+        width: imgWidth,
+        height: imgHeight,
+      });
+    } catch (error) {
+      console.error('⚠️ Erreur embed signature image:', error);
+    }
+  } else {
+    drawTextSafe('Espace signature', {
+      x: marginX + cardPadding + 16,
+      y: signatureBoxY - signatureBoxHeight / 2,
+      size: 8.5,
+      font: fontRegular,
+      color: toPdfColor(colors.muted),
+    });
+  }
+
+  if (consentMentions) {
+    const consentX = marginX + cardPadding + signatureBoxWidth + 12;
+    const consentY = signatureBoxY - 2;
+    drawParagraph(consentMentions, consentX, consentY, contentWidth - cardPadding * 2 - signatureBoxWidth - 12, 8.5, 3, toPdfColor(colors.text));
+    if (consentDate) {
+      const consentTextHeightLocal = measureParagraph(consentMentions, contentWidth - cardPadding * 2 - signatureBoxWidth - 12, 8.5, 3);
+      drawTextSafe(`CGV acceptees le: ${consentDate}`, {
+        x: consentX,
+        y: consentY - consentTextHeightLocal - 2,
+        size: 8,
+        font: fontRegular,
+        color: toPdfColor(colors.muted),
+      });
+    }
+  }
+
+  y -= signatureHeight + 14;
+
+  // Preuve integrite / details techniques
+  const signatureHashEntries = [
+    { label: 'Adresse IP', value: prospect.signature?.metadata?.ipAddress || '' },
+    { label: 'Navigateur', value: prospect.signature?.metadata?.userAgent || '' },
+    { label: 'Algorithme', value: prospect.signature?.integrite?.hashAlgorithm || '' },
+  ].filter((entry) => entry.value);
+  const signatureHash = prospect.signature?.integrite?.documentHash || '';
+  const signatureHashFormatted = signatureHash
+    ? (signatureHash.match(/.{1,48}/g) || [signatureHash]).join(' ')
+    : '';
+  const hashGridHeight = measureKeyValueGrid(signatureHashEntries, contentWidth - cardPadding * 2, 1, 8, 9.5, 6, 0);
+  const hashTextHeight = signatureHashFormatted
+    ? measureParagraph(signatureHashFormatted, contentWidth - cardPadding * 2, 8, 3, fontMono)
+    : 0;
+  const technicalHeight =
+    cardPadding * 2 +
+    14 +
+    hashGridHeight +
+    (hashTextHeight ? hashTextHeight + 10 : 0);
+
+  ensureSpace(technicalHeight + 12);
+  drawCard(marginX, y, contentWidth, technicalHeight, 'Details techniques (preuve integrite)', colors.navy);
+  const technicalTop = y - cardPadding - 14;
+  drawKeyValueGrid(
+    signatureHashEntries,
+    marginX + cardPadding,
+    technicalTop,
+    contentWidth - cardPadding * 2,
+    1,
+    8,
+    9.5,
+    6,
+    0,
+    toPdfColor(colors.muted),
+    toPdfColor(colors.text)
+  );
+  if (hashTextHeight) {
+    const hashY = technicalTop - hashGridHeight - 6;
+    drawTextSafe('Hash document:', {
+      x: marginX + cardPadding,
+      y: hashY,
+      size: 8,
+      font: fontBold,
+      color: toPdfColor(colors.muted),
+    });
+    drawParagraph(signatureHashFormatted, marginX + cardPadding, hashY - 10, contentWidth - cardPadding * 2, 8, 3, toPdfColor(colors.text), fontMono);
+  }
+  y -= technicalHeight + 14;
+
+  // Conditions generales & mentions legales
+  if (inclureCGV) {
+    const cgvLegalFields = cgv?.sections?.article0?.fields || {};
+    const legalSummaryLines = [
+      getTextValue(conditions.delaiPaiement) ? `Conditions de paiement: ${getTextValue(conditions.delaiPaiement)}` : '',
+      cgv?.hero?.subtitle,
+      cgv?.hero?.effectiveDate,
+      cgv?.sections?.article6?.section1?.legalLimit,
+      cgv?.sections?.article16?.sections?.law?.description,
+      cgv?.sections?.article16?.sections?.jurisdiction?.description,
+    ].filter(Boolean).map((line) => `• ${line}`);
+
+    const legalFooterLines = [
+      cgvLegalFields.legalFormValue ? `Forme juridique: ${cgvLegalFields.legalFormValue}` : '',
+      cgvLegalFields.managerValue ? `Gerant: ${cgvLegalFields.managerValue}` : '',
+      cgvLegalFields.siretValue ? `SIRET: ${cgvLegalFields.siretValue}` : '',
+      cgvLegalFields.vatValue ? `TVA intracom: ${cgvLegalFields.vatValue}` : '',
+      cgvLegalFields.addressValue ? `Adresse: ${cgvLegalFields.addressValue}` : '',
+      cgvLegalFields.contactValue ? `Contact: ${cgvLegalFields.contactValue}` : '',
+    ].filter(Boolean);
+
+    const legalText = legalSummaryLines.join('\n');
+    const legalFooterText = legalFooterLines.join('\n');
+    const legalTextHeight = measureParagraph(legalText, contentWidth - cardPadding * 2, 8.5, 3);
+    const legalFooterHeight = legalFooterText
+      ? measureParagraph(legalFooterText, contentWidth - cardPadding * 2, 8, 3)
+      : 0;
+    const legalHeight =
+      cardPadding * 2 +
+      14 +
+      legalTextHeight +
+      (legalFooterHeight ? legalFooterHeight + 8 : 0);
+
+    ensureSpace(legalHeight + 12);
+    drawCard(marginX, y, contentWidth, legalHeight, 'Conditions generales & mentions legales', colors.primary);
+    const legalTop = y - cardPadding - 14;
+    drawParagraph(legalText, marginX + cardPadding, legalTop, contentWidth - cardPadding * 2, 8.5, 3, toPdfColor(colors.text));
+    if (legalFooterText) {
+      const legalFooterY = legalTop - legalTextHeight - 6;
+      drawParagraph(legalFooterText, marginX + cardPadding, legalFooterY, contentWidth - cardPadding * 2, 8, 3, toPdfColor(colors.muted));
+    }
+    y -= legalHeight + 14;
+  }
+
+  // Footer
+  const pages = pdfDoc.getPages();
+  const totalPages = pages.length;
+  const generatedLabel = formatDateForPdf(new Date().toISOString()) || '';
+  pages.forEach((currentPage, index) => {
+    currentPage.drawRectangle({
+      x: 0,
+      y: 0,
+      width: pageWidth,
+      height: footerHeight,
+      color: toPdfColor(tint(colors.white, 0.98)),
+    });
+    currentPage.drawLine({
+      start: { x: 0, y: footerHeight },
+      end: { x: pageWidth, y: footerHeight },
+      thickness: 1,
+      color: toPdfColor(tint(colors.primary, 0.2)),
+    });
+    const footerText = 'YOJOB - contact@yojob.fr - +33 1 23 45 67 89 - yojob.fr';
+    drawTextOnPage(currentPage, footerText, {
+      x: marginX,
+      y: 12,
+      size: 8,
+      font: fontRegular,
+      color: toPdfColor(colors.muted),
+    });
+    if (generatedLabel) {
+      drawTextOnPage(currentPage, `Genere le: ${generatedLabel}`, {
+        x: marginX,
+        y: 3,
+        size: 7.5,
+        font: fontRegular,
+        color: toPdfColor(colors.muted),
+      });
+    }
+    const pageLabel = `Page ${index + 1}/${totalPages}`;
+    const pageLabelWidth = measureTextWidth(fontRegular, pageLabel, 8);
+    drawTextOnPage(currentPage, pageLabel, {
+      x: pageWidth - marginX - pageLabelWidth,
+      y: 12,
+      size: 8,
+      font: fontRegular,
+      color: toPdfColor(colors.muted),
+    });
+  });
+
+  return await pdfDoc.save();
+}
+
+const generateDevisPdfBytesByVersion = async (
+  prospect: any,
+  inclureCGV: boolean,
+  templateVersion?: string | null
+): Promise<Uint8Array> => {
+  const resolved = resolvePdfTemplateVersion(templateVersion ?? getDefaultPdfTemplateVersion());
+  if (resolved === 'v2-modern') {
+    return await generateDevisPdfBytesV2(prospect, inclureCGV);
+  }
+  return await generateDevisPdfBytes(prospect, inclureCGV);
+};
+
 
 async function generateAndStorePdf(
   prospect: any,
-  inclureCGV: boolean
+  inclureCGV: boolean,
+  templateVersion?: string | null
 ): Promise<{ pdfUrl: string; pdfPath: string; pdfBytes: Uint8Array; prospectUpdated: any } | null> {
   try {
-    const pdfBytes = await generateDevisPdfBytes(prospect, inclureCGV);
+    const pdfBytes = await generateDevisPdfBytesByVersion(prospect, inclureCGV, templateVersion);
     const supabase = getSupabaseClient();
     const bucketReady = await ensureDevisPdfBucket(supabase);
     if (!bucketReady) {
@@ -2158,7 +3320,7 @@ devis.get('/api/stats', async (c) => {
  */
 devis.post('/generer-pdf', async (c) => {
   try {
-    const { devisId, inclureCGV } = await c.req.json();
+    const { devisId, inclureCGV, templateVersion } = await c.req.json();
     
     console.log(`📄 Génération PDF pour devis: ${devisId}`);
     
@@ -2175,7 +3337,7 @@ devis.post('/generer-pdf', async (c) => {
       );
     }
     
-    const pdfResult = await generateAndStorePdf(prospect, Boolean(inclureCGV));
+    const pdfResult = await generateAndStorePdf(prospect, Boolean(inclureCGV), templateVersion);
 
     if (!pdfResult) {
       return c.json(
