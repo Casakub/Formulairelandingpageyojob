@@ -1,5 +1,6 @@
 import { Hono } from 'npm:hono';
 import { createClient } from "npm:@supabase/supabase-js@2.39.3";
+import { PDFDocument, StandardFonts, rgb } from "npm:pdf-lib@1.17.1";
 import * as kv from './kv_store.tsx';
 import { emailService } from './email-service.tsx';
 import { SIGNATURE_EMAIL_TEMPLATES } from './signature-email-templates.ts';
@@ -7,6 +8,520 @@ import { SIGNATURE_EMAIL_TEMPLATES } from './signature-email-templates.ts';
 const devis = new Hono();
 
 const INTERNAL_CONTACT_EMAIL = 'contact@yojob.fr';
+const DEVIS_PDF_BUCKET = 'yojob-devis-pdfs';
+let devisPdfBucketReady: boolean | null = null;
+
+function formatDateForPdf(dateInput?: string): string {
+  if (!dateInput) return '';
+  const date = new Date(dateInput);
+  if (Number.isNaN(date.getTime())) return '';
+  return date.toLocaleDateString('fr-FR', {
+    year: 'numeric',
+    month: 'long',
+    day: '2-digit',
+  });
+}
+
+function formatCurrency(value?: number): string {
+  const number = typeof value === 'number' ? value : Number(value);
+  if (!Number.isFinite(number)) return '';
+  return new Intl.NumberFormat('fr-FR', {
+    style: 'currency',
+    currency: 'EUR',
+    maximumFractionDigits: 2,
+  }).format(number);
+}
+
+async function ensureDevisPdfBucket(supabase: any) {
+  if (devisPdfBucketReady !== null) return devisPdfBucketReady;
+
+  try {
+    const { data: buckets, error } = await supabase.storage.listBuckets();
+    if (error) {
+      console.error('❌ Impossible de lister les buckets:', error);
+      devisPdfBucketReady = false;
+      return devisPdfBucketReady;
+    }
+
+    const exists = buckets?.some((bucket: any) => bucket.name === DEVIS_PDF_BUCKET);
+    if (!exists) {
+      const { error: createError } = await supabase.storage.createBucket(DEVIS_PDF_BUCKET, {
+        public: false,
+        fileSizeLimit: 20 * 1024 * 1024,
+        allowedMimeTypes: ['application/pdf'],
+      });
+      if (createError) {
+        console.error('❌ Erreur création bucket PDF devis:', createError);
+        devisPdfBucketReady = false;
+        return devisPdfBucketReady;
+      }
+      console.log(`✅ Bucket PDF devis créé: ${DEVIS_PDF_BUCKET}`);
+    }
+
+    devisPdfBucketReady = true;
+    return devisPdfBucketReady;
+  } catch (error) {
+    console.error('❌ Erreur initialization bucket PDF devis:', error);
+    devisPdfBucketReady = false;
+    return devisPdfBucketReady;
+  }
+}
+
+function wrapTextForPdf(text: string, font: any, fontSize: number, maxWidth: number): string[] {
+  if (!text) return [];
+  const words = text.split(/\s+/);
+  const lines: string[] = [];
+  let currentLine = '';
+
+  for (const word of words) {
+    const testLine = currentLine ? `${currentLine} ${word}` : word;
+    const width = font.widthOfTextAtSize(testLine, fontSize);
+    if (width <= maxWidth) {
+      currentLine = testLine;
+    } else {
+      if (currentLine) {
+        lines.push(currentLine);
+      }
+      currentLine = word;
+    }
+  }
+
+  if (currentLine) {
+    lines.push(currentLine);
+  }
+
+  return lines;
+}
+
+async function generateDevisPdfBytes(prospect: any, inclureCGV: boolean): Promise<Uint8Array> {
+  const pdfDoc = await PDFDocument.create();
+  const fontRegular = await pdfDoc.embedFont(StandardFonts.Helvetica);
+  const fontBold = await pdfDoc.embedFont(StandardFonts.HelveticaBold);
+  const pageWidth = 595.28;
+  const pageHeight = 841.89;
+  const margin = 40;
+  const gutter = 16;
+  const headerHeight = 72;
+
+  const colors = {
+    brand: rgb(0.12, 0.24, 0.55),
+    accent: rgb(0.02, 0.72, 0.83),
+    text: rgb(0.12, 0.12, 0.12),
+    muted: rgb(0.4, 0.4, 0.4),
+    light: rgb(0.96, 0.97, 0.99),
+    border: rgb(0.82, 0.84, 0.88),
+    white: rgb(1, 1, 1),
+  };
+
+  let page = pdfDoc.addPage([pageWidth, pageHeight]);
+  let y = pageHeight - margin;
+
+  const drawHeader = () => {
+    page.drawRectangle({
+      x: 0,
+      y: pageHeight - headerHeight,
+      width: pageWidth,
+      height: headerHeight,
+      color: colors.brand,
+    });
+    page.drawText('YOJOB', { x: margin, y: pageHeight - 40, size: 22, font: fontBold, color: colors.white });
+    page.drawText('Courtage en recrutement européen', {
+      x: margin,
+      y: pageHeight - 58,
+      size: 9,
+      font: fontRegular,
+      color: rgb(0.85, 0.93, 0.98),
+    });
+
+    const infoX = pageWidth - margin - 190;
+    page.drawText('DEVIS', { x: infoX, y: pageHeight - 32, size: 9, font: fontBold, color: colors.white });
+    page.drawText(prospect.numero || '-', { x: infoX, y: pageHeight - 46, size: 12, font: fontBold, color: colors.white });
+    page.drawText(`Date : ${formatDateForPdf(prospect.createdAt) || '-'}`, {
+      x: infoX,
+      y: pageHeight - 60,
+      size: 8,
+      font: fontRegular,
+      color: rgb(0.88, 0.94, 1),
+    });
+    page.drawText(`Statut : ${prospect.statut || '-'}`, {
+      x: infoX,
+      y: pageHeight - 72,
+      size: 8,
+      font: fontRegular,
+      color: rgb(0.88, 0.94, 1),
+    });
+
+    y = pageHeight - headerHeight - 20;
+  };
+
+  const drawMiniHeader = () => {
+    page.drawText(`Devis ${prospect.numero || ''}`, {
+      x: margin,
+      y: pageHeight - margin,
+      size: 12,
+      font: fontBold,
+      color: colors.brand,
+    });
+    y = pageHeight - margin - 18;
+  };
+
+  const ensureSpace = (needed: number) => {
+    if (y - needed < margin) {
+      page = pdfDoc.addPage([pageWidth, pageHeight]);
+      drawMiniHeader();
+    }
+  };
+
+  const drawSectionTitle = (text: string) => {
+    ensureSpace(26);
+    page.drawText(text, { x: margin, y, size: 13, font: fontBold, color: colors.brand });
+    y -= 18;
+  };
+
+  const drawBox = (title: string, lines: string[], x: number, boxWidth: number) => {
+    const padding = 10;
+    const fontSize = 10;
+    const titleSize = 11;
+    const lineGap = 4;
+    const boxHeight = padding * 2 + titleSize + 6 + lines.length * (fontSize + lineGap);
+    ensureSpace(boxHeight + 8);
+
+    page.drawRectangle({
+      x,
+      y: y - boxHeight,
+      width: boxWidth,
+      height: boxHeight,
+      color: colors.light,
+      borderColor: colors.border,
+      borderWidth: 1,
+    });
+
+    page.drawText(title, {
+      x: x + padding,
+      y: y - padding - titleSize,
+      size: titleSize,
+      font: fontBold,
+      color: colors.brand,
+    });
+
+    let currentY = y - padding - titleSize - 8;
+    for (const line of lines) {
+      page.drawText(line, {
+        x: x + padding,
+        y: currentY,
+        size: fontSize,
+        font: fontRegular,
+        color: colors.text,
+      });
+      currentY -= fontSize + lineGap;
+    }
+
+    return boxHeight;
+  };
+
+  const buildBoxLines = (entries: Array<[string, string]>, maxWidth: number) => {
+    const lines: string[] = [];
+    for (const [label, value] of entries) {
+      if (!value) continue;
+      const content = `${label} : ${value}`;
+      const wrapped = wrapTextForPdf(content, fontRegular, 10, maxWidth);
+      lines.push(...wrapped);
+    }
+    return lines;
+  };
+
+  drawHeader();
+
+  const boxWidth = (pageWidth - margin * 2 - gutter) / 2;
+  const companyLines = buildBoxLines(
+    [
+      ['Raison sociale', prospect.entreprise?.raisonSociale || ''],
+      ['SIRET', prospect.entreprise?.siret || ''],
+      ['Code APE', prospect.entreprise?.codeAPE || ''],
+      ['TVA', prospect.entreprise?.tvaIntracommunautaire || ''],
+      ['Adresse', [
+        prospect.entreprise?.adresse,
+        prospect.entreprise?.codePostal,
+        prospect.entreprise?.ville,
+        prospect.entreprise?.region,
+        prospect.entreprise?.pays,
+      ].filter(Boolean).join(' ')],
+      ['Site web', prospect.entreprise?.siteInternet || ''],
+    ],
+    boxWidth - 20
+  );
+  const contactLines = buildBoxLines(
+    [
+      ['Nom', [prospect.contact?.prenom, prospect.contact?.nom].filter(Boolean).join(' ')],
+      ['Fonction', prospect.contact?.fonction || ''],
+      ['Email', prospect.contact?.email || ''],
+      ['Téléphone', prospect.contact?.telephonePortable || prospect.contact?.telephoneFixe || ''],
+    ],
+    boxWidth - 20
+  );
+
+  const boxHeight = Math.max(
+    drawBox('Entreprise', companyLines, margin, boxWidth),
+    drawBox('Contact', contactLines, margin + boxWidth + gutter, boxWidth)
+  );
+  y -= boxHeight + 18;
+
+  const postes = Array.isArray(prospect.postes) ? prospect.postes : [];
+  const totalCandidats = postes.reduce((sum: number, poste: any) => sum + (Number(poste?.quantite) || 0), 0);
+  const secteurPrincipal = postes[0]?.secteur ? mapDevisSector(postes[0].secteur) : '-';
+
+  const summaryHeight = 46;
+  ensureSpace(summaryHeight + 8);
+  page.drawRectangle({
+    x: margin,
+    y: y - summaryHeight,
+    width: pageWidth - margin * 2,
+    height: summaryHeight,
+    color: colors.white,
+    borderColor: colors.border,
+    borderWidth: 1,
+  });
+  const summaryY = y - 30;
+  const summaryColumn = (pageWidth - margin * 2) / 3;
+  page.drawText(`Postes : ${postes.length}`, { x: margin + 12, y: summaryY, size: 10, font: fontBold, color: colors.brand });
+  page.drawText(`Candidats : ${totalCandidats}`, {
+    x: margin + summaryColumn + 12,
+    y: summaryY,
+    size: 10,
+    font: fontBold,
+    color: colors.brand,
+  });
+  page.drawText(`Secteur : ${secteurPrincipal || '-'}`, {
+    x: margin + summaryColumn * 2 + 12,
+    y: summaryY,
+    size: 10,
+    font: fontBold,
+    color: colors.brand,
+  });
+  y -= summaryHeight + 20;
+
+  drawSectionTitle('Postes demandés');
+
+  const tableX = margin;
+  const tableWidth = pageWidth - margin * 2;
+  const columnDefs = [
+    { label: 'Poste', width: 170 },
+    { label: 'Secteur', width: 90 },
+    { label: 'Classification', width: 90 },
+    { label: 'Qté', width: 30 },
+    { label: 'Salaire brut', width: 70 },
+    { label: 'Taux ETT', width: 70 },
+  ];
+
+  const drawTableHeader = () => {
+    const headerHeight = 20;
+    ensureSpace(headerHeight + 8);
+    page.drawRectangle({
+      x: tableX,
+      y: y - headerHeight,
+      width: tableWidth,
+      height: headerHeight,
+      color: colors.brand,
+    });
+    let currentX = tableX + 6;
+    columnDefs.forEach((col) => {
+      page.drawText(col.label, {
+        x: currentX,
+        y: y - 14,
+        size: 9,
+        font: fontBold,
+        color: colors.white,
+      });
+      currentX += col.width;
+    });
+    y -= headerHeight + 4;
+  };
+
+  drawTableHeader();
+
+  if (postes.length === 0) {
+    ensureSpace(16);
+    page.drawText('Aucun poste renseigné.', { x: tableX, y, size: 10, font: fontRegular, color: colors.muted });
+    y -= 16;
+  } else {
+    postes.forEach((poste: any, index: number) => {
+      const rowValues = [
+        poste.poste || `Poste ${index + 1}`,
+        mapDevisSector(poste.secteur) || '',
+        poste.classification || '',
+        poste.quantite ? String(poste.quantite) : '',
+        Number.isFinite(poste.salaireBrut) ? formatCurrency(poste.salaireBrut) : '',
+        Number.isFinite(poste.tauxETT) ? formatCurrency(poste.tauxETT) : '',
+      ];
+
+      const rowLines = rowValues.map((value, colIndex) =>
+        wrapTextForPdf(value, fontRegular, 9, columnDefs[colIndex].width - 6)
+      );
+      const maxLines = Math.max(...rowLines.map((lines) => lines.length), 1);
+      const rowHeight = maxLines * 12 + 6;
+
+      if (y - rowHeight < margin) {
+        page = pdfDoc.addPage([pageWidth, pageHeight]);
+        drawMiniHeader();
+        drawTableHeader();
+      }
+
+      if (index % 2 === 0) {
+        page.drawRectangle({
+          x: tableX,
+          y: y - rowHeight + 2,
+          width: tableWidth,
+          height: rowHeight,
+          color: colors.light,
+        });
+      }
+
+      let currentX = tableX + 6;
+      rowLines.forEach((lines, colIndex) => {
+        let lineY = y - 12;
+        lines.forEach((line) => {
+          page.drawText(line, {
+            x: currentX,
+            y: lineY,
+            size: 9,
+            font: fontRegular,
+            color: colors.text,
+          });
+          lineY -= 12;
+        });
+        currentX += columnDefs[colIndex].width;
+      });
+
+      y -= rowHeight;
+    });
+  }
+
+  y -= 8;
+  drawSectionTitle('Conditions');
+  const conditions = prospect.conditions || {};
+  const conditionsLines = [
+    `Motif : ${conditions.motifRecours || '-'}`,
+    `Lieu(x) de mission : ${conditions.lieuxMission || '-'}`,
+    `Date de début : ${formatDateForPdf(conditions.dateDebut) || '-'}`,
+    `Date de fin : ${formatDateForPdf(conditions.dateFin) || '-'}`,
+    `Durée estimée : ${conditions.dureeMission ? `${conditions.dureeMission} mois` : '-'}`,
+    `Base horaire : ${conditions.baseHoraire ? `${conditions.baseHoraire}h/mois` : '-'}`,
+    `Délai de paiement : ${conditions.delaiPaiement || '-'}`,
+    `Période d’essai : ${conditions.periodeEssai ? `${conditions.periodeEssai} mois` : '-'}`,
+  ];
+
+  conditionsLines.forEach((line) => {
+    ensureSpace(14);
+    page.drawText(line, { x: margin, y, size: 10, font: fontRegular, color: colors.text });
+    y -= 14;
+  });
+
+  if (prospect.signature) {
+    y -= 6;
+    drawSectionTitle('Signature électronique');
+    const signatureLines = [
+      `Signataire : ${[prospect.signature.signataire?.prenom, prospect.signature.signataire?.nom].filter(Boolean).join(' ') || '-'}`,
+      `Email : ${prospect.signature.signataire?.email || '-'}`,
+      `Date : ${prospect.signature.metadata?.timestampReadable || formatDateForPdf(prospect.signature.metadata?.timestamp) || '-'}`,
+      `Hash document : ${prospect.signature.integrite?.documentHash || '-'}`,
+    ];
+    signatureLines.forEach((line) => {
+      ensureSpace(14);
+      page.drawText(line, { x: margin, y, size: 10, font: fontRegular, color: colors.text });
+      y -= 14;
+    });
+  }
+
+  if (inclureCGV) {
+    y -= 6;
+    drawSectionTitle('Conditions générales');
+    const cgvLines = [
+      'Le signataire certifie avoir lu et accepté les Conditions Générales de Vente.',
+      'Cette signature électronique a la même valeur légale qu’une signature manuscrite (eIDAS UE).',
+    ];
+    cgvLines.forEach((line) => {
+      const wrapped = wrapTextForPdf(line, fontRegular, 9, pageWidth - margin * 2);
+      wrapped.forEach((wrappedLine) => {
+        ensureSpace(12);
+        page.drawText(wrappedLine, { x: margin, y, size: 9, font: fontRegular, color: colors.muted });
+        y -= 12;
+      });
+    });
+  }
+
+  const footerY = margin - 10;
+  page.drawText('YOJOB • contact@yojob.fr • +33 1 23 45 67 89', {
+    x: margin,
+    y: footerY,
+    size: 8,
+    font: fontRegular,
+    color: colors.muted,
+  });
+
+  return await pdfDoc.save();
+}
+
+async function generateAndStorePdf(
+  prospect: any,
+  inclureCGV: boolean
+): Promise<{ pdfUrl: string; pdfPath: string; pdfBytes: Uint8Array; prospectUpdated: any } | null> {
+  try {
+    const pdfBytes = await generateDevisPdfBytes(prospect, inclureCGV);
+    const supabase = getSupabaseClient();
+    const bucketReady = await ensureDevisPdfBucket(supabase);
+    if (!bucketReady) {
+      throw new Error('Bucket PDF devis indisponible');
+    }
+
+    const safeNumero = String(prospect.numero || prospect.id || 'devis')
+      .replace(/[^a-zA-Z0-9_-]/g, '_');
+    const pdfPath = `devis/${safeNumero}.pdf`;
+
+    const { error: uploadError } = await supabase.storage
+      .from(DEVIS_PDF_BUCKET)
+      .upload(pdfPath, pdfBytes, {
+        contentType: 'application/pdf',
+        upsert: true,
+      });
+
+    if (uploadError) {
+      throw uploadError;
+    }
+
+    const { data: signedUrlData, error: signedError } = await supabase.storage
+      .from(DEVIS_PDF_BUCKET)
+      .createSignedUrl(pdfPath, 315360000);
+
+    if (signedError || !signedUrlData?.signedUrl) {
+      throw signedError || new Error('Impossible de générer l’URL signée');
+    }
+
+    const pdfUrl = signedUrlData.signedUrl;
+    const generatedAt = new Date().toISOString();
+
+    const prospectUpdated = {
+      ...prospect,
+      pdfUrl,
+      pdf_url: pdfUrl,
+      pdf_storage_path: pdfPath,
+      pdfGeneratedAt: generatedAt,
+      pdf_generated_at: generatedAt,
+    };
+
+    await kv.set(`prospects:${prospect.id}`, prospectUpdated);
+
+    await updateProspectCustomFields(prospectUpdated, {
+      pdf_url: pdfUrl,
+      pdf_storage_path: pdfPath,
+      pdf_generated_at: generatedAt,
+    });
+
+    return { pdfUrl, pdfPath, pdfBytes, prospectUpdated };
+  } catch (error) {
+    console.error('❌ Erreur génération PDF devis:', error);
+    return null;
+  }
+}
 
 // Helper pour obtenir le client Supabase (CRM prospects)
 function getSupabaseClient() {
@@ -49,7 +564,7 @@ function applyTemplateVariables(
   return { subject, bodyHtml, bodyText };
 }
 
-async function sendEmailSafe(options: { to: string; subject: string; body: string; html?: string; replyTo?: string }) {
+async function sendEmailSafe(options: { to: string; subject: string; body: string; html?: string; replyTo?: string; attachments?: { filename: string; content?: string | Uint8Array; contentType?: string }[] }) {
   try {
     const result = await emailService.sendEmail(options);
     if (!result.success) {
@@ -110,7 +625,11 @@ async function updateProspectCustomFields(
   }
 }
 
-async function sendSignatureConfirmationEmails(prospect: any, signatureTimestamp: string) {
+async function sendSignatureConfirmationEmails(
+  prospect: any,
+  signatureTimestamp: string,
+  pdfAttachment?: { filename: string; content?: string | Uint8Array; contentType?: string }
+) {
   try {
     const template = SIGNATURE_EMAIL_TEMPLATES.find(t => t.id === 'tpl-signature-confirmed');
     const signatureDate = new Date(signatureTimestamp).toLocaleString('fr-FR', {
@@ -140,12 +659,14 @@ async function sendSignatureConfirmationEmails(prospect: any, signatureTimestamp
         subject,
         body: bodyText + extraText,
         html: bodyHtml + extraHtml,
+        ...(pdfAttachment ? { attachments: [pdfAttachment] } : {}),
       });
     } else {
       await sendEmailSafe({
         to: prospect.contact.email,
         subject: '✅ Votre devis est signé',
         body: `Bonjour ${contactName || ''},\n\nVotre devis ${prospect.numero} a été signé le ${signatureDate}.\n\nL'équipe YOJOB`,
+        ...(pdfAttachment ? { attachments: [pdfAttachment] } : {}),
       });
     }
 
@@ -807,28 +1328,24 @@ devis.post('/generer-pdf', async (c) => {
       );
     }
     
-    // TODO: Implémenter la génération PDF réelle avec react-pdf
-    // Pour l'instant, on retourne un placeholder
-    
-    const pdfData = {
-      id: crypto.randomUUID(),
-      devisId,
-      numero: prospect.numero,
-      pdfUrl: '#', // URL temporaire
-      statut: 'genere',
-      dateGeneration: new Date().toISOString(),
-      inclureCGV
-    };
-    
-    // Sauvegarder les métadonnées du PDF
-    await kv.set(`pdf:${pdfData.id}`, pdfData);
-    
-    console.log(`✅ PDF généré: ${pdfData.id}`);
-    
+    const pdfResult = await generateAndStorePdf(prospect, Boolean(inclureCGV));
+
+    if (!pdfResult) {
+      return c.json(
+        {
+          success: false,
+          error: 'Impossible de générer le PDF'
+        },
+        500
+      );
+    }
+
+    console.log(`✅ PDF généré: ${pdfResult.pdfPath}`);
+
     return c.json({
       success: true,
-      pdfUrl: pdfData.pdfUrl,
-      pdfId: pdfData.id,
+      pdfUrl: pdfResult.pdfUrl,
+      pdfId: pdfResult.pdfPath,
       message: 'PDF généré avec succès'
     });
     
@@ -987,18 +1504,35 @@ devis.post('/signer-devis', async (c) => {
     console.log(`📍 IP: ${ipAddress}`);
     console.log(`🔐 Hash: ${hashHex.substring(0, 16)}...`);
     
+    const pdfResult = await generateAndStorePdf(prospectMisAJour, true);
+    const prospectWithPdf = pdfResult?.prospectUpdated || prospectMisAJour;
+    const pdfAttachment = pdfResult
+      ? {
+          filename: `Devis-${prospectWithPdf.numero || prospectWithPdf.id}.pdf`,
+          content: pdfResult.pdfBytes,
+          contentType: 'application/pdf',
+        }
+      : undefined;
+
     // 🔄 Sync CRM + email confirmation
-    await updateProspectCustomFields(prospectMisAJour, {
+    await updateProspectCustomFields(prospectWithPdf, {
       devis_status: 'signe',
       signature_date: timestamp,
       signed_via_token: false,
+      ...(pdfResult
+        ? {
+            pdf_url: pdfResult.pdfUrl,
+            pdf_storage_path: pdfResult.pdfPath,
+            pdf_generated_at: prospectWithPdf.pdf_generated_at || new Date().toISOString(),
+          }
+        : {}),
     });
-    await sendSignatureConfirmationEmails(prospectMisAJour, timestamp);
+    await sendSignatureConfirmationEmails(prospectWithPdf, timestamp, pdfAttachment);
     
     return c.json({
       success: true,
       message: 'Devis signé avec succès',
-      data: prospectMisAJour,
+      data: prospectWithPdf,
       certificat: certificatSignature
     });
     
@@ -1399,19 +1933,36 @@ devis.post('/signer-avec-token', async (c) => {
     console.log(`📍 IP: ${ipAddress}`);
     console.log(`🔐 Hash: ${hashHex.substring(0, 16)}...`);
     
+    const pdfResult = await generateAndStorePdf(prospectMisAJour, true);
+    const prospectWithPdf = pdfResult?.prospectUpdated || prospectMisAJour;
+    const pdfAttachment = pdfResult
+      ? {
+          filename: `Devis-${prospectWithPdf.numero || prospectWithPdf.id}.pdf`,
+          content: pdfResult.pdfBytes,
+          contentType: 'application/pdf',
+        }
+      : undefined;
+
     // 🔄 Sync CRM + email confirmation
-    await updateProspectCustomFields(prospectMisAJour, {
+    await updateProspectCustomFields(prospectWithPdf, {
       devis_status: 'signe',
       signature_date: timestamp,
       signed_via_token: true,
       signature_token_used: token,
+      ...(pdfResult
+        ? {
+            pdf_url: pdfResult.pdfUrl,
+            pdf_storage_path: pdfResult.pdfPath,
+            pdf_generated_at: prospectWithPdf.pdf_generated_at || new Date().toISOString(),
+          }
+        : {}),
     });
-    await sendSignatureConfirmationEmails(prospectMisAJour, timestamp);
+    await sendSignatureConfirmationEmails(prospectWithPdf, timestamp, pdfAttachment);
     
     return c.json({
       success: true,
       message: 'Devis signé avec succès',
-      data: prospectMisAJour,
+      data: prospectWithPdf,
       certificat: certificatSignature
     });
     

@@ -11,6 +11,7 @@ interface EmailOptions {
   cc?: string | string[];
   bcc?: string | string[];
   replyTo?: string;
+  attachments?: EmailAttachment[];
 }
 
 interface SMTPConfig {
@@ -26,6 +27,12 @@ interface SMTPConfig {
   provider_api_key?: string;
   provider_domain?: string;
   reply_to?: string;
+}
+
+interface EmailAttachment {
+  filename: string;
+  content?: string | Uint8Array;
+  contentType?: string;
 }
 
 // Helper pour obtenir le client Supabase
@@ -331,6 +338,17 @@ async function sendViaSMTP(
       text: textBody,
       html: htmlBody,
       replyTo: options.replyTo || config.reply_to,
+      ...(options.attachments?.length
+        ? {
+            attachments: options.attachments
+              .filter((attachment) => attachment.content)
+              .map((attachment) => ({
+                filename: attachment.filename,
+                content: attachment.content,
+                contentType: attachment.contentType,
+              })),
+          }
+        : {}),
     });
   };
 
@@ -398,6 +416,30 @@ async function sendViaSendGrid(
         { type: "text/plain", value: textBody },
         { type: "text/html", value: htmlBody },
       ],
+      ...(options.attachments?.length
+        ? {
+            attachments: options.attachments
+              .filter((attachment) => attachment.content)
+              .map((attachment) => {
+              const encoder = new TextEncoder();
+              const bytes = typeof attachment.content === 'string'
+                ? encoder.encode(attachment.content)
+                : (attachment.content || new Uint8Array());
+              let binary = '';
+              const chunkSize = 0x8000;
+              for (let i = 0; i < bytes.length; i += chunkSize) {
+                binary += String.fromCharCode(...bytes.subarray(i, i + chunkSize));
+              }
+              const content = btoa(binary);
+              return {
+                content,
+                filename: attachment.filename,
+                type: attachment.contentType || 'application/octet-stream',
+                disposition: 'attachment',
+              };
+            }),
+          }
+        : {}),
     }),
   });
 
@@ -431,20 +473,39 @@ async function sendViaMailgun(
   htmlBody: string
 ): Promise<{ success: boolean; message: string; messageId?: string }> {
   const url = `https://api.mailgun.net/v3/${config.provider_domain}/messages`;
-  const form = new URLSearchParams();
-  form.set("from", `${config.from_name} <${config.from_email}>`);
-  form.set("to", options.to);
+  const hasAttachments = Boolean(options.attachments?.length);
+  const form = hasAttachments ? new FormData() : new URLSearchParams();
+  const setField = (key: string, value: string) => {
+    if (form instanceof FormData) {
+      form.append(key, value);
+    } else {
+      form.set(key, value);
+    }
+  };
+  setField("from", `${config.from_name} <${config.from_email}>`);
+  setField("to", options.to);
   if (options.cc) {
-    form.set("cc", Array.isArray(options.cc) ? options.cc.join(",") : options.cc);
+    setField("cc", Array.isArray(options.cc) ? options.cc.join(",") : options.cc);
   }
   if (options.bcc) {
-    form.set("bcc", Array.isArray(options.bcc) ? options.bcc.join(",") : options.bcc);
+    setField("bcc", Array.isArray(options.bcc) ? options.bcc.join(",") : options.bcc);
   }
-  form.set("subject", options.subject);
-  form.set("text", textBody);
-  form.set("html", htmlBody);
+  setField("subject", options.subject);
+  setField("text", textBody);
+  setField("html", htmlBody);
   if (options.replyTo || config.reply_to) {
-    form.set("h:Reply-To", options.replyTo || config.reply_to);
+    setField("h:Reply-To", options.replyTo || config.reply_to);
+  }
+
+  if (form instanceof FormData && options.attachments?.length) {
+    for (const attachment of options.attachments.filter((item) => item.content)) {
+      const encoder = new TextEncoder();
+      const bytes = typeof attachment.content === 'string'
+        ? encoder.encode(attachment.content)
+        : (attachment.content || new Uint8Array());
+      const blob = new Blob([bytes], { type: attachment.contentType || 'application/octet-stream' });
+      form.append('attachment', blob, attachment.filename);
+    }
   }
 
   const auth = btoa(`api:${config.provider_api_key}`);
@@ -452,9 +513,9 @@ async function sendViaMailgun(
     method: "POST",
     headers: {
       "Authorization": `Basic ${auth}`,
-      "Content-Type": "application/x-www-form-urlencoded",
+      ...(form instanceof URLSearchParams ? { "Content-Type": "application/x-www-form-urlencoded" } : {}),
     },
-    body: form.toString(),
+    body: form instanceof URLSearchParams ? form.toString() : form,
   });
 
   if (!response.ok) {

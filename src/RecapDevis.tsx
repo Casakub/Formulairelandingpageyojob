@@ -362,6 +362,16 @@ export default function RecapDevis() {
     langues: devisData.candidats?.langues,
     outillage: devisData.candidats?.outillage,
   });
+  const postes = Array.isArray(devisData.postes) ? devisData.postes : [];
+  const totalPostes = postes.length;
+  const totalCandidats = postes.reduce((sum: number, poste: any) => sum + (Number(poste?.quantite) || 0), 0);
+  const entrepriseAdresse = [
+    devisData.entreprise?.adresse,
+    devisData.entreprise?.codePostal,
+    devisData.entreprise?.ville,
+    devisData.entreprise?.region,
+    devisData.entreprise?.pays,
+  ].filter(Boolean).join(' ');
 
   return (
     <>
@@ -993,6 +1003,120 @@ export default function RecapDevis() {
             ) : (
               /* Contenu du devis optimisé pour l'impression */
               <div className="mt-6 space-y-6 px-6 print:px-8" id="printable-content">
+              <div className="hidden print:block text-gray-900">
+                <div className="flex items-start justify-between border-b border-gray-200 pb-4">
+                  <div>
+                    <h1 className="text-2xl font-bold">YOJOB</h1>
+                    <p className="text-xs text-gray-600">
+                      {lang === 'fr' ? 'Courtage en recrutement européen' : 'Recrutare europeană'}
+                    </p>
+                  </div>
+                  <div className="text-right text-sm">
+                    <p className="font-semibold">{numeroDevis || devisData.numero}</p>
+                    <p>{new Date(devisData.createdAt).toLocaleDateString(lang === 'fr' ? 'fr-FR' : 'ro-RO')}</p>
+                    <p>{isSigned ? t.pageRecap.statut.signe : t.pageRecap.statut.nouveau}</p>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-2 gap-6 mt-4 text-sm">
+                  <div>
+                    <h2 className="text-sm font-semibold mb-2">{t.pageRecap.entreprise.title}</h2>
+                    <p>{devisData.entreprise.raisonSociale}</p>
+                    <p>{t.pageRecap.entreprise.siret}: {devisData.entreprise.siret || 'N/A'}</p>
+                    <p>{t.pageRecap.entreprise.codeAPE}: {devisData.entreprise.codeAPE || 'N/A'}</p>
+                    <p>{t.pageRecap.entreprise.tvaIntracommunautaire}: {devisData.entreprise.tvaIntracommunautaire || 'N/A'}</p>
+                    <p className="mt-2">{entrepriseAdresse || 'N/A'}</p>
+                  </div>
+                  <div>
+                    <h2 className="text-sm font-semibold mb-2">{t.pageRecap.contact.title}</h2>
+                    <p>{devisData.contact.prenom} {devisData.contact.nom}</p>
+                    <p>{t.pageRecap.contact.fonction}: {devisData.contact.fonction || 'N/A'}</p>
+                    <p>{t.pageRecap.contact.email}: {devisData.contact.email || 'N/A'}</p>
+                    <p>{t.pageRecap.contact.telephonePortable}: {devisData.contact.telephonePortable || devisData.contact.telephoneFixe || 'N/A'}</p>
+                  </div>
+                </div>
+
+                <div className="mt-6">
+                  <h2 className="text-sm font-semibold mb-2">{t.pageRecap.postes.title}</h2>
+                  <table className="w-full text-xs border border-gray-300">
+                    <thead className="bg-gray-100">
+                      <tr>
+                        <th className="text-left p-2 border-b border-gray-200">Poste</th>
+                        <th className="text-left p-2 border-b border-gray-200">Secteur</th>
+                        <th className="text-left p-2 border-b border-gray-200">Classification</th>
+                        <th className="text-right p-2 border-b border-gray-200">Qté</th>
+                        <th className="text-right p-2 border-b border-gray-200">{t.pageRecap.postes.salaireBrut}</th>
+                        <th className="text-right p-2 border-b border-gray-200">{t.pageRecap.postes.tauxETT}</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {postes.map((poste: any, index: number) => {
+                        const salaireBrut = poste.salaireBrut ?? 0;
+                        const tauxHoraireBrut = poste.tauxHoraireBrut ?? (poste.salaireBrut ? poste.salaireBrut / 151.67 : 0);
+                        const tauxETTBase = calculerTauxETTComplet(
+                          tauxHoraireBrut,
+                          poste.coeffBase || 1.92,
+                          poste.facteurPays || 1.00,
+                          3.50,
+                          1.50,
+                          {
+                            hebergementNonFourni: !devisData.conditions?.hebergement?.chargeEU,
+                            transportETT: devisData.conditions?.transportLocal?.chargeETT
+                          }
+                        );
+                        const tauxETTMajore = appliquerMajorationTaux(tauxETTBase, majorations.total);
+
+                        return (
+                          <tr key={index} className="border-b border-gray-200">
+                            <td className="p-2">{translatePoste(poste.secteur, poste.poste, lang)}</td>
+                            <td className="p-2">{translateSecteur(poste.secteur, lang)}</td>
+                            <td className="p-2">{translateClassification(poste.secteur, poste.classification, lang)}</td>
+                            <td className="p-2 text-right">{poste.quantite || 0}</td>
+                            <td className="p-2 text-right">{formaterMontant(salaireBrut)}</td>
+                            <td className="p-2 text-right">{formaterMontant(tauxETTMajore)}/h</td>
+                          </tr>
+                        );
+                      })}
+                    </tbody>
+                  </table>
+                  <div className="mt-2 text-xs text-gray-600">
+                    {lang === 'fr' ? 'Postes' : 'Posturi'}: {totalPostes} • {lang === 'fr' ? 'Candidats' : 'Candidați'}: {totalCandidats}
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-2 gap-6 mt-6 text-sm">
+                  <div>
+                    <h2 className="text-sm font-semibold mb-2">{t.pageRecap.conditions.title}</h2>
+                    <p>{t.pageRecap.conditions.dateDebut}: {devisData.conditions?.dateDebut ? new Date(devisData.conditions.dateDebut).toLocaleDateString(lang === 'fr' ? 'fr-FR' : 'ro-RO') : 'N/A'}</p>
+                    <p>{t.pageRecap.conditions.dateFin}: {devisData.conditions?.dateFin ? new Date(devisData.conditions.dateFin).toLocaleDateString(lang === 'fr' ? 'fr-FR' : 'ro-RO') : 'N/A'}</p>
+                    <p>{t.pageRecap.conditions.periodeEssai}: {devisData.conditions?.periodeEssai ? `${devisData.conditions.periodeEssai} ${t.common.months}` : 'N/A'}</p>
+                    <p>{t.pageRecap.conditions.baseHoraire}: {devisData.conditions?.baseHoraire ? `${devisData.conditions.baseHoraire}${t.pageRecap.conditions.heuresMois}` : 'N/A'}</p>
+                    <p>{t.pageRecap.conditions.lieuxMission}: {devisData.conditions?.lieuxMission || 'N/A'}</p>
+                  </div>
+                  <div>
+                    <h2 className="text-sm font-semibold mb-2">{lang === 'fr' ? 'Résumé' : 'Rezumat'}</h2>
+                    <p>{lang === 'fr' ? 'Postes' : 'Posturi'}: {totalPostes}</p>
+                    <p>{lang === 'fr' ? 'Candidats' : 'Candidați'}: {totalCandidats}</p>
+                    <p>{lang === 'fr' ? 'Statut' : 'Status'}: {isSigned ? t.pageRecap.statut.signe : t.pageRecap.statut.nouveau}</p>
+                  </div>
+                </div>
+
+                {isSigned && devisData.signature && (
+                  <div className="mt-6 text-sm">
+                    <h2 className="text-sm font-semibold mb-2">{lang === 'fr' ? 'Signature électronique' : 'Semnătură electronică'}</h2>
+                    <p>{lang === 'fr' ? 'Signataire' : 'Semnatar'}: {devisData.signature.signataire?.prenom} {devisData.signature.signataire?.nom}</p>
+                    <p>Email: {devisData.signature.signataire?.email || 'N/A'}</p>
+                    <p>{lang === 'fr' ? 'Date' : 'Data'}: {devisData.signature.metadata?.timestampReadable || 'N/A'}</p>
+                    <p>IP: {devisData.signature.metadata?.ipAddress || 'N/A'}</p>
+                  </div>
+                )}
+
+                <div className="mt-6 text-xs text-gray-500">
+                  {lang === 'fr' ? 'Document généré le' : 'Document generat la'} {new Date().toLocaleDateString(lang === 'fr' ? 'fr-FR' : 'ro-RO')}
+                </div>
+              </div>
+
+              <div className="print:hidden">
               {/* En-tête avec logo premium */}
               <div className="bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl p-8 print:bg-white print:border-gray-300 print:backdrop-blur-none print:px-6 print:py-6">
                 <div className="flex items-start justify-between">
@@ -1308,6 +1432,7 @@ export default function RecapDevis() {
                   <div className="w-2 h-2 bg-violet-400 rounded-full"></div>
                   <div className="w-2 h-2 bg-blue-400 rounded-full"></div>
                 </div>
+              </div>
               </div>
             </div>
             )}
