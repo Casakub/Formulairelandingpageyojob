@@ -2,6 +2,7 @@ import { Hono } from "npm:hono";
 import { createClient } from "npm:@supabase/supabase-js@2.39.3";
 import { scoreAndUpdateProspect, scoreBatchProspects } from "./prospect-scoring.tsx";
 import { triggerProspectIntegrations } from "./prospect-integrations.tsx";
+import { emailService } from "./email-service.tsx";
 
 const app = new Hono();
 
@@ -20,6 +21,107 @@ function getSupabaseClient() {
   }
 
   return createClient(supabaseUrl, supabaseServiceKey);
+}
+
+async function sendContactNotifications(payload: {
+  email: string;
+  name?: string;
+  phone?: string;
+  company?: string;
+  countryCode?: string;
+  sector?: string;
+  needType?: string;
+  message?: string;
+  source?: string;
+}) {
+  try {
+    if (!payload.email) return;
+
+    const fullName = payload.name || 'Bonjour';
+    const subjectClient = '✅ Nous avons bien reçu votre demande';
+    const textClient = `Bonjour ${fullName},
+
+Merci pour votre message. Notre équipe YOJOB vous recontactera très rapidement.
+
+Récapitulatif :
+- Email : ${payload.email}
+- Société : ${payload.company || 'Non précisé'}
+- Téléphone : ${payload.phone || 'Non précisé'}
+- Pays : ${payload.countryCode || 'Non précisé'}
+- Secteur : ${payload.sector || 'Non précisé'}
+- Besoin : ${payload.needType || 'Non précisé'}
+- Message : ${payload.message || 'Non précisé'}
+
+À très vite,
+L'équipe YOJOB`;
+
+    const htmlClient = `
+      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+        <h2>Merci pour votre demande ✅</h2>
+        <p>Bonjour <strong>${fullName}</strong>,</p>
+        <p>Nous avons bien reçu votre message et nous vous recontactons très rapidement.</p>
+        <h3>Récapitulatif</h3>
+        <ul>
+          <li><strong>Email :</strong> ${payload.email}</li>
+          <li><strong>Société :</strong> ${payload.company || 'Non précisé'}</li>
+          <li><strong>Téléphone :</strong> ${payload.phone || 'Non précisé'}</li>
+          <li><strong>Pays :</strong> ${payload.countryCode || 'Non précisé'}</li>
+          <li><strong>Secteur :</strong> ${payload.sector || 'Non précisé'}</li>
+          <li><strong>Besoin :</strong> ${payload.needType || 'Non précisé'}</li>
+          <li><strong>Message :</strong> ${payload.message || 'Non précisé'}</li>
+        </ul>
+        <p>À très vite,<br><strong>L'équipe YOJOB</strong></p>
+      </div>
+    `;
+
+    await emailService.sendEmail({
+      to: payload.email,
+      subject: subjectClient,
+      body: textClient,
+      html: htmlClient,
+    });
+
+    const subjectAdmin = '📥 Nouvelle demande de contact';
+    const textAdmin = `Nouvelle demande reçue
+
+Source : ${payload.source || 'inconnue'}
+Nom : ${payload.name || 'Non précisé'}
+Email : ${payload.email}
+Téléphone : ${payload.phone || 'Non précisé'}
+Société : ${payload.company || 'Non précisé'}
+Pays : ${payload.countryCode || 'Non précisé'}
+Secteur : ${payload.sector || 'Non précisé'}
+Besoin : ${payload.needType || 'Non précisé'}
+Message : ${payload.message || 'Non précisé'}
+`;
+
+    const htmlAdmin = `
+      <div style="font-family: Arial, sans-serif; max-width: 700px; margin: 0 auto;">
+        <h2>📥 Nouvelle demande de contact</h2>
+        <ul>
+          <li><strong>Source :</strong> ${payload.source || 'inconnue'}</li>
+          <li><strong>Nom :</strong> ${payload.name || 'Non précisé'}</li>
+          <li><strong>Email :</strong> ${payload.email}</li>
+          <li><strong>Téléphone :</strong> ${payload.phone || 'Non précisé'}</li>
+          <li><strong>Société :</strong> ${payload.company || 'Non précisé'}</li>
+          <li><strong>Pays :</strong> ${payload.countryCode || 'Non précisé'}</li>
+          <li><strong>Secteur :</strong> ${payload.sector || 'Non précisé'}</li>
+          <li><strong>Besoin :</strong> ${payload.needType || 'Non précisé'}</li>
+          <li><strong>Message :</strong> ${payload.message || 'Non précisé'}</li>
+        </ul>
+      </div>
+    `;
+
+    await emailService.sendEmail({
+      to: 'contact@yojob.fr',
+      subject: subjectAdmin,
+      body: textAdmin,
+      html: htmlAdmin,
+      replyTo: payload.email,
+    });
+  } catch (error) {
+    console.error('⚠️ Erreur envoi emails contact (non-bloquant):', error);
+  }
 }
 
 /**
@@ -142,6 +244,27 @@ app.post("/submit", async (c) => {
     } catch (error: any) {
       console.error('⚠️ Erreur déclenchement workflows:', error);
       // Ne pas bloquer la création du prospect si les workflows échouent
+    }
+
+    // ✉️ Email confirmation + notification interne (formulaire de contact uniquement)
+    const sourceValue = source || 'manual';
+    const shouldSendContactEmails =
+      (sourceValue.startsWith('landing_contact') || (sourceValue.startsWith('landing') && prospectType === 'contact'))
+      && sourceValue !== 'manual'
+      && sourceValue !== 'import';
+
+    if (shouldSendContactEmails) {
+      await sendContactNotifications({
+        email,
+        name,
+        phone,
+        company,
+        countryCode,
+        sector,
+        needType,
+        message,
+        source: sourceValue,
+      });
     }
 
     return c.json({

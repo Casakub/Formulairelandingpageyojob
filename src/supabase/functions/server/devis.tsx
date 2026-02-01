@@ -1,8 +1,12 @@
 import { Hono } from 'npm:hono';
 import { createClient } from "npm:@supabase/supabase-js@2.39.3";
 import * as kv from './kv_store.tsx';
+import { emailService } from './email-service.tsx';
+import { SIGNATURE_EMAIL_TEMPLATES } from './signature-email-templates.ts';
 
 const devis = new Hono();
+
+const INTERNAL_CONTACT_EMAIL = 'contact@yojob.fr';
 
 // Helper pour obtenir le client Supabase (CRM prospects)
 function getSupabaseClient() {
@@ -25,6 +29,143 @@ function mapDevisSector(secteurKey?: string): string | null {
   }
 
   return secteurKey;
+}
+
+function applyTemplateVariables(
+  template: { subject: string; body_html: string; body_text: string },
+  variables: Record<string, string>
+) {
+  let subject = template.subject;
+  let bodyHtml = template.body_html;
+  let bodyText = template.body_text;
+
+  for (const [key, value] of Object.entries(variables)) {
+    const placeholder = `{{${key}}}`;
+    subject = subject.split(placeholder).join(value);
+    bodyHtml = bodyHtml.split(placeholder).join(value);
+    bodyText = bodyText.split(placeholder).join(value);
+  }
+
+  return { subject, bodyHtml, bodyText };
+}
+
+async function sendEmailSafe(options: { to: string; subject: string; body: string; html?: string; replyTo?: string }) {
+  try {
+    const result = await emailService.sendEmail(options);
+    if (!result.success) {
+      console.error('⚠️ Envoi email échoué:', result.message);
+    }
+  } catch (error) {
+    console.error('⚠️ Erreur envoi email (non-bloquant):', error);
+  }
+}
+
+async function updateProspectCustomFields(
+  devisData: any,
+  updates: Record<string, any>
+): Promise<string | null> {
+  try {
+    const supabase = getSupabaseClient();
+    const contactEmail = devisData?.contact?.email;
+    let prospectId = devisData?.prospectId || null;
+
+    let existing: any = null;
+    if (prospectId) {
+      const { data } = await supabase
+        .from('prospects')
+        .select('id, custom_fields')
+        .eq('id', prospectId)
+        .single();
+      existing = data;
+    } else if (contactEmail) {
+      const { data } = await supabase
+        .from('prospects')
+        .select('id, custom_fields')
+        .eq('email', contactEmail)
+        .maybeSingle();
+      existing = data;
+    }
+
+    if (!existing) return null;
+
+    const merged = {
+      ...(existing.custom_fields || {}),
+      ...updates,
+    };
+
+    const { error } = await supabase
+      .from('prospects')
+      .update({ custom_fields: merged })
+      .eq('id', existing.id);
+
+    if (error) {
+      console.error('⚠️ Erreur update custom_fields prospect:', error);
+      return existing.id;
+    }
+
+    return existing.id;
+  } catch (error) {
+    console.error('⚠️ Erreur update custom_fields prospect (non-bloquant):', error);
+    return null;
+  }
+}
+
+async function sendSignatureConfirmationEmails(prospect: any, signatureTimestamp: string) {
+  try {
+    const template = SIGNATURE_EMAIL_TEMPLATES.find(t => t.id === 'tpl-signature-confirmed');
+    const signatureDate = new Date(signatureTimestamp).toLocaleString('fr-FR', {
+      dateStyle: 'full',
+      timeStyle: 'short',
+      timeZone: 'Europe/Paris'
+    });
+
+    const contactName = [prospect.contact.prenom, prospect.contact.nom].filter(Boolean).join(' ').trim();
+    const variables = {
+      contact_firstname: prospect.contact.prenom || '',
+      contact_lastname: prospect.contact.nom || '',
+      quote_number: prospect.numero || '',
+      signature_date: signatureDate,
+    };
+
+    if (template) {
+      const { subject, bodyHtml, bodyText } = applyTemplateVariables(template, variables);
+      const pdfUrl = (prospect.pdfUrl && prospect.pdfUrl !== '#') ? prospect.pdfUrl : (prospect.pdf_url && prospect.pdf_url !== '#') ? prospect.pdf_url : '';
+      const extraHtml = pdfUrl
+        ? `<p style="margin-top: 20px;"><a href="${pdfUrl}" style="color:#06B6D4;text-decoration:none;">📄 Télécharger votre devis signé</a></p>`
+        : '';
+      const extraText = pdfUrl ? `\n\nTélécharger votre devis signé : ${pdfUrl}` : '';
+
+      await sendEmailSafe({
+        to: prospect.contact.email,
+        subject,
+        body: bodyText + extraText,
+        html: bodyHtml + extraHtml,
+      });
+    } else {
+      await sendEmailSafe({
+        to: prospect.contact.email,
+        subject: '✅ Votre devis est signé',
+        body: `Bonjour ${contactName || ''},\n\nVotre devis ${prospect.numero} a été signé le ${signatureDate}.\n\nL'équipe YOJOB`,
+      });
+    }
+
+    await sendEmailSafe({
+      to: INTERNAL_CONTACT_EMAIL,
+      subject: `✅ Devis signé - ${prospect.numero}`,
+      body: `Le devis ${prospect.numero} a été signé.\n\nContact: ${contactName}\nEmail: ${prospect.contact.email}`,
+      html: `
+        <div style="font-family: Arial, sans-serif; max-width: 700px; margin: 0 auto;">
+          <h2>✅ Devis signé</h2>
+          <p><strong>Numéro :</strong> ${prospect.numero}</p>
+          <p><strong>Contact :</strong> ${contactName}</p>
+          <p><strong>Email :</strong> ${prospect.contact.email}</p>
+        </div>
+      `,
+      replyTo: prospect.contact.email,
+    });
+  } catch (error) {
+    console.error('⚠️ Erreur envoi email signature (non-bloquant):', error);
+  }
 }
 
 async function syncDevisToProspect(devisData: any) {
@@ -300,6 +441,75 @@ devis.post('/', async (c) => {
     await kv.set('prospects:stats', stats);
     
     console.log(`✅ Devis créé: ${numero} (ID: ${id})`);
+
+    // ✉️ Emails transactionnels (confirmation client + notification interne)
+    try {
+      const contactName = [prospect.contact.prenom, prospect.contact.nom].filter(Boolean).join(' ').trim() || 'Bonjour';
+      const subjectClient = '✅ Votre demande de devis a bien été reçue';
+      const textClient = `Bonjour ${contactName},
+
+Merci pour votre demande de devis. Notre équipe vous recontacte rapidement.
+
+Numéro de devis : ${prospect.numero}
+Entreprise : ${prospect.entreprise.raisonSociale || 'Non précisé'}
+
+L'équipe YOJOB`;
+
+      const htmlClient = `
+        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+          <h2>Demande de devis reçue ✅</h2>
+          <p>Bonjour <strong>${contactName}</strong>,</p>
+          <p>Merci pour votre demande de devis. Notre équipe vous recontacte rapidement.</p>
+          <p><strong>Numéro de devis :</strong> ${prospect.numero}</p>
+          <p><strong>Entreprise :</strong> ${prospect.entreprise.raisonSociale || 'Non précisé'}</p>
+          <p>À très vite,<br><strong>L'équipe YOJOB</strong></p>
+        </div>
+      `;
+
+      await sendEmailSafe({
+        to: prospect.contact.email,
+        subject: subjectClient,
+        body: textClient,
+        html: htmlClient,
+      });
+
+      const subjectAdmin = '📥 Nouvelle demande de devis';
+      const textAdmin = `Nouvelle demande de devis
+
+Numéro : ${prospect.numero}
+Entreprise : ${prospect.entreprise.raisonSociale || 'Non précisé'}
+Contact : ${contactName}
+Email : ${prospect.contact.email}
+Téléphone : ${prospect.contact.telephonePortable || prospect.contact.telephoneFixe || 'Non précisé'}
+Pays : ${prospect.entreprise.pays || 'Non précisé'}
+Postes : ${prospect.postes?.length || 0}
+`;
+
+      const htmlAdmin = `
+        <div style="font-family: Arial, sans-serif; max-width: 700px; margin: 0 auto;">
+          <h2>📥 Nouvelle demande de devis</h2>
+          <ul>
+            <li><strong>Numéro :</strong> ${prospect.numero}</li>
+            <li><strong>Entreprise :</strong> ${prospect.entreprise.raisonSociale || 'Non précisé'}</li>
+            <li><strong>Contact :</strong> ${contactName}</li>
+            <li><strong>Email :</strong> ${prospect.contact.email}</li>
+            <li><strong>Téléphone :</strong> ${prospect.contact.telephonePortable || prospect.contact.telephoneFixe || 'Non précisé'}</li>
+            <li><strong>Pays :</strong> ${prospect.entreprise.pays || 'Non précisé'}</li>
+            <li><strong>Postes :</strong> ${prospect.postes?.length || 0}</li>
+          </ul>
+        </div>
+      `;
+
+      await sendEmailSafe({
+        to: INTERNAL_CONTACT_EMAIL,
+        subject: subjectAdmin,
+        body: textAdmin,
+        html: htmlAdmin,
+        replyTo: prospect.contact.email,
+      });
+    } catch (notifyError) {
+      console.error('⚠️ Emails devis (non-bloquant):', notifyError);
+    }
 
     // 🔗 Sync CRM + Trigger automations (non bloquant)
     try {
@@ -777,8 +987,13 @@ devis.post('/signer-devis', async (c) => {
     console.log(`📍 IP: ${ipAddress}`);
     console.log(`🔐 Hash: ${hashHex.substring(0, 16)}...`);
     
-    // TODO: Envoyer email de confirmation avec certificat
-    // TODO: Régénérer le PDF avec la signature et le certificat
+    // 🔄 Sync CRM + email confirmation
+    await updateProspectCustomFields(prospectMisAJour, {
+      devis_status: 'signe',
+      signature_date: timestamp,
+      signed_via_token: false,
+    });
+    await sendSignatureConfirmationEmails(prospectMisAJour, timestamp);
     
     return c.json({
       success: true,
@@ -860,6 +1075,7 @@ devis.post('/generer-lien-signature', async (c) => {
     const prospectMisAJour = {
       ...prospect,
       signatureToken: token,
+      signatureUrl: signatureUrl,
       signatureLinkGeneratedAt: timestamp,
       signatureLinkExpiresAt: expirationDate.toISOString(),
       updatedAt: timestamp
@@ -875,17 +1091,10 @@ devis.post('/generer-lien-signature', async (c) => {
     
     // 🆕 ENVOI AUTOMATIQUE D'EMAIL AVEC LE LIEN
     try {
-      const { SIGNATURE_EMAIL_TEMPLATES } = await import('./signature-email-templates.ts');
       const template = SIGNATURE_EMAIL_TEMPLATES.find(t => t.id === 'tpl-signature-link');
       
       if (template && prospectMisAJour) {
-        // Calculer candidats totaux
         const totalCandidats = prospectMisAJour.postes.reduce((sum, p) => sum + p.quantite, 0);
-        
-        // Remplacer les variables dans le template
-        let emailBody = template.body_html;
-        let emailSubject = template.subject;
-        
         const variables = {
           contact_firstname: prospectMisAJour.contact.prenom || '',
           contact_lastname: prospectMisAJour.contact.nom || '',
@@ -894,41 +1103,31 @@ devis.post('/generer-lien-signature', async (c) => {
           signature_url: signatureUrl,
           positions_count: String(prospectMisAJour.postes.length),
           candidates_count: String(totalCandidats),
-          sector: prospectMisAJour.postes[0]?.secteur || 'Non spécifié'
+          sector: prospectMisAJour.postes[0]?.secteur || 'Non spécifié',
+          country: prospectMisAJour.entreprise.pays || '',
         };
         
-        // Remplacer les variables
-        Object.entries(variables).forEach(([key, value]) => {
-          const placeholder = `{{${key}}}`;
-          emailBody = emailBody.replaceAll(placeholder, value);
-          emailSubject = emailSubject.replaceAll(placeholder, value);
+        const { subject, bodyHtml, bodyText } = applyTemplateVariables(template, variables);
+        
+        await sendEmailSafe({
+          to: prospectMisAJour.contact.email,
+          subject,
+          body: bodyText,
+          html: bodyHtml,
         });
-        
-        // TODO: Configurer votre service SMTP et envoyer l'email
-        // Exemple avec Deno.env pour les credentials SMTP
-        console.log('📧 Email automatique prêt à envoyer :');
-        console.log('To:', prospectMisAJour.contact.email);
-        console.log('Subject:', emailSubject);
-        console.log('📄 Template HTML chargé et personnalisé');
-        
-        // OPTION 1: Utiliser un service externe (SendGrid, Mailgun, etc.)
-        // await fetch('https://api.sendgrid.com/v3/mail/send', { ... });
-        
-        // OPTION 2: Utiliser SMTP direct avec Deno
-        // const smtpConfig = {
-        //   host: Deno.env.get('SMTP_HOST'),
-        //   port: Number(Deno.env.get('SMTP_PORT')),
-        //   username: Deno.env.get('SMTP_USER'),
-        //   password: Deno.env.get('SMTP_PASS')
-        // };
-        // await sendEmailViaSMTP(smtpConfig, prospectMisAJour.contact.email, emailSubject, emailBody);
-        
-        console.log('✅ Email de signature configuré (à activer avec SMTP)');
       }
     } catch (emailError) {
       // Ne pas bloquer si l'email échoue (non-bloquant)
       console.error('⚠️ Erreur envoi email (non-bloquant):', emailError);
     }
+
+    // 🔄 Synchroniser infos signature dans le CRM prospects
+    await updateProspectCustomFields(prospectMisAJour, {
+      signature_token: token,
+      signature_url: signatureUrl,
+      signature_link_generated_at: timestamp,
+      signature_link_expires_at: expirationDate.toISOString(),
+    });
     
     return c.json({
       success: true,
@@ -1200,8 +1399,14 @@ devis.post('/signer-avec-token', async (c) => {
     console.log(`📍 IP: ${ipAddress}`);
     console.log(`🔐 Hash: ${hashHex.substring(0, 16)}...`);
     
-    // TODO: Envoyer email de confirmation
-    // TODO: Déclencher workflow "Devis signé"
+    // 🔄 Sync CRM + email confirmation
+    await updateProspectCustomFields(prospectMisAJour, {
+      devis_status: 'signe',
+      signature_date: timestamp,
+      signed_via_token: true,
+      signature_token_used: token,
+    });
+    await sendSignatureConfirmationEmails(prospectMisAJour, timestamp);
     
     return c.json({
       success: true,
