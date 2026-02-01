@@ -1628,6 +1628,10 @@
     max-width: 100px;
   }
 
+  .max-w-full {
+    max-width: 100%;
+  }
+
   .max-w-lg {
     max-width: var(--container-lg);
   }
@@ -3823,6 +3827,11 @@
     --tw-gradient-stops: var(--tw-gradient-via-stops, var(--tw-gradient-position), var(--tw-gradient-from) var(--tw-gradient-from-position), var(--tw-gradient-to) var(--tw-gradient-to-position));
   }
 
+  .from-\[\#1E3A8A\]\/80 {
+    --tw-gradient-from: oklab(37.9059% -.0107554 -.137341 / .8);
+    --tw-gradient-stops: var(--tw-gradient-via-stops, var(--tw-gradient-position), var(--tw-gradient-from) var(--tw-gradient-from-position), var(--tw-gradient-to) var(--tw-gradient-to-position));
+  }
+
   .from-\[\#1E3A8A\]\/95 {
     --tw-gradient-from: oklab(37.9059% -.0107554 -.137341 / .95);
     --tw-gradient-stops: var(--tw-gradient-via-stops, var(--tw-gradient-position), var(--tw-gradient-from) var(--tw-gradient-from-position), var(--tw-gradient-to) var(--tw-gradient-to-position));
@@ -3935,6 +3944,17 @@
   @supports (color: color-mix(in lab, red, red)) {
     .from-blue-900\/20 {
       --tw-gradient-from: color-mix(in oklab, var(--color-blue-900) 20%, transparent);
+    }
+  }
+
+  .from-blue-900\/90 {
+    --tw-gradient-from: color-mix(in srgb, oklch(.379 .146 265.522) 90%, transparent);
+    --tw-gradient-stops: var(--tw-gradient-via-stops, var(--tw-gradient-position), var(--tw-gradient-from) var(--tw-gradient-from-position), var(--tw-gradient-to) var(--tw-gradient-to-position));
+  }
+
+  @supports (color: color-mix(in lab, red, red)) {
+    .from-blue-900\/90 {
+      --tw-gradient-from: color-mix(in oklab, var(--color-blue-900) 90%, transparent);
     }
   }
 
@@ -4514,6 +4534,12 @@
     --tw-gradient-stops: var(--tw-gradient-via-stops);
   }
 
+  .via-\[\#7C3AED\]\/80 {
+    --tw-gradient-via: oklab(54.1337% .0963843 -.226968 / .8);
+    --tw-gradient-via-stops: var(--tw-gradient-position), var(--tw-gradient-from) var(--tw-gradient-from-position), var(--tw-gradient-via) var(--tw-gradient-via-position), var(--tw-gradient-to) var(--tw-gradient-to-position);
+    --tw-gradient-stops: var(--tw-gradient-via-stops);
+  }
+
   .via-\[\#7C3AED\]\/95 {
     --tw-gradient-via: oklab(54.1337% .0963843 -.226968 / .95);
     --tw-gradient-via-stops: var(--tw-gradient-position), var(--tw-gradient-from) var(--tw-gradient-from-position), var(--tw-gradient-via) var(--tw-gradient-via-position), var(--tw-gradient-to) var(--tw-gradient-to-position);
@@ -4718,6 +4744,18 @@
     }
   }
 
+  .via-violet-900\/90 {
+    --tw-gradient-via: color-mix(in srgb, oklch(.38 .189 293.745) 90%, transparent);
+    --tw-gradient-via-stops: var(--tw-gradient-position), var(--tw-gradient-from) var(--tw-gradient-from-position), var(--tw-gradient-via) var(--tw-gradient-via-position), var(--tw-gradient-to) var(--tw-gradient-to-position);
+    --tw-gradient-stops: var(--tw-gradient-via-stops);
+  }
+
+  @supports (color: color-mix(in lab, red, red)) {
+    .via-violet-900\/90 {
+      --tw-gradient-via: color-mix(in oklab, var(--color-violet-900) 90%, transparent);
+    }
+  }
+
   .via-violet-900\/95 {
     --tw-gradient-via: color-mix(in srgb, oklch(.38 .189 293.745) 95%, transparent);
     --tw-gradient-via-stops: var(--tw-gradient-position), var(--tw-gradient-from) var(--tw-gradient-from-position), var(--tw-gradient-via) var(--tw-gradient-via-position), var(--tw-gradient-to) var(--tw-gradient-to-position);
@@ -4795,6 +4833,11 @@
 
   .to-\[\#06B6D4\]\/10 {
     --tw-gradient-to: oklab(71.4837% -.102719 -.0725165 / .1);
+    --tw-gradient-stops: var(--tw-gradient-via-stops, var(--tw-gradient-position), var(--tw-gradient-from) var(--tw-gradient-from-position), var(--tw-gradient-to) var(--tw-gradient-to-position));
+  }
+
+  .to-\[\#06B6D4\]\/80 {
+    --tw-gradient-to: oklab(71.4837% -.102719 -.0725165 / .8);
     --tw-gradient-stops: var(--tw-gradient-via-stops, var(--tw-gradient-position), var(--tw-gradient-from) var(--tw-gradient-from-position), var(--tw-gradient-to) var(--tw-gradient-to-position));
   }
 
@@ -5018,6 +5061,17 @@
   @supports (color: color-mix(in lab, red, red)) {
     .to-cyan-900\/50 {
       --tw-gradient-to: color-mix(in oklab, var(--color-cyan-900) 50%, transparent);
+    }
+  }
+
+  .to-cyan-900\/90 {
+    --tw-gradient-to: color-mix(in srgb, oklch(.398 .07 227.392) 90%, transparent);
+    --tw-gradient-stops: var(--tw-gradient-via-stops, var(--tw-gradient-position), var(--tw-gradient-from) var(--tw-gradient-from-position), var(--tw-gradient-to) var(--tw-gradient-to-position));
+  }
+
+  @supports (color: color-mix(in lab, red, red)) {
+    .to-cyan-900\/90 {
+      --tw-gradient-to: color-mix(in oklab, var(--color-cyan-900) 90%, transparent);
     }
   }
 
@@ -6068,6 +6122,10 @@
 
   .break-all {
     word-break: break-all;
+  }
+
+  .whitespace-normal {
+    white-space: normal;
   }
 
   .whitespace-nowrap {
@@ -9855,6 +9913,12 @@
   }
 
   @media (width >= 48rem) {
+    .md\:pt-40 {
+      padding-top: calc(var(--spacing) * 40);
+    }
+  }
+
+  @media (width >= 48rem) {
     .md\:text-sm {
       font-size: var(--text-sm);
       line-height: var(--tw-leading, var(--text-sm--line-height));
@@ -10094,6 +10158,12 @@
   }
 
   @media (width >= 64rem) {
+    .lg\:bg-transparent {
+      background-color: #0000;
+    }
+  }
+
+  @media (width >= 64rem) {
     .lg\:p-2 {
       padding: calc(var(--spacing) * 2);
     }
@@ -10168,6 +10238,14 @@
   @media (width >= 64rem) {
     .lg\:text-right {
       text-align: right;
+    }
+  }
+
+  @media (width >= 64rem) {
+    .lg\:backdrop-blur-none {
+      --tw-backdrop-blur: ;
+      -webkit-backdrop-filter: var(--tw-backdrop-blur, ) var(--tw-backdrop-brightness, ) var(--tw-backdrop-contrast, ) var(--tw-backdrop-grayscale, ) var(--tw-backdrop-hue-rotate, ) var(--tw-backdrop-invert, ) var(--tw-backdrop-opacity, ) var(--tw-backdrop-saturate, ) var(--tw-backdrop-sepia, );
+      backdrop-filter: var(--tw-backdrop-blur, ) var(--tw-backdrop-brightness, ) var(--tw-backdrop-contrast, ) var(--tw-backdrop-grayscale, ) var(--tw-backdrop-hue-rotate, ) var(--tw-backdrop-invert, ) var(--tw-backdrop-opacity, ) var(--tw-backdrop-saturate, ) var(--tw-backdrop-sepia, );
     }
   }
 

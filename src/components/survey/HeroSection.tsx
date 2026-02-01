@@ -110,7 +110,7 @@ export function HeroSection({ onStart, respondentType }: HeroSectionProps) {
   const stats = getStatsForProfile();
 
   return (
-    <section className="relative min-h-[90vh] flex items-center justify-center overflow-hidden py-20 px-4">
+    <section className="relative min-h-[90vh] flex items-center justify-center overflow-hidden py-20 pt-32 md:pt-40 px-4">
       {/* Content */}
       <div className="relative z-10 max-w-4xl mx-auto text-center">
         {/* Badge */}
@@ -118,10 +118,10 @@ export function HeroSection({ onStart, respondentType }: HeroSectionProps) {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }}
-          className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-white/10 backdrop-blur-sm border border-white/20 mb-8"
+          className="inline-flex items-center justify-center gap-2 px-6 py-3 rounded-full bg-white/10 backdrop-blur-sm border border-white/20 mb-8 max-w-full text-center flex-wrap"
         >
           <span className="text-2xl">📊</span>
-          <span className="text-white/90">{getText('hero.badge', 'Étude de marché européen')}</span>
+          <span className="text-white/90 leading-relaxed">{getText('hero.badge', 'Étude de marché européen')}</span>
         </motion.div>
 
         {/* Title */}

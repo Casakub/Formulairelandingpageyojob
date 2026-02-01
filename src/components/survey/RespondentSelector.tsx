@@ -48,7 +48,7 @@ export function RespondentSelector({ onSelect, currentLanguage = 'fr', available
   const { t } = useI18n(); // ✅ Le hook ne prend pas de paramètre, il utilise le contexte
 
   return (
-    <section className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-900 via-violet-900 to-cyan-900 px-4 py-16">
+    <section className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-900 via-violet-900 to-cyan-900 px-4 py-20 pt-32 md:pt-40">
       <div className="max-w-6xl mx-auto w-full">
         
         {/* Header */}
@@ -56,9 +56,9 @@ export function RespondentSelector({ onSelect, currentLanguage = 'fr', available
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }}
-          className="text-center mb-12"
+          className="text-center mb-16"
         >
-          <Badge className="mb-6 bg-white/10 backdrop-blur-sm border-white/20 text-white px-6 py-2">
+          <Badge className="mb-8 bg-white/10 backdrop-blur-sm border-white/20 text-white px-6 py-3 text-base whitespace-normal text-center max-w-full mx-auto leading-relaxed">
             {t('selector.badge', '🌍 Étude de marché européen - Recrutement & Intérim')}
           </Badge>
           
