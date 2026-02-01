@@ -6,7 +6,7 @@ import * as kv from './kv_store.tsx';
 import { emailService } from './email-service.tsx';
 import { SIGNATURE_EMAIL_TEMPLATES } from './signature-email-templates.ts';
 import { cgvFR } from './cgv-data.ts';
-import { generateModernDevisPdf } from './devis-pdf-generator-v2.tsx';
+import { generateModernDevisPdf } from './devis-pdf-generator-v3.tsx';
 
 const devis = new Hono();
 
