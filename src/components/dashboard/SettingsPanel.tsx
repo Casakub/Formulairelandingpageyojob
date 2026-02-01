@@ -86,7 +86,7 @@ export function SettingsPanel() {
   const [smtpConfig, setSMTPConfig] = useState<SMTPConfig>({
     host: '',
     port: 587,
-    secure: true,
+    secure: false,
     username: '',
     password: '',
     from_email: '',
@@ -415,9 +415,13 @@ export function SettingsPanel() {
         const result = await response.json();
         const config = result?.config || result?.settings || result;
         if (config && typeof config === 'object') {
+          const normalizedSecure = typeof config.secure === 'boolean'
+            ? config.secure
+            : Number(config.port) === 465;
           setSMTPConfig((prev) => ({
             ...prev,
             ...config,
+            secure: normalizedSecure,
             provider: (config.provider || prev.provider) as SMTPConfig['provider'],
           }));
         }
@@ -1085,6 +1089,17 @@ export function SettingsPanel() {
                           className="mt-1 bg-white border-slate-200 text-slate-900 placeholder:text-slate-400 focus:border-cyan-400 focus:ring-cyan-400/20"
                         />
                       </div>
+                    </div>
+
+                    <div className="flex flex-col gap-1">
+                      <div className="flex items-center gap-2">
+                        <Switch
+                          checked={smtpConfig.secure}
+                          onCheckedChange={(checked) => setSMTPConfig({ ...smtpConfig, secure: checked })}
+                        />
+                        <Label>Connexion SSL/TLS (port 465)</Label>
+                      </div>
+                      <p className="text-xs text-slate-500">Pour le port 587, laissez désactivé (STARTTLS).</p>
                     </div>
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">

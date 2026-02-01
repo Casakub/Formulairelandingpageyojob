@@ -1,7 +1,205 @@
 import { Hono } from 'npm:hono';
+import { createClient } from "npm:@supabase/supabase-js@2.39.3";
 import * as kv from './kv_store.tsx';
 
 const devis = new Hono();
+
+// Helper pour obtenir le client Supabase (CRM prospects)
+function getSupabaseClient() {
+  const supabaseUrl = Deno.env.get("SUPABASE_URL");
+  const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
+
+  if (!supabaseUrl || !supabaseServiceKey) {
+    throw new Error("Missing Supabase credentials");
+  }
+
+  return createClient(supabaseUrl, supabaseServiceKey);
+}
+
+function mapDevisSector(secteurKey?: string): string | null {
+  if (!secteurKey) return null;
+
+  const normalized = secteurKey.toLowerCase();
+  if (normalized === 'batiment' || normalized === 'tp' || normalized === 'travaux_publics') {
+    return 'BTP';
+  }
+
+  return secteurKey;
+}
+
+async function syncDevisToProspect(devisData: any) {
+  try {
+    const contact = devisData?.contact || {};
+    const entreprise = devisData?.entreprise || {};
+    const postes = Array.isArray(devisData?.postes) ? devisData.postes : [];
+    const conditions = devisData?.conditions || {};
+
+    if (!contact.email) {
+      console.warn('⚠️ Devis sans email, sync CRM ignorée.');
+      return null;
+    }
+
+    const supabase = getSupabaseClient();
+
+    const fullName = [contact.prenom, contact.nom].filter(Boolean).join(' ').trim();
+    const phone = contact.telephonePortable || contact.telephoneFixe || null;
+    const sectorKey = postes[0]?.secteur || null;
+    const sectorLabel = mapDevisSector(sectorKey || undefined);
+    const totalCandidates = postes.reduce((sum: number, poste: any) => sum + (Number(poste?.quantite) || 0), 0);
+    const projectDescription = [conditions.motifRecours, conditions.lieuxMission].filter(Boolean).join(' - ');
+
+    const customFields = {
+      devis_id: devisData.id,
+      devis_numero: devisData.numero,
+      devis_status: devisData.statut,
+      devis_created_at: devisData.createdAt,
+      devis_updated_at: devisData.updatedAt,
+      workers_count: totalCandidates,
+      industry_sector: sectorLabel || sectorKey || null,
+      sector_key: sectorKey,
+      project_description: projectDescription || null,
+      entreprise,
+      contact,
+      postes,
+      conditions,
+      source_event: 'devis_submitted',
+    };
+
+    const { data: existingProspect, error: searchError } = await supabase
+      .from('prospects')
+      .select('id, status, type, source, name, phone, company, country_code, sector, need_type, message, custom_fields')
+      .eq('email', contact.email)
+      .maybeSingle();
+
+    if (searchError) {
+      const message = (searchError as any)?.message || '';
+      const code = (searchError as any)?.code || '';
+      if (code === 'PGRST205' || message.includes('schema cache') || message.includes('does not exist')) {
+        console.warn('⚠️ Tables CRM non initialisées, sync devis ignorée.');
+        return null;
+      }
+      console.error('❌ Erreur recherche prospect existant:', searchError);
+    }
+
+    let prospectId: string;
+    let isNew = false;
+    let previousStatus: string | null = null;
+    let currentStatus: string | null = null;
+
+    if (existingProspect) {
+      previousStatus = existingProspect.status || null;
+
+      const updatedCustomFields = {
+        ...(existingProspect.custom_fields || {}),
+        ...customFields,
+      };
+
+      const { data: updatedProspect, error: updateError } = await supabase
+        .from('prospects')
+        .update({
+          type: existingProspect.type || 'client',
+          source: existingProspect.source || 'devis_form',
+          status: existingProspect.status || 'new',
+          name: existingProspect.name || fullName || null,
+          phone: existingProspect.phone || phone,
+          company: existingProspect.company || entreprise.raisonSociale || null,
+          country_code: existingProspect.country_code || entreprise.pays || null,
+          sector: existingProspect.sector || sectorLabel || sectorKey || null,
+          need_type: existingProspect.need_type || conditions.motifRecours || null,
+          message: existingProspect.message || 'Demande de devis',
+          custom_fields: updatedCustomFields,
+        })
+        .eq('id', existingProspect.id)
+        .select('id, status')
+        .single();
+
+      if (updateError) {
+        console.error('❌ Erreur mise à jour prospect (devis):', updateError);
+        return null;
+      }
+
+      prospectId = updatedProspect.id;
+      currentStatus = updatedProspect.status || null;
+    } else {
+      const { data: newProspect, error: insertError } = await supabase
+        .from('prospects')
+        .insert([{
+          type: 'client',
+          source: 'devis_form',
+          status: 'new',
+          name: fullName || null,
+          email: contact.email,
+          phone,
+          company: entreprise.raisonSociale || null,
+          country_code: entreprise.pays || null,
+          language_code: 'fr',
+          sector: sectorLabel || sectorKey || null,
+          need_type: conditions.motifRecours || null,
+          message: 'Demande de devis',
+          custom_fields: customFields,
+        }])
+        .select('id, status')
+        .single();
+
+      if (insertError) {
+        console.error('❌ Erreur création prospect (devis):', insertError);
+        return null;
+      }
+
+      prospectId = newProspect.id;
+      currentStatus = newProspect.status || null;
+      isNew = true;
+    }
+
+    try {
+      await supabase.from('prospect_actions').insert({
+        prospect_id: prospectId,
+        action_type: 'quote_request',
+        action_label: 'Demande de devis',
+        action_description: `Demande de devis ${devisData.numero}`,
+        user_name: 'Système',
+        metadata: {
+          devis_id: devisData.id,
+          devis_numero: devisData.numero,
+          source: 'devis_form',
+        },
+      });
+    } catch (actionError) {
+      console.warn('⚠️ Impossible d\'enregistrer action prospect (devis):', actionError);
+    }
+
+    return {
+      prospectId,
+      isNew,
+      previousStatus,
+      currentStatus,
+    };
+  } catch (error) {
+    console.error('❌ Erreur sync devis → prospect:', error);
+    return null;
+  }
+}
+
+async function triggerWorkflow(triggerType: 'prospect_created' | 'status_changed', payload: Record<string, any>) {
+  try {
+    const supabaseUrl = Deno.env.get("SUPABASE_URL");
+    const anonKey = Deno.env.get("SUPABASE_ANON_KEY");
+    if (!supabaseUrl || !anonKey) return;
+
+    fetch(`${supabaseUrl}/functions/v1/make-server-10092a63/workflow-engine/trigger/${triggerType}`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${anonKey}`,
+      },
+      body: JSON.stringify(payload),
+    }).catch(err => {
+      console.error(`⚠️ Erreur trigger ${triggerType} (non-bloquant):`, err);
+    });
+  } catch (error) {
+    console.error(`⚠️ Erreur déclenchement workflow ${triggerType}:`, error);
+  }
+}
 
 /**
  * Génère un numéro de devis unique
@@ -102,6 +300,34 @@ devis.post('/', async (c) => {
     await kv.set('prospects:stats', stats);
     
     console.log(`✅ Devis créé: ${numero} (ID: ${id})`);
+
+    // 🔗 Sync CRM + Trigger automations (non bloquant)
+    try {
+      const syncResult = await syncDevisToProspect(prospect);
+      if (syncResult?.prospectId) {
+        await kv.set(`prospects:${id}`, {
+          ...prospect,
+          prospectId: syncResult.prospectId,
+        });
+
+        // Déclencher les workflows automatiquement (SMTP)
+        await triggerWorkflow('prospect_created', { prospect_id: syncResult.prospectId });
+
+        if (
+          syncResult.previousStatus &&
+          syncResult.currentStatus &&
+          syncResult.previousStatus !== syncResult.currentStatus
+        ) {
+          await triggerWorkflow('status_changed', {
+            prospect_id: syncResult.prospectId,
+            status_from: syncResult.previousStatus,
+            status_to: syncResult.currentStatus,
+          });
+        }
+      }
+    } catch (syncError) {
+      console.error('⚠️ Sync CRM devis (non-bloquant):', syncError);
+    }
     
     return c.json({
       success: true,

@@ -295,32 +295,56 @@ async function sendViaSMTP(
   textBody: string,
   htmlBody: string
 ): Promise<{ success: boolean; message: string; messageId?: string }> {
+  const port = Number(config.port) || 587;
+  const secure = typeof config.secure === 'boolean' ? config.secure : port === 465;
+
   console.log('📧 Envoi email via SMTP:', {
     from: `${config.from_name} <${config.from_email}>`,
     to: options.to,
     subject: options.subject,
     host: config.host,
-    port: config.port,
+    port,
+    secure,
   });
 
-  const transporter = nodemailer.createTransport({
+  const baseTransportOptions: any = {
     host: config.host,
-    port: config.port,
-    secure: config.secure,
+    port,
+    secure,
     auth: {
       user: config.username,
       pass: config.password,
     },
-  });
+  };
 
-  const info = await transporter.sendMail({
-    from: `${config.from_name} <${config.from_email}>`,
-    to: options.to,
-    subject: options.subject,
-    text: textBody,
-    html: htmlBody,
-    replyTo: config.reply_to,
-  });
+  const sendWithTransport = async (transportOptions: any) => {
+    const transporter = nodemailer.createTransport(transportOptions);
+    return await transporter.sendMail({
+      from: `${config.from_name} <${config.from_email}>`,
+      to: options.to,
+      subject: options.subject,
+      text: textBody,
+      html: htmlBody,
+      replyTo: config.reply_to,
+    });
+  };
+
+  let info;
+  try {
+    info = await sendWithTransport(baseTransportOptions);
+  } catch (error) {
+    const shouldRetryWithStartTls = secure && (port === 587 || port === 25);
+    if (shouldRetryWithStartTls) {
+      console.warn('⚠️ SMTP TLS direct échoué, tentative STARTTLS...');
+      info = await sendWithTransport({
+        ...baseTransportOptions,
+        secure: false,
+        requireTLS: true,
+      });
+    } else {
+      throw error;
+    }
+  }
 
   const messageId = info?.messageId || `<${Date.now()}.${Math.random().toString(36).slice(2)}@yojob.com>`;
   await logEmailResult({

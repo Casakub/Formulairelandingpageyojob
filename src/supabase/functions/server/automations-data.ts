@@ -1209,7 +1209,7 @@ export const WORKFLOW_TEMPLATES: any[] = [
 export const MOCK_SMTP_SETTINGS: any = {
   host: 'smtp.gmail.com',
   port: 587,
-  secure: true,
+  secure: false,
   user: 'contact@yojob.eu',
   password_encrypted: '••••••••••••',
   from_name: 'YoJob Team',

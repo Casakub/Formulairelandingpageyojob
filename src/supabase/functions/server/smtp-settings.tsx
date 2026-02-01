@@ -8,7 +8,7 @@ const app = new Hono();
 const DEFAULT_SMTP_CONFIG = {
   host: '',
   port: 587,
-  secure: true,
+  secure: false,
   username: '',
   password: '',
   from_email: '',
@@ -19,6 +19,26 @@ const DEFAULT_SMTP_CONFIG = {
   reply_to: '',
   test_email: '',
 };
+
+function normalizeSMTPConfig(config: any): any {
+  if (!config || typeof config !== 'object') {
+    return config;
+  }
+
+  const normalized = { ...config };
+  const port = Number(normalized.port) || 587;
+  normalized.port = port;
+
+  const inputSecure = typeof normalized.secure === 'boolean'
+    ? normalized.secure
+    : port === 465;
+
+  // For 465 (SMTPS) we keep secure=true by default.
+  // For 587/25 we force STARTTLS (secure=false) to avoid TLS-on-plaintext errors.
+  normalized.secure = port === 465 ? inputSecure !== false : false;
+
+  return normalized;
+}
 
 function validateSMTPConfig(config: any): string | null {
   if (!config) {
@@ -87,7 +107,7 @@ const DEFAULT_COMPLIANCE_SETTINGS = {
 // GET /settings/smtp - Récupérer config SMTP
 app.get('/smtp', async (c) => {
   try {
-    const config = await kv.get('settings:smtp');
+    const config = normalizeSMTPConfig(await kv.get('settings:smtp'));
     return c.json({
       success: true,
       config: config || DEFAULT_SMTP_CONFIG,
@@ -105,7 +125,8 @@ app.get('/smtp', async (c) => {
 // PUT /settings/smtp - Sauvegarder config SMTP
 app.put('/smtp', async (c) => {
   try {
-    const config = await c.req.json();
+    const rawConfig = await c.req.json();
+    const config = normalizeSMTPConfig(rawConfig);
     
     const validationError = validateSMTPConfig(config);
     if (validationError) {
@@ -130,7 +151,8 @@ app.put('/smtp', async (c) => {
 // POST /settings/smtp - Sauvegarder config SMTP (alias pour compatibilité frontend)
 app.post('/smtp', async (c) => {
   try {
-    const config = await c.req.json();
+    const rawConfig = await c.req.json();
+    const config = normalizeSMTPConfig(rawConfig);
     
     const validationError = validateSMTPConfig(config);
     if (validationError) {
@@ -156,7 +178,8 @@ app.post('/smtp', async (c) => {
 // POST /settings/smtp/test - Tester la connexion SMTP
 app.post('/smtp/test', async (c) => {
   try {
-    const config = await c.req.json();
+    const rawConfig = await c.req.json();
+    const config = normalizeSMTPConfig(rawConfig);
 
     // Validation basique
     const validationError = validateSMTPConfig(config);
@@ -206,7 +229,7 @@ app.post('/smtp/test', async (c) => {
 app.post('/test-smtp', async (c) => {
   // Charger la config stockée pour le test
   try {
-    const storedConfig = await kv.get('settings:smtp');
+    const storedConfig = normalizeSMTPConfig(await kv.get('settings:smtp'));
     
     if (!storedConfig) {
       return c.json({
@@ -261,7 +284,7 @@ app.post('/smtp/dry-run', async (c) => {
   try {
     const body = await c.req.json();
     const storedConfig = await kv.get('settings:smtp');
-    const config = storedConfig || body;
+    const config = normalizeSMTPConfig(storedConfig || body);
 
     if (!config) {
       return c.json({ success: false, message: 'Aucune configuration SMTP trouvée' }, 400);
@@ -300,7 +323,7 @@ app.post('/dry-run-smtp', async (c) => {
   try {
     const body = await c.req.json().catch(() => ({}));
     const storedConfig = await kv.get('settings:smtp');
-    const config = storedConfig || body;
+    const config = normalizeSMTPConfig(storedConfig || body);
 
     if (!config) {
       return c.json({ success: false, message: 'Aucune configuration SMTP trouvée' }, 400);
