@@ -12,6 +12,7 @@
 
 import { PDFDocument, StandardFonts, rgb, PDFPage, PDFFont, PDFImage } from "npm:pdf-lib@1.17.1";
 import { cgvFR } from './cgv-data.ts';
+import { YOJOB_LOGO_BASE64 } from './yojob-logo-base64.ts';
 
 // ========================================
 // 🎨 TYPES ET CONSTANTES
@@ -184,6 +185,7 @@ function drawHeader(
   config: PDFConfig,
   colors: PDFColors,
   fonts: { regular: PDFFont; bold: PDFFont },
+  logo: PDFImage | null,
   devisData: {
     numero: string;
     isSigned: boolean;
@@ -202,50 +204,73 @@ function drawHeader(
     color: rgb(0.09, 0.13, 0.28), // Bleu très foncé (proche de #172136)
   });
 
-  // Logo YOJOB stylisé simplifié avec cercle
-  // Fond cercle glassmorphism
-  page.drawCircle({
-    x: 60,
-    y: pageHeight - 35,
-    size: 30,
-    color: rgb(0.15, 0.20, 0.35),
-    borderColor: colors.cyan,
-    borderWidth: 2,
-  });
+  // Logo YOJOB réel (si disponible)
+  if (logo) {
+    try {
+      // Taille du logo adaptée à l'en-tête
+      const logoHeight = 45;
+      const logoWidth = 120; // Ajuster selon le ratio du logo
+      
+      page.drawImage(logo, {
+        x: 40,
+        y: pageHeight - 60,
+        width: logoWidth,
+        height: logoHeight,
+      });
+    } catch (error) {
+      console.error('Erreur dessin logo:', error);
+      // Fallback sur texte si l'image échoue
+      page.drawText('YOJOB', {
+        x: 40,
+        y: pageHeight - 35,
+        size: 24,
+        font: fonts.bold,
+        color: colors.cyan,
+      });
+    }
+  } else {
+    // Fallback : Logo stylisé simplifié avec cercle si pas d'image
+    page.drawCircle({
+      x: 60,
+      y: pageHeight - 35,
+      size: 30,
+      color: rgb(0.15, 0.20, 0.35),
+      borderColor: colors.cyan,
+      borderWidth: 2,
+    });
 
-  // Initiales YJ dans le cercle
-  page.drawText('YJ', {
-    x: 48,
-    y: pageHeight - 40,
-    size: 20,
-    font: fonts.bold,
-    color: colors.cyan,
-  });
-  
-  // Texte YOJOB à côté
-  page.drawText('YO', {
-    x: 100,
-    y: pageHeight - 32,
-    size: 24,
-    font: fonts.bold,
-    color: colors.white,
-  });
-  
-  page.drawText('JOB', {
-    x: 140,
-    y: pageHeight - 32,
-    size: 24,
-    font: fonts.bold,
-    color: colors.cyan,
-  });
+    page.drawText('YJ', {
+      x: 48,
+      y: pageHeight - 40,
+      size: 20,
+      font: fonts.bold,
+      color: colors.cyan,
+    });
+    
+    page.drawText('YO', {
+      x: 100,
+      y: pageHeight - 32,
+      size: 24,
+      font: fonts.bold,
+      color: colors.white,
+    });
+    
+    page.drawText('JOB', {
+      x: 140,
+      y: pageHeight - 32,
+      size: 24,
+      font: fonts.bold,
+      color: colors.cyan,
+    });
 
-  page.drawText('Courtage en recrutement europeen', {
-    x: 100,
-    y: pageHeight - 48,
-    size: 8,
-    font: fonts.regular,
-    color: rgb(0.7, 0.7, 0.7),
-  });
+    page.drawText('Courtage en recrutement europeen', {
+      x: 100,
+      y: pageHeight - 48,
+      size: 8,
+      font: fonts.regular,
+      color: rgb(0.7, 0.7, 0.7),
+    });
+  }
 
   // Numéro de devis
   const devisLabel = toPdfText(`DEVIS ${devisData.numero}`);
@@ -490,7 +515,18 @@ export async function generateModernDevisPdf(prospect: any, inclureCGV: boolean)
   const pages: PDFPage[] = [currentPage];
 
   // Header première page
-  drawHeader(currentPage, config, colors, fonts, devisData);
+  let logo: PDFImage | null = null;
+  try {
+    // Extraire le base64 pur (enlever le préfixe data:image/png;base64, si présent)
+    const base64Data = YOJOB_LOGO_BASE64.includes(',') 
+      ? YOJOB_LOGO_BASE64.split(',')[1] 
+      : YOJOB_LOGO_BASE64;
+    const logoBytes = Uint8Array.from(atob(base64Data), c => c.charCodeAt(0));
+    logo = await pdfDoc.embedPng(logoBytes);
+  } catch (error) {
+    console.error('Erreur chargement logo:', error);
+  }
+  drawHeader(currentPage, config, colors, fonts, logo, devisData);
 
   // ========================================
   // 🏢 SECTION ENTREPRISE
@@ -566,7 +602,7 @@ export async function generateModernDevisPdf(prospect: any, inclureCGV: boolean)
     pages.push(currentPage);
     pageNumber++;
     y = config.pageHeight - config.headerHeight;
-    drawHeader(currentPage, config, colors, fonts, devisData);
+    drawHeader(currentPage, config, colors, fonts, logo, devisData);
     y -= 20;
   }
 
@@ -625,7 +661,7 @@ export async function generateModernDevisPdf(prospect: any, inclureCGV: boolean)
     pages.push(currentPage);
     pageNumber++;
     y = config.pageHeight - config.headerHeight;
-    drawHeader(currentPage, config, colors, fonts, devisData);
+    drawHeader(currentPage, config, colors, fonts, logo, devisData);
     y -= 20;
   }
 
@@ -649,7 +685,7 @@ export async function generateModernDevisPdf(prospect: any, inclureCGV: boolean)
       pages.push(currentPage);
       pageNumber++;
       y = config.pageHeight - config.headerHeight;
-      drawHeader(currentPage, config, colors, fonts, devisData);
+      drawHeader(currentPage, config, colors, fonts, logo, devisData);
       y -= 20;
     }
 
@@ -868,7 +904,7 @@ export async function generateModernDevisPdf(prospect: any, inclureCGV: boolean)
       pages.push(currentPage);
       pageNumber++;
       y = config.pageHeight - config.headerHeight;
-      drawHeader(currentPage, config, colors, fonts, devisData);
+      drawHeader(currentPage, config, colors, fonts, logo, devisData);
       y -= 20;
     }
 
@@ -944,7 +980,7 @@ export async function generateModernDevisPdf(prospect: any, inclureCGV: boolean)
       pages.push(currentPage);
       pageNumber++;
       y = config.pageHeight - config.headerHeight;
-      drawHeader(currentPage, config, colors, fonts, devisData);
+      drawHeader(currentPage, config, colors, fonts, logo, devisData);
       y -= 20;
     }
 
@@ -1049,7 +1085,7 @@ export async function generateModernDevisPdf(prospect: any, inclureCGV: boolean)
     pages.push(currentPage);
     pageNumber++;
     y = config.pageHeight - config.headerHeight;
-    drawHeader(currentPage, config, colors, fonts, devisData);
+    drawHeader(currentPage, config, colors, fonts, logo, devisData);
     y -= 20;
 
     // En-tête signature
@@ -1094,36 +1130,6 @@ export async function generateModernDevisPdf(prospect: any, inclureCGV: boolean)
     });
 
     y -= 62;
-
-    // Image de signature si disponible
-    if (signature.image) {
-      try {
-        // Extraire l'image base64
-        const base64Data = signature.image.split(',')[1] || signature.image;
-        const imageBytes = Uint8Array.from(atob(base64Data), c => c.charCodeAt(0));
-        
-        let signatureImage: PDFImage;
-        if (signature.image.includes('png')) {
-          signatureImage = await pdfDoc.embedPng(imageBytes);
-        } else {
-          signatureImage = await pdfDoc.embedJpg(imageBytes);
-        }
-
-        const imgWidth = 200;
-        const imgHeight = 80;
-
-        currentPage.drawImage(signatureImage, {
-          x: config.margin + 12,
-          y: y - imgHeight,
-          width: imgWidth,
-          height: imgHeight,
-        });
-
-        y -= imgHeight + 10;
-      } catch (error) {
-        console.error('Erreur chargement image signature:', error);
-      }
-    }
 
     // Identité du signataire
     currentPage.drawRectangle({
@@ -1297,6 +1303,67 @@ export async function generateModernDevisPdf(prospect: any, inclureCGV: boolean)
       });
 
       y -= 30;
+    }
+
+    y -= 20;
+
+    currentPage.drawLine({
+      start: { x: config.margin + 12, y: y },
+      end: { x: config.pageWidth - config.margin - 12, y: y },
+      thickness: 0.5,
+      color: colors.lightGray,
+    });
+
+    y -= 20;
+
+    // Image de signature si disponible (APRÈS Intégrité)
+    if (signature.image) {
+      try {
+        // Titre "Signature"
+        currentPage.drawRectangle({
+          x: config.margin,
+          y: y,
+          width: 4,
+          height: 2,
+          color: colors.green,
+        });
+
+        currentPage.drawText('Signature', {
+          x: config.margin + 12,
+          y: y,
+          size: 9,
+          font: fontBold,
+          color: colors.navy,
+        });
+
+        y -= 20;
+
+        // Extraire l'image base64
+        const base64Data = signature.image.split(',')[1] || signature.image;
+        const imageBytes = Uint8Array.from(atob(base64Data), c => c.charCodeAt(0));
+        
+        let signatureImage: PDFImage;
+        if (signature.image.includes('png')) {
+          signatureImage = await pdfDoc.embedPng(imageBytes);
+        } else {
+          signatureImage = await pdfDoc.embedJpg(imageBytes);
+        }
+
+        const imgWidth = 200;
+        const imgHeight = 80;
+
+        currentPage.drawImage(signatureImage, {
+          x: config.margin + 12,
+          y: y - imgHeight,
+          width: imgWidth,
+          height: imgHeight,
+        });
+
+        y -= imgHeight + 20;
+      } catch (error) {
+        console.error('Erreur chargement image signature:', error);
+        y -= 20;
+      }
     }
 
     y -= 20;
