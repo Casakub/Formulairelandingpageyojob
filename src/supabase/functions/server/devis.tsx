@@ -838,12 +838,16 @@ devis.get('/', async (c) => {
 /**
  * GET /make-server-10092a63/devis/:id
  * Récupérer un devis spécifique
+ *
+ * ⚠️ PRICING CANONIQUE: Cette route garantit que le devis retourné
+ * contient toujours pricing.totals (via ensurePricingPayload).
+ * Self-heal: si pricing manquant, on l'enrichit et on persiste.
  */
 devis.get('/:id', async (c) => {
   try {
     const id = c.req.param('id');
     const prospect = await kv.get(`prospects:${id}`);
-    
+
     if (!prospect) {
       return c.json(
         {
@@ -853,10 +857,12 @@ devis.get('/:id', async (c) => {
         404
       );
     }
-    
+
+    // Garantir payload canonique avec pricing
     const prospectWithPricing = ensurePricingPayload(prospect);
     const prospectWithPrivacy = applySignaturePrivacy(prospectWithPricing);
 
+    // Self-heal: si l'objet a été enrichi, persister pour éviter recalcul futur
     if (prospectWithPricing !== prospect || prospectWithPrivacy !== prospectWithPricing) {
       await kv.set(`prospects:${id}`, prospectWithPrivacy);
     }
@@ -1039,16 +1045,19 @@ devis.get('/api/stats', async (c) => {
 /**
  * POST /make-server-10092a63/generer-pdf
  * Générer un PDF pour un devis
+ *
+ * Body: { devisId, inclureCGV?, force? }
+ * - force: si true, régénère même si pdfUrl existe déjà (utile debug/prod)
  */
 devis.post('/generer-pdf', async (c) => {
   try {
-    const { devisId, inclureCGV } = await c.req.json();
-    
-    console.log(`📄 Génération PDF pour devis: ${devisId}`);
-    
+    const { devisId, inclureCGV, force } = await c.req.json();
+
+    console.log(`📄 Génération PDF pour devis: ${devisId}${force ? ' (force=true)' : ''}`);
+
     // Récupérer le devis
     const prospect = await kv.get(`prospects:${devisId}`);
-    
+
     if (!prospect) {
       return c.json(
         {
@@ -1058,7 +1067,21 @@ devis.post('/generer-pdf', async (c) => {
         404
       );
     }
-    
+
+    // Si PDF existe déjà et force=false, retourner l'URL existante
+    const existingPdfUrl = prospect.pdfUrl || prospect.pdf_url;
+    if (existingPdfUrl && !force) {
+      console.log(`📄 PDF existant retourné (force=false): ${existingPdfUrl}`);
+      return c.json({
+        success: true,
+        pdfUrl: existingPdfUrl,
+        pdfId: prospect.pdf_storage_path || 'existing',
+        message: 'PDF existant retourné',
+        cached: true,
+      });
+    }
+
+    // Génération PDF avec payload canonique (ensurePricingPayload appelé dans generateAndStorePdf)
     const pdfResult = await generateAndStorePdf(prospect, Boolean(inclureCGV));
 
     if (!pdfResult) {
@@ -1077,9 +1100,10 @@ devis.post('/generer-pdf', async (c) => {
       success: true,
       pdfUrl: pdfResult.pdfUrl,
       pdfId: pdfResult.pdfPath,
-      message: 'PDF généré avec succès'
+      message: 'PDF généré avec succès',
+      regenerated: Boolean(force),
     });
-    
+
   } catch (error) {
     console.error('❌ Erreur génération PDF:', error);
     return c.json(
@@ -1228,8 +1252,10 @@ devis.post('/signer-devis', async (c) => {
     });
 
     // Mettre à jour le statut du devis
+    // ⚠️ IMPORTANT: on merge signature sur le prospect existant (qui contient déjà pricing)
+    // ensurePricingPayload garantit que pricing existe toujours dans l'objet final
     const prospectMisAJour = ensurePricingPayload({
-      ...prospect,
+      ...prospect, // conserve pricing, majorations, postes existants
       statut: 'signe',
       signature: certificatSignature,
       updatedAt: timestamp
@@ -1482,6 +1508,7 @@ devis.post('/verifier-token-signature', async (c) => {
       );
     }
     
+    // Garantir payload canonique avec pricing (self-heal)
     const prospectWithPricing = ensurePricingPayload(prospect);
     const prospectWithPrivacy = applySignaturePrivacy(prospectWithPricing);
 
@@ -1670,9 +1697,11 @@ devis.post('/signer-avec-token', async (c) => {
       documentHash: certificatSignature.integrite.documentHash,
     });
 
-    // Mettre à jour le devis
+    // Mettre à jour le devis (signature via token)
+    // ⚠️ IMPORTANT: on merge signature sur le prospect existant (qui contient déjà pricing)
+    // ensurePricingPayload garantit que pricing existe toujours dans l'objet final
     const prospectMisAJour = ensurePricingPayload({
-      ...prospect,
+      ...prospect, // conserve pricing, majorations, postes existants
       statut: 'signe',
       signature: certificatSignature,
       signedViaToken: true,
