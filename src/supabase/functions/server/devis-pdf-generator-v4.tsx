@@ -181,20 +181,38 @@ const readEnv = (key: string): string | undefined => {
   return undefined;
 };
 
+// Valeurs par défaut YOJOB (utilisées si variables d'environnement non définies)
+const YOJOB_DEFAULTS = {
+  name: 'YOJOB',
+  legalForm: 'EI',
+  siret: '44786276400035',
+  siren: '447862764',
+  rcs: 'Bordeaux B 447 862 764',
+  vatNumber: 'FR79447862764',
+  address: '108 Avenue de Montesquieu, 33160 Saint-M\u00e9dard-en-Jalles, France',
+  capital: '10 000 \u20ac',
+  email: 'contact@yojob.fr',
+  phone: '+33 6 50 62 25 24',
+  website: 'https://www.yojob.fr',
+  privacyUrl: 'https://www.yojob.fr/politique-confidentialite',
+  cgvUrl: 'https://www.yojob.fr/cgv',
+  createdAt: '01 avril 2003',
+} as const;
+
 const getIssuerInfo = () => ({
-  name: readEnv('YOJOB_LEGAL_NAME') || '',
-  legalForm: readEnv('YOJOB_LEGAL_FORM') || '',
-  siret: readEnv('YOJOB_SIRET') || '',
-  rcs: readEnv('YOJOB_RCS') || '',
-  vatNumber: readEnv('YOJOB_VAT_NUMBER') || '',
-  address: readEnv('YOJOB_ADDRESS') || '',
-  capital: readEnv('YOJOB_CAPITAL') || '',
-  email: readEnv('YOJOB_EMAIL') || '',
-  phone: readEnv('YOJOB_PHONE') || '',
-  website: readEnv('YOJOB_WEBSITE') || '',
-  privacyUrl: readEnv('YOJOB_PRIVACY_URL') || '',
-  rgpdEmail: readEnv('YOJOB_RGPD_EMAIL') || readEnv('YOJOB_EMAIL') || '',
-  cgvUrl: readEnv('YOJOB_CGV_URL') || '',
+  name: readEnv('YOJOB_LEGAL_NAME') || YOJOB_DEFAULTS.name,
+  legalForm: readEnv('YOJOB_LEGAL_FORM') || YOJOB_DEFAULTS.legalForm,
+  siret: readEnv('YOJOB_SIRET') || YOJOB_DEFAULTS.siret,
+  rcs: readEnv('YOJOB_RCS') || YOJOB_DEFAULTS.rcs,
+  vatNumber: readEnv('YOJOB_VAT_NUMBER') || YOJOB_DEFAULTS.vatNumber,
+  address: readEnv('YOJOB_ADDRESS') || YOJOB_DEFAULTS.address,
+  capital: readEnv('YOJOB_CAPITAL') || YOJOB_DEFAULTS.capital,
+  email: readEnv('YOJOB_EMAIL') || YOJOB_DEFAULTS.email,
+  phone: readEnv('YOJOB_PHONE') || YOJOB_DEFAULTS.phone,
+  website: readEnv('YOJOB_WEBSITE') || YOJOB_DEFAULTS.website,
+  privacyUrl: readEnv('YOJOB_PRIVACY_URL') || YOJOB_DEFAULTS.privacyUrl,
+  rgpdEmail: readEnv('YOJOB_RGPD_EMAIL') || readEnv('YOJOB_EMAIL') || YOJOB_DEFAULTS.email,
+  cgvUrl: readEnv('YOJOB_CGV_URL') || YOJOB_DEFAULTS.cgvUrl,
 });
 
 const getValidityDays = () => {
@@ -834,7 +852,7 @@ export async function generateModernDevisPdf(prospect: any, inclureCGV: boolean)
   addPage();
 
   // ========================================
-  // EMETTEUR & CLIENT (dashboard-like cards)
+  // EMETTEUR & CLIENT (dashboard-like avec accents)
   // ========================================
 
   y = drawSectionHeader(
@@ -850,68 +868,56 @@ export async function generateModernDevisPdf(prospect: any, inclureCGV: boolean)
   );
   y -= 8;
 
-  const columnWidth = (config.contentWidth - 20) / 2;
-  const cardHeight = 200;
+  const columnWidth = (config.contentWidth - 24) / 2;
 
-  // Card Émetteur (left) avec accent cyan
-  drawCard(
-    currentPage,
-    config.margin,
-    y,
-    columnWidth,
-    cardHeight,
-    colors,
-    {
-      bgColor: colors.white,
-      borderColor: colors.lightGray,
-      accentColor: colors.cyan,
-      accentWidth: 4,
-    }
-  );
+  // Dessiner les accents colorés en haut de chaque colonne
+  // Accent cyan pour ÉMETTEUR
+  currentPage.drawRectangle({
+    x: config.margin,
+    y: y - 2,
+    width: columnWidth,
+    height: 4,
+    color: colors.cyan,
+  });
+  // Accent violet pour CLIENT
+  currentPage.drawRectangle({
+    x: config.margin + columnWidth + 24,
+    y: y - 2,
+    width: columnWidth,
+    height: 4,
+    color: colors.violet,
+  });
+  y -= 8;
 
-  // Card Client (right) avec accent violet
-  drawCard(
-    currentPage,
-    config.margin + columnWidth + 20,
-    y,
-    columnWidth,
-    cardHeight,
-    colors,
-    {
-      bgColor: colors.white,
-      borderColor: colors.lightGray,
-      accentColor: colors.violet,
-      accentWidth: 4,
-    }
-  );
-
-  // Titres des cards
+  // Titres des colonnes
   currentPage.drawText('\u00c9METTEUR (YOJOB)', {
-    x: config.margin + 16,
-    y: y - 16,
+    x: config.margin + 4,
+    y: y - 12,
     size: 9,
     font: fontBold,
     color: colors.cyan,
   });
   currentPage.drawText('CLIENT', {
-    x: config.margin + columnWidth + 36,
-    y: y - 16,
+    x: config.margin + columnWidth + 28,
+    y: y - 12,
     size: 9,
     font: fontBold,
     color: colors.violet,
   });
+  y -= 24;
 
+  // Entries YOJOB - version condensée pour économiser l'espace
   const issuerEntries = [
-    { label: 'Raison sociale', value: issuer.name || 'Non renseign\u00e9e' },
-    { label: 'Forme juridique', value: issuer.legalForm || 'Non renseign\u00e9e' },
-    { label: 'SIRET', value: issuer.siret || 'Non renseign\u00e9e' },
-    { label: 'TVA', value: issuer.vatNumber || 'Non renseign\u00e9e' },
-    { label: 'RCS', value: issuer.rcs || 'Non renseign\u00e9e' },
-    { label: 'Capital', value: issuer.capital || 'Non renseign\u00e9e' },
-    { label: 'Adresse', value: issuer.address || 'Non renseign\u00e9e' },
-    { label: 'Email', value: issuer.email || 'Non renseign\u00e9e' },
-    { label: 'T\u00e9l\u00e9phone', value: issuer.phone || 'Non renseign\u00e9e' },
-    { label: 'Site', value: issuer.website || 'Non renseign\u00e9e' },
+    { label: 'Raison sociale', value: issuer.name },
+    { label: 'Forme juridique', value: issuer.legalForm },
+    { label: 'SIRET', value: issuer.siret },
+    { label: 'TVA intracom.', value: issuer.vatNumber },
+    { label: 'RCS', value: issuer.rcs },
+    { label: 'Capital', value: issuer.capital },
+    { label: 'Adresse', value: issuer.address },
+    { label: 'Email', value: issuer.email },
+    { label: 'T\u00e9l\u00e9phone', value: issuer.phone },
+    { label: 'Site web', value: issuer.website },
   ];
 
   const clientEntries = [
@@ -925,15 +931,16 @@ export async function generateModernDevisPdf(prospect: any, inclureCGV: boolean)
     { label: 'T\u00e9l\u00e9phone', value: contact.telephonePortable || contact.telephoneFixe || '' },
   ];
 
-  drawColumn(issuerEntries, config.margin + 16, y - 28, columnWidth - 28);
-  drawColumn(clientEntries, config.margin + columnWidth + 36, y - 28, columnWidth - 28);
-  y = y - cardHeight - 12;
+  // Dessiner les colonnes et calculer la hauteur utilisée
+  const leftEnd = drawColumn(issuerEntries, config.margin + 4, y, columnWidth - 8);
+  const rightEnd = drawColumn(clientEntries, config.margin + columnWidth + 28, y, columnWidth - 8);
+  y = Math.min(leftEnd, rightEnd) - 16;
 
   // ========================================
-  // RESUME DE MISSION (dashboard-like card)
+  // RESUME DE MISSION (avec accent bleu)
   // ========================================
 
-  ensureSpace(180);
+  ensureSpace(160);
   y = drawSectionHeader(
     currentPage,
     config.margin,
@@ -945,7 +952,16 @@ export async function generateModernDevisPdf(prospect: any, inclureCGV: boolean)
     colors,
     fonts
   );
-  y -= 8;
+  y -= 4;
+
+  // Accent bleu à gauche
+  currentPage.drawRectangle({
+    x: config.margin,
+    y: y - 4,
+    width: 4,
+    height: 4,
+    color: colors.blue,
+  });
 
   const periodeLabel = conditions.dateDebut || conditions.dateFin
     ? `${formatDateForPdf(conditions.dateDebut)} -> ${formatDateForPdf(conditions.dateFin)}`
@@ -962,30 +978,11 @@ export async function generateModernDevisPdf(prospect: any, inclureCGV: boolean)
     { label: 'Validit\u00e9 du devis', value: validityLabel },
   ].filter((entry) => entry.value);
 
-  // Calculer la hauteur nécessaire pour la card
-  const resumeCardHeight = resumeEntries.length * 28 + 20;
-
-  // Card avec accent bleu foncé (style dashboard)
-  drawCard(
-    currentPage,
-    config.margin,
-    y,
-    config.contentWidth,
-    resumeCardHeight,
-    colors,
-    {
-      bgColor: rgb(0.99, 0.99, 1),
-      borderColor: colors.lightGray,
-      accentColor: colors.blue,
-      accentWidth: 4,
-    }
-  );
-
-  let resumeY = y - 16;
+  let resumeY = y;
   resumeEntries.forEach((entry) => {
-    resumeY -= drawKeyValue(currentPage, config.margin + 16, resumeY, entry.label, entry.value, colors, fonts, config.contentWidth - 32) + 2;
+    resumeY -= drawKeyValue(currentPage, config.margin + 12, resumeY, entry.label, entry.value, colors, fonts, config.contentWidth - 24) + 2;
   });
-  y = y - resumeCardHeight - 12;
+  y = resumeY - 10;
 
   // ========================================
   // TOTAUX (display-only from payload.pricing.totals)
