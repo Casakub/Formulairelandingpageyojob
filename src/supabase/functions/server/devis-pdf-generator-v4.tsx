@@ -16,6 +16,13 @@ import { formatDelaiPaiementLabel } from './devis-payload.ts';
 // 🎨 TYPES ET CONSTANTES
 // ========================================
 
+/**
+ * ⚠️ DISPLAY-ONLY MODULE
+ * Ce générateur est purement un affichage. Toutes les valeurs (pricing, totals,
+ * majorations, heures) doivent provenir du payload canonique (payload.pricing).
+ * Aucun fallback hardcodé, aucun recalcul ici.
+ */
+
 interface PDFColors {
   violet: ReturnType<typeof rgb>;
   cyan: ReturnType<typeof rgb>;
@@ -41,6 +48,41 @@ interface PDFConfig {
   footerHeight: number;
   contentWidth: number;
 }
+
+// ========================================
+// 🎨 DESIGN TOKENS (dashboard-like)
+// ========================================
+
+const DESIGN_TOKENS = {
+  // Spacing
+  spacing: {
+    xs: 4,
+    sm: 8,
+    md: 12,
+    lg: 16,
+    xl: 24,
+  },
+  // Font sizes
+  fontSize: {
+    xs: 7,
+    sm: 8,
+    md: 9,
+    lg: 10,
+    xl: 12,
+    xxl: 14,
+  },
+  // Border radius (simulated via rectangles)
+  radius: {
+    sm: 2,
+    md: 4,
+    lg: 8,
+  },
+  // Card styles
+  card: {
+    padding: 12,
+    borderWidth: 1,
+  },
+} as const;
 
 // ========================================
 // 🛠️ UTILITAIRES DE CONVERSION
@@ -538,6 +580,121 @@ function checkNeedNewPage(currentY: number, requiredSpace: number, config: PDFCo
   return currentY - requiredSpace < config.footerHeight + 40;
 }
 
+/**
+ * 🎨 drawCard - Helper pour dessiner une card style dashboard
+ * Display-only: ne fait aucun calcul, affiche ce qu'on lui donne
+ */
+function drawCard(
+  page: PDFPage,
+  x: number,
+  y: number,
+  width: number,
+  height: number,
+  colors: PDFColors,
+  options?: {
+    bgColor?: ReturnType<typeof rgb>;
+    borderColor?: ReturnType<typeof rgb>;
+    accentColor?: ReturnType<typeof rgb>;
+    accentWidth?: number;
+  }
+) {
+  const bgColor = options?.bgColor || colors.white;
+  const borderColor = options?.borderColor || colors.lightGray;
+  const padding = DESIGN_TOKENS.card.padding;
+
+  // Background
+  page.drawRectangle({
+    x,
+    y: y - height,
+    width,
+    height,
+    color: bgColor,
+    borderColor,
+    borderWidth: DESIGN_TOKENS.card.borderWidth,
+  });
+
+  // Accent bar (left side, dashboard-like)
+  if (options?.accentColor) {
+    const accentWidth = options.accentWidth || 4;
+    page.drawRectangle({
+      x,
+      y: y - height,
+      width: accentWidth,
+      height,
+      color: options.accentColor,
+    });
+  }
+
+  return { innerX: x + padding, innerY: y - padding, innerWidth: width - padding * 2 };
+}
+
+/**
+ * 🏷️ drawBadge - Helper pour dessiner un badge style dashboard
+ * Display-only: affiche un petit rectangle coloré avec du texte
+ */
+function drawBadge(
+  page: PDFPage,
+  x: number,
+  y: number,
+  text: string,
+  font: PDFFont,
+  options: {
+    bgColor: ReturnType<typeof rgb>;
+    textColor: ReturnType<typeof rgb>;
+    fontSize?: number;
+    paddingX?: number;
+    paddingY?: number;
+  }
+): { width: number; height: number } {
+  const fontSize = options.fontSize || 7;
+  const paddingX = options.paddingX || 6;
+  const paddingY = options.paddingY || 3;
+  const safeText = toPdfText(text);
+  const textWidth = font.widthOfTextAtSize(safeText, fontSize);
+  const badgeWidth = textWidth + paddingX * 2;
+  const badgeHeight = fontSize + paddingY * 2;
+
+  // Badge background
+  page.drawRectangle({
+    x,
+    y: y - badgeHeight,
+    width: badgeWidth,
+    height: badgeHeight,
+    color: options.bgColor,
+  });
+
+  // Badge text
+  page.drawText(safeText, {
+    x: x + paddingX,
+    y: y - badgeHeight + paddingY,
+    size: fontSize,
+    font,
+    color: options.textColor,
+  });
+
+  return { width: badgeWidth, height: badgeHeight };
+}
+
+/**
+ * 🎨 Couleurs de badge par type (dashboard-like)
+ */
+function getBadgeColors(type: string, colors: PDFColors): { bg: ReturnType<typeof rgb>; text: ReturnType<typeof rgb> } {
+  switch (type) {
+    case 'secteur':
+      return { bg: rgb(0.93, 0.95, 0.99), text: colors.blue };
+    case 'classification':
+      return { bg: rgb(0.95, 0.93, 0.99), text: colors.violet };
+    case 'status-signed':
+      return { bg: colors.green, text: colors.white };
+    case 'status-pending':
+      return { bg: colors.orange, text: colors.white };
+    case 'quantity':
+      return { bg: rgb(0.93, 0.99, 0.96), text: colors.emerald };
+    default:
+      return { bg: colors.lightGray, text: colors.navy };
+  }
+}
+
 // ========================================
 // 🎯 FONCTION PRINCIPALE
 // ========================================
@@ -677,7 +834,7 @@ export async function generateModernDevisPdf(prospect: any, inclureCGV: boolean)
   addPage();
 
   // ========================================
-  // EMETTEUR & CLIENT
+  // EMETTEUR & CLIENT (dashboard-like cards)
   // ========================================
 
   y = drawSectionHeader(
@@ -693,23 +850,56 @@ export async function generateModernDevisPdf(prospect: any, inclureCGV: boolean)
   );
   y -= 8;
 
-  const columnWidth = (config.contentWidth - 24) / 2;
+  const columnWidth = (config.contentWidth - 20) / 2;
+  const cardHeight = 200;
 
-  currentPage.drawText('\u00c9METTEUR (YOJOB)', {
-    x: config.margin + 12,
+  // Card Émetteur (left) avec accent cyan
+  drawCard(
+    currentPage,
+    config.margin,
     y,
-    size: 8.5,
+    columnWidth,
+    cardHeight,
+    colors,
+    {
+      bgColor: colors.white,
+      borderColor: colors.lightGray,
+      accentColor: colors.cyan,
+      accentWidth: 4,
+    }
+  );
+
+  // Card Client (right) avec accent violet
+  drawCard(
+    currentPage,
+    config.margin + columnWidth + 20,
+    y,
+    columnWidth,
+    cardHeight,
+    colors,
+    {
+      bgColor: colors.white,
+      borderColor: colors.lightGray,
+      accentColor: colors.violet,
+      accentWidth: 4,
+    }
+  );
+
+  // Titres des cards
+  currentPage.drawText('\u00c9METTEUR (YOJOB)', {
+    x: config.margin + 16,
+    y: y - 16,
+    size: 9,
     font: fontBold,
-    color: colors.gray,
+    color: colors.cyan,
   });
   currentPage.drawText('CLIENT', {
-    x: config.margin + columnWidth + 24,
-    y,
-    size: 8.5,
+    x: config.margin + columnWidth + 36,
+    y: y - 16,
+    size: 9,
     font: fontBold,
-    color: colors.gray,
+    color: colors.violet,
   });
-  y -= 16;
 
   const issuerEntries = [
     { label: 'Raison sociale', value: issuer.name || 'Non renseign\u00e9e' },
@@ -735,15 +925,15 @@ export async function generateModernDevisPdf(prospect: any, inclureCGV: boolean)
     { label: 'T\u00e9l\u00e9phone', value: contact.telephonePortable || contact.telephoneFixe || '' },
   ];
 
-  const leftEnd = drawColumn(issuerEntries, config.margin + 12, y, columnWidth - 20);
-  const rightEnd = drawColumn(clientEntries, config.margin + columnWidth + 24, y, columnWidth - 20);
-  y = Math.min(leftEnd, rightEnd) - 12;
+  drawColumn(issuerEntries, config.margin + 16, y - 28, columnWidth - 28);
+  drawColumn(clientEntries, config.margin + columnWidth + 36, y - 28, columnWidth - 28);
+  y = y - cardHeight - 12;
 
   // ========================================
-  // RESUME DE MISSION
+  // RESUME DE MISSION (dashboard-like card)
   // ========================================
 
-  ensureSpace(160);
+  ensureSpace(180);
   y = drawSectionHeader(
     currentPage,
     config.margin,
@@ -772,14 +962,33 @@ export async function generateModernDevisPdf(prospect: any, inclureCGV: boolean)
     { label: 'Validit\u00e9 du devis', value: validityLabel },
   ].filter((entry) => entry.value);
 
-  let resumeY = y;
+  // Calculer la hauteur nécessaire pour la card
+  const resumeCardHeight = resumeEntries.length * 28 + 20;
+
+  // Card avec accent bleu foncé (style dashboard)
+  drawCard(
+    currentPage,
+    config.margin,
+    y,
+    config.contentWidth,
+    resumeCardHeight,
+    colors,
+    {
+      bgColor: rgb(0.99, 0.99, 1),
+      borderColor: colors.lightGray,
+      accentColor: colors.blue,
+      accentWidth: 4,
+    }
+  );
+
+  let resumeY = y - 16;
   resumeEntries.forEach((entry) => {
-    resumeY -= drawKeyValue(currentPage, config.margin + 12, resumeY, entry.label, entry.value, colors, fonts, config.contentWidth - 24) + 2;
+    resumeY -= drawKeyValue(currentPage, config.margin + 16, resumeY, entry.label, entry.value, colors, fonts, config.contentWidth - 32) + 2;
   });
-  y = resumeY - 10;
+  y = y - resumeCardHeight - 12;
 
   // ========================================
-  // TOTAUX
+  // TOTAUX (display-only from payload.pricing.totals)
   // ========================================
 
   ensureSpace(140);
@@ -794,18 +1003,24 @@ export async function generateModernDevisPdf(prospect: any, inclureCGV: boolean)
     colors,
     fonts
   );
-  y -= 8;
+  y -= DESIGN_TOKENS.spacing.sm;
 
   const totalBoxHeight = 90;
-  currentPage.drawRectangle({
-    x: config.margin + 8,
-    y: y - totalBoxHeight,
-    width: config.contentWidth - 16,
-    height: totalBoxHeight,
-    color: rgb(0.98, 0.98, 0.99),
-    borderColor: colors.lightGray,
-    borderWidth: 1,
-  });
+  // Card style dashboard avec accent vert
+  drawCard(
+    currentPage,
+    config.margin + DESIGN_TOKENS.spacing.sm,
+    y,
+    config.contentWidth - DESIGN_TOKENS.spacing.md,
+    totalBoxHeight,
+    colors,
+    {
+      bgColor: rgb(0.98, 0.99, 0.98),
+      borderColor: colors.emerald,
+      accentColor: colors.emerald,
+      accentWidth: 4,
+    }
+  );
 
   const totalsX = config.margin + 16;
   let totalsY = y - 18;
@@ -924,17 +1139,21 @@ export async function generateModernDevisPdf(prospect: any, inclureCGV: boolean)
 
   drawTableHeader();
 
-  pricing?.postes?.forEach((poste) => {
-    const profilLabel = [poste.poste, poste.classification].filter(Boolean).join(' - ') || 'Profil';
+  pricing?.postes?.forEach((poste: any) => {
+    const posteName = poste.poste || 'Profil';
+    const classification = poste.classification || '';
+    const secteur = poste.secteur || '';
     const cells = {
-      profil: profilLabel,
       qty: String(poste.quantite || 1),
       taux: `${formatCurrency(poste.tauxETTMajore)}/h`,
       cout: formatCurrency(poste.coutTotalMensuel),
     };
 
-    const profilLines = wrapText(cells.profil, fontRegular, 8, columns[0].width - 10);
-    const rowHeight = Math.max(16, profilLines.length * 10 + 4);
+    // Calculer la hauteur de la ligne avec badges
+    const hasBadges = classification || secteur;
+    const profilLines = wrapText(posteName, fontRegular, 8, columns[0].width - 10);
+    const baseRowHeight = Math.max(16, profilLines.length * 10 + 4);
+    const rowHeight = hasBadges ? baseRowHeight + 14 : baseRowHeight;
 
     if (checkNeedNewPage(y, rowHeight + 30, config)) {
       addPage();
@@ -953,6 +1172,7 @@ export async function generateModernDevisPdf(prospect: any, inclureCGV: boolean)
       drawTableHeader();
     }
 
+    // Row background avec accent gauche coloré
     currentPage.drawRectangle({
       x: tableX,
       y: y - rowHeight,
@@ -963,27 +1183,71 @@ export async function generateModernDevisPdf(prospect: any, inclureCGV: boolean)
       borderWidth: 0.5,
     });
 
-    let offsetX = tableX + 6;
+    // Accent bar left (style dashboard)
+    currentPage.drawRectangle({
+      x: tableX,
+      y: y - rowHeight,
+      width: 3,
+      height: rowHeight,
+      color: colors.violet,
+    });
+
+    let offsetX = tableX + 10;
+
+    // Nom du poste
     profilLines.forEach((line, idx) => {
       currentPage.drawText(toPdfText(line), {
         x: offsetX,
         y: y - 12 - idx * 10,
         size: 8,
-        font: fontRegular,
+        font: fontBold,
         color: colors.navy,
       });
     });
-    offsetX += columns[0].width;
 
-    currentPage.drawText(toPdfText(cells.qty), {
-      x: offsetX,
-      y: y - 12,
-      size: 8,
-      font: fontRegular,
-      color: colors.navy,
+    // Badges secteur et classification
+    if (hasBadges) {
+      let badgeX = offsetX;
+      const badgeY = y - 12 - profilLines.length * 10 - 2;
+
+      if (secteur) {
+        const secteurColors = getBadgeColors('secteur', colors);
+        const { width } = drawBadge(currentPage, badgeX, badgeY, secteur, fontBold, {
+          bgColor: secteurColors.bg,
+          textColor: secteurColors.text,
+          fontSize: 6,
+          paddingX: 4,
+          paddingY: 2,
+        });
+        badgeX += width + 4;
+      }
+
+      if (classification) {
+        const classifColors = getBadgeColors('classification', colors);
+        drawBadge(currentPage, badgeX, badgeY, classification, fontBold, {
+          bgColor: classifColors.bg,
+          textColor: classifColors.text,
+          fontSize: 6,
+          paddingX: 4,
+          paddingY: 2,
+        });
+      }
+    }
+
+    offsetX += columns[0].width - 4;
+
+    // Quantité avec badge style
+    const qtyColors = getBadgeColors('quantity', colors);
+    drawBadge(currentPage, offsetX, y - 6, cells.qty, fontBold, {
+      bgColor: qtyColors.bg,
+      textColor: qtyColors.text,
+      fontSize: 7,
+      paddingX: 6,
+      paddingY: 2,
     });
     offsetX += columns[1].width;
 
+    // Taux ETT
     currentPage.drawText(toPdfText(cells.taux), {
       x: offsetX,
       y: y - 12,
@@ -993,6 +1257,7 @@ export async function generateModernDevisPdf(prospect: any, inclureCGV: boolean)
     });
     offsetX += columns[2].width;
 
+    // Coût mensuel (mis en valeur)
     currentPage.drawText(toPdfText(cells.cout), {
       x: offsetX,
       y: y - 12,
@@ -1024,7 +1289,7 @@ export async function generateModernDevisPdf(prospect: any, inclureCGV: boolean)
   );
   y -= 8;
 
-  pricing?.postes?.forEach((poste, index) => {
+  pricing?.postes?.forEach((poste: any, index: number) => {
     const posteTitle = `Profil #${index + 1} - ${poste.poste || 'Poste'}`;
     const blocks = [] as string[];
     blocks.push(`Coefficient ETT: ${poste.coeffBase.toFixed(2)} x ${poste.facteurPays.toFixed(2)} = ${poste.coeffFinal.toFixed(2)}`);
@@ -1265,7 +1530,7 @@ export async function generateModernDevisPdf(prospect: any, inclureCGV: boolean)
   y = drawBulletLines([scopeNotice, paiementClause, rgpdNotice], config.margin + 12, y, config.contentWidth - 20, 8);
   y -= 6;
 
-  ensureSpace(160);
+  ensureSpace(200);
   y = drawSectionHeader(
     currentPage,
     config.margin,
@@ -1303,30 +1568,96 @@ export async function generateModernDevisPdf(prospect: any, inclureCGV: boolean)
       metadata.ipAddress ? `IP (masquee): ${maskIpAddress(metadata.ipAddress)}` : '',
     ].filter(Boolean) as string[];
 
-    y = drawBulletLines(signatureLines, config.margin + 12, y, config.contentWidth - 20, 8.2);
-    y -= 4;
+    // Calculer la hauteur de la card signature
+    const signatureCardHeight = signatureLines.length * 12 + (integrite.documentHash ? 50 : 0) + (signature.image ? 100 : 0) + 30;
+
+    // Card avec accent vert (signé = valide)
+    drawCard(
+      currentPage,
+      config.margin,
+      y,
+      config.contentWidth,
+      signatureCardHeight,
+      colors,
+      {
+        bgColor: rgb(0.98, 1, 0.98),
+        borderColor: colors.green,
+        accentColor: colors.green,
+        accentWidth: 5,
+      }
+    );
+
+    // Badge SIGNÉ en haut à droite de la card
+    const statusColors = getBadgeColors('status-signed', colors);
+    drawBadge(
+      currentPage,
+      config.pageWidth - config.margin - 60,
+      y - 4,
+      'SIGN\u00c9',
+      fontBold,
+      {
+        bgColor: statusColors.bg,
+        textColor: statusColors.text,
+        fontSize: 8,
+        paddingX: 8,
+        paddingY: 3,
+      }
+    );
+
+    // Titre dans la card
+    currentPage.drawText('Document sign\u00e9 \u00e9lectroniquement', {
+      x: config.margin + 16,
+      y: y - 18,
+      size: 10,
+      font: fontBold,
+      color: colors.green,
+    });
+
+    let certY = y - 34;
+    signatureLines.forEach((line) => {
+      currentPage.drawText(toPdfText(`• ${line}`), {
+        x: config.margin + 16,
+        y: certY,
+        size: 8,
+        font: fontRegular,
+        color: colors.navy,
+      });
+      certY -= 12;
+    });
 
     if (integrite.documentHash) {
-      currentPage.drawText('Empreinte du document:', {
-        x: config.margin + 12,
-        y,
-        size: 8.2,
+      certY -= 4;
+      currentPage.drawText('Empreinte du document (SHA-256):', {
+        x: config.margin + 16,
+        y: certY,
+        size: 8,
         font: fontBold,
         color: colors.navy,
       });
-      y -= 12;
-      const hashLines = wrapText(integrite.documentHash, fontMono, 7, config.contentWidth - 24);
+      certY -= 12;
+
+      // Hash dans une boîte monospace stylée
+      const hashLines = wrapText(integrite.documentHash, fontMono, 6.5, config.contentWidth - 40);
+      currentPage.drawRectangle({
+        x: config.margin + 16,
+        y: certY - hashLines.length * 9 - 4,
+        width: config.contentWidth - 32,
+        height: hashLines.length * 9 + 8,
+        color: rgb(0.96, 0.97, 0.98),
+        borderColor: colors.lightGray,
+        borderWidth: 0.5,
+      });
       hashLines.forEach((line) => {
         currentPage.drawText(toPdfText(line), {
-          x: config.margin + 12,
-          y,
-          size: 7,
+          x: config.margin + 20,
+          y: certY - 2,
+          size: 6.5,
           font: fontMono,
           color: colors.navy,
         });
-        y -= 9;
+        certY -= 9;
       });
-      y -= 6;
+      certY -= 8;
     }
 
     if (signature.image) {
@@ -1336,28 +1667,74 @@ export async function generateModernDevisPdf(prospect: any, inclureCGV: boolean)
         const signatureImage = signature.image.includes('png')
           ? await pdfDoc.embedPng(imageBytes)
           : await pdfDoc.embedJpg(imageBytes);
-        const imgWidth = 200;
-        const imgHeight = 80;
+        const imgWidth = 180;
+        const imgHeight = 70;
+        certY -= 4;
         currentPage.drawImage(signatureImage, {
-          x: config.margin + 12,
-          y: y - imgHeight,
+          x: config.margin + 16,
+          y: certY - imgHeight,
           width: imgWidth,
           height: imgHeight,
         });
-        y -= imgHeight + 10;
+        certY -= imgHeight + 6;
       } catch (error) {
         console.error('Erreur chargement image signature:', error);
       }
     }
+
+    y = y - signatureCardHeight - 12;
   } else {
-    currentPage.drawText("Ce devis n'a pas encore ete signe.", {
-      x: config.margin + 12,
+    // Card pour devis non signé avec accent orange
+    const unsignedCardHeight = 60;
+    drawCard(
+      currentPage,
+      config.margin,
       y,
+      config.contentWidth,
+      unsignedCardHeight,
+      colors,
+      {
+        bgColor: rgb(1, 0.99, 0.97),
+        borderColor: colors.orange,
+        accentColor: colors.orange,
+        accentWidth: 5,
+      }
+    );
+
+    // Badge EN ATTENTE
+    const statusColors = getBadgeColors('status-pending', colors);
+    drawBadge(
+      currentPage,
+      config.pageWidth - config.margin - 80,
+      y - 4,
+      'EN ATTENTE',
+      fontBold,
+      {
+        bgColor: statusColors.bg,
+        textColor: statusColors.text,
+        fontSize: 8,
+        paddingX: 8,
+        paddingY: 3,
+      }
+    );
+
+    currentPage.drawText('En attente de signature', {
+      x: config.margin + 16,
+      y: y - 20,
+      size: 10,
+      font: fontBold,
+      color: colors.orange,
+    });
+
+    currentPage.drawText("Ce devis n'a pas encore \u00e9t\u00e9 sign\u00e9 par le client.", {
+      x: config.margin + 16,
+      y: y - 38,
       size: 8.5,
       font: fontRegular,
       color: colors.gray,
     });
-    y -= 12;
+
+    y = y - unsignedCardHeight - 12;
   }
 
   // ========================================
