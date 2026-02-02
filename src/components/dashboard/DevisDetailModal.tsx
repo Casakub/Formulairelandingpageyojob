@@ -166,6 +166,43 @@ interface Devis {
     budgetEstime?: number;
     commentaires?: string;
   };
+  pricing?: {
+    totals?: {
+      totalMensuelHT?: number;
+      totalMensuelTVA?: number;
+      totalMensuelTTC?: number;
+      totalMissionHT?: number;
+      totalMissionTVA?: number;
+      totalMissionTTC?: number;
+      dureeMissionMois?: number;
+      tvaRate?: number;
+    };
+    majorations?: {
+      delaiPaiement?: number;
+      experience?: number;
+      permis?: number;
+      langues?: number;
+      outillage?: number;
+      total?: number;
+    };
+    postes?: Array<{
+      id?: string;
+      tauxHoraireBrut?: number;
+      tauxETTBase?: number;
+      tauxETTMajore?: number;
+      heures?: {
+        baseHoraire?: number;
+        coutTotal?: number;
+      };
+      panier?: {
+        montantJour?: number;
+        totalMensuel?: number;
+      };
+    }>;
+  };
+  pdfUrl?: string;
+  pdf_url?: string;
+  pdf_storage_path?: string;
 }
 
 const stripIpPort = (value: string) => {
@@ -1106,6 +1143,76 @@ export function DevisDetailModal({ devisId, onClose }: DevisDetailModalProps) {
                       )}
                     </motion.div>
                   )}
+                </div>
+              )}
+
+              {/* Section Totaux Pricing */}
+              {devis.pricing?.totals && (
+                <div className="border-2 border-emerald-200 rounded-lg overflow-hidden bg-gradient-to-br from-emerald-50 to-green-50">
+                  <div className="w-full p-4 bg-gradient-to-r from-emerald-100 to-green-100">
+                    <div className="flex items-center gap-3">
+                      <div className="p-2 rounded-lg bg-gradient-to-br from-emerald-500 to-green-500">
+                        <Euro className="w-5 h-5 text-white" />
+                      </div>
+                      <span className="text-slate-900">Totaux du devis</span>
+                    </div>
+                  </div>
+
+                  <div className="p-6 bg-white">
+                    <div className="grid md:grid-cols-2 gap-6">
+                      {/* Totaux Mensuels */}
+                      <div className="space-y-3">
+                        <h4 className="text-slate-900 font-medium mb-3">📅 Totaux Mensuels</h4>
+                        <div className="space-y-2">
+                          <div className="flex justify-between">
+                            <span className="text-slate-500">Total HT</span>
+                            <span className="text-slate-900 font-medium">
+                              {(devis.pricing.totals.totalMensuelHT ?? 0).toLocaleString('fr-FR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} €
+                            </span>
+                          </div>
+                          <div className="flex justify-between">
+                            <span className="text-slate-500">TVA ({((devis.pricing.totals.tvaRate ?? 0.2) * 100).toFixed(0)}%)</span>
+                            <span className="text-slate-900 font-medium">
+                              {(devis.pricing.totals.totalMensuelTVA ?? 0).toLocaleString('fr-FR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} €
+                            </span>
+                          </div>
+                          <div className="flex justify-between border-t border-slate-200 pt-2">
+                            <span className="text-slate-700 font-medium">Total TTC</span>
+                            <span className="text-emerald-600 font-bold text-lg">
+                              {(devis.pricing.totals.totalMensuelTTC ?? 0).toLocaleString('fr-FR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} €
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Totaux Mission */}
+                      <div className="space-y-3">
+                        <h4 className="text-slate-900 font-medium mb-3">
+                          📊 Total Mission ({devis.pricing.totals.dureeMissionMois ?? 1} mois)
+                        </h4>
+                        <div className="space-y-2">
+                          <div className="flex justify-between">
+                            <span className="text-slate-500">Total HT</span>
+                            <span className="text-slate-900 font-medium">
+                              {(devis.pricing.totals.totalMissionHT ?? 0).toLocaleString('fr-FR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} €
+                            </span>
+                          </div>
+                          <div className="flex justify-between">
+                            <span className="text-slate-500">TVA</span>
+                            <span className="text-slate-900 font-medium">
+                              {(devis.pricing.totals.totalMissionTVA ?? 0).toLocaleString('fr-FR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} €
+                            </span>
+                          </div>
+                          <div className="flex justify-between border-t border-slate-200 pt-2">
+                            <span className="text-slate-700 font-medium">Total TTC</span>
+                            <span className="text-emerald-600 font-bold text-lg">
+                              {(devis.pricing.totals.totalMissionTTC ?? 0).toLocaleString('fr-FR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} €
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
                 </div>
               )}
             </CardContent>
