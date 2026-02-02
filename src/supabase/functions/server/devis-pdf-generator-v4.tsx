@@ -10,7 +10,7 @@
 
 import { PDFDocument, StandardFonts, rgb, PDFPage, PDFFont, PDFImage } from "npm:pdf-lib@1.17.1";
 import { YOJOB_LOGO_BASE64 } from './yojob-logo-base64.ts';
-import { buildDevisPayload, formatDelaiPaiementLabel } from './devis-payload.ts';
+import { formatDelaiPaiementLabel } from './devis-payload.ts';
 
 // ========================================
 // 🎨 TYPES ET CONSTANTES
@@ -161,21 +161,43 @@ const getValidityDays = () => {
   return Number.isFinite(parsed) && parsed > 0 ? parsed : 30;
 };
 
-const maskIpAddress = (ip?: string): string => {
-  if (!ip) return '-';
-  if (ip.includes('.')) {
-    const parts = ip.split('.');
+const stripIpPort = (value: string) => {
+  const bracketMatch = value.match(/^\[(.+)](?::\d+)?$/);
+  if (bracketMatch?.[1]) return bracketMatch[1];
+  if (value.includes('.') && /:\d+$/.test(value)) {
+    return value.replace(/:\d+$/, '');
+  }
+  return value;
+};
+
+const maskSingleIp = (ip: string): string => {
+  const cleaned = stripIpPort(ip.trim());
+  if (!cleaned) return '';
+  if (cleaned.includes('.')) {
+    const parts = cleaned.split('.');
     if (parts.length === 4) {
       return `${parts[0]}.${parts[1]}.xxx.xxx`;
     }
   }
-  if (ip.includes(':')) {
-    const parts = ip.split(':').filter(Boolean);
+  if (cleaned.includes(':')) {
+    const parts = cleaned.split(':').filter(Boolean);
     if (parts.length >= 2) {
       return `${parts[0]}:${parts[1]}:xxxx:xxxx`;
     }
   }
-  return ip;
+  return cleaned;
+};
+
+const maskIpAddress = (ip?: string): string => {
+  if (!ip) return '-';
+  const parts = ip
+    .split(',')
+    .map((value) => value.trim())
+    .filter((value) => value && value.toLowerCase() !== 'unknown');
+  if (!parts.length) return '-';
+  const masked = parts.map(maskSingleIp).filter(Boolean);
+  const unique = Array.from(new Set(masked));
+  return unique.join(', ');
 };
 
 const formatPercent = (value?: number) => {
@@ -554,7 +576,7 @@ export async function generateModernDevisPdf(prospect: any, inclureCGV: boolean)
 
   const fonts = { regular: fontRegular, bold: fontBold };
 
-  const payload = buildDevisPayload({ ...prospect });
+  const payload = { ...prospect };
   const entreprise = payload.entreprise || {};
   const contact = payload.contact || {};
   const postes = Array.isArray(payload.postes) ? payload.postes : [];
@@ -562,7 +584,7 @@ export async function generateModernDevisPdf(prospect: any, inclureCGV: boolean)
   const candidats = payload.candidats || {};
   const pricing = payload.pricing;
   const totals = pricing?.totals;
-  const majorations = pricing?.majorations;
+  const majorations = pricing?.majorations || payload.majorations;
 
   const isSigned = payload?.statut === 'signe' || Boolean(payload?.signature);
   const createdAt = payload.createdAt || new Date().toISOString();
@@ -1328,7 +1350,7 @@ export async function generateModernDevisPdf(prospect: any, inclureCGV: boolean)
       }
     }
   } else {
-    currentPage.drawText('Ce devis n\\'a pas encore \u00e9t\u00e9 sign\u00e9.', {
+    currentPage.drawText("Ce devis n'a pas encore ete signe.", {
       x: config.margin + 12,
       y,
       size: 8.5,
