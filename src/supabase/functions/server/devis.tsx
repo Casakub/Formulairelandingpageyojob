@@ -47,13 +47,82 @@ async function ensureDevisPdfBucket(supabase: any) {
   }
 }
 
-const ensurePricingPayload = (prospect: any) => {
+const hasPricingPayload = (prospect: any) => {
+  const postesCount = Array.isArray(prospect?.postes) ? prospect.postes.length : 0;
+  const pricingPostesCount = Array.isArray(prospect?.pricing?.postes) ? prospect.pricing.postes.length : 0;
+  const hasMatchingPostes = postesCount === 0 || pricingPostesCount === postesCount;
+  return Boolean(prospect?.pricing?.totals && Array.isArray(prospect?.pricing?.postes) && hasMatchingPostes);
+};
+
+const ensurePricingPayload = (prospect: any, options: { force?: boolean } = {}) => {
   try {
+    if (!options.force && hasPricingPayload(prospect)) {
+      return prospect;
+    }
     return buildDevisPayload(prospect);
   } catch (error) {
     console.error('⚠️ Impossible de recalculer le pricing devis:', error);
     return prospect;
   }
+};
+
+const stripIpPort = (value: string) => {
+  const bracketMatch = value.match(/^\[(.+)](?::\d+)?$/);
+  if (bracketMatch?.[1]) return bracketMatch[1];
+  if (value.includes('.') && /:\d+$/.test(value)) {
+    return value.replace(/:\d+$/, '');
+  }
+  return value;
+};
+
+const maskSingleIp = (ip: string): string => {
+  const cleaned = stripIpPort(ip.trim());
+  if (!cleaned) return '';
+  if (cleaned.includes('.')) {
+    const parts = cleaned.split('.');
+    if (parts.length === 4) {
+      return `${parts[0]}.${parts[1]}.xxx.xxx`;
+    }
+  }
+  if (cleaned.includes(':')) {
+    const parts = cleaned.split(':').filter(Boolean);
+    if (parts.length >= 2) {
+      return `${parts[0]}:${parts[1]}:xxxx:xxxx`;
+    }
+  }
+  return cleaned;
+};
+
+const maskIpAddress = (ip?: string): string => {
+  if (!ip) return 'unknown';
+  const parts = ip
+    .split(',')
+    .map((value) => value.trim())
+    .filter((value) => value && value.toLowerCase() !== 'unknown');
+  if (!parts.length) return 'unknown';
+  const masked = parts.map(maskSingleIp).filter(Boolean);
+  const unique = Array.from(new Set(masked));
+  return unique.join(', ');
+};
+
+const sanitizeSignatureMetadata = (metadata: Record<string, any> | undefined) => {
+  if (!metadata) return metadata;
+  const { userAgent: _userAgent, ipAddress, ...rest } = metadata;
+  return {
+    ...rest,
+    ipAddress: maskIpAddress(ipAddress),
+  };
+};
+
+const applySignaturePrivacy = (prospect: any) => {
+  if (!prospect?.signature?.metadata) return prospect;
+  return {
+    ...prospect,
+    signature: {
+      ...prospect.signature,
+      metadata: sanitizeSignatureMetadata(prospect.signature.metadata),
+    },
+  };
 };
 
 async function logSignatureAudit(
@@ -80,8 +149,9 @@ async function generateAndStorePdf(
 ): Promise<{ pdfUrl: string; pdfPath: string; pdfBytes: Uint8Array; prospectUpdated: any } | null> {
   try {
     const prospectWithPricing = ensurePricingPayload(prospect);
+    const prospectWithPrivacy = applySignaturePrivacy(prospectWithPricing);
     // Utiliser le générateur PDF moderne v4
-    const pdfBytes = await generateModernDevisPdf(prospectWithPricing, inclureCGV);
+    const pdfBytes = await generateModernDevisPdf(prospectWithPrivacy, inclureCGV);
     const supabase = getSupabaseClient();
     const bucketReady = await ensureDevisPdfBucket(supabase);
     if (!bucketReady) {
@@ -115,7 +185,7 @@ async function generateAndStorePdf(
     const generatedAt = new Date().toISOString();
 
     const prospectUpdated = {
-      ...prospectWithPricing,
+      ...prospectWithPrivacy,
       pdfUrl,
       pdf_url: pdfUrl,
       pdf_storage_path: pdfPath,
@@ -558,7 +628,7 @@ devis.post('/', async (c) => {
       }
     };
 
-    const prospect = ensurePricingPayload(prospectRaw);
+    const prospect = ensurePricingPayload(prospectRaw, { force: true });
     
     // Sauvegarder dans le KV store
     await kv.set(`prospects:${id}`, prospect);
@@ -744,11 +814,12 @@ devis.get('/', async (c) => {
     
     // Filtrer les null (prospects supprimés)
     const prospectsFiltres = prospects.filter(p => p !== null);
+    const prospectsSanitises = prospectsFiltres.map((prospect) => applySignaturePrivacy(prospect));
     
     return c.json({
       success: true,
-      data: prospectsFiltres,
-      total: prospectsFiltres.length
+      data: prospectsSanitises,
+      total: prospectsSanitises.length
     });
     
   } catch (error) {
@@ -783,9 +854,16 @@ devis.get('/:id', async (c) => {
       );
     }
     
+    const prospectWithPricing = ensurePricingPayload(prospect);
+    const prospectWithPrivacy = applySignaturePrivacy(prospectWithPricing);
+
+    if (prospectWithPricing !== prospect || prospectWithPrivacy !== prospectWithPricing) {
+      await kv.set(`prospects:${id}`, prospectWithPrivacy);
+    }
+
     return c.json({
       success: true,
-      data: prospect
+      data: prospectWithPrivacy
     });
     
   } catch (error) {
@@ -831,20 +909,30 @@ devis.patch('/:id', async (c) => {
       await kv.set('prospects:stats', stats);
     }
     
+    const shouldReprice = Boolean(
+      updates.postes ||
+      updates.conditions ||
+      updates.candidats ||
+      updates.entreprise ||
+      updates.majorations
+    );
+
     // Fusionner les mises à jour
     const prospectMisAJour = ensurePricingPayload({
       ...prospect,
       ...updates,
       updatedAt: new Date().toISOString()
-    });
+    }, { force: shouldReprice });
+
+    const prospectAvecPrivacy = applySignaturePrivacy(prospectMisAJour);
     
-    await kv.set(`prospects:${id}`, prospectMisAJour);
+    await kv.set(`prospects:${id}`, prospectAvecPrivacy);
     
     console.log(`✅ Devis mis à jour: ${id}`);
     
     return c.json({
       success: true,
-      data: prospectMisAJour
+      data: prospectAvecPrivacy
     });
     
   } catch (error) {
@@ -1078,6 +1166,19 @@ devis.post('/signer-devis', async (c) => {
     const timestamp = new Date().toISOString();
     const transactionId = crypto.randomUUID();
     
+    const signatureMetadata = sanitizeSignatureMetadata({
+      ipAddress,
+      userAgent,
+      timestamp,
+      transactionId,
+      signatureMethod: 'direct_form',
+      timestampReadable: new Date(timestamp).toLocaleString('fr-FR', {
+        dateStyle: 'full',
+        timeStyle: 'long',
+        timeZone: 'Europe/Paris'
+      })
+    });
+
     // Créer le certificat de signature électronique
     const certificatSignature = {
       // Signature graphique
@@ -1094,18 +1195,7 @@ devis.post('/signer-devis', async (c) => {
       },
       
       // Traçabilité technique
-      metadata: {
-        ipAddress: ipAddress,
-        userAgent: userAgent,
-        timestamp: timestamp,
-        transactionId,
-        signatureMethod: 'direct_form',
-        timestampReadable: new Date(timestamp).toLocaleString('fr-FR', {
-          dateStyle: 'full',
-          timeStyle: 'long',
-          timeZone: 'Europe/Paris'
-        })
-      },
+      metadata: signatureMetadata,
       
       // Preuve d'intégrité
       integrite: {
@@ -1144,8 +1234,9 @@ devis.post('/signer-devis', async (c) => {
       signature: certificatSignature,
       updatedAt: timestamp
     });
+    const prospectAvecPrivacy = applySignaturePrivacy(prospectMisAJour);
     
-    await kv.set(`prospects:${devisId}`, prospectMisAJour);
+    await kv.set(`prospects:${devisId}`, prospectAvecPrivacy);
     
     // Mettre à jour les stats
     const stats = await kv.get('prospects:stats') || {};
@@ -1161,8 +1252,8 @@ devis.post('/signer-devis', async (c) => {
     console.log(`📍 IP: ${ipAddress}`);
     console.log(`🔐 Hash: ${hashHex.substring(0, 16)}...`);
     
-    const pdfResult = await generateAndStorePdf(prospectMisAJour, true);
-    const prospectWithPdf = pdfResult?.prospectUpdated || prospectMisAJour;
+    const pdfResult = await generateAndStorePdf(prospectAvecPrivacy, true);
+    const prospectWithPdf = pdfResult?.prospectUpdated || prospectAvecPrivacy;
     const pdfAttachment = pdfResult
       ? {
           filename: `Devis-${prospectWithPdf.numero || prospectWithPdf.id}.pdf`,
@@ -1391,11 +1482,18 @@ devis.post('/verifier-token-signature', async (c) => {
       );
     }
     
-    console.log(`✅ Token valide pour devis: ${prospect.numero}`);
+    const prospectWithPricing = ensurePricingPayload(prospect);
+    const prospectWithPrivacy = applySignaturePrivacy(prospectWithPricing);
+
+    if (prospectWithPricing !== prospect || prospectWithPrivacy !== prospectWithPricing) {
+      await kv.set(`prospects:${tokenData.devisId}`, prospectWithPrivacy);
+    }
+
+    console.log(`✅ Token valide pour devis: ${prospectWithPrivacy.numero}`);
     
     return c.json({
       success: true,
-      devis: prospect,
+      devis: prospectWithPrivacy,
       tokenData: {
         createdAt: tokenData.createdAt,
         expiresAt: tokenData.expiresAt
@@ -1522,6 +1620,19 @@ devis.post('/signer-avec-token', async (c) => {
     const timestamp = new Date().toISOString();
     const transactionId = crypto.randomUUID();
     
+    const signatureMetadata = sanitizeSignatureMetadata({
+      ipAddress,
+      userAgent,
+      timestamp,
+      transactionId,
+      timestampReadable: new Date(timestamp).toLocaleString('fr-FR', {
+        dateStyle: 'full',
+        timeStyle: 'long',
+        timeZone: 'Europe/Paris'
+      }),
+      signatureMethod: 'online_link'
+    });
+
     // Créer le certificat de signature
     const certificatSignature = {
       image: signatureBase64,
@@ -1533,18 +1644,7 @@ devis.post('/signer-avec-token', async (c) => {
         entreprise: prospect.entreprise.raisonSociale,
         siret: prospect.entreprise.siret
       },
-      metadata: {
-        ipAddress,
-        userAgent,
-        timestamp,
-        transactionId,
-        timestampReadable: new Date(timestamp).toLocaleString('fr-FR', {
-          dateStyle: 'full',
-          timeStyle: 'long',
-          timeZone: 'Europe/Paris'
-        }),
-        signatureMethod: 'online_link'
-      },
+      metadata: signatureMetadata,
       integrite: {
         hashAlgorithm: 'SHA-256',
         documentHash: hashHex,
@@ -1579,8 +1679,9 @@ devis.post('/signer-avec-token', async (c) => {
       signatureTokenUsed: token,
       updatedAt: timestamp
     });
+    const prospectAvecPrivacy = applySignaturePrivacy(prospectMisAJour);
     
-    await kv.set(`prospects:${devisId}`, prospectMisAJour);
+    await kv.set(`prospects:${devisId}`, prospectAvecPrivacy);
     
     // Marquer le token comme utilisé
     const tokenDataUpdated = {
@@ -1604,8 +1705,8 @@ devis.post('/signer-avec-token', async (c) => {
     console.log(`📍 IP: ${ipAddress}`);
     console.log(`🔐 Hash: ${hashHex.substring(0, 16)}...`);
     
-    const pdfResult = await generateAndStorePdf(prospectMisAJour, true);
-    const prospectWithPdf = pdfResult?.prospectUpdated || prospectMisAJour;
+    const pdfResult = await generateAndStorePdf(prospectAvecPrivacy, true);
+    const prospectWithPdf = pdfResult?.prospectUpdated || prospectAvecPrivacy;
     const pdfAttachment = pdfResult
       ? {
           filename: `Devis-${prospectWithPdf.numero || prospectWithPdf.id}.pdf`,

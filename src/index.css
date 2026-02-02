@@ -10400,6 +10400,12 @@
   }
 
   @media print {
+    .print\:bg-emerald-600 {
+      background-color: var(--color-emerald-600);
+    }
+  }
+
+  @media print {
     .print\:bg-green-600 {
       background-color: var(--color-green-600);
     }
@@ -10468,6 +10474,12 @@
   @media print {
     .print\:text-blue-800 {
       color: var(--color-blue-800);
+    }
+  }
+
+  @media print {
+    .print\:text-gray-500 {
+      color: var(--color-gray-500);
     }
   }
 

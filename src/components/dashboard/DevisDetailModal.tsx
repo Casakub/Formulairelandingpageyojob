@@ -58,8 +58,8 @@ interface Devis {
       siret: string;
     };
     metadata: {
-      ipAddress: string;
-      userAgent: string;
+      ipAddress?: string;
+      userAgent?: string;
       timestamp: string;
       timestampReadable: string;
     };
@@ -167,6 +167,45 @@ interface Devis {
     commentaires?: string;
   };
 }
+
+const stripIpPort = (value: string) => {
+  const bracketMatch = value.match(/^\[(.+)](?::\d+)?$/);
+  if (bracketMatch?.[1]) return bracketMatch[1];
+  if (value.includes('.') && /:\d+$/.test(value)) {
+    return value.replace(/:\d+$/, '');
+  }
+  return value;
+};
+
+const maskSingleIp = (ip: string): string => {
+  const cleaned = stripIpPort(ip.trim());
+  if (!cleaned) return '';
+  if (cleaned.includes('.')) {
+    const parts = cleaned.split('.');
+    if (parts.length === 4) {
+      return `${parts[0]}.${parts[1]}.xxx.xxx`;
+    }
+  }
+  if (cleaned.includes(':')) {
+    const parts = cleaned.split(':').filter(Boolean);
+    if (parts.length >= 2) {
+      return `${parts[0]}:${parts[1]}:xxxx:xxxx`;
+    }
+  }
+  return cleaned;
+};
+
+const maskIpAddress = (ip?: string): string => {
+  if (!ip) return 'N/A';
+  const parts = ip
+    .split(',')
+    .map((value) => value.trim())
+    .filter((value) => value && value.toLowerCase() !== 'unknown');
+  if (!parts.length) return 'N/A';
+  const masked = parts.map(maskSingleIp).filter(Boolean);
+  const unique = Array.from(new Set(masked));
+  return unique.join(', ');
+};
 
 export function DevisDetailModal({ devisId, onClose }: DevisDetailModalProps) {
   const [devis, setDevis] = useState<Devis | null>(null);
@@ -930,12 +969,17 @@ export function DevisDetailModal({ devisId, onClose }: DevisDetailModalProps) {
                         </div>
                         <div>
                           <p className="text-slate-500 text-sm">Adresse IP</p>
-                          <p className="text-green-600 font-mono">{devis.signature.metadata?.ipAddress}</p>
+                          <p className="text-green-600 font-mono">{maskIpAddress(devis.signature.metadata?.ipAddress)}</p>
                         </div>
                         <div>
                           <p className="text-slate-500 text-sm">Navigateur (User-Agent)</p>
-                          <p className="text-slate-900 text-xs truncate" title={devis.signature.metadata?.userAgent}>
-                            {devis.signature.metadata?.userAgent?.substring(0, 50)}...
+                          <p
+                            className="text-slate-900 text-xs truncate"
+                            title={devis.signature.metadata?.userAgent ? 'Masqué' : 'Non conservé'}
+                          >
+                            {devis.signature.metadata?.userAgent
+                              ? `${devis.signature.metadata.userAgent.substring(0, 50)}...`
+                              : 'Non conservé'}
                           </p>
                         </div>
                       </div>

@@ -12,7 +12,6 @@ import type {
   DevisPoste,
   DevisEntreprise
 } from '../../../types/devis.ts';
-import { configData } from '../../../data/config/index.ts';
 
 const SECTEUR_KEY_TO_LABEL: Record<string, string> = {
   batiment: 'B\u00e2timent',
@@ -208,16 +207,8 @@ const getPanierMontantJour = (
     return conditions.repas.montant;
   }
 
-  const region = entreprise?.region || '';
-  if (!region) return panierFallback;
-  const regionNormalized = region.toUpperCase();
-  const paniersRegion = configData?.supplements?.paniers_repas?.[regionNormalized];
-  if (!paniersRegion) return panierFallback;
-
-  const secteurLabel = normalizeSecteurLabel(poste.secteur);
-  const montant = paniersRegion[secteurLabel];
-  if (typeof montant === 'number') return montant;
-  if (typeof paniersRegion.Autre === 'number') return paniersRegion.Autre;
+  // Note: configData n'est pas accessible côté serveur, on utilise le fallback
+  // Les montants régionaux devront être configurés via les variables d'environnement si nécessaire
   return panierFallback;
 };
 
