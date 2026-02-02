@@ -36,15 +36,19 @@ const SECTEUR_KEY_TO_LABEL: Record<string, string> = {
   autre: 'Autre',
 };
 
+const BASE_HORAIRE_LEGALE = 151.67;
+const DEFAULT_VAT_RATE = 0.2;
+
 interface StepRecapitulatifProps {
   formData: DevisFormData;
   onSubmit: () => void;
   isSubmitting: boolean;
   lang?: DevisLanguage;
   onGoToStep?: (step: number) => void;  // 🆕 Fonction pour naviguer vers une étape
+  pricingLoading?: boolean;
 }
 
-export function StepRecapitulatif({ formData, onSubmit, isSubmitting, lang = 'fr', onGoToStep }: StepRecapitulatifProps) {
+export function StepRecapitulatif({ formData, onSubmit, isSubmitting, lang = 'fr', onGoToStep, pricingLoading = false }: StepRecapitulatifProps) {
   const { t, isLoading: isLoadingTranslations } = useDevisTranslationStatic(lang);
   const [accepteConditions, setAccepteConditions] = useState(false);
 
@@ -81,6 +85,12 @@ export function StepRecapitulatif({ formData, onSubmit, isSubmitting, lang = 'fr
       </div>
     );
   }
+
+  const pricing = (formData as any)?.pricing;
+  const baseHoraireMensuelle = pricing?.baseHoraireMensuelle ?? (Number(formData.conditions.baseHoraire) || BASE_HORAIRE_LEGALE);
+  const baseHoraireLegale = pricing?.baseHoraireLegale ?? BASE_HORAIRE_LEGALE;
+  const vatRate = pricing?.totals?.tvaRate ?? DEFAULT_VAT_RATE;
+  const hasCanonicalPricing = Boolean(pricing?.totals);
 
   const majorations = calculerMajorationsDevis({
     delaiPaiement: formData.conditions.delaiPaiement,
@@ -136,8 +146,8 @@ export function StepRecapitulatif({ formData, onSubmit, isSubmitting, lang = 'fr
     let totalMensuel = 0;
     
     formData.postes.forEach(poste => {
-      const baseHoraire = formData.conditions.baseHoraire;
-      const tauxHoraireBrut = poste.salaireBrut / 151.67;
+      const baseHoraire = baseHoraireMensuelle;
+      const tauxHoraireBrut = baseHoraire ? poste.salaireBrut / baseHoraire : 0;
       
       // Taux ETT avec suppléments horaires (sans panier)
       const tauxETTBase = calculerTauxETTComplet(
@@ -179,8 +189,9 @@ export function StepRecapitulatif({ formData, onSubmit, isSubmitting, lang = 'fr
     return totalMensuel;
   };
   
-  const totalHT = calculerTotalCorrect();
-  const totalTTC = Math.round(totalHT * 1.20 * 100) / 100;
+  const previewTotalHT = calculerTotalCorrect();
+  const previewTotalTVA = Math.round(previewTotalHT * vatRate * 100) / 100;
+  const previewTotalTTC = Math.round((previewTotalHT + previewTotalTVA) * 100) / 100;
   
   // Calculer durée mission
   const calculerDuree = (dateDebut: string, dateFin: string | null): number => {
@@ -192,8 +203,12 @@ export function StepRecapitulatif({ formData, onSubmit, isSubmitting, lang = 'fr
     return Math.max(1, Math.ceil(diffDays / 30));
   };
   
-  const dureeMission = calculerDuree(formData.conditions.dateDebut, formData.conditions.dateFin);
-  const totalMission = Math.round(totalHT * dureeMission * 100) / 100;
+  const previewDureeMission = calculerDuree(formData.conditions.dateDebut, formData.conditions.dateFin);
+  const previewTotalMission = Math.round(previewTotalTTC * previewDureeMission * 100) / 100;
+  const totalHT = pricing?.totals?.totalMensuelHT ?? previewTotalHT;
+  const totalTTC = pricing?.totals?.totalMensuelTTC ?? previewTotalTTC;
+  const dureeMission = pricing?.totals?.dureeMissionMois ?? previewDureeMission;
+  const totalMission = pricing?.totals?.totalMissionTTC ?? previewTotalMission;
 
   const handleSubmit = () => {
     if (!accepteConditions) {
@@ -341,11 +356,12 @@ export function StepRecapitulatif({ formData, onSubmit, isSubmitting, lang = 'fr
         <CardContent className="space-y-4">
           {formData.postes.map((poste, index) => {
             // 🆕 Recalculer avec les nouvelles fonctions
-            const baseHoraire = formData.conditions.baseHoraire;
-            const tauxHoraireBrut = poste.salaireBrut / 151.67; // Toujours sur base légale
+            const pricingPoste = pricing?.postes?.find((p: any) => p?.id && p.id === poste.id) || pricing?.postes?.[index];
+            const baseHoraire = baseHoraireMensuelle;
+            const tauxHoraireBrut = pricingPoste?.tauxHoraireBrut ?? (baseHoraire ? poste.salaireBrut / baseHoraire : 0);
             
             // Taux ETT avec suppléments horaires uniquement (sans panier)
-            const tauxETTBase = calculerTauxETTComplet(
+            const tauxETTBase = pricingPoste?.tauxETTBase ?? calculerTauxETTComplet(
               tauxHoraireBrut,
               poste.coeffBase || 1.92,
               poste.facteurPays || 1.00,
@@ -358,10 +374,10 @@ export function StepRecapitulatif({ formData, onSubmit, isSubmitting, lang = 'fr
             );
 
             // 🆕 Appliquer les majorations (délai paiement, expérience, permis, langues, outillage)
-            const tauxETTMajore = appliquerMajorationTaux(tauxETTBase, majorations.total);
+            const tauxETTMajore = pricingPoste?.tauxETTMajore ?? appliquerMajorationTaux(tauxETTBase, majorations.total);
             
             // Détail des heures supplémentaires
-            const detailHeures = calculerCoutAvecHeuresSup(
+            const detailHeures = pricingPoste?.heures ?? calculerCoutAvecHeuresSup(
               tauxETTMajore,
               baseHoraire,
               poste.quantite
@@ -369,17 +385,13 @@ export function StepRecapitulatif({ formData, onSubmit, isSubmitting, lang = 'fr
             
             // Panier repas mensuel (séparé)
             const secteurLabel = SECTEUR_KEY_TO_LABEL[poste.secteur] || poste.secteur;
-            const montantPanierJour = formData.conditions.repas.type === 'panier' 
+            const montantPanierJour = pricingPoste?.panier?.montantJour ?? (formData.conditions.repas.type === 'panier' 
               ? getPanierRepas(formData.entreprise.region, secteurLabel)
-              : 0;
-            const panierMensuel = calculerPanierRepasMensuel(
-              montantPanierJour,
-              baseHoraire,
-              poste.quantite
-            );
+              : 0);
+            const panierMensuel = pricingPoste?.panier?.totalMensuel ?? calculerPanierRepasMensuel(montantPanierJour, baseHoraire, poste.quantite);
             
-            const joursParMois = Math.round(baseHoraire / 7);
-            const hasHeuresSup = baseHoraire > 151.67;
+            const joursParMois = pricingPoste?.panier?.joursParMois ?? Math.round(baseHoraire / 7);
+            const hasHeuresSup = baseHoraire > baseHoraireLegale;
             
             return (
               <div key={index} className="border border-white/10 rounded-lg p-4 bg-white/5 space-y-3">
@@ -633,7 +645,7 @@ export function StepRecapitulatif({ formData, onSubmit, isSubmitting, lang = 'fr
         </CardContent>
       </Card>
 
-      {/* Total Estimation */}
+      {/* Total Devis */}
       <Card className="border-2 border-cyan-500/50 bg-gradient-to-br from-cyan-500/10 to-green-500/10 backdrop-blur-sm">
         <CardContent className="p-6">
           <div className="space-y-4">
@@ -655,6 +667,12 @@ export function StepRecapitulatif({ formData, onSubmit, isSubmitting, lang = 'fr
                 {formaterMontant(totalMission)}
               </span>
             </div>
+            {pricingLoading && (
+              <p className="text-xs text-white/70">Calcul en cours…</p>
+            )}
+            {!hasCanonicalPricing && (
+              <p className="text-xs text-white/60">Devis (pré-calcul) — confirmé dans le PDF</p>
+            )}
           </div>
         </CardContent>
       </Card>

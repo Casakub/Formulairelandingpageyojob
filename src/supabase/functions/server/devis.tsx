@@ -4,6 +4,7 @@ import * as kv from './kv_store.tsx';
 import { emailService } from './email-service.tsx';
 import { SIGNATURE_EMAIL_TEMPLATES } from './signature-email-templates.ts';
 import { generateModernDevisPdf } from './devis-pdf-generator-v4.tsx';
+import { buildDevisPayload, computeDevisPricing } from './devis-payload.ts';
 
 const devis = new Hono();
 
@@ -46,13 +47,41 @@ async function ensureDevisPdfBucket(supabase: any) {
   }
 }
 
+const ensurePricingPayload = (prospect: any) => {
+  try {
+    return buildDevisPayload(prospect);
+  } catch (error) {
+    console.error('⚠️ Impossible de recalculer le pricing devis:', error);
+    return prospect;
+  }
+};
+
+async function logSignatureAudit(
+  devisId: string,
+  entry: Record<string, unknown>
+) {
+  try {
+    const key = `signature-audit:${devisId}`;
+    const existing = (await kv.get(key)) || [];
+    if (Array.isArray(existing)) {
+      existing.push(entry);
+      await kv.set(key, existing);
+    } else {
+      await kv.set(key, [entry]);
+    }
+  } catch (error) {
+    console.error('⚠️ Erreur log audit signature (non-bloquant):', error);
+  }
+}
+
 async function generateAndStorePdf(
   prospect: any,
   inclureCGV: boolean
 ): Promise<{ pdfUrl: string; pdfPath: string; pdfBytes: Uint8Array; prospectUpdated: any } | null> {
   try {
+    const prospectWithPricing = ensurePricingPayload(prospect);
     // Utiliser le générateur PDF moderne v4
-    const pdfBytes = await generateModernDevisPdf(prospect, inclureCGV);
+    const pdfBytes = await generateModernDevisPdf(prospectWithPricing, inclureCGV);
     const supabase = getSupabaseClient();
     const bucketReady = await ensureDevisPdfBucket(supabase);
     if (!bucketReady) {
@@ -86,7 +115,7 @@ async function generateAndStorePdf(
     const generatedAt = new Date().toISOString();
 
     const prospectUpdated = {
-      ...prospect,
+      ...prospectWithPricing,
       pdfUrl,
       pdf_url: pdfUrl,
       pdf_storage_path: pdfPath,
@@ -475,15 +504,15 @@ devis.post('/', async (c) => {
     const numero = genererNumeroDevis();
     const timestamp = new Date().toISOString();
     
-    // Créer l'objet prospect/devis
-    const prospect = {
+    const prospectRaw = {
       id,
       numero,
       type: 'devis',
       statut: 'nouveau',
       createdAt: timestamp,
       updatedAt: timestamp,
-      
+      language: data.language || data.lang,
+
       // Informations entreprise
       entreprise: {
         pays: data.entreprise.pays || 'France', // Valeur par défaut pour rétrocompatibilité
@@ -497,9 +526,10 @@ devis.post('/', async (c) => {
         region: data.entreprise.region,
         siteInternet: data.entreprise.siteInternet
       },
-      
+
       // Contact
       contact: {
+        civilite: data.contact.civilite,
         nom: data.contact.nom,
         prenom: data.contact.prenom,
         fonction: data.contact.fonction,
@@ -507,16 +537,19 @@ devis.post('/', async (c) => {
         telephoneFixe: data.contact.telephoneFixe,
         telephonePortable: data.contact.telephonePortable
       },
-      
+
       // Besoins (postes)
       postes: data.postes,
-      
+
       // Conditions
       conditions: data.conditions,
-      
+
       // Profil candidats
       candidats: data.candidats,
-      
+
+      // Majorations (si fournies par le frontend)
+      majorations: data.majorations,
+
       // Métadonnées
       metadata: {
         source: 'formulaire-web',
@@ -524,6 +557,8 @@ devis.post('/', async (c) => {
         ip: c.req.header('x-forwarded-for') || c.req.header('x-real-ip')
       }
     };
+
+    const prospect = ensurePricingPayload(prospectRaw);
     
     // Sauvegarder dans le KV store
     await kv.set(`prospects:${id}`, prospect);
@@ -667,6 +702,28 @@ Postes : ${prospect.postes?.length || 0}
 });
 
 /**
+ * POST /make-server-10092a63/devis/preview-pricing
+ * Calcule le pricing sans persistance (preview UI)
+ */
+devis.post('/preview-pricing', async (c) => {
+  try {
+    const data = await c.req.json();
+    const pricing = computeDevisPricing(data);
+    return c.json({ success: true, pricing });
+  } catch (error) {
+    console.error('❌ Erreur preview pricing:', error);
+    return c.json(
+      {
+        success: false,
+        error: 'Erreur lors du calcul du pricing',
+        details: error.message
+      },
+      500
+    );
+  }
+});
+
+/**
  * GET /make-server-10092a63/devis
  * Lister tous les devis/prospects
  */
@@ -775,11 +832,11 @@ devis.patch('/:id', async (c) => {
     }
     
     // Fusionner les mises à jour
-    const prospectMisAJour = {
+    const prospectMisAJour = ensurePricingPayload({
       ...prospect,
       ...updates,
       updatedAt: new Date().toISOString()
-    };
+    });
     
     await kv.set(`prospects:${id}`, prospectMisAJour);
     
@@ -1019,6 +1076,7 @@ devis.post('/signer-devis', async (c) => {
                       'unknown';
     const userAgent = c.req.header('user-agent') || 'unknown';
     const timestamp = new Date().toISOString();
+    const transactionId = crypto.randomUUID();
     
     // Créer le certificat de signature électronique
     const certificatSignature = {
@@ -1040,6 +1098,8 @@ devis.post('/signer-devis', async (c) => {
         ipAddress: ipAddress,
         userAgent: userAgent,
         timestamp: timestamp,
+        transactionId,
+        signatureMethod: 'direct_form',
         timestampReadable: new Date(timestamp).toLocaleString('fr-FR', {
           dateStyle: 'full',
           timeStyle: 'long',
@@ -1066,13 +1126,24 @@ devis.post('/signer-devis', async (c) => {
       contexte: identiteSignataire || {}
     };
     
+    await logSignatureAudit(devisId, {
+      devisId,
+      transactionId,
+      signatureMethod: 'direct_form',
+      ipAddress,
+      userAgent,
+      timestamp,
+      hashAlgorithm: certificatSignature.integrite.hashAlgorithm,
+      documentHash: certificatSignature.integrite.documentHash,
+    });
+
     // Mettre à jour le statut du devis
-    const prospectMisAJour = {
+    const prospectMisAJour = ensurePricingPayload({
       ...prospect,
       statut: 'signe',
       signature: certificatSignature,
       updatedAt: timestamp
-    };
+    });
     
     await kv.set(`prospects:${devisId}`, prospectMisAJour);
     
@@ -1191,6 +1262,9 @@ devis.post('/generer-lien-signature', async (c) => {
     
     await kv.set(`signature-token:${token}`, tokenData);
     
+    // Générer l'URL complète (à adapter selon votre domaine)
+    const signatureUrl = `${c.req.url.split('/functions')[0]}/signer/${token}`;
+
     // Mettre à jour le devis avec le token
     const prospectMisAJour = {
       ...prospect,
@@ -1202,9 +1276,6 @@ devis.post('/generer-lien-signature', async (c) => {
     };
     
     await kv.set(`prospects:${devisId}`, prospectMisAJour);
-    
-    // Générer l'URL complète (à adapter selon votre domaine)
-    const signatureUrl = `${c.req.url.split('/functions')[0]}/signer/${token}`;
     
     console.log(`✅ Lien signature généré: ${token.substring(0, 16)}...`);
     console.log(`🔗 URL: ${signatureUrl}`);
@@ -1449,6 +1520,7 @@ devis.post('/signer-avec-token', async (c) => {
                       'unknown';
     const userAgent = c.req.header('user-agent') || 'unknown';
     const timestamp = new Date().toISOString();
+    const transactionId = crypto.randomUUID();
     
     // Créer le certificat de signature
     const certificatSignature = {
@@ -1465,6 +1537,7 @@ devis.post('/signer-avec-token', async (c) => {
         ipAddress,
         userAgent,
         timestamp,
+        transactionId,
         timestampReadable: new Date(timestamp).toLocaleString('fr-FR', {
           dateStyle: 'full',
           timeStyle: 'long',
@@ -1485,15 +1558,27 @@ devis.post('/signer-avec-token', async (c) => {
       }
     };
     
+    await logSignatureAudit(devisId, {
+      devisId,
+      transactionId,
+      signatureMethod: 'online_link',
+      ipAddress,
+      userAgent,
+      timestamp,
+      token,
+      hashAlgorithm: certificatSignature.integrite.hashAlgorithm,
+      documentHash: certificatSignature.integrite.documentHash,
+    });
+
     // Mettre à jour le devis
-    const prospectMisAJour = {
+    const prospectMisAJour = ensurePricingPayload({
       ...prospect,
       statut: 'signe',
       signature: certificatSignature,
       signedViaToken: true,
       signatureTokenUsed: token,
       updatedAt: timestamp
-    };
+    });
     
     await kv.set(`prospects:${devisId}`, prospectMisAJour);
     

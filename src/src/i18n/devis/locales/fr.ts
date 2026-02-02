@@ -569,7 +569,7 @@ export const fr: DevisTranslations = {
       mensuelTTC: "Total mensuel TTC",
       totalMission: "Coût total mission",
     },
-    noteLegale: "ℹ️ Cette estimation est donnée à titre indicatif. Le tarif définitif sera confirmé après validation par notre équipe et l'ETT partenaire sélectionnée.",
+    noteLegale: "ℹ️ Ce devis est donné à titre indicatif. Le tarif définitif sera confirmé après validation par notre équipe et l'ETT partenaire sélectionnée.",
     acceptConditions: {
       text: "J'accepte que mes données soient traitées conformément à la",
       lien: "politique de confidentialité",

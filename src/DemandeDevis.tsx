@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import {
   ArrowLeft,
@@ -41,109 +41,18 @@ import {
   calculerMajorationsDevis, 
   appliquerMajorationTaux 
 } from './utils/devis-calculations';
+import type { DevisFormData } from './types/devis';
 
 // 🎯 Import du système SEO optimisé
 import { SEOHead } from './components/SEOHead';
 
-// Types pour les données du formulaire
-export interface DevisFormData {
-  // Étape 1: Entreprise
-  entreprise: {
-    pays: string;
-    raisonSociale: string;
-    siret: string;
-    codeAPE: string;
-    tvaIntracommunautaire: string;
-    adresse: string;
-    codePostal: string;
-    ville: string;
-    region: string;
-    siteInternet: string;
-  };
-  
-  // Étape 2: Contact
-  contact: {
-    nom: string;
-    prenom: string;
-    fonction: string;
-    email: string;
-    telephoneFixe: string;
-    telephonePortable: string;
-  };
-  
-  // Étape 3: Besoins (multiple)
-  postes: Array<{
-    id: string;
-    secteur: string;
-    convention: string;
-    nationalite: string;  // 🆕 Code pays (RO, PL, PT, etc.)
-    poste: string;
-    classification: string;
-    quantite: number;
-    salaireBrut: number;
-    tauxHoraireBrut: number;
-    tauxETT: number;
-    tauxETTMajore?: number;
-    // 🆕 Détails du coefficient pour affichage
-    coeffBase: number;
-    facteurPays: number;
-    coeffFinal: number;
-    labelPays: string;
-  }>;
-  
-  // Étape 4: Conditions
-  conditions: {
-    dateDebut: string;
-    dateFin: string;
-    periodeEssai: string;
-    baseHoraire: number;
-    lieuxMission: string;
-    motifRecours: string;
-    delaiPaiement: string;
-    hebergement: {
-      chargeEU: boolean;
-      commentaire: string;
-    };
-    transportLocal: {
-      chargeETT: boolean;
-    };
-    repas: {
-      type: 'restaurant' | 'panier' | 'non-concerne';
-      montant?: number;
-    };
-  };
-  
-  // Étape 5: Candidats
-  candidats: {
-    experience: {
-      obligatoire: boolean;
-      annees?: number;
-    };
-    formation: {
-      obligatoire: boolean;
-      type?: string;
-    };
-    travailRisque: {
-      active: boolean;
-      precisions?: string;
-    };
-    langues: Record<string, string>; // langue: niveau
-    permis: {
-      requis: boolean;
-      categorie?: string;
-    };
-    outillage: {
-      requis: boolean;
-      type?: string;
-    };
-    epis: string[];
-  };
-}
+const BASE_HORAIRE_LEGALE = 151.67;
 
 export default function DemandeDevis() {
   // ⚠️ TOUS LES HOOKS DOIVENT ÊTRE APPELÉS AVANT TOUT RETURN CONDITIONNEL
   const [currentStep, setCurrentStep] = useState(1);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [pricingLoading, setPricingLoading] = useState(false);
   
   // 🌍 Hook unifié de gestion de la langue (auto-détection + persistance + synchronisation)
   const {
@@ -203,7 +112,7 @@ export default function DemandeDevis() {
       dateDebut: '',
       dateFin: '',
       periodeEssai: '3',
-      baseHoraire: 151.67,
+      baseHoraire: BASE_HORAIRE_LEGALE,
       lieuxMission: '',
       motifRecours: '',
       delaiPaiement: '',
@@ -238,6 +147,65 @@ export default function DemandeDevis() {
       epis: []
     }
   });
+
+  useEffect(() => {
+    if (currentStep !== 6) return;
+
+    const payload = {
+      entreprise: formData.entreprise,
+      contact: formData.contact,
+      postes: formData.postes,
+      conditions: formData.conditions,
+      candidats: formData.candidats,
+    };
+
+    const controller = new AbortController();
+    const timeout = setTimeout(async () => {
+      setPricingLoading(true);
+      try {
+        const response = await fetch(`https://${projectId}.supabase.co/functions/v1/make-server-10092a63/devis/preview-pricing`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${publicAnonKey}`,
+            'apikey': publicAnonKey
+          },
+          body: JSON.stringify(payload),
+          signal: controller.signal,
+        });
+
+        if (!response.ok) {
+          const errorData = await response.json().catch(() => ({}));
+          throw new Error(errorData.error || 'Erreur preview pricing');
+        }
+
+        const result = await response.json();
+        if (result?.pricing) {
+          setFormData(prev => ({ ...prev, pricing: result.pricing } as DevisFormData));
+        }
+      } catch (error) {
+        if (error?.name !== 'AbortError') {
+          console.error('❌ Erreur preview pricing:', error);
+        }
+      } finally {
+        if (!controller.signal.aborted) {
+          setPricingLoading(false);
+        }
+      }
+    }, 400);
+
+    return () => {
+      controller.abort();
+      clearTimeout(timeout);
+    };
+  }, [
+    currentStep,
+    formData.entreprise,
+    formData.contact,
+    formData.postes,
+    formData.conditions,
+    formData.candidats,
+  ]);
   
   // 🛡️ Attendre que les traductions ET la langue soient prêtes (APRÈS tous les hooks)
   if (!languageReady || isLoadingTranslations) {
@@ -247,9 +215,6 @@ export default function DemandeDevis() {
       </div>
     );
   }
-  
-  // 🐛 DEBUG: Log la langue avant de charger les traductions
-  console.log('🔍 [DemandeDevis] Langue active:', { globalLanguage, lang, languageReady });
   
   const handleLanguageChange = (newLang: DevisLanguage) => {
     setGlobalLanguage(newLang);
@@ -349,8 +314,9 @@ export default function DemandeDevis() {
         outillage: formData.candidats.outillage,
       });
 
+      const baseHoraireMensuelle = Number(formData.conditions.baseHoraire) || BASE_HORAIRE_LEGALE;
       const postesMajores = formData.postes.map((poste) => {
-        const tauxHoraireBrut = poste.tauxHoraireBrut || calculerTauxHoraireBrut(poste.salaireBrut, 151.67);
+        const tauxHoraireBrut = poste.tauxHoraireBrut || calculerTauxHoraireBrut(poste.salaireBrut, baseHoraireMensuelle);
         const tauxETTBase = calculerTauxETTComplet(
           tauxHoraireBrut,
           poste.coeffBase || 1.92,
@@ -370,6 +336,7 @@ export default function DemandeDevis() {
         ...formData,
         postes: postesMajores,
         majorations,
+        language: lang,
       };
 
       // Envoyer les données au backend
@@ -469,6 +436,7 @@ export default function DemandeDevis() {
             onSubmit={handleSubmit}
             lang={lang}
             isSubmitting={isSubmitting}
+            pricingLoading={pricingLoading}
             onGoToStep={goToStep}
           />
         );
