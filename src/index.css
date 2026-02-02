@@ -6448,16 +6448,6 @@
     color: var(--color-purple-200);
   }
 
-  .text-purple-200\/70 {
-    color: color-mix(in srgb, oklch(.902 .063 306.703) 70%, transparent);
-  }
-
-  @supports (color: color-mix(in lab, red, red)) {
-    .text-purple-200\/70 {
-      color: color-mix(in oklab, var(--color-purple-200) 70%, transparent);
-    }
-  }
-
   .text-purple-300 {
     color: var(--color-purple-300);
   }
