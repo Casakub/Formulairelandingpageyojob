@@ -169,6 +169,17 @@ const getTextValue = (value: any): string => {
   return String(value);
 };
 
+const formatPeriodeEssai = (value: any): string => {
+  const raw = getTextValue(value).trim();
+  if (!raw) return '';
+  const lower = raw.toLowerCase();
+  // Si l’unité est déjà présente, on garde
+  if (lower.includes('jour') || lower.includes('semaine') || lower.includes('mois') || lower.includes('an')) return raw;
+  // Si c’est un nombre (ex: "5"), on ajoute "jours"
+  if (/^\d+(?:[.,]\d+)?$/.test(raw)) return `${raw} jours`;
+  return raw;
+};
+
 const readEnv = (key: string): string | undefined => {
   try {
     const denoEnv = (globalThis as any)?.Deno?.env;
@@ -993,13 +1004,15 @@ export async function generateModernDevisPdf(prospect: any, inclureCGV: boolean)
     entries: Array<{ label: string; value: string }>,
     startX: number,
     startY: number,
-    width: number
+    width: number,
+    options?: { showSeparators?: boolean }
   ) => {
     const labelWidth = 72;
     const valueX = startX + labelWidth + 6;
     const valueWidth = width - labelWidth - 6;
     let cursor = startY;
     const visibleEntries = entries.filter((entry) => entry.value);
+    const showSeparators = options?.showSeparators !== false;
 
     visibleEntries.forEach((entry, index) => {
       const label = toPdfText(entry.label).toUpperCase();
@@ -1025,10 +1038,10 @@ export async function generateModernDevisPdf(prospect: any, inclureCGV: boolean)
         });
       });
 
-      if (index < visibleEntries.length - 1) {
+      if (showSeparators && index < visibleEntries.length - 1) {
         currentPage.drawLine({
-          start: { x: startX, y: cursor - rowHeight + 3 },
-          end: { x: startX + width, y: cursor - rowHeight + 3 },
+          start: { x: startX, y: cursor - rowHeight + 2 },
+          end: { x: startX + width, y: cursor - rowHeight + 2 },
           thickness: 0.3,
           color: colors.lightGray,
         });
@@ -1093,39 +1106,22 @@ export async function generateModernDevisPdf(prospect: any, inclureCGV: boolean)
   );
   y -= 6;
 
-  // Accents de colonne
-  currentPage.drawRectangle({
-    x: config.margin,
-    y: y - 2,
-    width: columnWidth,
-    height: 3,
-    color: colors.cyan,
-  });
-  currentPage.drawRectangle({
-    x: config.margin + columnWidth + 24,
-    y: y - 2,
-    width: columnWidth,
-    height: 3,
-    color: colors.violet,
-  });
-  y -= 12;
-
   // Titres des colonnes
   currentPage.drawText('\u00c9METTEUR (YOJOB)', {
     x: config.margin + 6,
-    y: y - 8,
+    y: y - 10,
     size: 8.5,
     font: fontBold,
     color: colors.cyan,
   });
   currentPage.drawText('CLIENT', {
     x: config.margin + columnWidth + 30,
-    y: y - 8,
+    y: y - 10,
     size: 8.5,
     font: fontBold,
     color: colors.violet,
   });
-  y -= 18;
+  y -= 16;
 
   const cardTopY = y;
   const leftCard = drawCard(
@@ -1136,7 +1132,7 @@ export async function generateModernDevisPdf(prospect: any, inclureCGV: boolean)
     cardHeight,
     colors,
     {
-      bgColor: rgb(0.99, 0.99, 0.995),
+      bgColor: colors.white,
       borderColor: colors.lightGray,
       accentColor: colors.cyan,
       accentWidth: 3,
@@ -1150,15 +1146,15 @@ export async function generateModernDevisPdf(prospect: any, inclureCGV: boolean)
     cardHeight,
     colors,
     {
-      bgColor: rgb(0.99, 0.99, 0.995),
+      bgColor: colors.white,
       borderColor: colors.lightGray,
       accentColor: colors.violet,
       accentWidth: 3,
     }
   );
 
-  drawInfoTable(issuerEntries, leftCard.innerX, leftCard.innerY, leftCard.innerWidth);
-  drawInfoTable(clientEntries, rightCard.innerX, rightCard.innerY, rightCard.innerWidth);
+  drawInfoTable(issuerEntries, leftCard.innerX, leftCard.innerY, leftCard.innerWidth, { showSeparators: false });
+  drawInfoTable(clientEntries, rightCard.innerX, rightCard.innerY, rightCard.innerWidth, { showSeparators: false });
 
   y = cardTopY - cardHeight - 16;
 
@@ -1180,15 +1176,6 @@ export async function generateModernDevisPdf(prospect: any, inclureCGV: boolean)
   );
   y -= 4;
 
-  // Accent bleu à gauche
-  currentPage.drawRectangle({
-    x: config.margin,
-    y: y - 4,
-    width: 4,
-    height: 4,
-    color: colors.blue,
-  });
-
   const periodeLabel = conditions.dateDebut || conditions.dateFin
     ? `${formatDateForPdf(conditions.dateDebut)} -> ${formatDateForPdf(conditions.dateFin)}`
     : '';
@@ -1197,18 +1184,47 @@ export async function generateModernDevisPdf(prospect: any, inclureCGV: boolean)
     { label: 'Postes', value: totalPostes ? String(totalPostes) : '' },
     { label: 'Candidats', value: totalCandidats ? String(totalCandidats) : '' },
     { label: 'Lieu de mission', value: conditions.lieuxMission || '' },
-    { label: 'P\u00e9riode', value: periodeLabel },
+    { label: 'Période', value: periodeLabel },
     { label: 'Base horaire', value: pricing?.baseHoraireMensuelle ? `${pricing.baseHoraireMensuelle} h/mois` : '' },
     { label: 'Motif de recours', value: getTextValue(conditions.motifRecours) || '' },
-    { label: 'D\u00e9lai de paiement', value: formatDelaiPaiementLabel(conditions.delaiPaiement) || '' },
-    { label: 'Validit\u00e9 du devis', value: validityLabel },
+    { label: 'Délai de paiement', value: formatDelaiPaiementLabel(conditions.delaiPaiement) || '' },
+    { label: 'Validité du devis', value: validityLabel },
   ].filter((entry) => entry.value);
 
-  let resumeY = y;
+  // Card de résumé (mise en valeur)
+  const resumeCardHeight = Math.max(90, resumeEntries.length * 28 + 18);
+  ensureSpace(resumeCardHeight + 40);
+
+  const resumeCard = drawCard(
+    currentPage,
+    config.margin,
+    y,
+    config.contentWidth,
+    resumeCardHeight,
+    colors,
+    {
+      bgColor: colors.white,
+      borderColor: colors.lightGray,
+      accentColor: colors.blue,
+      accentWidth: 5,
+    }
+  );
+
+  let resumeY = resumeCard.innerY + 6;
   resumeEntries.forEach((entry) => {
-    resumeY -= drawKeyValue(currentPage, config.margin + 12, resumeY, entry.label, entry.value, colors, fonts, config.contentWidth - 24) + 2;
+    resumeY -= drawKeyValue(
+      currentPage,
+      resumeCard.innerX,
+      resumeY,
+      entry.label,
+      entry.value,
+      colors,
+      fonts,
+      resumeCard.innerWidth
+    );
   });
-  y = resumeY - 10;
+
+  y = y - resumeCardHeight - 16;
 
   // ========================================
   // TABLEAU PROFILS
@@ -1483,7 +1499,26 @@ export async function generateModernDevisPdf(prospect: any, inclureCGV: boolean)
   // TOTAUX (display-only from payload.pricing.totals)
   // ========================================
 
-  ensureSpace(170);
+  const intracomNotice =
+    "TVA intracommunautaire : si votre numéro de TVA est valide, la facturation pourra être établie en autoliquidation (B2B intracommunautaire au sein de l’Union européenne), conformément à la réglementation en vigueur.";
+
+  const noticeFontSize = 7.5;
+  const noticeLines = wrapText(intracomNotice, fontRegular, noticeFontSize, config.contentWidth - 32);
+  const noticeHeight = noticeLines.length * (noticeFontSize + 3) + 10;
+
+  const totalBoxHeight = 78;
+
+  // Estimation plus juste (évite de basculer Totaux sur la page suivante alors qu'il reste assez de place)
+  // drawSectionHeader consomme ~38px, puis spacing.sm, puis la card, puis le texte notice.
+  const requiredTotauxHeight =
+    38 /* header */ +
+    DESIGN_TOKENS.spacing.sm +
+    totalBoxHeight +
+    18 /* marge sous la card */ +
+    (noticeLines.length * (noticeFontSize + 3)) +
+    14 /* marges finales */;
+
+  ensureSpace(requiredTotauxHeight);
   y = drawSectionHeader(
     currentPage,
     config.margin,
@@ -1497,7 +1532,6 @@ export async function generateModernDevisPdf(prospect: any, inclureCGV: boolean)
   );
   y -= DESIGN_TOKENS.spacing.sm;
 
-  const totalBoxHeight = 90;
   drawCard(
     currentPage,
     config.margin + DESIGN_TOKENS.spacing.sm,
@@ -1546,7 +1580,7 @@ export async function generateModernDevisPdf(prospect: any, inclureCGV: boolean)
       font: fontBold,
       color: colors.navy,
     });
-    totalsY -= 16;
+    totalsY -= 14;
   });
 
   currentPage.drawLine({
@@ -1576,32 +1610,32 @@ export async function generateModernDevisPdf(prospect: any, inclureCGV: boolean)
 
   y = y - totalBoxHeight - 18;
 
-  // Note TVA intracom (pro)
-  const intracomNotice =
-    "TVA intracommunautaire : si votre numéro de TVA est valide, la facturation pourra être établie en autoliquidation (B2B intracommunautaire au sein de l’Union européenne), conformément à la réglementation en vigueur.";
-
-const noticeFontSize = 7.5;
-const noticeLines = wrapText(intracomNotice, fontRegular, noticeFontSize, config.contentWidth - 32);
-
-noticeLines.forEach((line) => {
-  currentPage.drawText(toPdfText(line), {
-    x: config.margin + 16,
-    y,
-    size: noticeFontSize,
-    font: fontRegular,
-    color: colors.gray,
+  // Note TVA intracom (pro) – sous le bloc Totaux
+  noticeLines.forEach((line) => {
+    currentPage.drawText(toPdfText(line), {
+      x: config.margin + 16,
+      y,
+      size: noticeFontSize,
+      font: fontRegular,
+      color: colors.gray,
+    });
+    y -= noticeFontSize + 3;
   });
-  y -= noticeFontSize + 3;
-});
 
-y -= 6;
+  y -= 6;
+
+  // Si la prochaine section (Conditions) n'a pas assez d'espace pour respirer, on force un saut de page.
+  // Objectif: garder "Totaux & TVA" juste après le détail, et éviter un enchaînement tassé.
+  if (checkNeedNewPage(y, 140, config)) {
+    addPage();
+  }
 
   // ========================================
   // CONDITIONS & CANDIDATS
   // ========================================
   const conditionsLines = [
     conditions.typeContrat ? `Type de contrat: ${getTextValue(conditions.typeContrat)}` : '',
-    conditions.periodeEssai ? `Période d’essai: ${getTextValue(conditions.periodeEssai)}` : '',
+    conditions.periodeEssai ? `Période d’essai: ${formatPeriodeEssai(conditions.periodeEssai)}` : '',
     conditions.baseHoraire ? `Base horaire: ${conditions.baseHoraire} h/mois` : '',
     conditions.lieuxMission ? `Lieu de mission: ${conditions.lieuxMission}` : '',
     conditions.dateDebut ? `Date de début: ${formatDateForPdf(conditions.dateDebut)}` : '',
