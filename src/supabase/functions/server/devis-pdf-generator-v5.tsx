@@ -278,6 +278,36 @@ const formatPercent = (value?: number) => {
 };
 
 // ========================================
+// 🌍 NATIONALITÉ (affichage)
+// ========================================
+
+/**
+ * Récupère la nationalité (ou pays) associée à un poste/profil.
+ * On supporte plusieurs clés possibles selon l’évolution du payload.
+ */
+const getPosteNationality = (poste: any): string => {
+  if (!poste) return '';
+
+  const candidates = [
+    poste.nationalite,
+    poste.nationaliteTravailleurs,
+    poste.nationaliteTravailleur,
+    poste.workerNationality,
+    poste.paysOrigine,
+    poste.originCountry,
+    poste.countryOfOrigin,
+    poste?.candidats?.nationalite,
+  ];
+
+  for (const cand of candidates) {
+    const value = getTextValue(cand).trim();
+    if (value) return value;
+  }
+
+  return '';
+};
+
+// ========================================
 // 🎨 FONCTIONS DE DESSIN
 // ========================================
 
@@ -732,6 +762,8 @@ function getBadgeColors(type: string, colors: PDFColors): { bg: ReturnType<typeo
       return { bg: rgb(0.93, 0.95, 0.99), text: colors.blue };
     case 'classification':
       return { bg: rgb(0.95, 0.93, 0.99), text: colors.violet };
+    case 'nationality':
+      return { bg: rgb(0.97, 0.95, 1.0), text: colors.violet };
     case 'status-signed':
       return { bg: colors.green, text: colors.white };
     case 'status-pending':
@@ -1284,6 +1316,7 @@ export async function generateModernDevisPdf(prospect: any, inclureCGV: boolean)
     const posteName = poste.poste || 'Profil';
     const classification = poste.classification || '';
     const secteur = poste.secteur || '';
+    const nationality = getPosteNationality(poste);
     const cells = {
       qty: String(poste.quantite || 1),
       taux: `${formatCurrency(poste.tauxETTMajore)}/h`,
@@ -1293,7 +1326,8 @@ export async function generateModernDevisPdf(prospect: any, inclureCGV: boolean)
     const badgeItems = [
       secteur ? { text: secteur, type: 'secteur' as const } : null,
       classification ? { text: classification, type: 'classification' as const } : null,
-    ].filter(Boolean) as Array<{ text: string; type: 'secteur' | 'classification' }>;
+      nationality ? { text: nationality, type: 'nationality' as const } : null,
+    ].filter(Boolean) as Array<{ text: string; type: 'secteur' | 'classification' | 'nationality' }>;
 
     const badgeGap = 4;
     const badgeSizes = badgeItems.map((item) =>
@@ -1454,6 +1488,12 @@ export async function generateModernDevisPdf(prospect: any, inclureCGV: boolean)
   pricing?.postes?.forEach((poste: any, index: number) => {
     const posteTitle = `Profil #${index + 1} - ${poste.poste || 'Poste'}`;
     const blocks = [] as string[];
+
+    const posteNationality = getPosteNationality(poste);
+    if (posteNationality) {
+      blocks.push(`Nationalité des travailleurs: ${posteNationality}`);
+    }
+
     blocks.push(`Coefficient ETT: ${poste.coeffBase.toFixed(2)} x ${poste.facteurPays.toFixed(2)} = ${poste.coeffFinal.toFixed(2)}`);
 
     if (poste.supplements.total > 0) {
