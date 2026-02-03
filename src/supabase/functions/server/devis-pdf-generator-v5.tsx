@@ -1292,7 +1292,17 @@ export async function generateModernDevisPdf(prospect: any, inclureCGV: boolean)
       : profileCellWidth;
 
     const profilLines = wrapText(posteName, fontRegular, 8, nameMaxWidth);
-    const baseRowHeight = Math.max(20, profilLines.length * 10 + 8);
+    const firstLine = profilLines[0] || posteName;
+    const firstLineWidth = fontBold.widthOfTextAtSize(toPdfText(firstLine), 8);
+
+    // Si multi-ligne ou titre "serré", on stack les badges sous le titre
+    const shouldStackBadges =
+      badgeItems.length > 0 && (profilLines.length > 1 || firstLineWidth > nameMaxWidth * 0.85);
+
+    const baseRowHeight = Math.max(
+      20,
+      profilLines.length * 10 + 8 + (shouldStackBadges ? 12 : 0)
+    );
     const rowHeight = baseRowHeight;
 
     if (checkNeedNewPage(y, rowHeight + 30, config)) {
@@ -1346,18 +1356,16 @@ export async function generateModernDevisPdf(prospect: any, inclureCGV: boolean)
     });
 
     if (badgeItems.length) {
-      const firstLine = profilLines[0] || posteName;
-      const firstLineWidth = fontBold.widthOfTextAtSize(toPdfText(firstLine), 8);
       const maxBadgeStartX = offsetX + profileCellWidth - badgeTotalWidth;
-      let badgeX = offsetX + firstLineWidth + 6;
-      if (badgeX > maxBadgeStartX) {
-        badgeX = maxBadgeStartX;
-      }
-      if (badgeX < offsetX) {
-        badgeX = offsetX;
-      }
 
-      const badgeTopY = y - 6;
+      // Inline si possible, sinon sous le titre
+      let badgeX = shouldStackBadges ? offsetX : (offsetX + firstLineWidth + 6);
+
+      if (badgeX > maxBadgeStartX) badgeX = maxBadgeStartX;
+      if (badgeX < offsetX) badgeX = offsetX;
+
+      const badgeTopY = shouldStackBadges ? (y - 22) : (y - 6);
+
       badgeItems.forEach((item, index) => {
         const colorSet = getBadgeColors(item.type, colors);
         const size = badgeSizes[index];
@@ -1569,8 +1577,8 @@ export async function generateModernDevisPdf(prospect: any, inclureCGV: boolean)
   y = y - totalBoxHeight - 18;
 
   // Note TVA intracom (pro)
-const intracomNotice =
-  "TVA intracommunautaire : si votre numéro de TVA est valide, la facturation sera établie en régime intracommunautaire (B2B au sein de l’Union européenne), conformément aux règles applicables.";
+  const intracomNotice =
+    "TVA intracommunautaire : si votre numéro de TVA est valide, la facturation pourra être établie en autoliquidation (B2B intracommunautaire au sein de l’Union européenne), conformément à la réglementation en vigueur.";
 
 const noticeFontSize = 7.5;
 const noticeLines = wrapText(intracomNotice, fontRegular, noticeFontSize, config.contentWidth - 32);
@@ -1900,16 +1908,15 @@ y -= 6;
     });
 
     let certY = y - 34;
-    signatureLines.forEach((line) => {
-      currentPage.drawText(toPdfText(`• ${line}`), {
-        x: config.margin + 16,
-        y: certY,
-        size: 8,
-        font: fontRegular,
-        color: colors.navy,
-      });
-      certY -= 12;
-    });
+
+    // Utilise drawBulletLines : détecte "Label: value" et rend le label en gras
+    certY = drawBulletLines(
+      signatureLines,
+      config.margin + 16,
+      certY,
+      config.contentWidth - 32,
+      8
+    );
 
     if (integrite.documentHash) {
       certY -= 4;
@@ -1929,7 +1936,7 @@ y -= 6;
         y: certY - hashLines.length * 9 - 4,
         width: config.contentWidth - 32,
         height: hashLines.length * 9 + 8,
-        color: colors.background,
+        color: colors.white,
         borderColor: colors.lightGray,
         borderWidth: 0.5,
       });
