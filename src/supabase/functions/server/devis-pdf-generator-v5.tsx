@@ -80,7 +80,7 @@ const DESIGN_TOKENS = {
   // Card styles
   card: {
     padding: 12,
-    borderWidth: 1,
+    borderWidth: 0.5,
   },
 } as const;
 
@@ -541,6 +541,34 @@ function drawFooter(
   });
 }
 
+function drawRoundedRectFill(
+  page: PDFPage,
+  x: number,
+  yTop: number,
+  width: number,
+  height: number,
+  radius: number,
+  color: ReturnType<typeof rgb>
+) {
+  const r = Math.max(0, Math.min(radius, Math.min(width, height) / 2));
+  const bottom = yTop - height;
+
+  if (r <= 0) {
+    page.drawRectangle({ x, y: bottom, width, height, color });
+    return;
+  }
+
+  // Center + side rectangles
+  page.drawRectangle({ x: x + r, y: bottom, width: width - 2 * r, height, color });
+  page.drawRectangle({ x, y: bottom + r, width, height: height - 2 * r, color });
+
+  // Corner circles
+  page.drawCircle({ x: x + r, y: bottom + r, size: r, color });
+  page.drawCircle({ x: x + width - r, y: bottom + r, size: r, color });
+  page.drawCircle({ x: x + r, y: bottom + height - r, size: r, color });
+  page.drawCircle({ x: x + width - r, y: bottom + height - r, size: r, color });
+}
+
 function drawSectionHeader(
   page: PDFPage,
   x: number,
@@ -550,34 +578,35 @@ function drawSectionHeader(
   icon: string,
   bgColor: ReturnType<typeof rgb>,
   colors: PDFColors,
-  fonts: { regular: PDFFont; bold: PDFFont }
+  fonts: { regular: PDFFont; bold: PDFFont },
+  accentColor?: ReturnType<typeof rgb>
 ): number {
-  // Rectangle de fond
+  const height = 30;
+  const radius = 6;
+
+  // Fond arrondi (style corporate)
+  drawRoundedRectFill(page, x, y, width, height, radius, bgColor);
+
+  // Petit accent à gauche (optionnel)
+  const acc = accentColor || colors.cyan;
   page.drawRectangle({
-    x,
-    y: y - 30,
-    width,
-    height: 30,
-    color: bgColor,
+    x: x + 10,
+    y: y - height + 7,
+    width: 3,
+    height: height - 14,
+    color: acc,
   });
 
   // Titre
   page.drawText(toPdfText(title), {
-    x: x + 12,
+    x: x + 18,
     y: y - 18,
     size: 10,
     font: fonts.bold,
     color: colors.navy,
   });
 
-  // Bordure inférieure
-  page.drawLine({
-    start: { x, y: y - 30 },
-    end: { x: x + width, y: y - 30 },
-    thickness: 3,
-    color: rgb(bgColor.red * 0.6, bgColor.green * 0.6, bgColor.blue * 0.6),
-  });
-
+  // (Suppression du trait gris sous le titre – plus moderne)
   return y - 38; // Position Y pour le contenu
 }
 
@@ -812,6 +841,8 @@ export async function generateModernDevisPdf(prospect: any, inclureCGV: boolean)
   };
 
   const fonts = { regular: fontRegular, bold: fontBold };
+  // Couleur unique des titres de section (corporate)
+  const SECTION_HEADER_BG = rgb(0.95, 0.96, 0.98);
 
   const payload = { ...prospect };
   const entreprise = payload.entreprise || {};
@@ -1132,9 +1163,10 @@ export async function generateModernDevisPdf(prospect: any, inclureCGV: boolean)
     config.contentWidth,
     '\u00c9metteur & Client',
     '',
-    rgb(0.93, 0.96, 0.99),
+    SECTION_HEADER_BG,
     colors,
-    fonts
+    fonts,
+    colors.cyan
   );
   y -= 6;
 
@@ -1165,7 +1197,7 @@ export async function generateModernDevisPdf(prospect: any, inclureCGV: boolean)
     colors,
     {
       bgColor: colors.white,
-      borderColor: colors.lightGray,
+      borderColor: rgb(0.92, 0.93, 0.95),
       accentColor: colors.cyan,
       accentWidth: 3,
     }
@@ -1179,7 +1211,7 @@ export async function generateModernDevisPdf(prospect: any, inclureCGV: boolean)
     colors,
     {
       bgColor: colors.white,
-      borderColor: colors.lightGray,
+      borderColor: rgb(0.92, 0.93, 0.95),
       accentColor: colors.violet,
       accentWidth: 3,
     }
@@ -1202,9 +1234,10 @@ export async function generateModernDevisPdf(prospect: any, inclureCGV: boolean)
     config.contentWidth,
     'R\u00e9sum\u00e9 de mission',
     '',
-    rgb(0.96, 0.95, 0.99),
+    SECTION_HEADER_BG,
     colors,
-    fonts
+    fonts,
+    colors.blue
   );
   y -= 4;
 
@@ -1212,19 +1245,8 @@ export async function generateModernDevisPdf(prospect: any, inclureCGV: boolean)
     ? `${formatDateForPdf(conditions.dateDebut)} -> ${formatDateForPdf(conditions.dateFin)}`
     : '';
 
-  const resumeEntries = [
-    { label: 'Postes', value: totalPostes ? String(totalPostes) : '' },
-    { label: 'Candidats', value: totalCandidats ? String(totalCandidats) : '' },
-    { label: 'Lieu de mission', value: conditions.lieuxMission || '' },
-    { label: 'Période', value: periodeLabel },
-    { label: 'Base horaire', value: pricing?.baseHoraireMensuelle ? `${pricing.baseHoraireMensuelle} h/mois` : '' },
-    { label: 'Motif de recours', value: getTextValue(conditions.motifRecours) || '' },
-    { label: 'Délai de paiement', value: formatDelaiPaiementLabel(conditions.delaiPaiement) || '' },
-    { label: 'Validité du devis', value: validityLabel },
-  ].filter((entry) => entry.value);
-
-  // Card de résumé (mise en valeur)
-  const resumeCardHeight = Math.max(90, resumeEntries.length * 28 + 18);
+  // Card de résumé (mise en valeur) – layout compact 2 colonnes
+  const resumeCardHeight = 110;
   ensureSpace(resumeCardHeight + 40);
 
   const resumeCard = drawCard(
@@ -1236,25 +1258,102 @@ export async function generateModernDevisPdf(prospect: any, inclureCGV: boolean)
     colors,
     {
       bgColor: colors.white,
-      borderColor: colors.lightGray,
+      borderColor: rgb(0.92, 0.93, 0.95),
       accentColor: colors.blue,
       accentWidth: 5,
     }
   );
 
-  let resumeY = resumeCard.innerY + 6;
-  resumeEntries.forEach((entry) => {
-    resumeY -= drawKeyValue(
-      currentPage,
-      resumeCard.innerX,
-      resumeY,
-      entry.label,
-      entry.value,
-      colors,
-      fonts,
-      resumeCard.innerWidth
-    );
-  });
+  const gridGap = 18;
+  const colW = (resumeCard.innerWidth - gridGap) / 2;
+  let gridY = resumeCard.innerY + 2;
+
+  const drawInlineKV = (
+    x0: number,
+    y0: number,
+    label: string,
+    value: string,
+    maxW: number
+  ): number => {
+    if (!value) return 0;
+    const safeLabel = toPdfText(label);
+    const safeValue = toPdfText(value);
+
+    const labelText = `${safeLabel}: `;
+    const labelW = fontBold.widthOfTextAtSize(labelText, 8.5);
+    const valueMax = Math.max(40, maxW - labelW);
+    const valueLines = wrapText(safeValue, fontRegular, 8.5, valueMax);
+
+    // 1ère ligne
+    currentPage.drawText(labelText, {
+      x: x0,
+      y: y0,
+      size: 8.5,
+      font: fontBold,
+      color: colors.navy,
+    });
+    currentPage.drawText(valueLines[0] || '', {
+      x: x0 + labelW,
+      y: y0,
+      size: 8.5,
+      font: fontRegular,
+      color: colors.navy,
+    });
+
+    let yy = y0 - 11;
+    // Lignes suivantes (alignées sous la valeur)
+    valueLines.slice(1).forEach((l) => {
+      currentPage.drawText(l, {
+        x: x0 + labelW,
+        y: yy,
+        size: 8.5,
+        font: fontRegular,
+        color: colors.navy,
+      });
+      yy -= 11;
+    });
+
+    return Math.max(1, valueLines.length) * 11;
+  };
+
+  // Ordre et regroupement (2 colonnes)
+  const leftCol = [
+    { label: 'Postes', value: totalPostes ? String(totalPostes) : '' },
+    { label: 'Lieu de mission', value: conditions.lieuxMission || '' },
+    { label: 'Base horaire', value: pricing?.baseHoraireMensuelle ? `${pricing.baseHoraireMensuelle} h/mois` : '' },
+    { label: 'Délai de paiement', value: formatDelaiPaiementLabel(conditions.delaiPaiement) || '' },
+  ].filter((e) => e.value);
+
+  const rightCol = [
+    { label: 'Candidats', value: totalCandidats ? String(totalCandidats) : '' },
+    { label: 'Période', value: periodeLabel },
+    { label: 'Motif de recours', value: getTextValue(conditions.motifRecours) || '' },
+    { label: 'Validité du devis', value: validityLabel },
+  ].filter((e) => e.value);
+
+  // Dessin ligne par ligne (sync des hauteurs)
+  const rows = Math.max(leftCol.length, rightCol.length);
+  for (let i = 0; i < rows; i++) {
+    const l = leftCol[i];
+    const r = rightCol[i];
+
+    const yRow = gridY - 4;
+    const hL = l ? drawInlineKV(resumeCard.innerX, yRow, l.label, l.value, colW) : 0;
+    const hR = r ? drawInlineKV(resumeCard.innerX + colW + gridGap, yRow, r.label, r.value, colW) : 0;
+
+    const rowH = Math.max(hL, hR, 12);
+    gridY -= rowH + 2;
+
+    // séparateur subtil (sauf dernière ligne)
+    if (i < rows - 1) {
+      currentPage.drawLine({
+        start: { x: resumeCard.innerX, y: gridY + 4 },
+        end: { x: resumeCard.innerX + resumeCard.innerWidth, y: gridY + 4 },
+        thickness: 0.25,
+        color: rgb(0.92, 0.93, 0.95),
+      });
+    }
+  }
 
   y = y - resumeCardHeight - 16;
 
@@ -1270,9 +1369,10 @@ export async function generateModernDevisPdf(prospect: any, inclureCGV: boolean)
     config.contentWidth,
     'Profils & co\u00fbts mensuels',
     '',
-    rgb(0.93, 0.99, 0.96),
+    SECTION_HEADER_BG,
     colors,
-    fonts
+    fonts,
+    colors.emerald
   );
   y -= 12;
 
@@ -1364,9 +1464,10 @@ export async function generateModernDevisPdf(prospect: any, inclureCGV: boolean)
         config.contentWidth,
         'Profils & co\u00fbts mensuels (suite)',
         '',
-        rgb(0.93, 0.99, 0.96),
+        SECTION_HEADER_BG,
         colors,
-        fonts
+        fonts,
+        colors.emerald
       );
       y -= 12;
       drawTableHeader();
@@ -1479,9 +1580,10 @@ export async function generateModernDevisPdf(prospect: any, inclureCGV: boolean)
     config.contentWidth,
     'D\u00e9tail tarifaire par profil',
     '',
-    rgb(0.99, 0.95, 0.97),
+    SECTION_HEADER_BG,
     colors,
-    fonts
+    fonts,
+    colors.violet
   );
   y -= 8;
 
@@ -1566,9 +1668,10 @@ export async function generateModernDevisPdf(prospect: any, inclureCGV: boolean)
     config.contentWidth,
     'Totaux & TVA',
     '',
-    rgb(0.93, 0.99, 0.96),
+    SECTION_HEADER_BG,
     colors,
-    fonts
+    fonts,
+    colors.emerald
   );
   y -= DESIGN_TOKENS.spacing.sm;
 
@@ -1695,9 +1798,10 @@ export async function generateModernDevisPdf(prospect: any, inclureCGV: boolean)
     config.contentWidth,
     'Conditions de mission',
     '',
-    rgb(0.99, 0.96, 0.93),
+    SECTION_HEADER_BG,
     colors,
-    fonts
+    fonts,
+    colors.orange
   );
   y -= 10;
 
@@ -1749,9 +1853,10 @@ export async function generateModernDevisPdf(prospect: any, inclureCGV: boolean)
     config.contentWidth,
     'Profil des candidats',
     '',
-    rgb(0.99, 0.95, 0.97),
+    SECTION_HEADER_BG,
     colors,
-    fonts
+    fonts,
+    colors.violet
   );
   y -= 10;
 
@@ -1787,9 +1892,10 @@ export async function generateModernDevisPdf(prospect: any, inclureCGV: boolean)
     config.contentWidth,
     'Ajustements tarifaires',
     '',
-    rgb(0.93, 0.96, 0.99),
+    SECTION_HEADER_BG,
     colors,
-    fonts
+    fonts,
+    colors.blue
   );
   y -= 10;
 
@@ -1852,9 +1958,10 @@ export async function generateModernDevisPdf(prospect: any, inclureCGV: boolean)
     config.contentWidth,
     'Mentions l\u00e9gales & RGPD',
     '',
-    rgb(0.99, 0.96, 0.93),
+    SECTION_HEADER_BG,
     colors,
-    fonts
+    fonts,
+    colors.orange
   );
   y -= 10;
 
@@ -1930,9 +2037,10 @@ export async function generateModernDevisPdf(prospect: any, inclureCGV: boolean)
     config.contentWidth,
     'Certificat de signature \u00e9lectronique',
     '',
-    rgb(0.93, 0.99, 0.96),
+    SECTION_HEADER_BG,
     colors,
-    fonts
+    fonts,
+    colors.green
   );
   y -= 10;
 
