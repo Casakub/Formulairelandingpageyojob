@@ -560,9 +560,9 @@ function drawKeyValue(
     x,
     y,
     size: 8,
-    font: fonts.regular,
+    font: fonts.bold,
     color: colors.gray,
-  });
+  }); 
 
   // Valeur (avec wrap si nécessaire)
   if (maxWidth) {
@@ -836,13 +836,76 @@ export async function generateModernDevisPdf(prospect: any, inclureCGV: boolean)
     }
   };
 
-  const drawBulletLines = (lines: string[], startX: number, startY: number, width: number, fontSize: number) => {
-    let cursor = startY;
-    lines.forEach((line) => {
-      const wrapped = wrapText(line, fontRegular, fontSize, width - 14);
-      wrapped.forEach((wrappedLine, index) => {
-        currentPage.drawText(index === 0 ? `• ${wrappedLine}` : `  ${wrappedLine}`, {
-          x: startX,
+  const drawBulletLines = (
+  lines: string[],
+  startX: number,
+  startY: number,
+  width: number,
+  fontSize: number
+) => {
+  let cursor = startY;
+
+  const bullet = '• ';
+  const bulletWidth = fontRegular.widthOfTextAtSize(bullet, fontSize);
+  const indentX = startX + bulletWidth;
+  const maxTextWidth = width - 14;
+
+  lines.forEach((rawLine) => {
+    const line = toPdfText(rawLine || '').trim();
+    if (!line) return;
+
+    const kv = line.match(/^([^:]{2,40}):\s*(.+)$/); // "Label: value"
+
+    // Cas 1: Label: Value -> label en gras
+    if (kv) {
+      const label = `${kv[1]}: `;
+      const value = kv[2];
+
+      const labelWidth = fontBold.widthOfTextAtSize(toPdfText(label), fontSize);
+      const valueMaxWidthFirstLine = Math.max(40, maxTextWidth - bulletWidth - labelWidth);
+
+      // wrap valeur (1ère ligne = espace restant après label, puis lignes suivantes pleine largeur)
+      const valueLinesFirst = wrapText(value, fontRegular, fontSize, valueMaxWidthFirstLine);
+      const remainingValue = valueLinesFirst.length ? valueLinesFirst.join('\n') : value;
+      const valueLines = valueLinesFirst.length
+        ? [valueLinesFirst[0], ...wrapText(valueLinesFirst.slice(1).join(' '), fontRegular, fontSize, maxTextWidth - bulletWidth)]
+        : wrapText(value, fontRegular, fontSize, maxTextWidth - bulletWidth);
+
+      // Bullet
+      currentPage.drawText(bullet, {
+        x: startX,
+        y: cursor,
+        size: fontSize,
+        font: fontRegular,
+        color: colors.navy,
+      });
+
+      // Label bold
+      currentPage.drawText(toPdfText(label), {
+        x: indentX,
+        y: cursor,
+        size: fontSize,
+        font: fontBold,
+        color: colors.navy,
+      });
+
+      // Valeur regular - ligne 1
+      const firstValue = valueLines[0] || '';
+      currentPage.drawText(toPdfText(firstValue), {
+        x: indentX + labelWidth,
+        y: cursor,
+        size: fontSize,
+        font: fontRegular,
+        color: colors.navy,
+      });
+
+      cursor -= fontSize + 3;
+
+      // Lignes suivantes (alignées sous la valeur)
+      const tail = valueLines.slice(1);
+      tail.forEach((vLine) => {
+        currentPage.drawText(toPdfText(vLine), {
+          x: indentX,
           y: cursor,
           size: fontSize,
           font: fontRegular,
@@ -850,9 +913,26 @@ export async function generateModernDevisPdf(prospect: any, inclureCGV: boolean)
         });
         cursor -= fontSize + 3;
       });
+
+      return;
+    }
+
+    // Cas 2: phrase libre -> comportement actuel
+    const wrapped = wrapText(line, fontRegular, fontSize, maxTextWidth);
+    wrapped.forEach((wrappedLine, index) => {
+      currentPage.drawText(index === 0 ? `• ${wrappedLine}` : `  ${wrappedLine}`, {
+        x: startX,
+        y: cursor,
+        size: fontSize,
+        font: fontRegular,
+        color: colors.navy,
+      });
+      cursor -= fontSize + 3;
     });
-    return cursor;
-  };
+  });
+
+  return cursor;
+};
 
   const measureBulletLinesHeight = (lines: string[], width: number, fontSize: number) => {
     let height = 0;
@@ -966,13 +1046,15 @@ export async function generateModernDevisPdf(prospect: any, inclureCGV: boolean)
   // EMETTEUR & CLIENT (tableau pro, align\u00e9)
   // ========================================
 
+  const isEI = (issuer.legalForm || '').trim().toUpperCase() === 'EI';
+
   const issuerEntries = [
     { label: 'Raison sociale', value: issuer.name },
     { label: 'Forme juridique', value: issuer.legalForm },
     { label: 'SIRET', value: issuer.siret },
     { label: 'TVA intracom.', value: issuer.vatNumber },
     { label: 'RCS', value: issuer.rcs },
-    { label: 'Capital', value: issuer.capital },
+    ...(!isEI ? [{ label: 'Capital', value: issuer.capital }] : []),
     { label: 'Adresse', value: issuer.address },
     { label: 'Email', value: issuer.email },
     { label: 'T\u00e9l\u00e9phone', value: issuer.phone },
@@ -1393,7 +1475,7 @@ export async function generateModernDevisPdf(prospect: any, inclureCGV: boolean)
   // TOTAUX (display-only from payload.pricing.totals)
   // ========================================
 
-  ensureSpace(140);
+  ensureSpace(170);
   y = drawSectionHeader(
     currentPage,
     config.margin,
@@ -1485,6 +1567,26 @@ export async function generateModernDevisPdf(prospect: any, inclureCGV: boolean)
   });
 
   y = y - totalBoxHeight - 18;
+
+  // Note TVA intracom (pro)
+const intracomNotice =
+  "TVA intracommunautaire : si votre numéro de TVA est valide, la facturation sera établie en régime intracommunautaire (B2B au sein de l’Union européenne), conformément aux règles applicables.";
+
+const noticeFontSize = 7.5;
+const noticeLines = wrapText(intracomNotice, fontRegular, noticeFontSize, config.contentWidth - 32);
+
+noticeLines.forEach((line) => {
+  currentPage.drawText(toPdfText(line), {
+    x: config.margin + 16,
+    y,
+    size: noticeFontSize,
+    font: fontRegular,
+    color: colors.gray,
+  });
+  y -= noticeFontSize + 3;
+});
+
+y -= 6;
 
   // ========================================
   // CONDITIONS & CANDIDATS
@@ -1640,7 +1742,7 @@ export async function generateModernDevisPdf(prospect: any, inclureCGV: boolean)
     issuer.siret ? `SIRET: ${issuer.siret}` : '',
     issuer.rcs ? `RCS: ${issuer.rcs}` : '',
     issuer.vatNumber ? `TVA: ${issuer.vatNumber}` : '',
-    issuer.capital ? `Capital: ${issuer.capital}` : '',
+    (!isEI && issuer.capital) ? `Capital: ${issuer.capital}` : '',
     issuer.address ? `Adresse: ${issuer.address}` : '',
     issuer.email ? `Email: ${issuer.email}` : '',
     issuer.phone ? `T\u00e9l\u00e9phone: ${issuer.phone}` : '',
@@ -1827,7 +1929,7 @@ export async function generateModernDevisPdf(prospect: any, inclureCGV: boolean)
         y: certY - hashLines.length * 9 - 4,
         width: config.contentWidth - 32,
         height: hashLines.length * 9 + 8,
-        color: rgb(0.96, 0.97, 0.98),
+        color: colors.background,
         borderColor: colors.lightGray,
         borderWidth: 0.5,
       });
