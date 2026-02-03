@@ -13,6 +13,7 @@ import {
   Clock,
   FileText,
   Download,
+  RotateCcw,
   ChevronDown,
   ChevronUp,
   Globe,
@@ -331,10 +332,10 @@ export function DevisDetailModal({ devisId, onClose }: DevisDetailModalProps) {
     };
   };
 
-  const handleGeneratePDF = async () => {
+  const handleGeneratePDF = async (options: { force?: boolean } = {}) => {
     try {
       setIsGeneratingPDF(true);
-      toast.info('Génération du PDF en cours...');
+      toast.info(options.force ? 'Régénération du PDF en cours...' : 'Génération du PDF en cours...');
 
       const response = await fetch(
         `https://${projectId}.supabase.co/functions/v1/make-server-10092a63/devis/generer-pdf`,
@@ -346,7 +347,8 @@ export function DevisDetailModal({ devisId, onClose }: DevisDetailModalProps) {
           },
           body: JSON.stringify({
             devisId,
-            inclureCGV: true
+            inclureCGV: true,
+            ...(options.force ? { force: true } : {})
           })
         }
       );
@@ -361,11 +363,11 @@ export function DevisDetailModal({ devisId, onClose }: DevisDetailModalProps) {
       // Télécharger le PDF
       if (result.pdfUrl) {
         window.open(result.pdfUrl, '_blank');
-        toast.success('PDF généré avec succès !');
+        toast.success(options.force ? 'PDF régénéré avec succès !' : 'PDF généré avec succès !');
       }
     } catch (error) {
       console.error('Erreur génération PDF:', error);
-      toast.error('Impossible de générer le PDF');
+      toast.error(options.force ? 'Impossible de régénérer le PDF' : 'Impossible de générer le PDF');
     } finally {
       setIsGeneratingPDF(false);
     }
@@ -440,12 +442,23 @@ export function DevisDetailModal({ devisId, onClose }: DevisDetailModalProps) {
                 </div>
                 <div className="flex items-center gap-2">
                   <Button
-                    onClick={handleGeneratePDF}
+                    onClick={() => handleGeneratePDF()}
+                    disabled={isGeneratingPDF}
                     className="bg-gradient-to-r from-violet-500 to-purple-500 hover:from-violet-600 hover:to-purple-600 text-white"
                     size="sm"
                   >
                     <Download className="w-4 h-4 mr-2" />
                     Export PDF
+                  </Button>
+                  <Button
+                    onClick={() => handleGeneratePDF({ force: true })}
+                    disabled={isGeneratingPDF}
+                    variant="outline"
+                    size="sm"
+                    className="border-slate-300 text-slate-700 hover:bg-slate-100"
+                  >
+                    <RotateCcw className="w-4 h-4 mr-2" />
+                    Régénérer
                   </Button>
                   <Button
                     onClick={onClose}
@@ -1237,7 +1250,8 @@ export function DevisDetailModal({ devisId, onClose }: DevisDetailModalProps) {
                   Fermer
                 </Button>
                 <Button
-                  onClick={handleGeneratePDF}
+                  onClick={() => handleGeneratePDF()}
+                  disabled={isGeneratingPDF}
                   className="bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-600 hover:to-blue-600 text-white"
                 >
                   <Download className="w-4 h-4 mr-2" />
