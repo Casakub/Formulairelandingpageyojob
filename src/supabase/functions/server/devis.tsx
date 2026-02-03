@@ -3,7 +3,8 @@ import { createClient } from "npm:@supabase/supabase-js@2.39.3";
 import * as kv from './kv_store.tsx';
 import { emailService } from './email-service.tsx';
 import { SIGNATURE_EMAIL_TEMPLATES } from './signature-email-templates.ts';
-import { generateModernDevisPdf } from './devis-pdf-generator-v4.tsx';
+import { generateModernDevisPdf as generateModernDevisPdfV4 } from './devis-pdf-generator-v4.tsx';
+import { generateModernDevisPdf as generateModernDevisPdfV5 } from './devis-pdf-generator-v5.tsx';
 import { buildDevisPayload, computeDevisPricing } from './devis-payload.ts';
 
 const devis = new Hono();
@@ -150,8 +151,14 @@ async function generateAndStorePdf(
   try {
     const prospectWithPricing = ensurePricingPayload(prospect);
     const prospectWithPrivacy = applySignaturePrivacy(prospectWithPricing);
-    // Utiliser le générateur PDF moderne v4
-    const pdfBytes = await generateModernDevisPdf(prospectWithPrivacy, inclureCGV);
+    // Utiliser le générateur PDF moderne v5 (fallback v4)
+    let pdfBytes: Uint8Array;
+    try {
+      pdfBytes = await generateModernDevisPdfV5(prospectWithPrivacy, inclureCGV);
+    } catch (error) {
+      console.error('⚠️ Génération PDF v5 en échec, fallback v4:', error);
+      pdfBytes = await generateModernDevisPdfV4(prospectWithPrivacy, inclureCGV);
+    }
     const supabase = getSupabaseClient();
     const bucketReady = await ensureDevisPdfBucket(supabase);
     if (!bucketReady) {
