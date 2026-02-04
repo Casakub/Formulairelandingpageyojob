@@ -1101,7 +1101,7 @@ devis.delete('/:key', async (c) => {
       console.error('⚠️ Erreur mise à jour stats/listes (non-bloquant):', error);
     }
 
-    await supabase.from('deletion_logs').insert({
+    const { error: logError } = await supabase.from('deletion_logs').insert({
       entity_type: 'devis',
       entity_key: record.key,
       deleted_by: user.id,
@@ -1110,7 +1110,10 @@ devis.delete('/:key', async (c) => {
         numero: devisValue?.numero,
         pdf_deleted: pdfDeleted,
       }
-    }).catch(() => {});
+    });
+    if (logError) {
+      console.error('⚠️ Erreur log suppression devis (non-bloquant):', logError);
+    }
 
     console.log(`✅ Devis supprimé: ${record.key}`);
 
