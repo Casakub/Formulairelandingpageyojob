@@ -9,18 +9,29 @@ import {
   Clock,
   CheckCircle,
   AlertCircle,
-  Download,
   PenTool,
-  Send,
-  Link2
+  Link2,
+  Trash2,
+  Loader2,
+  AlertTriangle
 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '../ui/card';
 import { Button } from '../ui/button';
 import { Input } from '../ui/input';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue, SelectActionItem } from '../ui/select';
+import {
+  AlertDialog,
+  AlertDialogContent,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogCancel,
+} from '../ui/alert-dialog';
 import { Badge } from '../ui/badge';
 import { projectId, publicAnonKey } from '../../utils/supabase/info';
 import { DevisDetailModal } from './DevisDetailModal';
+import { getStoredSession } from '../../services/authService';
 import { toast } from 'sonner';
 
 interface Devis {
@@ -77,6 +88,10 @@ export function DevisTab() {
   const [filtreStatut, setFiltreStatut] = useState('tous');
   const [devisDetailId, setDevisDetailId] = useState<string | null>(null);
   const [carteActive, setCarteActive] = useState<string | null>(null);
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [deleteTarget, setDeleteTarget] = useState<Devis | null>(null);
+  const [confirmDeleteText, setConfirmDeleteText] = useState('');
+  const [isDeleting, setIsDeleting] = useState(false);
 
   useEffect(() => {
     chargerDonnees();
@@ -127,6 +142,60 @@ export function DevisTab() {
   const handleDevisDeleted = () => {
     setDevisDetailId(null);
     chargerDonnees();
+  };
+
+  const openDeleteDialog = (devis: Devis) => {
+    setDeleteTarget(devis);
+    setConfirmDeleteText('');
+    setDeleteDialogOpen(true);
+  };
+
+  const handleDeleteDialogChange = (nextOpen: boolean) => {
+    if (isDeleting) return;
+    setDeleteDialogOpen(nextOpen);
+    if (!nextOpen) {
+      setDeleteTarget(null);
+      setConfirmDeleteText('');
+    }
+  };
+
+  const handleDeleteFromList = async () => {
+    if (!deleteTarget) return;
+    setIsDeleting(true);
+    try {
+      const session = getStoredSession();
+      const token = session?.access_token || localStorage.getItem('sb-access-token');
+      if (!token) {
+        throw new Error('Session expirée. Veuillez vous reconnecter.');
+      }
+
+      const deleteKey = `prospects:${deleteTarget.id}`;
+      const response = await fetch(
+        `https://${projectId}.supabase.co/functions/v1/make-server-10092a63/devis/${encodeURIComponent(deleteKey)}`,
+        {
+          method: 'DELETE',
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          }
+        }
+      );
+
+      const result = await response.json().catch(() => ({}));
+      if (!response.ok) {
+        throw new Error(result.error || result.message || 'Échec de la suppression');
+      }
+
+      toast.success(`Devis ${deleteTarget.numero} supprimé avec succès`);
+      setDeleteDialogOpen(false);
+      setDeleteTarget(null);
+      setConfirmDeleteText('');
+      chargerDonnees();
+    } catch (error: any) {
+      toast.error(`Erreur lors de la suppression : ${error?.message || 'Erreur inconnue'}`);
+    } finally {
+      setIsDeleting(false);
+    }
   };
 
   const filtrerDemandes = () => {
@@ -312,6 +381,8 @@ export function DevisTab() {
       </div>
     );
   }
+  
+  const canConfirmDelete = confirmDeleteText.trim().toUpperCase() === 'SUPPRIMER';
 
   return (
     <div className="space-y-6">
@@ -511,6 +582,14 @@ export function DevisTab() {
                             <SelectItem value="devisEnvoye" className="text-xs">Devis envoyé</SelectItem>
                             <SelectItem value="converti" className="text-xs">Converti</SelectItem>
                             <SelectItem value="perdu" className="text-xs">Perdu</SelectItem>
+                            <div className="my-1 border-t border-slate-200" />
+                            <SelectActionItem
+                              onSelect={() => openDeleteDialog(devis)}
+                              className="text-destructive hover:bg-red-50 flex items-center gap-2 text-xs"
+                            >
+                              <Trash2 className="h-4 w-4" />
+                              Supprimer
+                            </SelectActionItem>
                           </SelectContent>
                         </Select>
 
@@ -543,6 +622,57 @@ export function DevisTab() {
           onDeleted={handleDevisDeleted}
         />
       )}
+
+      <AlertDialog open={deleteDialogOpen} onOpenChange={handleDeleteDialogChange}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle className="flex items-center gap-2">
+              <AlertTriangle className="h-5 w-5 text-destructive" />
+              Supprimer ce devis ?
+            </AlertDialogTitle>
+            <AlertDialogDescription asChild>
+              <div className="space-y-3 text-sm text-muted-foreground">
+                <p>
+                  Vous êtes sur le point de supprimer définitivement le devis{' '}
+                  <strong className="text-foreground">{deleteTarget?.numero || ''}</strong>.
+                </p>
+                <p className="text-destructive font-medium">
+                  Cette action est irréversible. Le devis et son PDF seront définitivement supprimés.
+                </p>
+                <div className="pt-2">
+                  <label className="text-sm font-medium text-foreground">
+                    Tapez <code className="bg-muted px-1 rounded">SUPPRIMER</code> pour confirmer :
+                  </label>
+                  <Input
+                    value={confirmDeleteText}
+                    onChange={(e) => setConfirmDeleteText(e.target.value)}
+                    placeholder="SUPPRIMER"
+                    className="mt-2"
+                    disabled={isDeleting}
+                  />
+                </div>
+              </div>
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={isDeleting}>Annuler</AlertDialogCancel>
+            <Button
+              variant="destructive"
+              onClick={handleDeleteFromList}
+              disabled={!canConfirmDelete || isDeleting}
+            >
+              {isDeleting ? (
+                <>
+                  <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                  Suppression...
+                </>
+              ) : (
+                'Confirmer la suppression'
+              )}
+            </Button>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }
