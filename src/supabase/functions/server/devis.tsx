@@ -11,6 +11,7 @@ const devis = new Hono();
 
 const INTERNAL_CONTACT_EMAIL = 'contact@yojob.fr';
 const DEVIS_PDF_BUCKET = 'yojob-devis-pdfs';
+const FRONTEND_BASE_URL = (Deno.env.get('YOJOB_BASE_URL') || Deno.env.get('FRONTEND_BASE_URL') || Deno.env.get('SITE_URL') || 'https://yojob.fr').replace(/\/+$/, '');
 let devisPdfBucketReady: boolean | null = null;
 
 async function ensureDevisPdfBucket(supabase: any) {
@@ -675,32 +676,111 @@ devis.post('/', async (c) => {
     
     console.log(`✅ Devis créé: ${numero} (ID: ${id})`);
 
+    let signatureToken = '';
+    let signatureUrl = '';
+    let signatureExpiresAt = '';
+    const recapUrl = `${FRONTEND_BASE_URL}/recap-devis/${id}?numero=${encodeURIComponent(numero)}`;
+    let prospectForComms = prospect;
+
+    // 🔗 Générer un lien de signature dès la création (non-bloquant)
+    try {
+      const tokenBytes = new Uint8Array(32);
+      crypto.getRandomValues(tokenBytes);
+      const token = Array.from(tokenBytes)
+        .map(b => b.toString(16).padStart(2, '0'))
+        .join('');
+
+      const expirationDate = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000);
+      signatureExpiresAt = expirationDate.toISOString();
+
+      const tokenData = {
+        token,
+        devisId: id,
+        prospectEmail: prospect.contact.email,
+        createdAt: timestamp,
+        expiresAt: signatureExpiresAt,
+        used: false
+      };
+
+      await kv.set(`signature-token:${token}`, tokenData);
+
+      signatureUrl = `${FRONTEND_BASE_URL}/signer/${token}`;
+
+      const prospectUpdated = {
+        ...prospect,
+        signatureToken: token,
+        signatureUrl,
+        signatureLinkGeneratedAt: timestamp,
+        signatureLinkExpiresAt: signatureExpiresAt,
+        updatedAt: timestamp
+      };
+
+      await kv.set(`prospects:${id}`, prospectUpdated);
+      prospectForComms = prospectUpdated;
+      signatureToken = token;
+    } catch (error) {
+      console.error('⚠️ Erreur génération lien signature (non-bloquant):', error);
+    }
+
     // ✉️ Emails transactionnels (confirmation client + notification interne)
     try {
-      const contactName = [prospect.contact.prenom, prospect.contact.nom].filter(Boolean).join(' ').trim() || 'Bonjour';
-      const subjectClient = '✅ Votre demande de devis a bien été reçue';
+      const contactName = [prospectForComms.contact.prenom, prospectForComms.contact.nom].filter(Boolean).join(' ').trim() || 'Bonjour';
+      const subjectClient = '✅ Votre devis YOJOB est prêt – consultez et signez en ligne';
+      const consultUrl = recapUrl;
+      const signUrl = signatureUrl || recapUrl;
+
       const textClient = `Bonjour ${contactName},
 
-Merci pour votre demande de devis. Notre équipe vous recontacte rapidement.
+Merci pour votre demande. Votre devis est prêt et disponible en ligne.
+Vous pouvez le consulter et le signer en quelques minutes.
 
-Numéro de devis : ${prospect.numero}
-Entreprise : ${prospect.entreprise.raisonSociale || 'Non précisé'}
+Cliquez ici pour consulter votre devis : ${consultUrl}
+Cliquez ici pour signer votre devis : ${signUrl}
+
+Numéro de devis : ${prospectForComms.numero}
+Entreprise : ${prospectForComms.entreprise.raisonSociale || 'Non précisé'}
+
+Signature électronique sécurisée (eIDAS UE) — lien valable 30 jours.
+La signature en ligne nous permet de lancer la suite rapidement.
+
+Une question ? Répondez simplement à cet email, notre équipe vous accompagne.
 
 L'équipe YOJOB`;
 
       const htmlClient = `
-        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-          <h2>Demande de devis reçue ✅</h2>
+        <div style="font-family: Arial, sans-serif; max-width: 640px; margin: 0 auto; color: #0f172a;">
+          <h2 style="margin-bottom: 8px;">Votre devis est prêt ✅</h2>
           <p>Bonjour <strong>${contactName}</strong>,</p>
-          <p>Merci pour votre demande de devis. Notre équipe vous recontacte rapidement.</p>
-          <p><strong>Numéro de devis :</strong> ${prospect.numero}</p>
-          <p><strong>Entreprise :</strong> ${prospect.entreprise.raisonSociale || 'Non précisé'}</p>
+          <p>Merci pour votre demande. Votre devis est disponible en ligne. Vous pouvez le consulter et le signer en quelques minutes.</p>
+          <p><strong>Numéro de devis :</strong> ${prospectForComms.numero}<br/>
+             <strong>Entreprise :</strong> ${prospectForComms.entreprise.raisonSociale || 'Non précisé'}</p>
+
+          <div style="margin: 24px 0; text-align: center;">
+            <a href="${consultUrl}" style="display: inline-block; margin: 6px; padding: 12px 20px; border-radius: 6px; background: #0f172a; color: #ffffff; text-decoration: none; font-weight: 600;">Consulter mon devis</a>
+            <a href="${signUrl}" style="display: inline-block; margin: 6px; padding: 12px 20px; border-radius: 6px; background: #06b6d4; color: #ffffff; text-decoration: none; font-weight: 600;">Signer mon devis</a>
+          </div>
+
+          <div style="background: #f8fafc; border-radius: 8px; padding: 14px; margin-bottom: 16px;">
+            <p style="margin: 0; font-size: 14px; color: #475569;">
+              Signature électronique sécurisée (eIDAS UE). Lien valable 30 jours.
+              La signature en ligne nous permet de lancer la suite rapidement.
+            </p>
+          </div>
+
+          <p style="font-size: 13px; color: #64748b;">
+            Si les boutons ne s'affichent pas :
+            <a href="${consultUrl}" style="color: #0f172a; text-decoration: underline;">cliquez ici pour consulter votre devis</a>
+            •
+            <a href="${signUrl}" style="color: #0f172a; text-decoration: underline;">cliquez ici pour signer votre devis</a>
+          </p>
+
+          <p>Une question ? Répondez simplement à cet email, notre équipe vous accompagne.</p>
           <p>À très vite,<br><strong>L'équipe YOJOB</strong></p>
         </div>
       `;
 
       await sendEmailSafe({
-        to: prospect.contact.email,
+        to: prospectForComms.contact.email,
         subject: subjectClient,
         body: textClient,
         html: htmlClient,
@@ -709,26 +789,26 @@ L'équipe YOJOB`;
       const subjectAdmin = '📥 Nouvelle demande de devis';
       const textAdmin = `Nouvelle demande de devis
 
-Numéro : ${prospect.numero}
-Entreprise : ${prospect.entreprise.raisonSociale || 'Non précisé'}
+Numéro : ${prospectForComms.numero}
+Entreprise : ${prospectForComms.entreprise.raisonSociale || 'Non précisé'}
 Contact : ${contactName}
-Email : ${prospect.contact.email}
-Téléphone : ${prospect.contact.telephonePortable || prospect.contact.telephoneFixe || 'Non précisé'}
-Pays : ${prospect.entreprise.pays || 'Non précisé'}
-Postes : ${prospect.postes?.length || 0}
+Email : ${prospectForComms.contact.email}
+Téléphone : ${prospectForComms.contact.telephonePortable || prospectForComms.contact.telephoneFixe || 'Non précisé'}
+Pays : ${prospectForComms.entreprise.pays || 'Non précisé'}
+Postes : ${prospectForComms.postes?.length || 0}
 `;
 
       const htmlAdmin = `
         <div style="font-family: Arial, sans-serif; max-width: 700px; margin: 0 auto;">
           <h2>📥 Nouvelle demande de devis</h2>
           <ul>
-            <li><strong>Numéro :</strong> ${prospect.numero}</li>
-            <li><strong>Entreprise :</strong> ${prospect.entreprise.raisonSociale || 'Non précisé'}</li>
+            <li><strong>Numéro :</strong> ${prospectForComms.numero}</li>
+            <li><strong>Entreprise :</strong> ${prospectForComms.entreprise.raisonSociale || 'Non précisé'}</li>
             <li><strong>Contact :</strong> ${contactName}</li>
-            <li><strong>Email :</strong> ${prospect.contact.email}</li>
-            <li><strong>Téléphone :</strong> ${prospect.contact.telephonePortable || prospect.contact.telephoneFixe || 'Non précisé'}</li>
-            <li><strong>Pays :</strong> ${prospect.entreprise.pays || 'Non précisé'}</li>
-            <li><strong>Postes :</strong> ${prospect.postes?.length || 0}</li>
+            <li><strong>Email :</strong> ${prospectForComms.contact.email}</li>
+            <li><strong>Téléphone :</strong> ${prospectForComms.contact.telephonePortable || prospectForComms.contact.telephoneFixe || 'Non précisé'}</li>
+            <li><strong>Pays :</strong> ${prospectForComms.entreprise.pays || 'Non précisé'}</li>
+            <li><strong>Postes :</strong> ${prospectForComms.postes?.length || 0}</li>
           </ul>
         </div>
       `;
@@ -738,7 +818,7 @@ Postes : ${prospect.postes?.length || 0}
         subject: subjectAdmin,
         body: textAdmin,
         html: htmlAdmin,
-        replyTo: prospect.contact.email,
+        replyTo: prospectForComms.contact.email,
       });
     } catch (notifyError) {
       console.error('⚠️ Emails devis (non-bloquant):', notifyError);
@@ -746,12 +826,24 @@ Postes : ${prospect.postes?.length || 0}
 
     // 🔗 Sync CRM + Trigger automations (non bloquant)
     try {
-      const syncResult = await syncDevisToProspect(prospect);
+      const syncResult = await syncDevisToProspect(prospectForComms);
       if (syncResult?.prospectId) {
         await kv.set(`prospects:${id}`, {
-          ...prospect,
+          ...prospectForComms,
           prospectId: syncResult.prospectId,
         });
+
+        if (signatureUrl && signatureToken) {
+          await updateProspectCustomFields(
+            { ...prospectForComms, prospectId: syncResult.prospectId },
+            {
+              signature_token: signatureToken,
+              signature_url: signatureUrl,
+              signature_link_generated_at: timestamp,
+              signature_link_expires_at: signatureExpiresAt,
+            }
+          );
+        }
 
         // Déclencher les workflows automatiquement (SMTP)
         await triggerWorkflow('prospect_created', { prospect_id: syncResult.prospectId });
@@ -1530,7 +1622,7 @@ devis.post('/generer-lien-signature', async (c) => {
     await kv.set(`signature-token:${token}`, tokenData);
     
     // Générer l'URL complète (à adapter selon votre domaine)
-    const signatureUrl = `${c.req.url.split('/functions')[0]}/signer/${token}`;
+    const signatureUrl = `${FRONTEND_BASE_URL}/signer/${token}`;
 
     // Mettre à jour le devis avec le token
     const prospectMisAJour = {
