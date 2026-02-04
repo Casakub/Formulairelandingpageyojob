@@ -372,14 +372,26 @@ function drawHeader(
 ) {
   const { pageWidth, pageHeight } = config;
   const headerHeight = 70;
+  const headerBg = rgb(0.96, 0.97, 0.99);
+  const headerText = rgb(0.11, 0.16, 0.32); // #1D2851 approx
+  const headerAccent = rgb(0.11, 0.16, 0.32);
 
-  // Background dark bleu-cyan (éclairci)
+  // Background clair (aligné avec le bandeau du footer)
   page.drawRectangle({
     x: 0,
     y: pageHeight - headerHeight,
     width: pageWidth,
     height: headerHeight,
-    color: rgb(0.11, 0.16, 0.32), // Bleu foncé légèrement éclairci
+    color: headerBg,
+  });
+
+  // Accent sombre discret en haut
+  page.drawRectangle({
+    x: 0,
+    y: pageHeight - 4,
+    width: pageWidth,
+    height: 4,
+    color: headerAccent,
   });
 
   // Logo YOJOB réel (si disponible)
@@ -408,7 +420,7 @@ function drawHeader(
         y: pageHeight - 35,
         size: 24,
         font: fonts.bold,
-        color: colors.cyan,
+        color: headerText,
       });
     }
   } else {
@@ -417,8 +429,8 @@ function drawHeader(
       x: 60,
       y: pageHeight - 35,
       size: 30,
-      color: rgb(0.15, 0.20, 0.35),
-      borderColor: colors.cyan,
+      color: rgb(0.9, 0.92, 0.96),
+      borderColor: headerAccent,
       borderWidth: 2,
     });
 
@@ -427,7 +439,7 @@ function drawHeader(
       y: pageHeight - 40,
       size: 20,
       font: fonts.bold,
-      color: colors.cyan,
+      color: headerAccent,
     });
     
     page.drawText('YO', {
@@ -435,7 +447,7 @@ function drawHeader(
       y: pageHeight - 32,
       size: 24,
       font: fonts.bold,
-      color: colors.white,
+      color: headerText,
     });
     
     page.drawText('JOB', {
@@ -443,7 +455,7 @@ function drawHeader(
       y: pageHeight - 32,
       size: 24,
       font: fonts.bold,
-      color: colors.cyan,
+      color: headerAccent,
     });
 
     page.drawText('Courtage en recrutement europ\u00e9en', {
@@ -451,7 +463,7 @@ function drawHeader(
       y: pageHeight - 48,
       size: 8,
       font: fonts.regular,
-      color: rgb(0.7, 0.7, 0.7),
+      color: colors.gray,
     });
   }
 
@@ -464,7 +476,7 @@ function drawHeader(
     y: pageHeight - 30,
     size: 14,
     font: fonts.bold,
-    color: colors.white,
+    color: headerText,
   });
 
   // Badge statut
