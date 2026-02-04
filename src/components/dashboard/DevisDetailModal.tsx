@@ -48,6 +48,7 @@ import {
 } from '../ui/alert-dialog';
 import { useState, useEffect } from 'react';
 import { projectId, publicAnonKey } from '../../utils/supabase/info';
+import { getStoredSession } from '../../services/authService';
 import { toast } from 'sonner';
 
 interface DevisDetailModalProps {
@@ -402,7 +403,8 @@ export function DevisDetailModal({ devisId, onClose, onDeleted }: DevisDetailMod
     if (!devis) return;
     setIsDeleting(true);
     try {
-      const token = localStorage.getItem('sb-access-token');
+      const session = getStoredSession();
+      const token = session?.access_token || localStorage.getItem('sb-access-token');
       if (!token) {
         throw new Error('Session expirée. Veuillez vous reconnecter.');
       }
