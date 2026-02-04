@@ -106,6 +106,20 @@ const maskIpAddress = (ip?: string): string => {
   return unique.join(', ');
 };
 
+const extractStoragePath = (url: string | null | undefined): string | null => {
+  if (!url) return null;
+  const match = url.match(/\/storage\/v1\/object\/(?:sign|public)\/yojob-devis-pdfs\/(.+?)(?:\?|$)/);
+  return match ? decodeURIComponent(match[1]) : null;
+};
+
+const normalizeStoragePath = (path: string | null | undefined): string | null => {
+  if (!path) return null;
+  if (path.startsWith(`${DEVIS_PDF_BUCKET}/`)) {
+    return path.slice(`${DEVIS_PDF_BUCKET}/`.length);
+  }
+  return path;
+};
+
 const sanitizeSignatureMetadata = (metadata: Record<string, any> | undefined) => {
   if (!metadata) return metadata;
   const { userAgent: _userAgent, ipAddress, ...rest } = metadata;
@@ -962,51 +976,153 @@ devis.patch('/:id', async (c) => {
 });
 
 /**
- * DELETE /make-server-10092a63/devis/:id
- * Supprimer un devis
+ * DELETE /make-server-10092a63/devis/:key
+ * Supprimer un devis (archive + storage + base)
  */
-devis.delete('/:id', async (c) => {
+devis.delete('/:key', async (c) => {
+  const rawKey = c.req.param('key');
+  const authHeader = c.req.header('Authorization');
+
+  if (!authHeader?.startsWith('Bearer ')) {
+    return c.json({ error: 'Non autorisé' }, 401);
+  }
+
+  const token = authHeader.replace('Bearer ', '').trim();
+  if (!token) {
+    return c.json({ error: 'Non autorisé' }, 401);
+  }
+
+  const resolvedKey = rawKey.includes(':') ? rawKey : `prospects:${rawKey}`;
+  const resolvedId = resolvedKey.startsWith('prospects:') ? resolvedKey.slice('prospects:'.length) : null;
+
   try {
-    const id = c.req.param('id');
-    
-    const prospect = await kv.get(`prospects:${id}`);
-    
-    if (!prospect) {
+    const supabase = getSupabaseClient();
+
+    const { data: { user }, error: authError } = await supabase.auth.getUser(token);
+    if (authError || !user) {
+      return c.json({ error: 'Token invalide' }, 401);
+    }
+
+    const { data: record, error: selectError } = await supabase
+      .from('kv_store_10092a63')
+      .select('key, value')
+      .eq('key', resolvedKey)
+      .maybeSingle();
+
+    if (selectError) {
       return c.json(
         {
-          success: false,
-          error: 'Devis non trouvé'
+          error: 'Erreur lors de la récupération du devis',
+          details: selectError.message
         },
-        404
+        500
       );
     }
-    
-    // Supprimer de la liste
-    const listeIds = await kv.get('prospects:list') || [];
-    const nouvelleListe = listeIds.filter(i => i !== id);
-    await kv.set('prospects:list', nouvelleListe);
-    
-    // Mettre à jour les stats
-    const stats = await kv.get('prospects:stats') || {};
-    if (stats.total) stats.total -= 1;
-    if (stats[prospect.statut]) stats[prospect.statut] -= 1;
-    await kv.set('prospects:stats', stats);
-    
-    // Supprimer le prospect
-    await kv.del(`prospects:${id}`);
-    
-    console.log(`✅ Devis supprimé: ${id}`);
-    
+
+    if (!record) {
+      return c.json({ error: 'Devis non trouvé' }, 404);
+    }
+
+    const devisValue = record.value as Record<string, any>;
+    const isDevisByType = devisValue?.type === 'devis';
+    const isDevisByKey = /^prospects:[0-9a-fA-F-]{36}$/.test(record.key);
+    if (!isDevisByType && !isDevisByKey) {
+      return c.json({ error: 'Clé invalide' }, 400);
+    }
+
+    const { error: archiveError } = await supabase
+      .from('kv_store_devis_archive')
+      .upsert({
+        key: record.key,
+        value: record.value,
+        archived_by: user.id,
+        archived_at: new Date().toISOString(),
+      });
+
+    if (archiveError) {
+      console.error('⚠️ Erreur archivage devis (non-bloquant):', archiveError);
+    }
+
+    const storagePathRaw = devisValue?.pdf_storage_path
+      || extractStoragePath(devisValue?.pdfUrl || devisValue?.pdf_url);
+    const storagePath = normalizeStoragePath(storagePathRaw);
+    let pdfDeleted = false;
+
+    if (storagePath) {
+      const { error: storageError } = await supabase.storage
+        .from(DEVIS_PDF_BUCKET)
+        .remove([storagePath]);
+
+      if (storageError) {
+        console.error('⚠️ Erreur suppression PDF devis (non-bloquant):', storageError);
+      } else {
+        pdfDeleted = true;
+      }
+    }
+
+    const { error: deleteError } = await supabase
+      .from('kv_store_10092a63')
+      .delete()
+      .eq('key', record.key);
+
+    if (deleteError) {
+      return c.json(
+        {
+          error: 'Échec de la suppression en base',
+          details: deleteError.message
+        },
+        500
+      );
+    }
+
+    try {
+      const devisId = devisValue?.id || resolvedId;
+      if (devisId) {
+        const listeIds = await kv.get('prospects:list') || [];
+        if (Array.isArray(listeIds)) {
+          const nouvelleListe = listeIds.filter((id: string) => id !== devisId);
+          if (nouvelleListe.length !== listeIds.length) {
+            await kv.set('prospects:list', nouvelleListe);
+          }
+        }
+      }
+
+      const stats = await kv.get('prospects:stats') || {};
+      if (stats && typeof stats === 'object') {
+        if (typeof stats.total === 'number') {
+          stats.total = Math.max(0, stats.total - 1);
+        }
+        if (devisValue?.statut && typeof stats[devisValue.statut] === 'number') {
+          stats[devisValue.statut] = Math.max(0, stats[devisValue.statut] - 1);
+        }
+        await kv.set('prospects:stats', stats);
+      }
+    } catch (error) {
+      console.error('⚠️ Erreur mise à jour stats/listes (non-bloquant):', error);
+    }
+
+    await supabase.from('deletion_logs').insert({
+      entity_type: 'devis',
+      entity_key: record.key,
+      deleted_by: user.id,
+      deleted_at: new Date().toISOString(),
+      metadata: {
+        numero: devisValue?.numero,
+        pdf_deleted: pdfDeleted,
+      }
+    }).catch(() => {});
+
+    console.log(`✅ Devis supprimé: ${record.key}`);
+
     return c.json({
       success: true,
-      message: 'Devis supprimé avec succès'
+      key: record.key,
+      pdf_deleted: pdfDeleted
     });
-    
-  } catch (error) {
+  } catch (error: any) {
     console.error('❌ Erreur suppression devis:', error);
     return c.json(
       {
-        success: false,
         error: 'Erreur lors de la suppression du devis',
         details: error.message
       },
