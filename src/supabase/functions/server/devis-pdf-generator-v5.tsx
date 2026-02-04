@@ -507,48 +507,37 @@ function drawFooter(
   totalPages: number,
   footerText: string
 ) {
-  const footerY = 26;
+  const footerY = 24;
 
-  // Bandeau léger
-  page.drawRectangle({
-    x: config.margin,
-    y: footerY - 6,
-    width: config.pageWidth - config.margin * 2,
-    height: 20,
-    color: rgb(0.985, 0.985, 0.99),
+  // Ligne séparatrice
+  page.drawLine({
+    start: { x: config.margin, y: footerY + 16 },
+    end: { x: config.pageWidth - config.margin, y: footerY + 16 },
+    thickness: 0.5,
+    color: colors.lightGray,
   });
 
-  // Texte gauche
+  // Texte footer
   if (footerText) {
-    page.drawText(toPdfText(footerText), {
-      x: config.margin + 8,
+    page.drawText(footerText, {
+      x: config.margin,
       y: footerY,
-      size: 7.5,
+      size: 7,
       font,
-      color: rgb(0.38, 0.44, 0.54),
+      color: colors.gray,
     });
   }
 
-  // Badge pagination à droite
+  // Pagination
   const pageText = toPdfText(`Page ${pageNumber} / ${totalPages}`);
-  const fontSize = 7.5;
-  const paddingX = 8;
-  const paddingY = 4;
-  const textW = font.widthOfTextAtSize(pageText, fontSize);
-  const badgeW = textW + paddingX * 2;
-  const badgeH = fontSize + paddingY * 2;
-
-  const badgeX = config.pageWidth - config.margin - badgeW - 8;
-  const badgeYTop = footerY + 10;
-
-  drawRoundedRectFill(page, badgeX, badgeYTop, badgeW, badgeH, 8, rgb(0.95, 0.96, 0.98));
-
+  const pageWidth = font.widthOfTextAtSize(pageText, 7);
+  
   page.drawText(pageText, {
-    x: badgeX + paddingX,
-    y: badgeYTop - badgeH + paddingY + 1,
-    size: fontSize,
+    x: config.pageWidth - config.margin - pageWidth,
+    y: footerY,
+    size: 7,
     font,
-    color: colors.navy,
+    color: colors.gray,
   });
 }
 
@@ -1355,6 +1344,17 @@ export async function generateModernDevisPdf(prospect: any, inclureCGV: boolean)
     const rowH = Math.max(hL, hR, 12);
     gridY -= rowH + 2;
 
+    // séparateur subtil (sauf dernière ligne)
+    if (i < rows - 1) {
+      currentPage.drawLine({
+        start: { x: resumeCard.innerX, y: gridY + 4 },
+        end: { x: resumeCard.innerX + resumeCard.innerWidth, y: gridY + 4 },
+        thickness: 0.25,
+        color: rgb(0.92, 0.93, 0.95),
+      });
+    }
+  }
+
   y = y - resumeCardHeight - 16;
 
   // ========================================
@@ -1392,8 +1392,9 @@ export async function generateModernDevisPdf(prospect: any, inclureCGV: boolean)
       y: y - headerHeight,
       width: tableWidth,
       height: headerHeight,
-      color: rgb(0.95, 0.97, 0.99),
-      // pas de bordure -> rendu moderne
+      color: rgb(0.93, 0.96, 0.99),
+      borderColor: colors.lightGray,
+      borderWidth: 0.5,
     });
     let offsetX = tableX + 6;
     columns.forEach((col) => {
@@ -1473,15 +1474,14 @@ export async function generateModernDevisPdf(prospect: any, inclureCGV: boolean)
     }
 
     // Row background avec accent gauche coloré
-    const isEvenRow = index % 2 === 0;
-
     currentPage.drawRectangle({
       x: tableX,
       y: y - rowHeight,
       width: tableWidth,
       height: rowHeight,
-      color: isEvenRow ? rgb(1, 1, 1) : rgb(0.985, 0.99, 1),
-      // pas de bordure -> tableau plus premium
+      color: colors.white,
+      borderColor: colors.lightGray,
+      borderWidth: 0.5,
     });
 
     // Accent bar left (style dashboard)
@@ -1625,48 +1625,14 @@ export async function generateModernDevisPdf(prospect: any, inclureCGV: boolean)
     }
 
     ensureSpace(80);
-    // --- Titre profil mis en valeur (pill) ---
-    const titleX = config.margin + 12;
-    const titleY = y;
-    const titleText = toPdfText(posteTitle);
-
-    const pillPaddingX = 10;
-    const pillPaddingY = 6;
-    const titleFontSize = 9.5;
-
-    const titleW = fontBold.widthOfTextAtSize(titleText, titleFontSize);
-    const pillW = titleW + pillPaddingX * 2;
-    const pillH = titleFontSize + pillPaddingY * 2;
-
-    // Fond arrondi (pill)
-    drawRoundedRectFill(
-      currentPage,
-      titleX,
-      titleY + 6,         // petit ajustement visuel
-      pillW,
-      pillH,
-      8,
-      rgb(0.96, 0.95, 1)  // léger violet clair
-    );
-
-    // Accent gauche
-    currentPage.drawRectangle({
-      x: titleX + 6,
-      y: titleY + 6 - pillH + 4,
-      width: 3,
-      height: pillH - 8,
-      color: colors.violet,
-    });
-
-    // Texte
-    currentPage.drawText(titleText, {
-      x: titleX + pillPaddingX + 6,
-      y: titleY + 6 - (titleFontSize + 4),
-      size: titleFontSize,
+    currentPage.drawText(toPdfText(posteTitle), {
+      x: config.margin + 12,
+      y,
+      size: 9,
       font: fontBold,
-      color: colors.violet,
+      color: colors.navy,
     });
-    y -= 28;
+    y -= 14;
     y = drawBulletLines(blocks, config.margin + 16, y, config.contentWidth - 20, 8);
     y -= 8;
   });
@@ -1824,12 +1790,7 @@ export async function generateModernDevisPdf(prospect: any, inclureCGV: boolean)
     conditions.repas?.type ? `Repas: ${conditions.repas.type}${conditions.repas.montant ? ` (${formatCurrency(conditions.repas.montant)}/jour)` : ''}` : '',
   ].filter(Boolean) as string[];
 
-  const conditionsGap = 18;
-  const conditionsWidth = config.contentWidth - 24;
-  const conditionsHeight2Col = measureTwoColumnBulletHeight(conditionsLines, conditionsWidth, conditionsGap, 8.5);
-
-  ensureSpace(conditionsHeight2Col + 80);
-
+  ensureSpace(measureBulletLinesHeight(conditionsLines, config.contentWidth - 20, 8.5) + 60);
   y = drawSectionHeader(
     currentPage,
     config.margin,
@@ -1844,14 +1805,7 @@ export async function generateModernDevisPdf(prospect: any, inclureCGV: boolean)
   );
   y -= 10;
 
-  y = drawTwoColumnBulletLines(
-    conditionsLines,
-    config.margin + 12,
-    y,
-    conditionsWidth,
-    conditionsGap,
-    8.5
-  );
+  y = drawBulletLines(conditionsLines, config.margin + 12, y, config.contentWidth - 20, 8.5);
   y -= 10;
 
   const candidatsLines: string[] = [];
@@ -2267,5 +2221,4 @@ export async function generateModernDevisPdf(prospect: any, inclureCGV: boolean)
   });
 
   return await pdfDoc.save();
-}
 }
