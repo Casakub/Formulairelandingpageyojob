@@ -1344,15 +1344,7 @@ export async function generateModernDevisPdf(prospect: any, inclureCGV: boolean)
     const rowH = Math.max(hL, hR, 12);
     gridY -= rowH + 2;
 
-    // séparateur subtil (sauf dernière ligne)
-    if (i < rows - 1) {
-      currentPage.drawLine({
-        start: { x: resumeCard.innerX, y: gridY + 4 },
-        end: { x: resumeCard.innerX + resumeCard.innerWidth, y: gridY + 4 },
-        thickness: 0.25,
-        color: rgb(0.92, 0.93, 0.95),
-      });
-    }
+    // Pas de séparateurs pour garder un rendu plus clean
   }
 
   y = y - resumeCardHeight - 16;
@@ -1378,12 +1370,20 @@ export async function generateModernDevisPdf(prospect: any, inclureCGV: boolean)
 
   const tableX = config.margin + 8;
   const tableWidth = config.contentWidth - 16;
+  const tablePaddingX = 10;
   const columns = [
     { key: 'profil', label: 'Profil', width: 230 },
     { key: 'qty', label: 'Qte', width: 40 },
     { key: 'taux', label: 'Taux ETT', width: 100 },
     { key: 'cout', label: 'Co\u00fbt mensuel HT', width: 130 },
   ];
+  const columnStarts = columns.reduce((acc, col, index) => {
+    const start = index === 0
+      ? tableX + tablePaddingX
+      : acc[index - 1] + columns[index - 1].width;
+    acc.push(start);
+    return acc;
+  }, [] as number[]);
 
   const drawTableHeader = () => {
     const headerHeight = 22;
@@ -1393,19 +1393,26 @@ export async function generateModernDevisPdf(prospect: any, inclureCGV: boolean)
       width: tableWidth,
       height: headerHeight,
       color: rgb(0.93, 0.96, 0.99),
-      borderColor: colors.lightGray,
-      borderWidth: 0.5,
+      borderWidth: 0,
     });
-    let offsetX = tableX + 6;
-    columns.forEach((col) => {
-      currentPage.drawText(toPdfText(col.label), {
-        x: offsetX,
+    columns.forEach((col, index) => {
+      const text = toPdfText(col.label);
+      const textWidth = fontBold.widthOfTextAtSize(text, 8);
+      const colStart = columnStarts[index];
+      const colEnd = colStart + col.width;
+      let textX = colStart;
+      if (col.key === 'qty') {
+        textX = colStart + (col.width - textWidth) / 2;
+      } else if (col.key === 'taux' || col.key === 'cout') {
+        textX = colEnd - textWidth - 6;
+      }
+      currentPage.drawText(text, {
+        x: textX,
         y: y - 15,
         size: 8,
         font: fontBold,
         color: colors.navy,
       });
-      offsetX += col.width;
     });
     y -= headerHeight + 4;
   };
@@ -1480,8 +1487,7 @@ export async function generateModernDevisPdf(prospect: any, inclureCGV: boolean)
       width: tableWidth,
       height: rowHeight,
       color: colors.white,
-      borderColor: colors.lightGray,
-      borderWidth: 0.5,
+      borderWidth: 0,
     });
 
     // Accent bar left (style dashboard)
@@ -1493,7 +1499,7 @@ export async function generateModernDevisPdf(prospect: any, inclureCGV: boolean)
       color: colors.violet,
     });
 
-    let offsetX = tableX + 10;
+    let offsetX = columnStarts[0];
 
     // Nom du poste (avec badges inline)
     profilLines.forEach((line, idx) => {
@@ -1531,32 +1537,40 @@ export async function generateModernDevisPdf(prospect: any, inclureCGV: boolean)
       });
     }
 
-    offsetX += columns[0].width - 4;
+    offsetX = columnStarts[1];
 
     // Quantité avec badge style
     const qtyColors = getBadgeColors('quantity', colors);
-    drawBadge(currentPage, offsetX, y - 6, cells.qty, fontBold, {
+    const qtySize = measureBadge(cells.qty, fontBold, { fontSize: 7, paddingX: 6, paddingY: 2 });
+    const qtyX = columnStarts[1] + (columns[1].width - qtySize.width) / 2;
+    drawBadge(currentPage, qtyX, y - 6, cells.qty, fontBold, {
       bgColor: qtyColors.bg,
       textColor: qtyColors.text,
       fontSize: 7,
       paddingX: 6,
       paddingY: 2,
     });
-    offsetX += columns[1].width;
+    offsetX = columnStarts[2];
 
     // Taux ETT
-    currentPage.drawText(toPdfText(cells.taux), {
-      x: offsetX,
+    const tauxText = toPdfText(cells.taux);
+    const tauxWidth = fontRegular.widthOfTextAtSize(tauxText, 8);
+    const tauxX = columnStarts[2] + columns[2].width - tauxWidth - 6;
+    currentPage.drawText(tauxText, {
+      x: tauxX,
       y: y - 12,
       size: 8,
       font: fontRegular,
       color: colors.navy,
     });
-    offsetX += columns[2].width;
+    offsetX = columnStarts[3];
 
     // Coût mensuel (mis en valeur)
-    currentPage.drawText(toPdfText(cells.cout), {
-      x: offsetX,
+    const coutText = toPdfText(cells.cout);
+    const coutWidth = fontBold.widthOfTextAtSize(coutText, 8);
+    const coutX = columnStarts[3] + columns[3].width - coutWidth - 6;
+    currentPage.drawText(coutText, {
+      x: coutX,
       y: y - 12,
       size: 8,
       font: fontBold,
