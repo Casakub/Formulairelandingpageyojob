@@ -1319,24 +1319,26 @@ export function DevisDetailModal({ devisId, onClose, onDeleted }: DevisDetailMod
                         <AlertTriangle className="h-5 w-5 text-destructive" />
                         Supprimer ce devis ?
                       </AlertDialogTitle>
-                      <AlertDialogDescription className="space-y-3">
-                        <p>
-                          Vous êtes sur le point de supprimer définitivement le devis <strong>{devis.numero}</strong>.
-                        </p>
-                        <p className="text-destructive font-medium">
-                          Cette action est irréversible. Le devis et son PDF seront définitivement supprimés.
-                        </p>
-                        <div className="pt-2">
-                          <label className="text-sm font-medium">
-                            Tapez <code className="bg-muted px-1 rounded">SUPPRIMER</code> pour confirmer :
-                          </label>
-                          <Input
-                            value={confirmText}
-                            onChange={(e) => setConfirmText(e.target.value)}
-                            placeholder="SUPPRIMER"
-                            className="mt-2"
-                            disabled={isDeleting}
-                          />
+                      <AlertDialogDescription asChild>
+                        <div className="space-y-3 text-sm text-muted-foreground">
+                          <p>
+                            Vous êtes sur le point de supprimer définitivement le devis <strong className="text-foreground">{devis.numero}</strong>.
+                          </p>
+                          <p className="text-destructive font-medium">
+                            Cette action est irréversible. Le devis et son PDF seront définitivement supprimés.
+                          </p>
+                          <div className="pt-2">
+                            <label className="text-sm font-medium text-foreground">
+                              Tapez <code className="bg-muted px-1 rounded">SUPPRIMER</code> pour confirmer :
+                            </label>
+                            <Input
+                              value={confirmText}
+                              onChange={(e) => setConfirmText(e.target.value)}
+                              placeholder="SUPPRIMER"
+                              className="mt-2"
+                              disabled={isDeleting}
+                            />
+                          </div>
                         </div>
                       </AlertDialogDescription>
                     </AlertDialogHeader>
