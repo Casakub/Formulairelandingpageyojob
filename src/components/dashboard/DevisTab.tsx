@@ -18,7 +18,7 @@ import {
 import { Card, CardContent, CardHeader, CardTitle } from '../ui/card';
 import { Button } from '../ui/button';
 import { Input } from '../ui/input';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue, SelectActionItem } from '../ui/select';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select';
 import {
   AlertDialog,
   AlertDialogContent,
@@ -583,13 +583,14 @@ export function DevisTab() {
                             <SelectItem value="converti" className="text-xs">Converti</SelectItem>
                             <SelectItem value="perdu" className="text-xs">Perdu</SelectItem>
                             <div className="my-1 border-t border-slate-200" />
-                            <SelectActionItem
+                            <SelectItem
+                              value="__delete__"
                               onSelect={() => openDeleteDialog(devis)}
                               className="text-destructive hover:bg-red-50 flex items-center gap-2 text-xs"
                             >
                               <Trash2 className="h-4 w-4" />
                               Supprimer
-                            </SelectActionItem>
+                            </SelectItem>
                           </SelectContent>
                         </Select>
 

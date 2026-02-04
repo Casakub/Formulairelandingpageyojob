@@ -27,12 +27,7 @@ interface SelectItemProps {
   value: string;
   children: React.ReactNode;
   className?: string;
-}
-
-interface SelectActionItemProps {
-  onSelect: () => void;
-  children: React.ReactNode;
-  className?: string;
+  onSelect?: () => void;
 }
 
 const SelectContext = React.createContext<{
@@ -220,12 +215,18 @@ export function SelectContent({ children, className = '' }: SelectContentProps) 
   );
 }
 
-export function SelectItem({ value, children, className = '' }: SelectItemProps) {
+export function SelectItem({ value, children, className = '', onSelect }: SelectItemProps) {
   const { value: selectedValue, onValueChange, setIsOpen, setValueLabel } = React.useContext(SelectContext);
 
   const handleClick = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
+
+    if (onSelect) {
+      onSelect();
+      setIsOpen(false);
+      return;
+    }
     
     // Extraire le texte du label
     const label = typeof children === 'string' ? children : extractTextFromChildren(children);
@@ -252,27 +253,6 @@ export function SelectItem({ value, children, className = '' }: SelectItemProps)
       className={`w-full text-left px-3 py-2 text-sm cursor-pointer text-gray-900 hover:bg-slate-100 transition-colors ${
         isSelected ? 'bg-blue-50 text-blue-700 font-medium' : ''
       } ${className}`}
-    >
-      {children}
-    </button>
-  );
-}
-
-export function SelectActionItem({ onSelect, children, className = '' }: SelectActionItemProps) {
-  const { setIsOpen } = React.useContext(SelectContext);
-
-  const handleClick = (e: React.MouseEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-    onSelect();
-    setIsOpen(false);
-  };
-
-  return (
-    <button
-      type="button"
-      onClick={handleClick}
-      className={`w-full text-left px-3 py-2 text-sm cursor-pointer text-gray-900 hover:bg-slate-100 transition-colors ${className}`}
     >
       {children}
     </button>
