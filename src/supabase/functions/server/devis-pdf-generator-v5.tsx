@@ -502,43 +502,132 @@ function drawFooter(
   page: PDFPage,
   config: PDFConfig,
   colors: PDFColors,
-  font: PDFFont,
+  fonts: { regular: PDFFont; bold: PDFFont },
   pageNumber: number,
   totalPages: number,
   footerText: string
 ) {
-  const footerY = 24;
+  const bandHeight = 24;
+  const bandBottom = 8;
+  const bandTop = bandBottom + bandHeight;
+  const textSize = 7;
+  const textY = bandBottom + (bandHeight - textSize) / 2 - 1;
 
-  // Ligne séparatrice
+  const fitText = (text: string, maxWidth: number) => {
+    if (maxWidth <= 0) return '';
+    if (fonts.regular.widthOfTextAtSize(text, textSize) <= maxWidth) return text;
+    const ellipsis = '…';
+    let trimmed = text;
+    while (trimmed.length > 0) {
+      const candidate = `${trimmed}${ellipsis}`;
+      if (fonts.regular.widthOfTextAtSize(candidate, textSize) <= maxWidth) return candidate;
+      trimmed = trimmed.slice(0, -1);
+    }
+    return '';
+  };
+
+  // Bandeau de fond
+  page.drawRectangle({
+    x: 0,
+    y: bandBottom,
+    width: config.pageWidth,
+    height: bandHeight,
+    color: rgb(0.96, 0.97, 0.99),
+  });
+
+  // Ligne de séparation douce
   page.drawLine({
-    start: { x: config.margin, y: footerY + 16 },
-    end: { x: config.pageWidth - config.margin, y: footerY + 16 },
+    start: { x: config.margin, y: bandTop },
+    end: { x: config.pageWidth - config.margin, y: bandTop },
     thickness: 0.5,
     color: colors.lightGray,
   });
 
-  // Texte footer
-  if (footerText) {
-    page.drawText(footerText, {
-      x: config.margin,
-      y: footerY,
-      size: 7,
-      font,
-      color: colors.gray,
-    });
-  }
-
-  // Pagination
+  // Pagination (droite)
   const pageText = toPdfText(`Page ${pageNumber} / ${totalPages}`);
-  const pageWidth = font.widthOfTextAtSize(pageText, 7);
-  
+  const pageWidth = fonts.regular.widthOfTextAtSize(pageText, textSize);
+  const pageX = config.pageWidth - config.margin - pageWidth;
   page.drawText(pageText, {
-    x: config.pageWidth - config.margin - pageWidth,
-    y: footerY,
-    size: 7,
-    font,
+    x: pageX,
+    y: textY,
+    size: textSize,
+    font: fonts.regular,
     color: colors.gray,
   });
+
+  if (!footerText) {
+    return;
+  }
+
+  const parts = footerText.split(' | ').map((part) => part.trim()).filter(Boolean);
+  const name = parts[0] || '';
+  let contacts = parts.slice(1);
+
+  const emailIndex = contacts.findIndex((item) => item.includes('@'));
+  const urlIndex = contacts.findIndex((item) => /https?:\/\/|www\./i.test(item));
+  const badgeIndex = emailIndex !== -1 ? emailIndex : (urlIndex !== -1 ? urlIndex : (contacts.length ? 0 : -1));
+  const badgeText = badgeIndex >= 0 ? contacts[badgeIndex] : '';
+  if (badgeIndex >= 0) {
+    contacts = contacts.filter((_, index) => index !== badgeIndex);
+  }
+
+  let cursorX = config.margin;
+  const availableRight = pageX - 10;
+
+  if (name) {
+    const safeName = toPdfText(name);
+    page.drawText(safeName, {
+      x: cursorX,
+      y: textY,
+      size: textSize,
+      font: fonts.bold,
+      color: colors.navy,
+    });
+    cursorX += fonts.bold.widthOfTextAtSize(safeName, textSize) + 8;
+  }
+
+  if (badgeText) {
+    const badgeFontSize = 6.5;
+    const badgePaddingX = 6;
+    const badgePaddingY = 3;
+    const safeBadge = toPdfText(badgeText);
+    const badgeTextWidth = fonts.regular.widthOfTextAtSize(safeBadge, badgeFontSize);
+    const badgeWidth = badgeTextWidth + badgePaddingX * 2;
+    const badgeHeight = badgeFontSize + badgePaddingY * 2;
+    const badgeTop = bandBottom + bandHeight / 2 + badgeHeight / 2;
+
+    drawRoundedRectFill(
+      page,
+      cursorX,
+      badgeTop,
+      badgeWidth,
+      badgeHeight,
+      badgeHeight / 2,
+      rgb(0.92, 0.96, 0.99)
+    );
+    page.drawText(safeBadge, {
+      x: cursorX + badgePaddingX,
+      y: badgeTop - badgeHeight + badgePaddingY,
+      size: badgeFontSize,
+      font: fonts.regular,
+      color: colors.blue,
+    });
+    cursorX += badgeWidth + 10;
+  }
+
+  if (contacts.length && cursorX < availableRight) {
+    const restText = contacts.join(' • ');
+    const safeRest = fitText(toPdfText(restText), availableRight - cursorX);
+    if (safeRest) {
+      page.drawText(safeRest, {
+        x: cursorX,
+        y: textY,
+        size: textSize,
+        font: fonts.regular,
+        color: colors.gray,
+      });
+    }
+  }
 }
 
 function drawRoundedRectFill(
@@ -1652,6 +1741,55 @@ export async function generateModernDevisPdf(prospect: any, inclureCGV: boolean)
   });
 
   // ========================================
+  // AJUSTEMENTS TARIFAIRES
+  // ========================================
+
+  const majorationRows = [
+    { label: 'Délai de paiement', value: formatPercent(majorations?.delaiPaiement) },
+    { label: 'Expérience', value: formatPercent(majorations?.experience) },
+    { label: 'Permis', value: formatPercent(majorations?.permis) },
+    { label: 'Langues', value: formatPercent(majorations?.langues) },
+    { label: 'Outillage', value: formatPercent(majorations?.outillage) },
+    { label: 'Total', value: formatPercent(majorations?.total) },
+  ];
+
+  ensureSpace(majorationRows.length * 14 + 60);
+  y = drawSectionHeader(
+    currentPage,
+    config.margin,
+    y,
+    config.contentWidth,
+    'Ajustements tarifaires',
+    '',
+    SECTION_HEADER_BG,
+    colors,
+    fonts,
+    colors.blue
+  );
+  y -= 10;
+
+  let majY = y;
+  majorationRows.forEach((row, index) => {
+    currentPage.drawText(toPdfText(row.label), {
+      x: config.margin + 12,
+      y: majY,
+      size: 8.5,
+      font: index === majorationRows.length - 1 ? fontBold : fontRegular,
+      color: colors.navy,
+    });
+    const valueWidth = fontRegular.widthOfTextAtSize(toPdfText(row.value), 8.5);
+    currentPage.drawText(toPdfText(row.value), {
+      x: config.pageWidth - config.margin - valueWidth,
+      y: majY,
+      size: 8.5,
+      font: index === majorationRows.length - 1 ? fontBold : fontRegular,
+      color: colors.navy,
+    });
+    majY -= 14;
+  });
+  y = majY - 6;
+
+  // ========================================
   // TOTAUX (display-only from payload.pricing.totals)
   // ========================================
 
@@ -1804,7 +1942,12 @@ export async function generateModernDevisPdf(prospect: any, inclureCGV: boolean)
     conditions.repas?.type ? `Repas: ${conditions.repas.type}${conditions.repas.montant ? ` (${formatCurrency(conditions.repas.montant)}/jour)` : ''}` : '',
   ].filter(Boolean) as string[];
 
-  ensureSpace(measureBulletLinesHeight(conditionsLines, config.contentWidth - 20, 8.5) + 60);
+  const conditionsGap = 18;
+  const conditionsWidth = config.contentWidth - 24;
+  const conditionsHeight = conditionsLines.length
+    ? measureTwoColumnBulletHeight(conditionsLines, conditionsWidth, conditionsGap, 8.5)
+    : 14;
+  ensureSpace(conditionsHeight + 60);
   y = drawSectionHeader(
     currentPage,
     config.margin,
@@ -1819,7 +1962,14 @@ export async function generateModernDevisPdf(prospect: any, inclureCGV: boolean)
   );
   y -= 10;
 
-  y = drawBulletLines(conditionsLines, config.margin + 12, y, config.contentWidth - 20, 8.5);
+  y = drawTwoColumnBulletLines(
+    conditionsLines,
+    config.margin + 12,
+    y,
+    conditionsWidth,
+    conditionsGap,
+    8.5
+  );
   y -= 10;
 
   const candidatsLines: string[] = [];
@@ -1888,51 +2038,6 @@ export async function generateModernDevisPdf(prospect: any, inclureCGV: boolean)
   }
 
   y -= 10;
-
-  const majorationRows = [
-    { label: 'Délai de paiement', value: formatPercent(majorations?.delaiPaiement) },
-    { label: 'Expérience', value: formatPercent(majorations?.experience) },
-    { label: 'Permis', value: formatPercent(majorations?.permis) },
-    { label: 'Langues', value: formatPercent(majorations?.langues) },
-    { label: 'Outillage', value: formatPercent(majorations?.outillage) },
-    { label: 'Total', value: formatPercent(majorations?.total) },
-  ];
-
-  ensureSpace(majorationRows.length * 14 + 60);
-  y = drawSectionHeader(
-    currentPage,
-    config.margin,
-    y,
-    config.contentWidth,
-    'Ajustements tarifaires',
-    '',
-    SECTION_HEADER_BG,
-    colors,
-    fonts,
-    colors.blue
-  );
-  y -= 10;
-
-  let majY = y;
-  majorationRows.forEach((row, index) => {
-    currentPage.drawText(toPdfText(row.label), {
-      x: config.margin + 12,
-      y: majY,
-      size: 8.5,
-      font: index === majorationRows.length - 1 ? fontBold : fontRegular,
-      color: colors.navy,
-    });
-    const valueWidth = fontRegular.widthOfTextAtSize(toPdfText(row.value), 8.5);
-    currentPage.drawText(toPdfText(row.value), {
-      x: config.pageWidth - config.margin - valueWidth,
-      y: majY,
-      size: 8.5,
-      font: index === majorationRows.length - 1 ? fontBold : fontRegular,
-      color: colors.navy,
-    });
-    majY -= 14;
-  });
-  y = majY - 6;
 
   // ========================================
   // MENTIONS LEGALES & SIGNATURE
@@ -2231,7 +2336,7 @@ export async function generateModernDevisPdf(prospect: any, inclureCGV: boolean)
 
   const totalPages = pages.length;
   pages.forEach((page, index) => {
-    drawFooter(page, config, colors, fontRegular, index + 1, totalPages, footerText);
+    drawFooter(page, config, colors, fonts, index + 1, totalPages, footerText);
   });
 
   return await pdfDoc.save();
