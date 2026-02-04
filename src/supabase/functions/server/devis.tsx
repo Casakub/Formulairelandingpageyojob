@@ -1140,7 +1140,7 @@ devis.delete('/:key', async (c) => {
  */
 devis.get('/api/stats', async (c) => {
   try {
-    const stats = await kv.get('prospects:stats') || {
+    const baseStats = {
       total: 0,
       nouveau: 0,
       enCours: 0,
@@ -1149,7 +1149,31 @@ devis.get('/api/stats', async (c) => {
       converti: 0,
       perdu: 0
     };
-    
+
+    const listeIds = await kv.get('prospects:list') || [];
+    if (!Array.isArray(listeIds) || listeIds.length === 0) {
+      return c.json({
+        success: true,
+        data: baseStats
+      });
+    }
+
+    const prospects = await kv.mget(listeIds.map(id => `prospects:${id}`));
+    const stats = { ...baseStats };
+
+    for (const prospect of prospects) {
+      if (!prospect) continue;
+      if (prospect.type && prospect.type !== 'devis') continue;
+      stats.total += 1;
+      const statut = prospect.statut;
+      if (statut && typeof stats[statut] === 'number') {
+        stats[statut] += 1;
+      }
+    }
+
+    // Self-heal: keep KV stats in sync
+    await kv.set('prospects:stats', stats);
+
     return c.json({
       success: true,
       data: stats
