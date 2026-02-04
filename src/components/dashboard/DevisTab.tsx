@@ -124,6 +124,11 @@ export function DevisTab() {
     }
   };
 
+  const handleDevisDeleted = () => {
+    setDevisDetailId(null);
+    chargerDonnees();
+  };
+
   const filtrerDemandes = () => {
     let resultat = demandes;
 
@@ -535,6 +540,7 @@ export function DevisTab() {
         <DevisDetailModal
           devisId={devisDetailId}
           onClose={() => setDevisDetailId(null)}
+          onDeleted={handleDevisDeleted}
         />
       )}
     </div>

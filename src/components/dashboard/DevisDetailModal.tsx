@@ -24,6 +24,8 @@ import {
   CheckCircle,
   AlertCircle,
   TrendingUp,
+  Trash2,
+  AlertTriangle,
   Loader2,
   Shield,
   Fingerprint,
@@ -33,6 +35,17 @@ import { Card, CardContent, CardHeader, CardTitle } from '../ui/card';
 import { Button } from '../ui/button';
 import { Badge } from '../ui/badge';
 import { Separator } from '../ui/separator';
+import { Input } from '../ui/input';
+import {
+  AlertDialog,
+  AlertDialogTrigger,
+  AlertDialogContent,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogCancel,
+} from '../ui/alert-dialog';
 import { useState, useEffect } from 'react';
 import { projectId, publicAnonKey } from '../../utils/supabase/info';
 import { toast } from 'sonner';
@@ -40,6 +53,7 @@ import { toast } from 'sonner';
 interface DevisDetailModalProps {
   devisId: string;
   onClose: () => void;
+  onDeleted?: () => void;
 }
 
 interface Devis {
@@ -245,10 +259,13 @@ const maskIpAddress = (ip?: string): string => {
   return unique.join(', ');
 };
 
-export function DevisDetailModal({ devisId, onClose }: DevisDetailModalProps) {
+export function DevisDetailModal({ devisId, onClose, onDeleted }: DevisDetailModalProps) {
   const [devis, setDevis] = useState<Devis | null>(null);
   const [loading, setLoading] = useState(true);
   const [isGeneratingPDF, setIsGeneratingPDF] = useState(false);
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [confirmText, setConfirmText] = useState('');
+  const [isDeleting, setIsDeleting] = useState(false);
   const [sectionsOuvertes, setSectionsOuvertes] = useState({
     entreprise: true,
     contact: true,
@@ -373,6 +390,52 @@ export function DevisDetailModal({ devisId, onClose }: DevisDetailModalProps) {
     }
   };
 
+  const handleDeleteDialogChange = (nextOpen: boolean) => {
+    if (isDeleting) return;
+    setDeleteDialogOpen(nextOpen);
+    if (!nextOpen) {
+      setConfirmText('');
+    }
+  };
+
+  const handleDeleteDevis = async () => {
+    if (!devis) return;
+    setIsDeleting(true);
+    try {
+      const token = localStorage.getItem('sb-access-token');
+      if (!token) {
+        throw new Error('Session expirée. Veuillez vous reconnecter.');
+      }
+
+      const deleteKey = devis.id ? `prospects:${devis.id}` : devisId;
+      const response = await fetch(
+        `https://${projectId}.supabase.co/functions/v1/make-server-10092a63/devis/${encodeURIComponent(deleteKey)}`,
+        {
+          method: 'DELETE',
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          }
+        }
+      );
+
+      const result = await response.json().catch(() => ({}));
+      if (!response.ok) {
+        throw new Error(result.error || result.message || 'Échec de la suppression');
+      }
+
+      toast.success(`Devis ${devis.numero} supprimé avec succès`);
+      setDeleteDialogOpen(false);
+      setConfirmText('');
+      onDeleted?.();
+      onClose();
+    } catch (error: any) {
+      toast.error(`Erreur lors de la suppression : ${error?.message || 'Erreur inconnue'}`);
+    } finally {
+      setIsDeleting(false);
+    }
+  };
+
   if (loading) {
     return (
       <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
@@ -401,6 +464,7 @@ export function DevisDetailModal({ devisId, onClose }: DevisDetailModalProps) {
   }
 
   const badge = getStatutBadge(devis.statut);
+  const canConfirmDelete = confirmText.trim().toUpperCase() === 'SUPPRIMER';
 
   return (
     <AnimatePresence>
@@ -1242,6 +1306,59 @@ export function DevisDetailModal({ devisId, onClose }: DevisDetailModalProps) {
                 })}
               </div>
               <div className="flex gap-3">
+                <AlertDialog open={deleteDialogOpen} onOpenChange={handleDeleteDialogChange}>
+                  <AlertDialogTrigger asChild>
+                    <Button variant="destructive">
+                      <Trash2 className="w-4 h-4 mr-2" />
+                      Supprimer
+                    </Button>
+                  </AlertDialogTrigger>
+                  <AlertDialogContent>
+                    <AlertDialogHeader>
+                      <AlertDialogTitle className="flex items-center gap-2">
+                        <AlertTriangle className="h-5 w-5 text-destructive" />
+                        Supprimer ce devis ?
+                      </AlertDialogTitle>
+                      <AlertDialogDescription className="space-y-3">
+                        <p>
+                          Vous êtes sur le point de supprimer définitivement le devis <strong>{devis.numero}</strong>.
+                        </p>
+                        <p className="text-destructive font-medium">
+                          Cette action est irréversible. Le devis et son PDF seront définitivement supprimés.
+                        </p>
+                        <div className="pt-2">
+                          <label className="text-sm font-medium">
+                            Tapez <code className="bg-muted px-1 rounded">SUPPRIMER</code> pour confirmer :
+                          </label>
+                          <Input
+                            value={confirmText}
+                            onChange={(e) => setConfirmText(e.target.value)}
+                            placeholder="SUPPRIMER"
+                            className="mt-2"
+                            disabled={isDeleting}
+                          />
+                        </div>
+                      </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                      <AlertDialogCancel disabled={isDeleting}>Annuler</AlertDialogCancel>
+                      <Button
+                        variant="destructive"
+                        onClick={handleDeleteDevis}
+                        disabled={!canConfirmDelete || isDeleting}
+                      >
+                        {isDeleting ? (
+                          <>
+                            <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                            Suppression...
+                          </>
+                        ) : (
+                          'Confirmer la suppression'
+                        )}
+                      </Button>
+                    </AlertDialogFooter>
+                  </AlertDialogContent>
+                </AlertDialog>
                 <Button
                   onClick={onClose}
                   variant="outline"
