@@ -10,13 +10,15 @@
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
     "i18n:generate": "ts-node scripts/generate-base-locale.ts",
     "i18n:check": "ts-node scripts/check-translations.ts",
-    "i18n:migrate": "ts-node scripts/migrate-old-translations.ts"
+    "i18n:migrate": "ts-node scripts/migrate-old-translations.ts",
+    "prerender": "node scripts/prerender.cjs",
+    "build:prerender": "npm run build && node scripts/prerender.cjs"
   },
   "dependencies": {
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "motion": "^11.14.4",
-    "lucide-react": "^0.index.468.0",
+    "lucide-react": "^0.487.0",
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.0",
     "tailwind-merge": "^2.2.0",
@@ -74,6 +76,7 @@
     "tailwindcss": "^4.0.0",
     "ts-node": "^10.9.2",
     "typescript": "^5.2.2",
-    "vite": "^5.0.8"
+    "vite": "^5.0.8",
+    "puppeteer": "^22.0.0"
   }
 }
