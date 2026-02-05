@@ -11,10 +11,14 @@ echo "📥 Merging main into current branch..."
 if ! git merge origin/main -m "Merge Figma Make updates from main" --no-edit 2>/dev/null; then
     echo "⚠️  Merge conflict detected, resolving automatically..."
 
-    # Accepter les fichiers de main dans src/public/
-    git checkout --theirs src/public/ 2>/dev/null || true
+    # GARDER nos fichiers de config (pas ceux de Figma Make)
+    git checkout --ours package.json 2>/dev/null || true
+    git checkout --ours vite.config.ts 2>/dev/null || true
+    
+    # Accepter les fichiers de design de main dans src/
+    git checkout --theirs src/ 2>/dev/null || true
 
-    # Déplacer vers public/
+    # Déplacer src/public/ vers public/ si nécessaire
     if [ -d "src/public" ]; then
         mkdir -p public
         cp -r src/public/* public/ 2>/dev/null || true
@@ -23,10 +27,10 @@ if ! git merge origin/main -m "Merge Figma Make updates from main" --no-edit 2>/
 
     # Finaliser le merge
     git add -A
-    git commit -m "Merge Figma Make updates - auto-fix file locations" || true
+    git commit -m "Merge Figma Make updates - keep local config" || true
 fi
 
-# Corriger le placement des fichiers public si nécessaire (après merge réussi)
+# Corriger le placement des fichiers public si nécessaire
 if [ -d "src/public" ]; then
     echo "📁 Moving files from src/public/ to public/..."
     mkdir -p public

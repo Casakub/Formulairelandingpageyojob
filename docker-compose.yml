@@ -62,6 +62,14 @@ services:
       # Appliquer les middlewares
       - traefik.http.routers.yojob.middlewares=yojob-headers
 
+      # Pour les sitempas
+      - traefik.http.routers.yojob-sitemap.rule=Host(`yojob.fr`) && (Path(`/sitemap.xml`) || Path(`/sitemap-main.xml`) || Path(`/sitemap-about.xml`))
+      - traefik.http.routers.yojob-sitemap.entrypoints=websecure
+      - traefik.http.routers.yojob-sitemap.tls=true
+      - traefik.http.routers.yojob-sitemap.service=yojob
+      - traefik.http.routers.yojob-sitemap.middlewares=yojob-headers,yojob-sitemap-headers
+      - traefik.http.middlewares.yojob-sitemap-headers.headers.customResponseHeaders.Content-Type=application/xml; charset=UTF-8
+
       # Labels informatifs
       - app.name=yojob-landing
       - app.source=figma-make
