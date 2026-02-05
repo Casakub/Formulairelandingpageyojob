@@ -29,6 +29,8 @@ COPY .npmrc ./
 
 # Installer les dépendances
 # --legacy-peer-deps pour éviter les conflits de versions
+RUN npm config set registry https://registry.npmjs.org/
+
 RUN npm install --legacy-peer-deps
 
 # Copier tout le code source
