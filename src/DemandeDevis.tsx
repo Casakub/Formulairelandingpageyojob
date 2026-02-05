@@ -62,7 +62,9 @@ export default function DemandeDevis() {
   } = useLanguageManager();
   
   // Cast vers DevisLanguage pour le système de traduction
-  const lang = globalLanguage as DevisLanguage;
+  const lang: DevisLanguage = AVAILABLE_LANGUAGES.includes(globalLanguage as DevisLanguage)
+    ? (globalLanguage as DevisLanguage)
+    : 'fr';
   
   // Charger les traductions pour la langue active
   const { t, isLoading: isLoadingTranslations } = useDevisTranslationStatic(lang);
@@ -452,6 +454,7 @@ export default function DemandeDevis() {
         page="devis-form" 
         lang={lang}
         includeServiceSchema={true}
+        availableLanguages={AVAILABLE_LANGUAGES}
       />
 
       <div className="min-h-screen bg-gradient-to-br from-blue-900 via-violet-900 to-cyan-900">

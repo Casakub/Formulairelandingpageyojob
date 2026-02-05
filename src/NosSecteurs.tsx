@@ -73,7 +73,7 @@ export default function NosSecteurs() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#1E3A8A] via-[#7C3AED] to-[#06B6D4]">
-      <SEOHead page="nos-secteurs" lang={validLanguage} />
+      <SEOHead page="nos-secteurs" lang={validLanguage} availableLanguages={AVAILABLE_LANGUAGES_NOS_SECTEURS} />
 
       {/* ============================================ */}
       {/* HEADER */}

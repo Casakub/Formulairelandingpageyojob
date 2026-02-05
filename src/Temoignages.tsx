@@ -88,7 +88,7 @@ export default function Temoignages() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#1E3A8A] via-[#7C3AED] to-[#06B6D4]">
-      <SEOHead page="temoignages" lang={validLanguage} />
+      <SEOHead page="temoignages" lang={validLanguage} availableLanguages={AVAILABLE_LANGUAGES_TEMOIGNAGES} />
 
       {/* ============================================ */}
       {/* HEADER */}

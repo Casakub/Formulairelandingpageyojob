@@ -28,6 +28,7 @@ import { Badge } from './components/ui/badge';
 import { Skeleton } from './components/ui/skeleton';
 import { projectId, publicAnonKey } from './utils/supabase/info';
 import { LogoSvg } from './imports/YojobLogoComplete';
+import { SEOHead } from './components/SEOHead';
 import { LanguageSelector } from './components/shared/LanguageSelector';
 import { useLanguageManager } from './hooks/useLanguageManager';
 import { usePageTranslation } from './src/i18n/pages/usePageTranslation';
@@ -85,9 +86,17 @@ export default function Privacy() {
 
   const { currentLanguage, setLanguage } = useLanguageManager();
   const t = usePageTranslation('privacy', currentLanguage);
+  const seoTitle = `${t.hero.title} | YOJOB`;
+  const seoDescription = t.hero.subtitle.replace('{company}', company);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#0a0e27] via-[#1a1f3a] to-[#0a0e27]">
+      <SEOHead
+        title={seoTitle}
+        description={seoDescription}
+        lang={currentLanguage as any}
+        availableLanguages={AVAILABLE_LANGUAGES_PRIVACY}
+      />
       {/* Background effects */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <div className="absolute top-20 left-10 w-96 h-96 bg-cyan-500/20 rounded-full blur-3xl animate-pulse" />

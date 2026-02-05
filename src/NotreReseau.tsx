@@ -82,7 +82,7 @@ export default function NotreReseau() {
   return (
     <HelmetProvider>
       <div className="min-h-screen bg-gradient-to-br from-[#1E3A8A] via-[#7C3AED] to-[#06B6D4]">
-        <SEOHead page="notre-reseau" lang={currentLanguage as any} />
+        <SEOHead page="notre-reseau" lang={currentLanguage as any} availableLanguages={availableLanguages} />
 
         {/* ============================================ */}
         {/* HEADER */}
