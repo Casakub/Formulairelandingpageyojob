@@ -374,7 +374,11 @@ export default function AppLanding() {
     <HelmetProvider>
       <div className="min-h-screen bg-white">
         {/* 🎯 SEO Head - Toutes les balises SEO */}
-        <SEOHead content={content} language={currentLanguage} />
+        <SEOHead
+          content={content}
+          language={currentLanguage}
+          availableLanguages={AVAILABLE_LANGUAGES_LANDING}
+        />
 
         {/* HEADER */}
       <header

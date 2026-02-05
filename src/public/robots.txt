@@ -1,7 +1,7 @@
-# robots.txt pour YOJOB - Courtage en recrutement européen
+# robots.txt pour YOJOB - Courtage en recrutement europeen
 # https://yojob.fr
 
-# Règles pour tous les robots
+# Regles pour tous les robots
 User-agent: *
 Allow: /
 
@@ -14,7 +14,16 @@ Disallow: /api/
 # Bloquer les pages de confirmation et de traitement
 Disallow: /confirmation-devis
 Disallow: /recap-devis
-Disallow: /signature/
+Disallow: /signer/
+
+# Multilangue (prefixes /en/, /de/, etc.)
+Disallow: /*/dashboard
+Disallow: /*/dashboard-*
+Disallow: /*/admin
+Disallow: /*/api/
+Disallow: /*/confirmation-devis
+Disallow: /*/recap-devis
+Disallow: /*/signer/
 
 # Bloquer les fichiers techniques et de test
 Disallow: /*.sql$
@@ -29,7 +38,7 @@ Disallow: /.env
 Disallow: /package.json
 Disallow: /tsconfig.json
 
-# Autoriser spécifiquement les ressources importantes pour le SEO
+# Autoriser specifiquement les ressources importantes pour le SEO
 Allow: /
 Allow: /a-propos
 Allow: /notre-reseau
@@ -54,7 +63,7 @@ Allow: /*.gif$
 Allow: /*.svg$
 Allow: /*.webp$
 
-# Règles spécifiques pour les principaux moteurs de recherche
+# Regles specifiques pour les principaux moteurs de recherche
 User-agent: Googlebot
 Allow: /
 Disallow: /dashboard
@@ -74,7 +83,7 @@ Allow: /
 Disallow: /dashboard
 Disallow: /api/
 
-# Bloquer les scrapers et bots indésirables
+# Bloquer les scrapers et bots indesirables
 User-agent: AhrefsBot
 Crawl-delay: 10
 
