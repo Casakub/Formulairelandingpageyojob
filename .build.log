@@ -1,0 +1,13 @@
+2026-02-05T15:17:16.056672 Project directory: /docker/yojob
+2026-02-05T15:17:16.060080 Pulling project images
+2026-02-05T15:17:16.060852 ------------------------------
+2026-02-05T15:17:16.276565  yojob-landing Skipped 
+2026-02-05T15:17:16.283165 ------------------------------
+2026-02-05T15:17:16.283383 Deploying project
+2026-02-05T15:17:16.284224 ------------------------------
+2026-02-05T15:17:16.392033  Container yojob-landing-page  Recreate
+2026-02-05T15:17:17.089938  Container yojob-landing-page  Recreated
+2026-02-05T15:17:17.094237  Container yojob-landing-page  Starting
+2026-02-05T15:17:17.551546  Container yojob-landing-page  Started
+2026-02-05T15:17:17.563216 ------------------------------
+2026-02-05T15:17:17.563273 Project deployed successfully
