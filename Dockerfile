@@ -7,10 +7,20 @@
 # STAGE 1 : BUILD
 # Utilise Node.js pour installer les dépendances et builder l'application
 # -----------------------------------------------------------------------------
-FROM node:20-alpine AS builder
+FROM node:20-bullseye AS builder
 
 # Définir le répertoire de travail
 WORKDIR /app
+
+# Puppeteer: use system Chromium to avoid large downloads
+ENV PUPPETEER_SKIP_DOWNLOAD=true
+ENV PUPPETEER_EXECUTABLE_PATH=/usr/bin/chromium
+
+# Install Chromium for prerendering
+RUN apt-get update \
+  && apt-get install -y --no-install-recommends chromium \
+  && rm -rf /var/lib/apt/lists/*
+
 
 # Copier les fichiers de configuration npm AVANT le code source
 # Cela permet de mettre en cache les dépendances npm
@@ -30,15 +40,19 @@ ARG VITE_SUPABASE_URL
 ARG VITE_SUPABASE_ANON_KEY
 ARG VITE_APP_ENV=production
 ARG VITE_MATOMO_TAG_MANAGER_URL
+ARG PRERENDER_LANGS
+ARG PRERENDER_PAGES
 
 # Exposer les ARG comme ENV pour que Vite puisse les lire
 ENV VITE_SUPABASE_URL=$VITE_SUPABASE_URL
 ENV VITE_SUPABASE_ANON_KEY=$VITE_SUPABASE_ANON_KEY
 ENV VITE_APP_ENV=$VITE_APP_ENV
 ENV VITE_MATOMO_TAG_MANAGER_URL=$VITE_MATOMO_TAG_MANAGER_URL
+ENV PRERENDER_LANGS=$PRERENDER_LANGS
+ENV PRERENDER_PAGES=$PRERENDER_PAGES
 
 # Builder l'application (output dans /app/build/)
-RUN npm run build
+RUN npm run build:prerender
 
 # -----------------------------------------------------------------------------
 # STAGE 2 : PRODUCTION

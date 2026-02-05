@@ -54,7 +54,12 @@ if [ -d "src/public" ]; then
     git commit -m "Fix: move static files from src/public/ to public/" || true
 fi
 
-echo "🐳 Rebuilding Docker..."
-docker compose up -d --build
+echo "🐳 Rebuilding Docker..."\n# Prerender rapide par défaut (FR uniquement)
+if [ -z "$PRERENDER_LANGS" ] && [ -z "$FULL_PRERENDER" ]; then
+  export PRERENDER_LANGS=fr
+fi
+
+
+PRERENDER_LANGS="${PRERENDER_LANGS:-}" PRERENDER_PAGES="${PRERENDER_PAGES:-}" docker compose up -d --build
 
 echo "✅ Update complete!"

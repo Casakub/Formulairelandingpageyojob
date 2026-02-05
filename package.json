@@ -1,12 +1,12 @@
 {
-  "name": "Créer formulaire",
+  "name": "Cr\u00e9er formulaire",
   "version": "0.1.0",
   "private": true,
   "scripts": {
     "dev": "vite",
     "build": "vite build",
-    "prerender": "node scripts/prerender.cjs",
-    "build:prerender": "npm run build && node scripts/prerender.cjs"
+    "prerender": "node src/scripts/prerender.cjs",
+    "build:prerender": "npm run build && node src/scripts/prerender.cjs"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.32.1",
