@@ -1392,14 +1392,16 @@ export function getPageMetadata(page: PageKey, lang: DevisLanguage): PageMetadat
 /**
  * Générer le schéma Organization pour toutes les pages
  */
-export function getOrganizationSchema() {
+export function getOrganizationSchema(baseUrl: string = 'https://yojob.fr') {
+  const normalizedBaseUrl = baseUrl.replace(/\/+$/, '');
+  const logoUrl = `${normalizedBaseUrl}/logo.png`;
   return {
     '@context': 'https://schema.org',
     '@type': 'Organization',
     name: 'YOJOB',
     description: 'Courtier en recrutement et détachement de personnel européen BTP et industrie',
-    url: 'https://yojob.com',
-    logo: 'https://yojob.com/logo.png',
+    url: normalizedBaseUrl,
+    logo: logoUrl,
     areaServed: ['FR', 'PT', 'RO', 'PL', 'ES', 'IT', 'DE', 'NL', 'BE', 'LU', 'AT', 'CZ', 'SK', 'HU', 'BG', 'GR', 'HR', 'SI', 'LT', 'LV', 'EE', 'SE', 'DK', 'FI', 'NO', 'IE', 'GB'],
     serviceType: ['Détachement de personnel', 'Intérim européen', 'Recrutement international'],
     contactPoint: {
