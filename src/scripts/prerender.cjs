@@ -76,7 +76,14 @@ const run = async () => {
     throw new Error('Vite preview did not start in time.');
   }
 
-  const browser = await puppeteer.launch({ headless: 'new' });
+  const launchOptions = {
+    headless: 'new',
+    args: ['--no-sandbox', '--disable-setuid-sandbox'],
+  };
+  if (process.env.PUPPETEER_EXECUTABLE_PATH) {
+    launchOptions.executablePath = process.env.PUPPETEER_EXECUTABLE_PATH;
+  }
+  const browser = await puppeteer.launch(launchOptions);
   const routes = [];
   for (const page of PAGES) {
     for (const lang of page.langs) {

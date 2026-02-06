@@ -912,4 +912,8 @@ export const it: DevisTranslations = {
       signatureSucces: "Preventivo firmato con successo! Un'email di conferma ti è stata inviata.",
     },
   },
+<<<<<<< HEAD
 };
+=======
+};
+>>>>>>> origin/main
