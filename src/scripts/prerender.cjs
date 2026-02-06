@@ -9,7 +9,6 @@ const PORT = process.env.PRERENDER_PORT || 4173;
 const HOST = process.env.PRERENDER_HOST || '127.0.0.1';
 const BASE_URL = `http://${HOST}:${PORT}`;
 const PREVIEW_DELAY = Number(process.env.PRERENDER_PREVIEW_DELAY || 15000);
-const PREVIEW_TIMEOUT = Number(process.env.PRERENDER_PREVIEW_TIMEOUT || 180000);
 let BUILD_DIR = path.join(process.cwd(), 'build');
 if (!fs.existsSync(BUILD_DIR)) {
   const altBuild = path.join(process.cwd(), '..', 'build');
@@ -52,19 +51,6 @@ const routeToFilePath = (route) => {
   return path.join(BUILD_DIR, normalized, 'index.html');
 };
 
-const waitForServer = async (retries = 60) => {
-  for (let i = 0; i < retries; i += 1) {
-    try {
-      const res = await fetch(BASE_URL, { method: 'GET' });
-      if (res.ok) return true;
-    } catch (err) {
-      // ignore
-    }
-    await new Promise((r) => setTimeout(r, 500));
-  }
-  return false;
-};
-
 const run = async () => {
   if (!fs.existsSync(BUILD_DIR)) {
     throw new Error(`Build directory not found: ${BUILD_DIR}. Run \"vite build\" first.`);
@@ -77,11 +63,8 @@ const run = async () => {
     { stdio: 'inherit' }
   );
 
-  const serverReady = await waitForServer();
-  if (!serverReady) {
-    preview.kill();
-    throw new Error('Vite preview did not start in time.');
-  }
+  console.log(`[prerender] Waiting ${PREVIEW_DELAY}ms for Vite preview to be ready...`);
+  await new Promise((r) => setTimeout(r, PREVIEW_DELAY));
 
   const launchOptions = {
     headless: 'new',
