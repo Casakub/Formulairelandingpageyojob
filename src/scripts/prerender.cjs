@@ -75,9 +75,15 @@ const run = async () => {
 
   const pages = filterPages();
   const routes = [];
+<<<<<<< HEAD
   for (const page of pages) {
     for (const lang of filterLangs(page.langs)) {
       routes.push(localizedRoute(page.path, lang));
+=======
+  for (const pageEntry of pages) {
+    for (const lang of filterLangs(pageEntry.langs)) {
+      routes.push({ route: localizedRoute(pageEntry.path, lang), lang });
+>>>>>>> origin/main
     }
   }
 
@@ -109,9 +115,18 @@ const run = async () => {
   }
   const browser = await puppeteer.launch(launchOptions);
 
-  for (const route of routes) {
+  for (const { route, lang } of routes) {
     const url = `${BASE_URL}${route}`;
     const page = await browser.newPage();
+
+    // Forcer la locale du navigateur pour que useLanguageManager
+    // détecte la bonne langue (évite le fallback vers EN)
+    await page.setExtraHTTPHeaders({ 'Accept-Language': `${lang}` });
+    await page.evaluateOnNewDocument((langCode) => {
+      Object.defineProperty(navigator, 'language', { get: () => langCode });
+      Object.defineProperty(navigator, 'languages', { get: () => [langCode] });
+    }, lang);
+
     await page.goto(url, { waitUntil: 'networkidle0' });
     await page.waitForFunction('window.__SEO_READY__ === true', { timeout: 15000 }).catch(() => {});
     const html = await page.content();
@@ -119,7 +134,7 @@ const run = async () => {
     fs.mkdirSync(path.dirname(outputPath), { recursive: true });
     fs.writeFileSync(outputPath, html, 'utf8');
     await page.close();
-    console.log(`[prerender] ${route} -> ${outputPath}`);
+    console.log(`[prerender] ${route} (${lang}) -> ${outputPath}`);
   }
 
   await browser.close();

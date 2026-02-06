@@ -965,7 +965,7 @@ export default function CGV() {
           transition={{ duration: 0.6, delay: 2.0 }}
           className="mt-16 text-center"
         >
-          <Card className="border border-cyan-400/30 bg-gradient-to-br from-cyan-500/10 via-violet-500/10 to-transparent backdrop-blur-md shadow-2xl">
+          <Card className="border border-cyan-400/30 bg-gradient-to-br from-[#0f1a3d] via-[#1a2550] to-[#0f1a3d] backdrop-blur-md shadow-2xl">
             <CardContent className="p-8">
               <FileText className="w-16 h-16 text-cyan-400 mx-auto mb-4" />
               <h3 className="text-white text-2xl mb-3">{t.cta.title}</h3>
