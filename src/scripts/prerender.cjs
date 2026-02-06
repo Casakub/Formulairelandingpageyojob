@@ -75,15 +75,9 @@ const run = async () => {
 
   const pages = filterPages();
   const routes = [];
-<<<<<<< HEAD
-  for (const page of pages) {
-    for (const lang of filterLangs(page.langs)) {
-      routes.push(localizedRoute(page.path, lang));
-=======
   for (const pageEntry of pages) {
     for (const lang of filterLangs(pageEntry.langs)) {
       routes.push({ route: localizedRoute(pageEntry.path, lang), lang });
->>>>>>> origin/main
     }
   }
 

@@ -261,14 +261,7 @@ export function SEOHead(props: SEOHeadProps) {
       themeColor.setAttribute('content', '#1E3A8A');
       document.head.appendChild(themeColor);
     }
-
-    // ========================================================================
-    // SIGNAL SEO READY (pour le prerender Puppeteer)
-    // ========================================================================
-    if (metadata.title) {
-      (window as any).__SEO_READY__ = true;
-    }
-
+    
   }, [props]);
   
   // Ce composant n'affiche rien visuellement
