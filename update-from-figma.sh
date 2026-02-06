@@ -51,13 +51,14 @@ if [ -n "$GUARD_REF" ]; then
     git add docker-compose.yml Dockerfile nginx/nginx.conf .dockerignore .env.example update-from-figma.sh 2>/dev/null || true
     git commit -m "Restore infra files from guard branch" 2>/dev/null || true
 
-    echo "🛡️  Restoring app files from $GUARD_REF..."
-    APP_FILES="index.html src/index.html src/components/SEOHead.tsx src/src/i18n/seo/metadata.ts src/App-Survey-Original.tsx"
-    for file in $APP_FILES; do
-        git checkout "$GUARD_REF" -- "$file" 2>/dev/null || true
-    done
-    git add $APP_FILES 2>/dev/null || true
-    git commit -m "Restore app files from guard branch" 2>/dev/null || true
+echo "🛡️  Restoring app files from $GUARD_REF..."
+APP_FILES="index.html src/index.html src/components/SEOHead.tsx src/src/i18n/seo/metadata.ts src/App-Survey-Original.tsx src/scripts/prerender.cjs"
+for file in $APP_FILES; do
+    git checkout "$GUARD_REF" -- "$file" 2>/dev/null || true
+done
+git add $APP_FILES 2>/dev/null || true
+git commit -m "Restore app files from guard branch" 2>/dev/null || true
+
 else
     echo "⚠️  Guard branch not available; skipping infra restore."
 fi
