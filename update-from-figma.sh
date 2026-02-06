@@ -43,20 +43,16 @@ if ! git merge origin/main -m "Merge Figma Make updates from main" --no-edit 2>/
     git commit -m "Merge Figma Make updates - auto-fix file locations" || true
 fi
 
-# Restaurer les fichiers Docker s'ils ont été supprimés
+# Restaurer les fichiers Docker (FORCER la restauration)
 if [ -n "$BRANCH_REF" ]; then
   echo "🛡️  Restoring infra files from $BRANCH_REF..."
   for file in $DOCKER_FILES; do
-      if [ ! -e "$file" ]; then
-          echo "   Restoring $file..."
-          git checkout "$BRANCH_REF" -- "$file" 2>/dev/null || true
-      fi
+      echo "   Restoring $file..."
+      git checkout "$BRANCH_REF" -- "$file" 2>/dev/null || true
   done
 
-  if ! git diff --cached --quiet 2>/dev/null || ! git diff --quiet 2>/dev/null; then
-      git add -A
-      git commit -m "Restore Docker configuration files" 2>/dev/null || true
-  fi
+  git add -A
+  git commit -m "Restore Docker configuration files" 2>/dev/null || true
 
   echo "🛡️  Restoring app files from $BRANCH_REF..."
   for file in $APP_FILES; do
