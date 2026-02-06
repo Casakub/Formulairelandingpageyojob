@@ -8,6 +8,7 @@ const puppeteer = require('puppeteer');
 const PORT = process.env.PRERENDER_PORT || 4173;
 const HOST = process.env.PRERENDER_HOST || '127.0.0.1';
 const BASE_URL = `http://${HOST}:${PORT}`;
+const PREVIEW_DELAY = Number(process.env.PRERENDER_PREVIEW_DELAY || 15000);
 const PREVIEW_TIMEOUT = Number(process.env.PRERENDER_PREVIEW_TIMEOUT || 180000);
 let BUILD_DIR = path.join(process.cwd(), 'build');
 if (!fs.existsSync(BUILD_DIR)) {
