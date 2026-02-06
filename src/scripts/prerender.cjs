@@ -8,7 +8,12 @@ const puppeteer = require('puppeteer');
 const PORT = process.env.PRERENDER_PORT || 4173;
 const HOST = process.env.PRERENDER_HOST || 'http://localhost';
 const BASE_URL = `${HOST}:${PORT}`;
-const BUILD_DIR = path.join(__dirname, '..', 'build');
+let BUILD_DIR = path.join(process.cwd(), 'build');
+if (!fs.existsSync(BUILD_DIR)) {
+  const altBuild = path.join(process.cwd(), '..', 'build');
+  if (fs.existsSync(altBuild)) BUILD_DIR = altBuild;
+}
+
 
 const ALL_LANGS = [
   'fr','en','de','es','it','nl','pt','pl','cs','sk','hu','ro','bg','hr','sl','et','lv','lt','el','sv','da','fi','no'
