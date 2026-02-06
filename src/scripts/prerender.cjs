@@ -6,7 +6,7 @@ const { spawn } = require('child_process');
 const puppeteer = require('puppeteer');
 
 const PORT = process.env.PRERENDER_PORT || 4173;
-const HOST = process.env.PRERENDER_HOST || 'http://localhost';
+const HOST = process.env.PRERENDER_HOST || 'http://127.0.0.1';
 const BASE_URL = `${HOST}:${PORT}`;
 let BUILD_DIR = path.join(process.cwd(), 'build');
 if (!fs.existsSync(BUILD_DIR)) {
