@@ -54,7 +54,7 @@ ENV PRERENDER_LANGS=$PRERENDER_LANGS
 ENV PRERENDER_PAGES=$PRERENDER_PAGES
 
 # Builder l'application (output dans /app/build/)
-RUN npm run build:prerender
+RUN npm run build && if [ -f src/scripts/prerender.cjs ] && node -e 'require.resolve("puppeteer")' >/dev/null 2>&1; then node src/scripts/prerender.cjs; else echo "Skipping prerender (puppeteer missing)"; fi
 
 # -----------------------------------------------------------------------------
 # STAGE 2 : PRODUCTION
