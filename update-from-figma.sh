@@ -8,7 +8,7 @@ GUARD_BRANCH="claude/verify-root-files-placement-B4mK1"
 BRANCH_REF="origin/$GUARD_BRANCH"
 
 DOCKER_FILES="Dockerfile docker-compose.yml .dockerignore .env.example nginx/nginx.conf"
-APP_FILES="index.html src/index.html src/components/SEOHead.tsx src/src/i18n/seo/metadata.ts src/App-Survey-Original.tsx src/scripts/prerender.cjs src/src/i18n/devis/locales/it.ts update-from-figma.sh"
+APP_FILES="package.json package-lock.json package.json package-lock.json index.html src/index.html src/components/SEOHead.tsx src/src/i18n/seo/metadata.ts src/App-Survey-Original.tsx src/scripts/prerender.cjs src/src/i18n/devis/locales/it.ts update-from-figma.sh"
 
 echo "🔄 Fetching latest changes..."
 git fetch origin
