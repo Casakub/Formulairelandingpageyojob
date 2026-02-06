@@ -19,7 +19,25 @@ interface SEOHeadPropsNew {
   page: PageKey;
   lang?: DevisLanguage;
   includeServiceSchema?: boolean;
+  availableLanguages?: DevisLanguage[];
   // Marquer les anciennes props comme optionnelles pour compatibilité
+  content?: never;
+  language?: never;
+  allContent?: never;
+  title?: never;
+  description?: never;
+}
+
+// ============================================================================ 
+// API PERSONNALISÉE (title/description simples)
+// ============================================================================
+interface SEOHeadPropsCustom {
+  title: string;
+  description: string;
+  lang?: DevisLanguage;
+  includeServiceSchema?: boolean;
+  availableLanguages?: DevisLanguage[];
+  page?: never;
   content?: never;
   language?: never;
   allContent?: never;
@@ -32,13 +50,16 @@ interface SEOHeadPropsOld {
   content: any;
   language: string;
   allContent?: any;
+  availableLanguages?: DevisLanguage[];
   // Marquer les nouvelles props comme optionnelles
   page?: never;
   lang?: never;
   includeServiceSchema?: never;
+  title?: never;
+  description?: never;
 }
 
-type SEOHeadProps = SEOHeadPropsNew | SEOHeadPropsOld;
+type SEOHeadProps = SEOHeadPropsNew | SEOHeadPropsOld | SEOHeadPropsCustom;
 
 /**
  * Composant pour injecter les métadonnées SEO dans le <head>
@@ -48,13 +69,25 @@ export function SEOHead(props: SEOHeadProps) {
   
   useEffect(() => {
     // Détecter quelle API est utilisée
+    const isCustomAPI = 'title' in props && 'description' in props;
     const isNewAPI = 'page' in props && props.page !== undefined;
     
     let metadata: { title: string; description: string; h1: string; keywords?: string[] };
     let currentLang: DevisLanguage = 'fr';
     let shouldIncludeServiceSchema = false;
     
-    if (isNewAPI) {
+    if (isCustomAPI) {
+      // API PERSONNALISÉE (title/description)
+      const { title, description, lang = 'fr', includeServiceSchema = false } = props as SEOHeadPropsCustom;
+      metadata = {
+        title,
+        description,
+        h1: title,
+        keywords: []
+      };
+      currentLang = lang;
+      shouldIncludeServiceSchema = includeServiceSchema;
+    } else if (isNewAPI) {
       // NOUVELLE API
       const { page, lang = 'fr', includeServiceSchema = false } = props as SEOHeadPropsNew;
       metadata = getPageMetadata(page, lang);
@@ -160,7 +193,8 @@ export function SEOHead(props: SEOHeadProps) {
       schemaOrg.setAttribute('data-schema', 'organization');
       document.head.appendChild(schemaOrg);
     }
-    schemaOrg.textContent = JSON.stringify(getOrganizationSchema(), null, 2);
+    const baseUrl = typeof window !== 'undefined' ? window.location.origin : 'https://yojob.fr';
+    schemaOrg.textContent = JSON.stringify(getOrganizationSchema(baseUrl), null, 2);
     
     // ========================================================================
     // SCHEMA.ORG - SERVICE (conditionnel)
@@ -186,6 +220,47 @@ export function SEOHead(props: SEOHeadProps) {
     // LANG ATTRIBUTE sur <html>
     // ========================================================================
     document.documentElement.lang = currentLang;
+    
+    // ========================================================================
+    // FAVICON LINKS
+    // ========================================================================
+    // Favicon ICO (fallback)
+    let faviconIco = document.querySelector('link[rel="icon"][type="image/x-icon"]');
+    if (!faviconIco) {
+      faviconIco = document.createElement('link');
+      faviconIco.setAttribute('rel', 'icon');
+      faviconIco.setAttribute('type', 'image/x-icon');
+      faviconIco.setAttribute('href', '/favicon.ico');
+      document.head.appendChild(faviconIco);
+    }
+    
+    // Favicon SVG (modern browsers - prioritaire)
+    let faviconSvg = document.querySelector('link[rel="icon"][type="image/svg+xml"]');
+    if (!faviconSvg) {
+      faviconSvg = document.createElement('link');
+      faviconSvg.setAttribute('rel', 'icon');
+      faviconSvg.setAttribute('type', 'image/svg+xml');
+      faviconSvg.setAttribute('href', '/favicon.svg');
+      document.head.appendChild(faviconSvg);
+    }
+    
+    // Web Manifest
+    let manifest = document.querySelector('link[rel="manifest"]');
+    if (!manifest) {
+      manifest = document.createElement('link');
+      manifest.setAttribute('rel', 'manifest');
+      manifest.setAttribute('href', '/site.webmanifest');
+      document.head.appendChild(manifest);
+    }
+    
+    // Theme Color (pour mobile)
+    let themeColor = document.querySelector('meta[name="theme-color"]');
+    if (!themeColor) {
+      themeColor = document.createElement('meta');
+      themeColor.setAttribute('name', 'theme-color');
+      themeColor.setAttribute('content', '#1E3A8A');
+      document.head.appendChild(themeColor);
+    }
     
   }, [props]);
   
