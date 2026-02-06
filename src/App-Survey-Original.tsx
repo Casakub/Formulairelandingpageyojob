@@ -12,6 +12,7 @@ import { AutoImportTranslations } from './components/AutoImportTranslations';
 import { AdminLogin } from './components/auth/AdminLogin';
 import DashboardApp from './DashboardApp';
 import { SupabaseBanner } from './components/SupabaseBanner';
+import { SEOHead } from './components/SEOHead';
 import type { RespondentType } from './types/survey';
 import { saveResponsePublic } from './lib/supabase-public';
 import { extractCountry, getInterestLevel } from './utils/helpers';
@@ -563,6 +564,15 @@ function AppContent({
   currentLangRef
 }: AppContentProps) {
   const { t, currentLang } = useI18n();
+
+  const getSeoText = (key: string, fallback: string) => {
+    const translated = t(key);
+    return translated === key ? fallback : translated;
+  };
+
+  const seoTitle = `${getSeoText('selector.title', 'Partagez votre expérience du marché européen')} | YOJOB`;
+  const seoDescription = getSeoText('selector.subtitle', 'Sélectionnez votre profil pour commencer l\'enquête');
+  const seoLang = currentLang === 'cz' ? 'cs' : currentLang === 'ee' ? 'et' : currentLang;
   
   // Filtrer uniquement les langues traduites
   const translatedLanguages = SUPPORTED_LANGUAGES.filter(lang => 
@@ -574,6 +584,7 @@ function AppContent({
   
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-900 via-violet-900 to-cyan-900 relative overflow-hidden">
+      <SEOHead title={seoTitle} description={seoDescription} lang={seoLang as any} />
       {/* Background effects */}
       <div className="fixed inset-0 pointer-events-none">
         <div className="absolute top-20 left-10 w-96 h-96 bg-cyan-500/20 rounded-full blur-3xl animate-pulse" />
