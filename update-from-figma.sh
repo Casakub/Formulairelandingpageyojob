@@ -4,21 +4,34 @@
 
 set -e
 
+GUARD_BRANCH="claude/verify-root-files-placement-B4mK1"
+BRANCH_REF="origin/$GUARD_BRANCH"
+
+DOCKER_FILES="Dockerfile docker-compose.yml .dockerignore .env.example nginx/nginx.conf"
+APP_FILES="index.html src/index.html src/components/SEOHead.tsx src/src/i18n/seo/metadata.ts src/App-Survey-Original.tsx src/scripts/prerender.cjs src/src/i18n/devis/locales/it.ts update-from-figma.sh"
+
 echo "🔄 Fetching latest changes..."
 git fetch origin
+
+# S'assurer que la branche garde-fou est disponible
+if ! git show-ref --verify --quiet "refs/remotes/$BRANCH_REF"; then
+  echo "🔍 Guard branch not found on remotes, fetching..."
+  git fetch origin "$GUARD_BRANCH":"$GUARD_BRANCH" 2>/dev/null || true
+  if git show-ref --verify --quiet "refs/heads/$GUARD_BRANCH"; then
+    BRANCH_REF="$GUARD_BRANCH"
+  else
+    BRANCH_REF=""
+  fi
+fi
 
 echo "📥 Merging main into current branch..."
 if ! git merge origin/main -m "Merge Figma Make updates from main" --no-edit 2>/dev/null; then
     echo "⚠️  Merge conflict detected, resolving automatically..."
 
-    # GARDER nos fichiers de config (pas ceux de Figma Make)
-    git checkout --ours package.json 2>/dev/null || true
-    git checkout --ours vite.config.ts 2>/dev/null || true
-    
-    # Accepter les fichiers de design de main dans src/
-    git checkout --theirs src/ 2>/dev/null || true
+    # Accepter les fichiers de main dans src/public/
+    git checkout --theirs src/public/ 2>/dev/null || true
 
-    # Déplacer src/public/ vers public/ si nécessaire
+    # Déplacer vers public/
     if [ -d "src/public" ]; then
         mkdir -p public
         cp -r src/public/* public/ 2>/dev/null || true
@@ -27,40 +40,31 @@ if ! git merge origin/main -m "Merge Figma Make updates from main" --no-edit 2>/
 
     # Finaliser le merge
     git add -A
-    git commit -m "Merge Figma Make updates - keep local config" || true
+    git commit -m "Merge Figma Make updates - auto-fix file locations" || true
 fi
 
-# Restaurer les fichiers critiques depuis la branche garde-fou
-GUARD_BRANCH="claude/verify-root-files-placement-B4mK1"
-GUARD_REF=""
-if git rev-parse --verify --quiet "$GUARD_BRANCH" >/dev/null; then
-    GUARD_REF="$GUARD_BRANCH"
-elif git rev-parse --verify --quiet "origin/$GUARD_BRANCH" >/dev/null; then
-    GUARD_REF="origin/$GUARD_BRANCH"
-else
-    echo "🔍 Guard branch not found locally, fetching..."
-    git fetch origin "$GUARD_BRANCH":"$GUARD_BRANCH" 2>/dev/null || true
-    if git rev-parse --verify --quiet "$GUARD_BRANCH" >/dev/null; then
-        GUARD_REF="$GUARD_BRANCH"
-    fi
-fi
+# Restaurer les fichiers Docker s'ils ont été supprimés
+if [ -n "$BRANCH_REF" ]; then
+  echo "🛡️  Restoring infra files from $BRANCH_REF..."
+  for file in $DOCKER_FILES; do
+      if [ ! -e "$file" ]; then
+          echo "   Restoring $file..."
+          git checkout "$BRANCH_REF" -- "$file" 2>/dev/null || true
+      fi
+  done
 
-if [ -n "$GUARD_REF" ]; then
-    echo "🛡️  Restoring infra files from $GUARD_REF..."
-    git checkout "$GUARD_REF" -- docker-compose.yml Dockerfile nginx/nginx.conf .dockerignore .env.example update-from-figma.sh 2>/dev/null || true
-    git add docker-compose.yml Dockerfile nginx/nginx.conf .dockerignore .env.example update-from-figma.sh 2>/dev/null || true
-    git commit -m "Restore infra files from guard branch" 2>/dev/null || true
+  if ! git diff --cached --quiet 2>/dev/null || ! git diff --quiet 2>/dev/null; then
+      git add -A
+      git commit -m "Restore Docker configuration files" 2>/dev/null || true
+  fi
 
-echo "🛡️  Restoring app files from $GUARD_REF..."
-APP_FILES="index.html src/index.html src/components/SEOHead.tsx src/src/i18n/seo/metadata.ts src/App-Survey-Original.tsx src/scripts/prerender.cjs"
-for file in $APP_FILES; do
-    git checkout "$GUARD_REF" -- "$file" 2>/dev/null || true
-done
-git add $APP_FILES 2>/dev/null || true
-git commit -m "Restore app files from guard branch" 2>/dev/null || true
+  echo "🛡️  Restoring app files from $BRANCH_REF..."
+  for file in $APP_FILES; do
+      git checkout "$BRANCH_REF" -- "$file" 2>/dev/null || true
+  done
 
-else
-    echo "⚠️  Guard branch not available; skipping infra restore."
+  git add -A
+  git commit -m "Restore app files from guard branch" 2>/dev/null || true
 fi
 
 # Corriger le placement des fichiers public si nécessaire
@@ -74,10 +78,15 @@ if [ -d "src/public" ]; then
 fi
 
 echo "🐳 Rebuilding Docker..."
-if [ -f "docker-compose.yml" ] || [ -f "compose.yml" ] || [ -f "compose.yaml" ]; then
-    docker compose up -d --build
+# Prerender rapide par défaut (FR uniquement)
+if [ -z "$PRERENDER_LANGS" ] && [ -z "$FULL_PRERENDER" ]; then
+  export PRERENDER_LANGS=fr
+fi
+
+if [ -f docker-compose.yml ]; then
+  PRERENDER_LANGS="${PRERENDER_LANGS:-}" PRERENDER_PAGES="${PRERENDER_PAGES:-}" docker compose up -d --build
 else
-    echo "⚠️  No docker compose file found, skipping Docker rebuild."
+  echo "⚠️  No docker compose file found, skipping Docker rebuild."
 fi
 
 echo "✅ Update complete!"
