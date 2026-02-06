@@ -27,6 +27,7 @@ import { Badge } from './components/ui/badge';
 import { Skeleton } from './components/ui/skeleton';
 import { projectId, publicAnonKey } from './utils/supabase/info';
 import { LogoSvg } from './imports/YojobLogoComplete';
+import { SEOHead } from './components/SEOHead';
 import { LanguageSelector } from './components/shared/LanguageSelector';
 import { useLanguageManager } from './hooks/useLanguageManager';
 import { usePageTranslation } from './src/i18n/pages/usePageTranslation';
@@ -80,8 +81,17 @@ export default function Legal() {
   const t = usePageTranslation('legal', currentLanguage);
   const availableLanguages = getAvailableLanguagesForPage('legal');
 
+  const seoTitle = `${t.hero.title} | YOJOB`;
+  const seoDescription = t.hero.subtitle;
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#0a0e27] via-[#1a1f3a] to-[#0a0e27]">
+      <SEOHead
+        title={seoTitle}
+        description={seoDescription}
+        lang={currentLanguage as any}
+        availableLanguages={availableLanguages}
+      />
       {/* Background effects */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <div className="absolute top-20 left-10 w-96 h-96 bg-cyan-500/20 rounded-full blur-3xl animate-pulse" />
@@ -478,7 +488,7 @@ export default function Legal() {
           transition={{ duration: 0.6, delay: 1.2 }}
           className="mt-16 text-center"
         >
-          <Card className="border border-cyan-400/30 bg-gradient-to-br from-cyan-500/10 via-violet-500/10 to-transparent backdrop-blur-md shadow-2xl">
+          <Card className="border border-cyan-400/30 bg-gradient-to-br from-[#0f1a3d] via-[#1a2550] to-[#0f1a3d] backdrop-blur-md shadow-2xl">
             <CardContent className="p-8">
               <Scale className="w-16 h-16 text-cyan-400 mx-auto mb-4" />
               <h3 className="text-white text-2xl mb-3">{t.cta.title}</h3>

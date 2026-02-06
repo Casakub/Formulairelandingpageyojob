@@ -7,7 +7,7 @@
 export const legalEN = {
   hero: {
     badge: "Legal Notice",
-    title: "Legal Information",
+    title: "Legal Notice & Company Information",
     subtitle: "In accordance with the provisions of French Law No. 2004-575 of June 21, 2004 on confidence in the digital economy.",
     lastUpdate: "Last updated:"
   },
