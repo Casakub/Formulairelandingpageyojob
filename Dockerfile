@@ -52,6 +52,8 @@ ENV VITE_APP_ENV=$VITE_APP_ENV
 ENV VITE_MATOMO_TAG_MANAGER_URL=$VITE_MATOMO_TAG_MANAGER_URL
 ENV PRERENDER_LANGS=$PRERENDER_LANGS
 ENV PRERENDER_PAGES=$PRERENDER_PAGES
+ENV PRERENDER_PREVIEW_TIMEOUT=$PRERENDER_PREVIEW_TIMEOUT
+ENV PRERENDER_HOST=$PRERENDER_HOST
 
 # Builder l'application (output dans /app/build/)
 RUN npm run build && if [ -f src/scripts/prerender.cjs ] && node -e 'require.resolve("puppeteer")' >/dev/null 2>&1; then node src/scripts/prerender.cjs; else echo "Skipping prerender (puppeteer missing)"; fi
