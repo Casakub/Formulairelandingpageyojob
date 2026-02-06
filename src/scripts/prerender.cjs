@@ -15,7 +15,6 @@ if (!fs.existsSync(BUILD_DIR)) {
   if (fs.existsSync(altBuild)) BUILD_DIR = altBuild;
 }
 
-
 const ALL_LANGS = [
   'fr','en','de','es','it','nl','pt','pl','cs','sk','hu','ro','bg','hr','sl','et','lv','lt','el','sv','da','fi','no'
 ];
@@ -23,7 +22,7 @@ const DEVIS_LANGS = [
   'fr','en','de','es','pl','ro','it','pt','nl','bg','hu','cs','sk','hr','sl','et','lt','lv','el','fi','sv','da'
 ];
 
-const PAGES = [
+const ALL_PAGES = [
   { path: '/', langs: ALL_LANGS },
   { path: '/a-propos', langs: ALL_LANGS },
   { path: '/notre-reseau', langs: ALL_LANGS },
@@ -38,6 +37,22 @@ const PAGES = [
   { path: '/legal', langs: ALL_LANGS },
   { path: '/cgv', langs: ALL_LANGS },
 ];
+
+// Filter pages by PRERENDER_PAGES env var (comma-separated paths)
+const filterPages = () => {
+  const envPages = process.env.PRERENDER_PAGES;
+  if (!envPages) return ALL_PAGES;
+  const allowed = envPages.split(',').map((p) => p.trim());
+  return ALL_PAGES.filter((page) => allowed.includes(page.path));
+};
+
+// Filter langs by PRERENDER_LANGS env var (comma-separated lang codes)
+const filterLangs = (langs) => {
+  const envLangs = process.env.PRERENDER_LANGS;
+  if (!envLangs) return langs;
+  const allowed = envLangs.split(',').map((l) => l.trim());
+  return langs.filter((l) => allowed.includes(l));
+};
 
 const localizedRoute = (pagePath, lang) => {
   if (lang === 'fr') return pagePath;
@@ -54,6 +69,23 @@ const routeToFilePath = (route) => {
 const run = async () => {
   if (!fs.existsSync(BUILD_DIR)) {
     throw new Error(`Build directory not found: ${BUILD_DIR}. Run \"vite build\" first.`);
+  }
+
+  const pages = filterPages();
+  const routes = [];
+  for (const page of pages) {
+    for (const lang of filterLangs(page.langs)) {
+      routes.push(localizedRoute(page.path, lang));
+    }
+  }
+
+  console.log(`[prerender] ${routes.length} routes to render`);
+  if (process.env.PRERENDER_LANGS) console.log(`[prerender] Langs filter: ${process.env.PRERENDER_LANGS}`);
+  if (process.env.PRERENDER_PAGES) console.log(`[prerender] Pages filter: ${process.env.PRERENDER_PAGES}`);
+
+  if (routes.length === 0) {
+    console.log('[prerender] No routes to render, skipping.');
+    return;
   }
 
   const npxCmd = process.platform === 'win32' ? 'npx.cmd' : 'npx';
@@ -74,12 +106,6 @@ const run = async () => {
     launchOptions.executablePath = process.env.PUPPETEER_EXECUTABLE_PATH;
   }
   const browser = await puppeteer.launch(launchOptions);
-  const routes = [];
-  for (const page of PAGES) {
-    for (const lang of page.langs) {
-      routes.push(localizedRoute(page.path, lang));
-    }
-  }
 
   for (const route of routes) {
     const url = `${BASE_URL}${route}`;
