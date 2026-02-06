@@ -6,8 +6,8 @@ const { spawn } = require('child_process');
 const puppeteer = require('puppeteer');
 
 const PORT = process.env.PRERENDER_PORT || 4173;
-const HOST = process.env.PRERENDER_HOST || '127.0.0.1';
-const BASE_URL = `http://${HOST}:${PORT}`;
+const HOST = process.env.PRERENDER_HOST || '0.0.0.0';
+const BASE_URL = `http://127.0.0.1:${PORT}`;
 const PREVIEW_DELAY = Number(process.env.PRERENDER_PREVIEW_DELAY || 15000);
 let BUILD_DIR = path.join(process.cwd(), 'build');
 if (!fs.existsSync(BUILD_DIR)) {
@@ -59,7 +59,7 @@ const run = async () => {
   const npxCmd = process.platform === 'win32' ? 'npx.cmd' : 'npx';
   const preview = spawn(
     npxCmd,
-    ['vite', 'preview', '--port', String(PORT), '--strictPort'],
+    ['vite', 'preview', '--port', String(PORT), '--strictPort', '--host', HOST],
     { stdio: 'inherit' }
   );
 
