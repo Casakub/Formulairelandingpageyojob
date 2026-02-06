@@ -198,6 +198,9 @@ export function SignatureOnline({ token }: SignatureOnlineProps) {
       const data = await response.json();
 
       if (data.success) {
+        if (data.data) {
+          setDevis(data.data);
+        }
         setSigned(true);
         toast.success('✅ Devis signé avec succès !');
       } else {

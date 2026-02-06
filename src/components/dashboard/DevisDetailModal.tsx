@@ -13,6 +13,7 @@ import {
   Clock,
   FileText,
   Download,
+  RotateCcw,
   ChevronDown,
   ChevronUp,
   Globe,
@@ -23,6 +24,8 @@ import {
   CheckCircle,
   AlertCircle,
   TrendingUp,
+  Trash2,
+  AlertTriangle,
   Loader2,
   Shield,
   Fingerprint,
@@ -32,13 +35,26 @@ import { Card, CardContent, CardHeader, CardTitle } from '../ui/card';
 import { Button } from '../ui/button';
 import { Badge } from '../ui/badge';
 import { Separator } from '../ui/separator';
+import { Input } from '../ui/input';
+import {
+  AlertDialog,
+  AlertDialogTrigger,
+  AlertDialogContent,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogCancel,
+} from '../ui/alert-dialog';
 import { useState, useEffect } from 'react';
 import { projectId, publicAnonKey } from '../../utils/supabase/info';
+import { getStoredSession } from '../../services/authService';
 import { toast } from 'sonner';
 
 interface DevisDetailModalProps {
   devisId: string;
   onClose: () => void;
+  onDeleted?: () => void;
 }
 
 interface Devis {
@@ -58,8 +74,8 @@ interface Devis {
       siret: string;
     };
     metadata: {
-      ipAddress: string;
-      userAgent: string;
+      ipAddress?: string;
+      userAgent?: string;
       timestamp: string;
       timestampReadable: string;
     };
@@ -166,12 +182,91 @@ interface Devis {
     budgetEstime?: number;
     commentaires?: string;
   };
+  pricing?: {
+    totals?: {
+      totalMensuelHT?: number;
+      totalMensuelTVA?: number;
+      totalMensuelTTC?: number;
+      totalMissionHT?: number;
+      totalMissionTVA?: number;
+      totalMissionTTC?: number;
+      dureeMissionMois?: number;
+      tvaRate?: number;
+    };
+    majorations?: {
+      delaiPaiement?: number;
+      experience?: number;
+      permis?: number;
+      langues?: number;
+      outillage?: number;
+      total?: number;
+    };
+    postes?: Array<{
+      id?: string;
+      tauxHoraireBrut?: number;
+      tauxETTBase?: number;
+      tauxETTMajore?: number;
+      heures?: {
+        baseHoraire?: number;
+        coutTotal?: number;
+      };
+      panier?: {
+        montantJour?: number;
+        totalMensuel?: number;
+      };
+    }>;
+  };
+  pdfUrl?: string;
+  pdf_url?: string;
+  pdf_storage_path?: string;
 }
 
-export function DevisDetailModal({ devisId, onClose }: DevisDetailModalProps) {
+const stripIpPort = (value: string) => {
+  const bracketMatch = value.match(/^\[(.+)](?::\d+)?$/);
+  if (bracketMatch?.[1]) return bracketMatch[1];
+  if (value.includes('.') && /:\d+$/.test(value)) {
+    return value.replace(/:\d+$/, '');
+  }
+  return value;
+};
+
+const maskSingleIp = (ip: string): string => {
+  const cleaned = stripIpPort(ip.trim());
+  if (!cleaned) return '';
+  if (cleaned.includes('.')) {
+    const parts = cleaned.split('.');
+    if (parts.length === 4) {
+      return `${parts[0]}.${parts[1]}.xxx.xxx`;
+    }
+  }
+  if (cleaned.includes(':')) {
+    const parts = cleaned.split(':').filter(Boolean);
+    if (parts.length >= 2) {
+      return `${parts[0]}:${parts[1]}:xxxx:xxxx`;
+    }
+  }
+  return cleaned;
+};
+
+const maskIpAddress = (ip?: string): string => {
+  if (!ip) return 'N/A';
+  const parts = ip
+    .split(',')
+    .map((value) => value.trim())
+    .filter((value) => value && value.toLowerCase() !== 'unknown');
+  if (!parts.length) return 'N/A';
+  const masked = parts.map(maskSingleIp).filter(Boolean);
+  const unique = Array.from(new Set(masked));
+  return unique.join(', ');
+};
+
+export function DevisDetailModal({ devisId, onClose, onDeleted }: DevisDetailModalProps) {
   const [devis, setDevis] = useState<Devis | null>(null);
   const [loading, setLoading] = useState(true);
   const [isGeneratingPDF, setIsGeneratingPDF] = useState(false);
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [confirmText, setConfirmText] = useState('');
+  const [isDeleting, setIsDeleting] = useState(false);
   const [sectionsOuvertes, setSectionsOuvertes] = useState({
     entreprise: true,
     contact: true,
@@ -255,10 +350,10 @@ export function DevisDetailModal({ devisId, onClose }: DevisDetailModalProps) {
     };
   };
 
-  const handleGeneratePDF = async () => {
+  const handleGeneratePDF = async (options: { force?: boolean } = {}) => {
     try {
       setIsGeneratingPDF(true);
-      toast.info('Génération du PDF en cours...');
+      toast.info(options.force ? 'Régénération du PDF en cours...' : 'Génération du PDF en cours...');
 
       const response = await fetch(
         `https://${projectId}.supabase.co/functions/v1/make-server-10092a63/devis/generer-pdf`,
@@ -270,7 +365,8 @@ export function DevisDetailModal({ devisId, onClose }: DevisDetailModalProps) {
           },
           body: JSON.stringify({
             devisId,
-            inclureCGV: true
+            inclureCGV: true,
+            ...(options.force ? { force: true } : {})
           })
         }
       );
@@ -285,13 +381,60 @@ export function DevisDetailModal({ devisId, onClose }: DevisDetailModalProps) {
       // Télécharger le PDF
       if (result.pdfUrl) {
         window.open(result.pdfUrl, '_blank');
-        toast.success('PDF généré avec succès !');
+        toast.success(options.force ? 'PDF régénéré avec succès !' : 'PDF généré avec succès !');
       }
     } catch (error) {
       console.error('Erreur génération PDF:', error);
-      toast.error('Impossible de générer le PDF');
+      toast.error(options.force ? 'Impossible de régénérer le PDF' : 'Impossible de générer le PDF');
     } finally {
       setIsGeneratingPDF(false);
+    }
+  };
+
+  const handleDeleteDialogChange = (nextOpen: boolean) => {
+    if (isDeleting) return;
+    setDeleteDialogOpen(nextOpen);
+    if (!nextOpen) {
+      setConfirmText('');
+    }
+  };
+
+  const handleDeleteDevis = async () => {
+    if (!devis) return;
+    setIsDeleting(true);
+    try {
+      const session = getStoredSession();
+      const token = session?.access_token || localStorage.getItem('sb-access-token');
+      if (!token) {
+        throw new Error('Session expirée. Veuillez vous reconnecter.');
+      }
+
+      const deleteKey = devis.id ? `prospects:${devis.id}` : devisId;
+      const response = await fetch(
+        `https://${projectId}.supabase.co/functions/v1/make-server-10092a63/devis/${encodeURIComponent(deleteKey)}`,
+        {
+          method: 'DELETE',
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          }
+        }
+      );
+
+      const result = await response.json().catch(() => ({}));
+      if (!response.ok) {
+        throw new Error(result.error || result.message || 'Échec de la suppression');
+      }
+
+      toast.success(`Devis ${devis.numero} supprimé avec succès`);
+      setDeleteDialogOpen(false);
+      setConfirmText('');
+      onDeleted?.();
+      onClose();
+    } catch (error: any) {
+      toast.error(`Erreur lors de la suppression : ${error?.message || 'Erreur inconnue'}`);
+    } finally {
+      setIsDeleting(false);
     }
   };
 
@@ -323,6 +466,7 @@ export function DevisDetailModal({ devisId, onClose }: DevisDetailModalProps) {
   }
 
   const badge = getStatutBadge(devis.statut);
+  const canConfirmDelete = confirmText.trim().toUpperCase() === 'SUPPRIMER';
 
   return (
     <AnimatePresence>
@@ -364,12 +508,23 @@ export function DevisDetailModal({ devisId, onClose }: DevisDetailModalProps) {
                 </div>
                 <div className="flex items-center gap-2">
                   <Button
-                    onClick={handleGeneratePDF}
+                    onClick={() => handleGeneratePDF()}
+                    disabled={isGeneratingPDF}
                     className="bg-gradient-to-r from-violet-500 to-purple-500 hover:from-violet-600 hover:to-purple-600 text-white"
                     size="sm"
                   >
                     <Download className="w-4 h-4 mr-2" />
                     Export PDF
+                  </Button>
+                  <Button
+                    onClick={() => handleGeneratePDF({ force: true })}
+                    disabled={isGeneratingPDF}
+                    variant="outline"
+                    size="sm"
+                    className="border-slate-300 text-slate-700 hover:bg-slate-100"
+                  >
+                    <RotateCcw className="w-4 h-4 mr-2" />
+                    Régénérer
                   </Button>
                   <Button
                     onClick={onClose}
@@ -930,12 +1085,17 @@ export function DevisDetailModal({ devisId, onClose }: DevisDetailModalProps) {
                         </div>
                         <div>
                           <p className="text-slate-500 text-sm">Adresse IP</p>
-                          <p className="text-green-600 font-mono">{devis.signature.metadata?.ipAddress}</p>
+                          <p className="text-green-600 font-mono">{maskIpAddress(devis.signature.metadata?.ipAddress)}</p>
                         </div>
                         <div>
                           <p className="text-slate-500 text-sm">Navigateur (User-Agent)</p>
-                          <p className="text-slate-900 text-xs truncate" title={devis.signature.metadata?.userAgent}>
-                            {devis.signature.metadata?.userAgent?.substring(0, 50)}...
+                          <p
+                            className="text-slate-900 text-xs truncate"
+                            title={devis.signature.metadata?.userAgent ? 'Masqué' : 'Non conservé'}
+                          >
+                            {devis.signature.metadata?.userAgent
+                              ? `${devis.signature.metadata.userAgent.substring(0, 50)}...`
+                              : 'Non conservé'}
                           </p>
                         </div>
                       </div>
@@ -1064,6 +1224,76 @@ export function DevisDetailModal({ devisId, onClose }: DevisDetailModalProps) {
                   )}
                 </div>
               )}
+
+              {/* Section Totaux Pricing */}
+              {devis.pricing?.totals && (
+                <div className="border-2 border-emerald-200 rounded-lg overflow-hidden bg-gradient-to-br from-emerald-50 to-green-50">
+                  <div className="w-full p-4 bg-gradient-to-r from-emerald-100 to-green-100">
+                    <div className="flex items-center gap-3">
+                      <div className="p-2 rounded-lg bg-gradient-to-br from-emerald-500 to-green-500">
+                        <Euro className="w-5 h-5 text-white" />
+                      </div>
+                      <span className="text-slate-900">Totaux du devis</span>
+                    </div>
+                  </div>
+
+                  <div className="p-6 bg-white">
+                    <div className="grid md:grid-cols-2 gap-6">
+                      {/* Totaux Mensuels */}
+                      <div className="space-y-3">
+                        <h4 className="text-slate-900 font-medium mb-3">📅 Totaux Mensuels</h4>
+                        <div className="space-y-2">
+                          <div className="flex justify-between">
+                            <span className="text-slate-500">Total HT</span>
+                            <span className="text-slate-900 font-medium">
+                              {(devis.pricing.totals.totalMensuelHT ?? 0).toLocaleString('fr-FR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} €
+                            </span>
+                          </div>
+                          <div className="flex justify-between">
+                            <span className="text-slate-500">TVA ({((devis.pricing.totals.tvaRate ?? 0.2) * 100).toFixed(0)}%)</span>
+                            <span className="text-slate-900 font-medium">
+                              {(devis.pricing.totals.totalMensuelTVA ?? 0).toLocaleString('fr-FR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} €
+                            </span>
+                          </div>
+                          <div className="flex justify-between border-t border-slate-200 pt-2">
+                            <span className="text-slate-700 font-medium">Total TTC</span>
+                            <span className="text-emerald-600 font-bold text-lg">
+                              {(devis.pricing.totals.totalMensuelTTC ?? 0).toLocaleString('fr-FR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} €
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Totaux Mission */}
+                      <div className="space-y-3">
+                        <h4 className="text-slate-900 font-medium mb-3">
+                          📊 Total Mission ({devis.pricing.totals.dureeMissionMois ?? 1} mois)
+                        </h4>
+                        <div className="space-y-2">
+                          <div className="flex justify-between">
+                            <span className="text-slate-500">Total HT</span>
+                            <span className="text-slate-900 font-medium">
+                              {(devis.pricing.totals.totalMissionHT ?? 0).toLocaleString('fr-FR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} €
+                            </span>
+                          </div>
+                          <div className="flex justify-between">
+                            <span className="text-slate-500">TVA</span>
+                            <span className="text-slate-900 font-medium">
+                              {(devis.pricing.totals.totalMissionTVA ?? 0).toLocaleString('fr-FR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} €
+                            </span>
+                          </div>
+                          <div className="flex justify-between border-t border-slate-200 pt-2">
+                            <span className="text-slate-700 font-medium">Total TTC</span>
+                            <span className="text-emerald-600 font-bold text-lg">
+                              {(devis.pricing.totals.totalMissionTTC ?? 0).toLocaleString('fr-FR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} €
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
             </CardContent>
 
             {/* Footer Actions */}
@@ -1078,6 +1308,61 @@ export function DevisDetailModal({ devisId, onClose }: DevisDetailModalProps) {
                 })}
               </div>
               <div className="flex gap-3">
+                <AlertDialog open={deleteDialogOpen} onOpenChange={handleDeleteDialogChange}>
+                  <AlertDialogTrigger asChild>
+                    <Button variant="destructive">
+                      <Trash2 className="w-4 h-4 mr-2" />
+                      Supprimer
+                    </Button>
+                  </AlertDialogTrigger>
+                  <AlertDialogContent>
+                    <AlertDialogHeader>
+                      <AlertDialogTitle className="flex items-center gap-2">
+                        <AlertTriangle className="h-5 w-5 text-destructive" />
+                        Supprimer ce devis ?
+                      </AlertDialogTitle>
+                      <AlertDialogDescription asChild>
+                        <div className="space-y-3 text-sm text-muted-foreground">
+                          <p>
+                            Vous êtes sur le point de supprimer définitivement le devis <strong className="text-foreground">{devis.numero}</strong>.
+                          </p>
+                          <p className="text-destructive font-medium">
+                            Cette action est irréversible. Le devis et son PDF seront définitivement supprimés.
+                          </p>
+                          <div className="pt-2">
+                            <label className="text-sm font-medium text-foreground">
+                              Tapez <code className="bg-muted px-1 rounded">SUPPRIMER</code> pour confirmer :
+                            </label>
+                            <Input
+                              value={confirmText}
+                              onChange={(e) => setConfirmText(e.target.value)}
+                              placeholder="SUPPRIMER"
+                              className="mt-2"
+                              disabled={isDeleting}
+                            />
+                          </div>
+                        </div>
+                      </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                      <AlertDialogCancel disabled={isDeleting}>Annuler</AlertDialogCancel>
+                      <Button
+                        variant="destructive"
+                        onClick={handleDeleteDevis}
+                        disabled={!canConfirmDelete || isDeleting}
+                      >
+                        {isDeleting ? (
+                          <>
+                            <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                            Suppression...
+                          </>
+                        ) : (
+                          'Confirmer la suppression'
+                        )}
+                      </Button>
+                    </AlertDialogFooter>
+                  </AlertDialogContent>
+                </AlertDialog>
                 <Button
                   onClick={onClose}
                   variant="outline"
@@ -1086,7 +1371,8 @@ export function DevisDetailModal({ devisId, onClose }: DevisDetailModalProps) {
                   Fermer
                 </Button>
                 <Button
-                  onClick={handleGeneratePDF}
+                  onClick={() => handleGeneratePDF()}
+                  disabled={isGeneratingPDF}
                   className="bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-600 hover:to-blue-600 text-white"
                 >
                   <Download className="w-4 h-4 mr-2" />

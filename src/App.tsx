@@ -18,13 +18,29 @@ import NosSecteurs from './NosSecteurs';
 import Temoignages from './Temoignages';
 import { SignatureOnline } from './components/SignatureOnline';
 import { Toaster } from './components/ui/sonner';
+import { buildLocalizedPath, DEFAULT_LANGUAGE, splitPathByLang, stripLangPrefix } from './lib/i18nRouting';
 
 export default function App() {
-  const [currentPath, setCurrentPath] = useState(window.location.pathname);
+  const getNormalizedPath = () => {
+    const { pathname, search, hash } = window.location;
+    const { lang, hasLangPrefix, restPath } = splitPathByLang(pathname);
+
+    if (hasLangPrefix && lang === DEFAULT_LANGUAGE) {
+      // Canonicaliser /fr/... vers /
+      const canonicalUrl = `${restPath}${search}${hash}`;
+      if (canonicalUrl !== `${pathname}${search}${hash}`) {
+        window.history.replaceState({}, '', canonicalUrl);
+      }
+    }
+
+    return restPath;
+  };
+
+  const [currentPath, setCurrentPath] = useState(getNormalizedPath());
 
   useEffect(() => {
     const handlePopState = () => {
-      setCurrentPath(window.location.pathname);
+      setCurrentPath(getNormalizedPath());
     };
 
     window.addEventListener('popstate', handlePopState);
@@ -43,6 +59,16 @@ export default function App() {
         return;
       }
       
+      // Ignorer les liens qui doivent rester natifs
+      if (anchor.target === '_blank' || anchor.hasAttribute('download')) {
+        return;
+      }
+
+      const hrefAttr = anchor.getAttribute('href') || '';
+      if (hrefAttr.startsWith('mailto:') || hrefAttr.startsWith('tel:')) {
+        return;
+      }
+
       const url = new URL(anchor.href);
       
       // Only handle same-origin links
@@ -51,12 +77,26 @@ export default function App() {
         if (anchor.getAttribute('href')?.startsWith('#')) {
           return;
         }
+
+        // Ne pas intercepter les liens vers des fichiers/ressources
+        const isFile = /\.[a-zA-Z0-9]+$/.test(url.pathname);
+        if (
+          isFile ||
+          url.pathname.startsWith('/assets') ||
+          url.pathname.startsWith('/images') ||
+          url.pathname.startsWith('/styles')
+        ) {
+          return;
+        }
         
         // Intercepter la navigation client-side
         e.preventDefault();
         e.stopPropagation();
-        window.history.pushState({}, '', url.pathname);
-        setCurrentPath(url.pathname);
+        const { lang } = splitPathByLang(window.location.pathname);
+        const nextPath = buildLocalizedPath(url.pathname, lang);
+        const nextUrl = `${nextPath}${url.search}${url.hash}`;
+        window.history.pushState({}, '', nextUrl);
+        setCurrentPath(stripLangPrefix(nextPath));
         window.scrollTo({ top: 0, behavior: 'smooth' });
       }
     };

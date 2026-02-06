@@ -78,7 +78,7 @@ export default function APropos() {
   return (
     <HelmetProvider>
       <div className="min-h-screen bg-gradient-to-br from-[#1E3A8A] via-[#7C3AED] to-[#06B6D4]">
-        <SEOHead pageKey="a-propos" />
+        <SEOHead page="a-propos" lang={validLanguage} availableLanguages={AVAILABLE_LANGUAGES_A_PROPOS} />
 
         {/* ============================================ */}
         {/* HEADER */}

@@ -76,16 +76,6 @@ export function Step3Besoins({ data, pays, region, onChange, lang = 'fr' }: Step
   const { getPaysActifs, getCoefficientDetail, getPaysInfo, isLoading } = useDevisConfig();
   const paysDisponibles = getPaysActifs();
 
-  // 🐛 DEBUG: Vérifier l'état des traductions
-  console.log('🔍 [Step3Besoins] État des traductions:', {
-    lang,
-    isLoadingTranslations,
-    hasT: !!t,
-    hasStep3: !!t?.step3,
-    hasSecteurs: !!t?.secteurs,
-    tKeys: t ? Object.keys(t) : [],
-  });
-
   const handleAddPoste = () => {
     const newPoste: Poste = {
       id: crypto.randomUUID(),
@@ -124,11 +114,6 @@ export function Step3Besoins({ data, pays, region, onChange, lang = 'fr' }: Step
           updated.poste = '';
           updated.classification = '';
           updated.salaireBrut = 0;
-          
-          console.log('📋 [Step3Besoins] Convention remplie:', {
-            secteurKey: value,
-            convention: updated.convention
-          });
         }
 
         // Auto-remplir le salaire si la classification change
@@ -143,14 +128,6 @@ export function Step3Besoins({ data, pays, region, onChange, lang = 'fr' }: Step
           } else {
             updated.salaireBrut = 0;
           }
-          
-          console.log('💶 [Step3Besoins] Calcul salaire:', {
-            secteurKey: updated.secteur,
-            secteurLabelFr,
-            classificationKey: value,
-            classificationLabelFr,
-            salaireBrut: updated.salaireBrut
-          });
         }
 
         // 🆕 Recalculer le coefficient si secteur, classification ou nationalité change
@@ -165,19 +142,6 @@ export function Step3Besoins({ data, pays, region, onChange, lang = 'fr' }: Step
           updated.facteurPays = detail.facteurPays;
           updated.coeffFinal = detail.coeffFinal;
           updated.labelPays = detail.labelPays;
-          
-          console.log('🔄 [Step3Besoins] Recalcul du coefficient:', {
-            champ: field,
-            secteurKey: updated.secteur,
-            secteurLabelFr,
-            classificationKey: updated.classification,
-            classificationLabelFr,
-            nationalite: updated.nationalite,
-            coeffBase: detail.coeffBase,
-            facteurPays: detail.facteurPays,
-            coeffFinal: detail.coeffFinal,
-            labelPays: detail.labelPays
-          });
         }
 
         // Recalculer les taux

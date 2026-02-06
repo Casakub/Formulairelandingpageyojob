@@ -6,7 +6,8 @@
  */
 
 import { createClient } from "npm:@supabase/supabase-js@2.39.3";
-import type { RespondentType } from "../../types/survey.ts";
+import { emailService } from "./email-service.tsx";
+import type { RespondentType } from "./types.ts";
 
 /**
  * Mapping des types de répondants vers les types de prospects
@@ -38,6 +39,30 @@ function getSupabaseClient() {
   }
 
   return createClient(supabaseUrl, supabaseServiceKey);
+}
+
+async function triggerWorkflow(
+  triggerType: 'prospect_created' | 'status_changed',
+  payload: Record<string, any>
+) {
+  try {
+    const supabaseUrl = Deno.env.get("SUPABASE_URL");
+    const anonKey = Deno.env.get("SUPABASE_ANON_KEY");
+    if (!supabaseUrl || !anonKey) return;
+
+    fetch(`${supabaseUrl}/functions/v1/make-server-10092a63/workflow-engine/trigger/${triggerType}`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${anonKey}`,
+      },
+      body: JSON.stringify(payload),
+    }).catch(err => {
+      console.error(`⚠️ Erreur trigger ${triggerType} (non-bloquant):`, err);
+    });
+  } catch (error) {
+    console.error(`⚠️ Erreur déclenchement workflow ${triggerType}:`, error);
+  }
 }
 
 /**
@@ -135,7 +160,10 @@ function determineProspectStatus(score: number): string {
 /**
  * 🎯 FONCTION PRINCIPALE : Synchroniser une enquête vers le CRM
  */
-export async function syncSurveyToProspect(surveyResponse: any) {
+export async function syncSurveyToProspect(
+  surveyResponse: any,
+  options: { sendNotifications?: boolean } = {}
+) {
   try {
     console.log('🔗 [SYNC] Démarrage synchronisation enquête → prospect CRM');
     console.log('   → Survey Response ID:', surveyResponse.response_id || surveyResponse.id);
@@ -172,7 +200,7 @@ export async function syncSurveyToProspect(surveyResponse: any) {
     // Vérifier si un prospect existe déjà avec cet email
     const { data: existingProspect, error: searchError } = await supabase
       .from('prospects')
-      .select('id, email')
+      .select('id, email, status, custom_fields')
       .eq('email', prospectData.email)
       .maybeSingle();
     
@@ -274,6 +302,85 @@ export async function syncSurveyToProspect(surveyResponse: any) {
     });
     
     console.log('✅ [SYNC] Synchronisation terminée avec succès');
+
+    const shouldNotify = options.sendNotifications !== false;
+    if (shouldNotify) {
+      try {
+        const respondentName = prospectData.name || 'Bonjour';
+        const subjectClient = '✅ Merci pour votre participation à l’enquête YOJOB';
+        const textClient = `Bonjour ${respondentName},
+
+Merci pour votre participation à notre enquête. Votre réponse a bien été enregistrée.
+
+Nous reviendrons vers vous si besoin.
+
+L'équipe YOJOB`;
+
+        const htmlClient = `
+          <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+            <h2>Merci pour votre participation ✅</h2>
+            <p>Bonjour <strong>${respondentName}</strong>,</p>
+            <p>Votre réponse a bien été enregistrée. Merci pour votre temps.</p>
+            <p>L'équipe YOJOB</p>
+          </div>
+        `;
+
+        await emailService.sendEmail({
+          to: prospectData.email,
+          subject: subjectClient,
+          body: textClient,
+          html: htmlClient,
+        });
+
+        const subjectAdmin = '📥 Nouvelle enquête complétée';
+        const textAdmin = `Nouvelle enquête complétée
+
+Email : ${prospectData.email}
+Nom : ${prospectData.name || 'Non précisé'}
+Type : ${respondentType}
+Score : ${qualificationScore}/100
+Source : ${source}
+`;
+
+        const htmlAdmin = `
+          <div style="font-family: Arial, sans-serif; max-width: 700px; margin: 0 auto;">
+            <h2>📥 Nouvelle enquête complétée</h2>
+            <ul>
+              <li><strong>Email :</strong> ${prospectData.email}</li>
+              <li><strong>Nom :</strong> ${prospectData.name || 'Non précisé'}</li>
+              <li><strong>Type :</strong> ${respondentType}</li>
+              <li><strong>Score :</strong> ${qualificationScore}/100</li>
+              <li><strong>Source :</strong> ${source}</li>
+            </ul>
+          </div>
+        `;
+
+        await emailService.sendEmail({
+          to: 'contact@yojob.fr',
+          subject: subjectAdmin,
+          body: textAdmin,
+          html: htmlAdmin,
+          replyTo: prospectData.email,
+        });
+      } catch (notifyError) {
+        console.error('⚠️ Erreur envoi emails enquête (non-bloquant):', notifyError);
+      }
+    }
+
+    // 🔥 Déclencher workflows automatiques (SMTP)
+    try {
+      await triggerWorkflow('prospect_created', { prospect_id: prospectId });
+
+      if (existingProspect?.status && existingProspect.status !== status) {
+        await triggerWorkflow('status_changed', {
+          prospect_id: prospectId,
+          status_from: existingProspect.status,
+          status_to: status,
+        });
+      }
+    } catch (workflowError) {
+      console.error('⚠️ Erreur déclenchement workflows survey (non-bloquant):', workflowError);
+    }
     
     return {
       success: true,
@@ -332,7 +439,7 @@ export async function batchSyncSurveysToProspects(limit = 100) {
     };
     
     for (const survey of surveys) {
-      const result = await syncSurveyToProspect(survey);
+      const result = await syncSurveyToProspect(survey, { sendNotifications: false });
       
       if (result.success) {
         results.synced++;

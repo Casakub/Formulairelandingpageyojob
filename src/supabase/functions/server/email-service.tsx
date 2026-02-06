@@ -8,6 +8,10 @@ interface EmailOptions {
   subject: string;
   body: string;
   html?: string;
+  cc?: string | string[];
+  bcc?: string | string[];
+  replyTo?: string;
+  attachments?: EmailAttachment[];
 }
 
 interface SMTPConfig {
@@ -23,6 +27,12 @@ interface SMTPConfig {
   provider_api_key?: string;
   provider_domain?: string;
   reply_to?: string;
+}
+
+interface EmailAttachment {
+  filename: string;
+  content?: string | Uint8Array;
+  contentType?: string;
 }
 
 // Helper pour obtenir le client Supabase
@@ -295,32 +305,69 @@ async function sendViaSMTP(
   textBody: string,
   htmlBody: string
 ): Promise<{ success: boolean; message: string; messageId?: string }> {
+  const port = Number(config.port) || 587;
+  const secure = typeof config.secure === 'boolean' ? config.secure : port === 465;
+
   console.log('📧 Envoi email via SMTP:', {
     from: `${config.from_name} <${config.from_email}>`,
     to: options.to,
     subject: options.subject,
     host: config.host,
-    port: config.port,
+    port,
+    secure,
   });
 
-  const transporter = nodemailer.createTransport({
+  const baseTransportOptions: any = {
     host: config.host,
-    port: config.port,
-    secure: config.secure,
+    port,
+    secure,
     auth: {
       user: config.username,
       pass: config.password,
     },
-  });
+  };
 
-  const info = await transporter.sendMail({
-    from: `${config.from_name} <${config.from_email}>`,
-    to: options.to,
-    subject: options.subject,
-    text: textBody,
-    html: htmlBody,
-    replyTo: config.reply_to,
-  });
+  const sendWithTransport = async (transportOptions: any) => {
+    const transporter = nodemailer.createTransport(transportOptions);
+    return await transporter.sendMail({
+      from: `${config.from_name} <${config.from_email}>`,
+      to: options.to,
+      ...(options.cc ? { cc: options.cc } : {}),
+      ...(options.bcc ? { bcc: options.bcc } : {}),
+      subject: options.subject,
+      text: textBody,
+      html: htmlBody,
+      replyTo: options.replyTo || config.reply_to,
+      ...(options.attachments?.length
+        ? {
+            attachments: options.attachments
+              .filter((attachment) => attachment.content)
+              .map((attachment) => ({
+                filename: attachment.filename,
+                content: attachment.content,
+                contentType: attachment.contentType,
+              })),
+          }
+        : {}),
+    });
+  };
+
+  let info;
+  try {
+    info = await sendWithTransport(baseTransportOptions);
+  } catch (error) {
+    const shouldRetryWithStartTls = secure && (port === 587 || port === 25);
+    if (shouldRetryWithStartTls) {
+      console.warn('⚠️ SMTP TLS direct échoué, tentative STARTTLS...');
+      info = await sendWithTransport({
+        ...baseTransportOptions,
+        secure: false,
+        requireTLS: true,
+      });
+    } else {
+      throw error;
+    }
+  }
 
   const messageId = info?.messageId || `<${Date.now()}.${Math.random().toString(36).slice(2)}@yojob.com>`;
   await logEmailResult({
@@ -346,6 +393,10 @@ async function sendViaSendGrid(
   textBody: string,
   htmlBody: string
 ): Promise<{ success: boolean; message: string; messageId?: string }> {
+  const toList = [options.to];
+  const ccList = options.cc ? (Array.isArray(options.cc) ? options.cc : [options.cc]) : [];
+  const bccList = options.bcc ? (Array.isArray(options.bcc) ? options.bcc : [options.bcc]) : [];
+
   const response = await fetch("https://api.sendgrid.com/v3/mail/send", {
     method: "POST",
     headers: {
@@ -353,14 +404,42 @@ async function sendViaSendGrid(
       "Authorization": `Bearer ${config.provider_api_key}`,
     },
     body: JSON.stringify({
-      personalizations: [{ to: [{ email: options.to }] }],
+      personalizations: [{
+        to: toList.map((email) => ({ email })),
+        ...(ccList.length ? { cc: ccList.map((email) => ({ email })) } : {}),
+        ...(bccList.length ? { bcc: bccList.map((email) => ({ email })) } : {}),
+      }],
       from: { email: config.from_email, name: config.from_name },
-      ...(config.reply_to ? { reply_to: { email: config.reply_to } } : {}),
+      ...((options.replyTo || config.reply_to) ? { reply_to: { email: options.replyTo || config.reply_to } } : {}),
       subject: options.subject,
       content: [
         { type: "text/plain", value: textBody },
         { type: "text/html", value: htmlBody },
       ],
+      ...(options.attachments?.length
+        ? {
+            attachments: options.attachments
+              .filter((attachment) => attachment.content)
+              .map((attachment) => {
+              const encoder = new TextEncoder();
+              const bytes = typeof attachment.content === 'string'
+                ? encoder.encode(attachment.content)
+                : (attachment.content || new Uint8Array());
+              let binary = '';
+              const chunkSize = 0x8000;
+              for (let i = 0; i < bytes.length; i += chunkSize) {
+                binary += String.fromCharCode(...bytes.subarray(i, i + chunkSize));
+              }
+              const content = btoa(binary);
+              return {
+                content,
+                filename: attachment.filename,
+                type: attachment.contentType || 'application/octet-stream',
+                disposition: 'attachment',
+              };
+            }),
+          }
+        : {}),
     }),
   });
 
@@ -394,14 +473,39 @@ async function sendViaMailgun(
   htmlBody: string
 ): Promise<{ success: boolean; message: string; messageId?: string }> {
   const url = `https://api.mailgun.net/v3/${config.provider_domain}/messages`;
-  const form = new URLSearchParams();
-  form.set("from", `${config.from_name} <${config.from_email}>`);
-  form.set("to", options.to);
-  form.set("subject", options.subject);
-  form.set("text", textBody);
-  form.set("html", htmlBody);
-  if (config.reply_to) {
-    form.set("h:Reply-To", config.reply_to);
+  const hasAttachments = Boolean(options.attachments?.length);
+  const form = hasAttachments ? new FormData() : new URLSearchParams();
+  const setField = (key: string, value: string) => {
+    if (form instanceof FormData) {
+      form.append(key, value);
+    } else {
+      form.set(key, value);
+    }
+  };
+  setField("from", `${config.from_name} <${config.from_email}>`);
+  setField("to", options.to);
+  if (options.cc) {
+    setField("cc", Array.isArray(options.cc) ? options.cc.join(",") : options.cc);
+  }
+  if (options.bcc) {
+    setField("bcc", Array.isArray(options.bcc) ? options.bcc.join(",") : options.bcc);
+  }
+  setField("subject", options.subject);
+  setField("text", textBody);
+  setField("html", htmlBody);
+  if (options.replyTo || config.reply_to) {
+    setField("h:Reply-To", options.replyTo || config.reply_to);
+  }
+
+  if (form instanceof FormData && options.attachments?.length) {
+    for (const attachment of options.attachments.filter((item) => item.content)) {
+      const encoder = new TextEncoder();
+      const bytes = typeof attachment.content === 'string'
+        ? encoder.encode(attachment.content)
+        : (attachment.content || new Uint8Array());
+      const blob = new Blob([bytes], { type: attachment.contentType || 'application/octet-stream' });
+      form.append('attachment', blob, attachment.filename);
+    }
   }
 
   const auth = btoa(`api:${config.provider_api_key}`);
@@ -409,9 +513,9 @@ async function sendViaMailgun(
     method: "POST",
     headers: {
       "Authorization": `Basic ${auth}`,
-      "Content-Type": "application/x-www-form-urlencoded",
+      ...(form instanceof URLSearchParams ? { "Content-Type": "application/x-www-form-urlencoded" } : {}),
     },
-    body: form.toString(),
+    body: form instanceof URLSearchParams ? form.toString() : form,
   });
 
   if (!response.ok) {

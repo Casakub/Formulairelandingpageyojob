@@ -10,6 +10,7 @@ import {
   MapPin,
   Calendar,
   Users,
+  Euro,
   ChevronDown,
   CheckCircle,
   Loader2,
@@ -35,8 +36,11 @@ import {
   formaterMontant, 
   calculerTauxETTComplet, 
   calculerMajorationsDevis, 
-  appliquerMajorationTaux 
+  appliquerMajorationTaux,
+  calculerCoutAvecHeuresSup,
+  calculerPanierRepasMensuel
 } from './utils/devis-calculations';
+import { getPanierRepas } from './data/config/helpers';
 import { useDevisTranslationStatic } from './hooks/useDevisTranslation';
 import { translateSecteur, translatePoste, translateClassification, translatePays } from './utils/recapitulatif-translations';
 import type { DevisLanguage } from './src/i18n/devis/types';
@@ -86,6 +90,50 @@ function Accordion({ title, icon: Icon, colorClass, children, defaultOpen = fals
     </motion.div>
   );
 }
+
+const BASE_HORAIRE_LEGALE = 151.67;
+const DEFAULT_VAT_RATE = 0.2;
+
+const round2 = (value: number) => Math.round(value * 100) / 100;
+
+const stripIpPort = (value: string) => {
+  const bracketMatch = value.match(/^\[(.+)](?::\d+)?$/);
+  if (bracketMatch?.[1]) return bracketMatch[1];
+  if (value.includes('.') && /:\d+$/.test(value)) {
+    return value.replace(/:\d+$/, '');
+  }
+  return value;
+};
+
+const maskSingleIp = (ip: string): string => {
+  const cleaned = stripIpPort(ip.trim());
+  if (!cleaned) return '';
+  if (cleaned.includes('.')) {
+    const parts = cleaned.split('.');
+    if (parts.length === 4) {
+      return `${parts[0]}.${parts[1]}.xxx.xxx`;
+    }
+  }
+  if (cleaned.includes(':')) {
+    const parts = cleaned.split(':').filter(Boolean);
+    if (parts.length >= 2) {
+      return `${parts[0]}:${parts[1]}:xxxx:xxxx`;
+    }
+  }
+  return cleaned;
+};
+
+const maskIpAddress = (ip?: string): string => {
+  if (!ip) return 'N/A';
+  const parts = ip
+    .split(',')
+    .map((value) => value.trim())
+    .filter((value) => value && value.toLowerCase() !== 'unknown');
+  if (!parts.length) return 'N/A';
+  const masked = parts.map(maskSingleIp).filter(Boolean);
+  const unique = Array.from(new Set(masked));
+  return unique.join(', ');
+};
 
 export default function RecapDevis() {
   const [devisData, setDevisData] = useState<any>(null);
@@ -355,13 +403,92 @@ export default function RecapDevis() {
   }
 
   const isSigned = devisData.statut === 'signe';
-  const majorations = calculerMajorationsDevis({
+  const pricing = devisData.pricing;
+  const pricingTotals = pricing?.totals;
+  const majorations = pricing?.majorations || calculerMajorationsDevis({
     delaiPaiement: devisData.conditions?.delaiPaiement,
     experience: devisData.candidats?.experience,
     permis: devisData.candidats?.permis,
     langues: devisData.candidats?.langues,
     outillage: devisData.candidats?.outillage,
   });
+  const postes = Array.isArray(devisData.postes) ? devisData.postes : [];
+  const totalPostes = postes.length;
+  const totalCandidats = postes.reduce((sum: number, poste: any) => sum + (Number(poste?.quantite) || 0), 0);
+  const entrepriseAdresse = [
+    devisData.entreprise?.adresse,
+    devisData.entreprise?.codePostal,
+    devisData.entreprise?.ville,
+    devisData.entreprise?.region,
+    devisData.entreprise?.pays,
+  ].filter(Boolean).join(' ');
+
+  const baseHoraire = Number(devisData.conditions?.baseHoraire) || BASE_HORAIRE_LEGALE;
+  const vatRate = pricingTotals?.tvaRate ?? DEFAULT_VAT_RATE;
+
+  const computeFallbackTotals = () => {
+    if (!postes.length) return null;
+    let totalMensuelHT = 0;
+
+    postes.forEach((poste: any) => {
+      const quantite = Number(poste.quantite) || 0;
+      if (!quantite) return;
+      const tauxHoraireBrut = poste.tauxHoraireBrut ?? (poste.salaireBrut ? poste.salaireBrut / baseHoraire : 0);
+      const tauxETTBase = calculerTauxETTComplet(
+        tauxHoraireBrut,
+        poste.coeffBase || 1.92,
+        poste.facteurPays || 1.00,
+        3.50,
+        1.50,
+        {
+          hebergementNonFourni: !devisData.conditions?.hebergement?.chargeEU,
+          transportETT: devisData.conditions?.transportLocal?.chargeETT
+        }
+      );
+      const tauxETTMajore = appliquerMajorationTaux(tauxETTBase, majorations.total);
+      const detailHeures = calculerCoutAvecHeuresSup(tauxETTMajore, baseHoraire, quantite);
+
+      const montantPanierJour = devisData.conditions?.repas?.type === 'panier' && devisData.entreprise?.region
+        ? getPanierRepas(devisData.entreprise.region, poste.secteur || 'Autre')
+        : 0;
+      const panierMensuel = calculerPanierRepasMensuel(montantPanierJour, baseHoraire, quantite);
+
+      totalMensuelHT += detailHeures.coutTotal + panierMensuel;
+    });
+
+    const totalMensuelTVA = round2(totalMensuelHT * vatRate);
+    const totalMensuelTTC = round2(totalMensuelHT + totalMensuelTVA);
+
+    const calculerDuree = (dateDebut?: string, dateFin?: string): number => {
+      if (!dateDebut || !dateFin) return 1;
+      const debut = new Date(dateDebut);
+      const fin = new Date(dateFin);
+      if (Number.isNaN(debut.getTime()) || Number.isNaN(fin.getTime())) return 1;
+      const diffTime = Math.abs(fin.getTime() - debut.getTime());
+      const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+      return Math.max(1, Math.ceil(diffDays / 30));
+    };
+
+    const dureeMissionMois = pricingTotals?.dureeMissionMois ?? calculerDuree(devisData.conditions?.dateDebut, devisData.conditions?.dateFin);
+    const totalMissionHT = round2(totalMensuelHT * dureeMissionMois);
+    const totalMissionTVA = round2(totalMensuelTVA * dureeMissionMois);
+    const totalMissionTTC = round2(totalMensuelTTC * dureeMissionMois);
+
+    return {
+      totalMensuelHT: round2(totalMensuelHT),
+      totalMensuelTVA,
+      totalMensuelTTC,
+      totalMissionHT,
+      totalMissionTVA,
+      totalMissionTTC,
+      dureeMissionMois,
+      tvaRate: vatRate,
+    };
+  };
+
+  const fallbackTotals = pricingTotals ? null : computeFallbackTotals();
+  const totals = pricingTotals || fallbackTotals;
+  const totalsAreFallback = !pricingTotals && Boolean(fallbackTotals);
 
   return (
     <>
@@ -826,7 +953,7 @@ export default function RecapDevis() {
                           </div>
                           <div>
                             <p className="text-white/60 mb-1">{t.pageRecap.signature.adresseIP}</p>
-                            <p className="text-green-400 font-medium font-mono">{userIp}</p>
+                            <p className="text-green-400 font-medium font-mono">{maskIpAddress(userIp)}</p>
                           </div>
                         </div>
                         <div className="mt-4 p-3 rounded-lg bg-white/5 border border-white/10">
@@ -993,6 +1120,146 @@ export default function RecapDevis() {
             ) : (
               /* Contenu du devis optimisé pour l'impression */
               <div className="mt-6 space-y-6 px-6 print:px-8" id="printable-content">
+              <div className="hidden print:block text-gray-900">
+                <div className="flex items-start justify-between border-b border-gray-200 pb-4">
+                  <div>
+                    <h1 className="text-2xl font-bold">YOJOB</h1>
+                    <p className="text-xs text-gray-600">
+                      {lang === 'fr' ? 'Courtage en recrutement européen' : 'Recrutare europeană'}
+                    </p>
+                  </div>
+                  <div className="text-right text-sm">
+                    <p className="font-semibold">{numeroDevis || devisData.numero}</p>
+                    <p>{new Date(devisData.createdAt).toLocaleDateString(lang === 'fr' ? 'fr-FR' : 'ro-RO')}</p>
+                    <p>{isSigned ? t.pageRecap.statut.signe : t.pageRecap.statut.nouveau}</p>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-2 gap-6 mt-4 text-sm">
+                  <div>
+                    <h2 className="text-sm font-semibold mb-2">{t.pageRecap.entreprise.title}</h2>
+                    <p>{devisData.entreprise.raisonSociale}</p>
+                    <p>{t.pageRecap.entreprise.siret}: {devisData.entreprise.siret || 'N/A'}</p>
+                    <p>{t.pageRecap.entreprise.codeAPE}: {devisData.entreprise.codeAPE || 'N/A'}</p>
+                    <p>{t.pageRecap.entreprise.tvaIntracommunautaire}: {devisData.entreprise.tvaIntracommunautaire || 'N/A'}</p>
+                    <p className="mt-2">{entrepriseAdresse || 'N/A'}</p>
+                  </div>
+                  <div>
+                    <h2 className="text-sm font-semibold mb-2">{t.pageRecap.contact.title}</h2>
+                    <p>{devisData.contact.prenom} {devisData.contact.nom}</p>
+                    <p>{t.pageRecap.contact.fonction}: {devisData.contact.fonction || 'N/A'}</p>
+                    <p>{t.pageRecap.contact.email}: {devisData.contact.email || 'N/A'}</p>
+                    <p>{t.pageRecap.contact.telephonePortable}: {devisData.contact.telephonePortable || devisData.contact.telephoneFixe || 'N/A'}</p>
+                  </div>
+                </div>
+
+                <div className="mt-6">
+                  <h2 className="text-sm font-semibold mb-2">{t.pageRecap.postes.title}</h2>
+                  <table className="w-full text-xs border border-gray-300">
+                    <thead className="bg-gray-100">
+                      <tr>
+                        <th className="text-left p-2 border-b border-gray-200">Poste</th>
+                        <th className="text-left p-2 border-b border-gray-200">Secteur</th>
+                        <th className="text-left p-2 border-b border-gray-200">Classification</th>
+                        <th className="text-right p-2 border-b border-gray-200">Qté</th>
+                        <th className="text-right p-2 border-b border-gray-200">{t.pageRecap.postes.salaireBrut}</th>
+                        <th className="text-right p-2 border-b border-gray-200">{t.pageRecap.postes.tauxETT}</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {postes.map((poste: any, index: number) => {
+                        const salaireBrut = poste.salaireBrut ?? 0;
+                        const tauxHoraireBrut = poste.tauxHoraireBrut ?? (poste.salaireBrut ? poste.salaireBrut / 151.67 : 0);
+                        const tauxETTBase = calculerTauxETTComplet(
+                          tauxHoraireBrut,
+                          poste.coeffBase || 1.92,
+                          poste.facteurPays || 1.00,
+                          3.50,
+                          1.50,
+                          {
+                            hebergementNonFourni: !devisData.conditions?.hebergement?.chargeEU,
+                            transportETT: devisData.conditions?.transportLocal?.chargeETT
+                          }
+                        );
+                        const tauxETTMajore = appliquerMajorationTaux(tauxETTBase, majorations.total);
+
+                        return (
+                          <tr key={index} className="border-b border-gray-200">
+                            <td className="p-2">{translatePoste(poste.secteur, poste.poste, lang)}</td>
+                            <td className="p-2">{translateSecteur(poste.secteur, lang)}</td>
+                            <td className="p-2">{translateClassification(poste.secteur, poste.classification, lang)}</td>
+                            <td className="p-2 text-right">{poste.quantite || 0}</td>
+                            <td className="p-2 text-right">{formaterMontant(salaireBrut)}</td>
+                            <td className="p-2 text-right">{formaterMontant(tauxETTMajore)}/h</td>
+                          </tr>
+                        );
+                      })}
+                    </tbody>
+                  </table>
+                  <div className="mt-2 text-xs text-gray-600">
+                    {lang === 'fr' ? 'Postes' : 'Posturi'}: {totalPostes} • {lang === 'fr' ? 'Candidats' : 'Candidați'}: {totalCandidats}
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-2 gap-6 mt-6 text-sm">
+                  <div>
+                    <h2 className="text-sm font-semibold mb-2">{t.pageRecap.conditions.title}</h2>
+                    <p>{t.pageRecap.conditions.dateDebut}: {devisData.conditions?.dateDebut ? new Date(devisData.conditions.dateDebut).toLocaleDateString(lang === 'fr' ? 'fr-FR' : 'ro-RO') : 'N/A'}</p>
+                    <p>{t.pageRecap.conditions.dateFin}: {devisData.conditions?.dateFin ? new Date(devisData.conditions.dateFin).toLocaleDateString(lang === 'fr' ? 'fr-FR' : 'ro-RO') : 'N/A'}</p>
+                    <p>{t.pageRecap.conditions.periodeEssai}: {devisData.conditions?.periodeEssai ? `${devisData.conditions.periodeEssai} ${t.common.months}` : 'N/A'}</p>
+                    <p>{t.pageRecap.conditions.baseHoraire}: {devisData.conditions?.baseHoraire ? `${devisData.conditions.baseHoraire}${t.pageRecap.conditions.heuresMois}` : 'N/A'}</p>
+                    <p>{t.pageRecap.conditions.lieuxMission}: {devisData.conditions?.lieuxMission || 'N/A'}</p>
+                  </div>
+                  <div>
+                    <h2 className="text-sm font-semibold mb-2">{lang === 'fr' ? 'Résumé' : 'Rezumat'}</h2>
+                    <p>{lang === 'fr' ? 'Postes' : 'Posturi'}: {totalPostes}</p>
+                    <p>{lang === 'fr' ? 'Candidats' : 'Candidați'}: {totalCandidats}</p>
+                    <p>{lang === 'fr' ? 'Statut' : 'Status'}: {isSigned ? t.pageRecap.statut.signe : t.pageRecap.statut.nouveau}</p>
+                  </div>
+                </div>
+
+                {totals && (
+                  <div className="mt-6 text-sm">
+                    <h2 className="text-sm font-semibold mb-2">
+                      {lang === 'fr' ? 'Totaux' : 'Totals'}
+                    </h2>
+                    <div className="grid grid-cols-2 gap-6">
+                      <div>
+                        <p>{t.recapitulatif.totaux.mensuelHT}: {formaterMontant(totals.totalMensuelHT)}</p>
+                        <p>TVA: {formaterMontant(totals.totalMensuelTVA)}</p>
+                        <p>{t.recapitulatif.totaux.mensuelTTC}: {formaterMontant(totals.totalMensuelTTC)}</p>
+                      </div>
+                      <div>
+                        <p>{t.recapitulatif.totaux.totalMission} HT: {formaterMontant(totals.totalMissionHT)}</p>
+                        <p>{t.recapitulatif.totaux.totalMission} TVA: {formaterMontant(totals.totalMissionTVA)}</p>
+                        <p>{t.recapitulatif.totaux.totalMission} TTC: {formaterMontant(totals.totalMissionTTC)}</p>
+                        <p className="text-xs text-gray-500">({totals.dureeMissionMois || 1} {t.common.months})</p>
+                      </div>
+                    </div>
+                    {totalsAreFallback && (
+                      <p className="text-xs text-gray-500 mt-2">
+                        {lang === 'fr' ? 'Totaux estimés (pré-calcul)' : 'Estimated totals (pre-calculation)'}
+                      </p>
+                    )}
+                  </div>
+                )}
+
+                {isSigned && devisData.signature && (
+                  <div className="mt-6 text-sm">
+                    <h2 className="text-sm font-semibold mb-2">{lang === 'fr' ? 'Signature électronique' : 'Semnătură electronică'}</h2>
+                    <p>{lang === 'fr' ? 'Signataire' : 'Semnatar'}: {devisData.signature.signataire?.prenom} {devisData.signature.signataire?.nom}</p>
+                    <p>Email: {devisData.signature.signataire?.email || 'N/A'}</p>
+                    <p>{lang === 'fr' ? 'Date' : 'Data'}: {devisData.signature.metadata?.timestampReadable || 'N/A'}</p>
+                    <p>IP: {maskIpAddress(devisData.signature.metadata?.ipAddress)}</p>
+                  </div>
+                )}
+
+                <div className="mt-6 text-xs text-gray-500">
+                  {lang === 'fr' ? 'Document généré le' : 'Document generat la'} {new Date().toLocaleDateString(lang === 'fr' ? 'fr-FR' : 'ro-RO')}
+                </div>
+              </div>
+
+              <div className="print:hidden">
               {/* En-tête avec logo premium */}
               <div className="bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl p-8 print:bg-white print:border-gray-300 print:backdrop-blur-none print:px-6 print:py-6">
                 <div className="flex items-start justify-between">
@@ -1191,6 +1458,58 @@ export default function RecapDevis() {
                 </div>
               </div>
 
+              {/* Totaux */}
+              {totals && (
+                <div className="bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl p-6 print:bg-white print:border-gray-300 print:backdrop-blur-none print:px-6 print:py-6">
+                  <div className="flex items-center gap-3 mb-5">
+                    <div className="w-10 h-10 bg-gradient-to-br from-emerald-500 to-cyan-500 rounded-xl flex items-center justify-center print:bg-emerald-600">
+                      <Euro className="w-5 h-5 text-white" />
+                    </div>
+                    <h2 className="text-xl text-white print:text-gray-900">
+                      {lang === 'fr' ? 'Totaux' : 'Totals'}
+                    </h2>
+                  </div>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6 text-sm">
+                    <div className="space-y-2">
+                      <div className="flex items-center justify-between">
+                        <span className="text-white/70 print:text-gray-600">{t.recapitulatif.totaux.mensuelHT}</span>
+                        <span className="text-white font-medium print:text-gray-900">{formaterMontant(totals.totalMensuelHT)}</span>
+                      </div>
+                      <div className="flex items-center justify-between">
+                        <span className="text-white/70 print:text-gray-600">TVA</span>
+                        <span className="text-white font-medium print:text-gray-900">{formaterMontant(totals.totalMensuelTVA)}</span>
+                      </div>
+                      <div className="flex items-center justify-between border-t border-white/10 pt-2 print:border-gray-200">
+                        <span className="text-white/70 print:text-gray-600">{t.recapitulatif.totaux.mensuelTTC}</span>
+                        <span className="text-white font-medium print:text-gray-900">{formaterMontant(totals.totalMensuelTTC)}</span>
+                      </div>
+                    </div>
+                    <div className="space-y-2">
+                      <div className="flex items-center justify-between">
+                        <span className="text-white/70 print:text-gray-600">{t.recapitulatif.totaux.totalMission} HT</span>
+                        <span className="text-white font-medium print:text-gray-900">{formaterMontant(totals.totalMissionHT)}</span>
+                      </div>
+                      <div className="flex items-center justify-between">
+                        <span className="text-white/70 print:text-gray-600">{t.recapitulatif.totaux.totalMission} TVA</span>
+                        <span className="text-white font-medium print:text-gray-900">{formaterMontant(totals.totalMissionTVA)}</span>
+                      </div>
+                      <div className="flex items-center justify-between border-t border-white/10 pt-2 print:border-gray-200">
+                        <span className="text-white/70 print:text-gray-600">{t.recapitulatif.totaux.totalMission} TTC</span>
+                        <span className="text-white font-medium print:text-gray-900">{formaterMontant(totals.totalMissionTTC)}</span>
+                      </div>
+                      <p className="text-xs text-white/60 print:text-gray-500">
+                        ({totals.dureeMissionMois || 1} {t.common.months})
+                      </p>
+                    </div>
+                  </div>
+                  {totalsAreFallback && (
+                    <p className="text-xs text-white/60 print:text-gray-500 mt-4">
+                      {lang === 'fr' ? 'Totaux estimés (pré-calcul)' : 'Estimated totals (pre-calculation)'}
+                    </p>
+                  )}
+                </div>
+              )}
+
               {/* Informations de signature - NOUVELLE SECTION */}
               {isSigned && devisData.signature && (
                 <div className="bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl p-8 print:bg-white print:border-gray-300 print:backdrop-blur-none print:px-6 print:py-6">
@@ -1264,7 +1583,7 @@ export default function RecapDevis() {
                             {lang === 'fr' ? 'Adresse IP' : 'Adresă IP'}
                           </p>
                           <p className="text-green-300 font-mono print:text-green-700">
-                            {devisData.signature.metadata?.ipAddress || 'N/A'}
+                            {maskIpAddress(devisData.signature.metadata?.ipAddress)}
                           </p>
                         </div>
                         <div className="col-span-2">
@@ -1272,7 +1591,7 @@ export default function RecapDevis() {
                             {lang === 'fr' ? 'Navigateur' : 'Browser'}
                           </p>
                           <p className="text-white text-xs print:text-gray-900 break-all">
-                            {devisData.signature.metadata?.userAgent?.substring(0, 100) || 'N/A'}...
+                            {lang === 'fr' ? 'Non conservé' : 'Not stored'}
                           </p>
                         </div>
                       </div>
@@ -1308,6 +1627,7 @@ export default function RecapDevis() {
                   <div className="w-2 h-2 bg-violet-400 rounded-full"></div>
                   <div className="w-2 h-2 bg-blue-400 rounded-full"></div>
                 </div>
+              </div>
               </div>
             </div>
             )}

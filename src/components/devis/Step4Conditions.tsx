@@ -52,14 +52,6 @@ export function Step4Conditions({ data, pays, region, postes, onChange, lang = '
   const [periodeEssaiAuto, setPeriodeEssaiAuto] = useState(true);
   const [explicationPeriodeEssai, setExplicationPeriodeEssai] = useState('');
 
-  // 🔍 DEBUG: Log de la langue active
-  console.log('🌍 [Step4] Langue active:', lang);
-  console.log('🔍 [Step4] Traductions chargées:', {
-    motifRecours: t.step4.fields.motifRecours.options,
-    periodeEssai: t.step4.fields.periodeEssai.options,
-    delaiPaiement: t.step4.fields.delaiPaiement.options
-  });
-
   // 🆕 Effet pour calculer automatiquement la période d'essai
   useEffect(() => {
     if (periodeEssaiAuto && data.dateDebut && data.dateFin) {
@@ -68,13 +60,6 @@ export function Step4Conditions({ data, pays, region, postes, onChange, lang = '
       
       // Mettre à jour la période d'essai si elle est différente
       if (data.periodeEssai !== periodeCalculee) {
-        console.log('📅 [Auto-calcul] Période d\'essai:', { 
-          dateDebut: data.dateDebut, 
-          dateFin: data.dateFin,
-          dureeMois: dureeMois.toFixed(1),
-          periodeCalculee 
-        });
-        
         onChange({
           ...data,
           periodeEssai: periodeCalculee
@@ -91,7 +76,6 @@ export function Step4Conditions({ data, pays, region, postes, onChange, lang = '
     if (!data.periodeEssai) return t.step4.fields.periodeEssai.placeholder;
     const options = t.step4.fields.periodeEssai.options;
     const label = options[data.periodeEssai as keyof typeof options] || t.step4.fields.periodeEssai.placeholder;
-    console.log('📋 [useMemo periodeEssai]', { value: data.periodeEssai, label, lang });
     return label;
   }, [data.periodeEssai, lang, t]);
 
@@ -99,7 +83,6 @@ export function Step4Conditions({ data, pays, region, postes, onChange, lang = '
     if (!data.motifRecours) return t.step4.fields.motifRecours.placeholder;
     const options = t.step4.fields.motifRecours.options;
     const label = options[data.motifRecours as keyof typeof options] || t.step4.fields.motifRecours.placeholder;
-    console.log('🎯 [useMemo motifRecours]', { value: data.motifRecours, label, lang });
     return label;
   }, [data.motifRecours, lang, t]);
 
@@ -107,12 +90,10 @@ export function Step4Conditions({ data, pays, region, postes, onChange, lang = '
     if (!data.delaiPaiement) return t.step4.fields.delaiPaiement.placeholder;
     const options = t.step4.fields.delaiPaiement.options;
     const label = options[data.delaiPaiement as keyof typeof options] || t.step4.fields.delaiPaiement.placeholder;
-    console.log('💰 [useMemo delaiPaiement]', { value: data.delaiPaiement, label, lang });
     return label;
   }, [data.delaiPaiement, lang, t]);
 
   const handleChange = (field: string, value: any) => {
-    console.log('✏️ [handleChange]', { field, value, lang });
     // 🆕 Valider la date de fin si on change la date de fin
     if (field === 'dateFin' && value && data.dateDebut) {
       if (new Date(value) < new Date(data.dateDebut)) {
@@ -149,21 +130,33 @@ export function Step4Conditions({ data, pays, region, postes, onChange, lang = '
   
   // 🆕 Calculer le montant du panier repas selon la région ET le secteur
   const montantPanierJour = useMemo(() => {
-    console.log('🔍 [useMemo Panier] Calcul avec:', { 
-      region, 
-      secteurPrincipal, 
-      postes,
-      postesLength: postes?.length 
-    });
-    
     if (region && secteurPrincipal) {
-      const montant = getPanierRepas(region, secteurPrincipal);
-      console.log('🍽️ [Panier repas] Résultat:', { region, secteur: secteurPrincipal, montant });
-      return montant;
+      return getPanierRepas(region, secteurPrincipal);
     }
-    console.warn('⚠️ [Panier repas] Fallback utilisé (région ou secteur manquant)');
     return 10.00; // Fallback
   }, [region, secteurPrincipal, getPanierRepas]);
+
+  useEffect(() => {
+    if (data.repas.type === 'panier') {
+      if (data.repas.montant !== montantPanierJour) {
+        onChange({
+          ...data,
+          repas: {
+            ...data.repas,
+            montant: montantPanierJour,
+          },
+        });
+      }
+    } else if (data.repas.montant) {
+      onChange({
+        ...data,
+        repas: {
+          ...data.repas,
+          montant: undefined,
+        },
+      });
+    }
+  }, [data.repas.type, data.repas.montant, montantPanierJour, onChange]);
 
   if (isLoadingTranslations) {
     return (
@@ -175,16 +168,6 @@ export function Step4Conditions({ data, pays, region, postes, onChange, lang = '
 
   return (
     <div className="space-y-6">
-      {/* 🔍 DEBUG PANEL - À RETIRER EN PRODUCTION */}
-      <div className="bg-purple-500/10 border border-purple-400/30 rounded-lg p-4">
-        <p className="text-purple-200 text-sm">
-          🔍 <strong>DEBUG:</strong> Langue active = <strong className="text-purple-100">{lang}</strong>
-        </p>
-        <p className="text-purple-200/70 text-xs mt-1">
-          Vérifiez que la langue affichée correspond au sélecteur de langue en haut de page
-        </p>
-      </div>
-
       <div>
         <h2 className="text-white text-2xl mb-2">{t.step4.title}</h2>
         <p className="text-white/70">

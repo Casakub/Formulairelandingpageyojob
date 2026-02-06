@@ -178,7 +178,7 @@ app.post("/submit", async (c) => {
     // Try to sync to prospects (non-blocking)
     try {
       const { syncSurveyToProspect } = await import("./survey-to-prospect.tsx");
-      await syncSurveyToProspect(data.id);
+      await syncSurveyToProspect(data);
       console.log('✅ Synced to prospects');
     } catch (prospectError) {
       console.warn('⚠️ Failed to sync to prospects:', prospectError);

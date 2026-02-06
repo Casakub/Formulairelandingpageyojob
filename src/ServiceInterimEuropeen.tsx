@@ -1,5 +1,4 @@
 import { useState } from 'react';
-import { Helmet, HelmetProvider } from 'react-helmet-async';
 import { motion } from 'motion/react';
 import {
   Globe,
@@ -29,6 +28,7 @@ import { Button } from './components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from './components/ui/card';
 import { LogoSvg } from './imports/YojobLogoComplete';
 import { LanguageSelector } from './components/shared/LanguageSelector';
+import { SEOHead } from './components/SEOHead';
 import { Footer } from './components/landing/Footer';
 import { useServiceTranslation } from './src/i18n/services/useServiceTranslation';
 import { useLanguageManager } from './hooks/useLanguageManager';
@@ -164,12 +164,12 @@ export default function ServiceInterimEuropeen() {
 
   return (
     <>
-      <HelmetProvider>
-        <Helmet>
-          <title>{t.meta.title}</title>
-          <meta name="description" content={t.meta.description} />
-        </Helmet>
-      </HelmetProvider>
+      <SEOHead
+        title={t.meta.title}
+        description={t.meta.description}
+        lang={globalLanguage as any}
+        availableLanguages={AVAILABLE_LANGUAGES_INTERIM_EUROPEEN}
+      />
 
       <div className="min-h-screen bg-gradient-to-br from-blue-900 via-violet-900 to-cyan-900">
         {/* Header */}

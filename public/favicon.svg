@@ -1,0 +1,76 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <defs>
+    <!-- Gradient principal YOJOB -->
+    <linearGradient id="yojobGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#1E3A8A;stop-opacity:1" />
+      <stop offset="50%" style="stop-color:#7C3AED;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#06B6D4;stop-opacity:1" />
+    </linearGradient>
+    
+    <!-- Gradient pour le texte -->
+    <linearGradient id="textGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#ffffff;stop-opacity:0.95" />
+      <stop offset="100%" style="stop-color:#ffffff;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  
+  <!-- Background avec gradient -->
+  <rect width="512" height="512" rx="80" fill="url(#yojobGradient)"/>
+  
+  <!-- Design moderne avec forme géométrique -->
+  <g transform="translate(256,256)">
+    <!-- Cercle central décoratif -->
+    <circle r="200" fill="rgba(255,255,255,0.05)" stroke="rgba(255,255,255,0.1)" stroke-width="2"/>
+    <circle r="140" fill="rgba(255,255,255,0.08)" stroke="rgba(255,255,255,0.15)" stroke-width="3"/>
+    
+    <!-- Lettre Y stylisée -->
+    <path d="M -100,-80 L -60,-20 L -60,40 L -40,40 L -40,-20 L 0,-80 L -20,-80 L -50,-35 L -80,-80 Z" 
+          fill="url(#textGradient)" 
+          stroke="rgba(255,255,255,0.3)" 
+          stroke-width="2"/>
+    
+    <!-- Lettre O stylisée (forme de réseau) -->
+    <circle cx="20" cy="10" r="35" 
+            fill="none" 
+            stroke="url(#textGradient)" 
+            stroke-width="12"
+            opacity="0.95"/>
+    
+    <!-- Points de connexion (réseau européen) -->
+    <circle cx="20" cy="-25" r="4" fill="#ffffff" opacity="0.8"/>
+    <circle cx="55" cy="10" r="4" fill="#ffffff" opacity="0.8"/>
+    <circle cx="20" cy="45" r="4" fill="#ffffff" opacity="0.8"/>
+    <circle cx="-15" cy="10" r="4" fill="#ffffff" opacity="0.8"/>
+    
+    <!-- Lettre J stylisée -->
+    <path d="M 75,-80 L 75,20 Q 75,50 50,50 Q 35,50 25,40" 
+          fill="none" 
+          stroke="url(#textGradient)" 
+          stroke-width="12"
+          stroke-linecap="round"
+          opacity="0.95"/>
+    
+    <!-- Point sur le J -->
+    <circle cx="75" cy="-95" r="8" fill="#ffffff" opacity="0.95"/>
+    
+    <!-- Étoile subtile (leader) -->
+    <path d="M 100,70 L 105,85 L 120,85 L 108,94 L 113,109 L 100,100 L 87,109 L 92,94 L 80,85 L 95,85 Z" 
+          fill="rgba(255,255,255,0.3)" 
+          stroke="rgba(255,255,255,0.4)" 
+          stroke-width="1"/>
+  </g>
+  
+  <!-- Badge "500+" discret en bas -->
+  <g transform="translate(410, 440)">
+    <rect x="-35" y="-15" width="70" height="30" rx="15" 
+          fill="rgba(6, 182, 212, 0.3)" 
+          stroke="rgba(255,255,255,0.4)" 
+          stroke-width="1.5"/>
+    <text x="0" y="5" 
+          font-family="Arial, sans-serif" 
+          font-size="18" 
+          font-weight="bold" 
+          fill="#ffffff" 
+          text-anchor="middle">500+</text>
+  </g>
+</svg>

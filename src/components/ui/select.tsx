@@ -27,6 +27,7 @@ interface SelectItemProps {
   value: string;
   children: React.ReactNode;
   className?: string;
+  onSelect?: () => void;
 }
 
 const SelectContext = React.createContext<{
@@ -214,12 +215,18 @@ export function SelectContent({ children, className = '' }: SelectContentProps) 
   );
 }
 
-export function SelectItem({ value, children, className = '' }: SelectItemProps) {
+export function SelectItem({ value, children, className = '', onSelect }: SelectItemProps) {
   const { value: selectedValue, onValueChange, setIsOpen, setValueLabel } = React.useContext(SelectContext);
 
   const handleClick = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
+
+    if (onSelect) {
+      onSelect();
+      setIsOpen(false);
+      return;
+    }
     
     // Extraire le texte du label
     const label = typeof children === 'string' ? children : extractTextFromChildren(children);

@@ -374,12 +374,16 @@ export default function AppLanding() {
     <HelmetProvider>
       <div className="min-h-screen bg-white">
         {/* 🎯 SEO Head - Toutes les balises SEO */}
-        <SEOHead content={content} language={currentLanguage} />
+        <SEOHead
+          content={content}
+          language={currentLanguage}
+          availableLanguages={AVAILABLE_LANGUAGES_LANDING}
+        />
 
         {/* HEADER */}
       <header
         className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
-          isScrolled ? 'bg-white shadow-md py-3' : 'bg-transparent py-5'
+          isScrolled ? 'bg-white shadow-md py-3' : 'bg-gradient-to-r from-[#1E3A8A]/80 via-[#7C3AED]/80 to-[#06B6D4]/80 lg:bg-transparent backdrop-blur-sm lg:backdrop-blur-none py-5'
         }`}
       >
         <div className="container mx-auto px-4">
@@ -471,7 +475,8 @@ export default function AppLanding() {
             {/* Mobile Menu Toggle */}
             <button
               onClick={() => setIsMenuOpen(!isMenuOpen)}
-              className="lg:hidden text-white p-2 bg-white/10 backdrop-blur-sm rounded-xl border border-white/20 hover:bg-white/20 transition-all"
+              className="lg:hidden text-white p-2.5 bg-gradient-to-br from-[#1E3A8A] to-[#7C3AED] backdrop-blur-md rounded-xl border-2 border-white/30 hover:border-white/50 hover:scale-105 transition-all shadow-lg hover:shadow-xl"
+              aria-label="Menu"
             >
               {isMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
             </button>
