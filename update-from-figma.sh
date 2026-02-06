@@ -4,11 +4,25 @@
 
 set -e
 
+GUARD_BRANCH="claude/verify-root-files-placement-B4mK1"
+BRANCH_REF="origin/$GUARD_BRANCH"
+
 DOCKER_FILES="Dockerfile docker-compose.yml .dockerignore .env.example nginx/nginx.conf"
-BRANCH_REF="origin/claude/verify-root-files-placement-B4mK1"
+APP_FILES="index.html src/index.html src/components/SEOHead.tsx src/src/i18n/seo/metadata.ts src/App-Survey-Original.tsx src/scripts/prerender.cjs src/src/i18n/devis/locales/it.ts update-from-figma.sh"
 
 echo "🔄 Fetching latest changes..."
 git fetch origin
+
+# S'assurer que la branche garde-fou est disponible
+if ! git show-ref --verify --quiet "refs/remotes/$BRANCH_REF"; then
+  echo "🔍 Guard branch not found on remotes, fetching..."
+  git fetch origin "$GUARD_BRANCH":"$GUARD_BRANCH" 2>/dev/null || true
+  if git show-ref --verify --quiet "refs/heads/$GUARD_BRANCH"; then
+    BRANCH_REF="$GUARD_BRANCH"
+  else
+    BRANCH_REF=""
+  fi
+fi
 
 echo "📥 Merging main into current branch..."
 if ! git merge origin/main -m "Merge Figma Make updates from main" --no-edit 2>/dev/null; then
@@ -30,18 +44,27 @@ if ! git merge origin/main -m "Merge Figma Make updates from main" --no-edit 2>/
 fi
 
 # Restaurer les fichiers Docker s'ils ont été supprimés
-echo "🔧 Ensuring Docker configuration files exist..."
-for file in $DOCKER_FILES; do
-    if [ ! -e "$file" ]; then
-        echo "   Restoring $file..."
-        git checkout $BRANCH_REF -- "$file" 2>/dev/null || true
-    fi
-done
+if [ -n "$BRANCH_REF" ]; then
+  echo "🛡️  Restoring infra files from $BRANCH_REF..."
+  for file in $DOCKER_FILES; do
+      if [ ! -e "$file" ]; then
+          echo "   Restoring $file..."
+          git checkout "$BRANCH_REF" -- "$file" 2>/dev/null || true
+      fi
+  done
 
-# Committer si des fichiers ont été restaurés
-if ! git diff --cached --quiet 2>/dev/null || ! git diff --quiet 2>/dev/null; then
-    git add -A
-    git commit -m "Restore Docker configuration files" 2>/dev/null || true
+  if ! git diff --cached --quiet 2>/dev/null || ! git diff --quiet 2>/dev/null; then
+      git add -A
+      git commit -m "Restore Docker configuration files" 2>/dev/null || true
+  fi
+
+  echo "🛡️  Restoring app files from $BRANCH_REF..."
+  for file in $APP_FILES; do
+      git checkout "$BRANCH_REF" -- "$file" 2>/dev/null || true
+  done
+
+  git add -A
+  git commit -m "Restore app files from guard branch" 2>/dev/null || true
 fi
 
 # Corriger le placement des fichiers public si nécessaire
@@ -60,7 +83,10 @@ if [ -z "$PRERENDER_LANGS" ] && [ -z "$FULL_PRERENDER" ]; then
   export PRERENDER_LANGS=fr
 fi
 
-
-PRERENDER_LANGS="${PRERENDER_LANGS:-}" PRERENDER_PAGES="${PRERENDER_PAGES:-}" docker compose up -d --build
+if [ -f docker-compose.yml ]; then
+  PRERENDER_LANGS="${PRERENDER_LANGS:-}" PRERENDER_PAGES="${PRERENDER_PAGES:-}" docker compose up -d --build
+else
+  echo "⚠️  No docker compose file found, skipping Docker rebuild."
+fi
 
 echo "✅ Update complete!"
