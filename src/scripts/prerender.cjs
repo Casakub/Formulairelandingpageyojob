@@ -6,10 +6,15 @@ const { spawn } = require('child_process');
 const puppeteer = require('puppeteer');
 
 const PORT = process.env.PRERENDER_PORT || 4173;
-const HOST = process.env.PRERENDER_HOST || 'http://localhost';
-const BASE_URL = `${HOST}:${PORT}`;
+const HOST = process.env.PRERENDER_HOST || '127.0.0.1';
+const BASE_URL = `http://${HOST}:${PORT}`;
 const PREVIEW_DELAY = Number(process.env.PRERENDER_PREVIEW_DELAY || 15000);
-const BUILD_DIR = path.join(__dirname, '..', 'build');
+let BUILD_DIR = path.join(process.cwd(), 'build');
+if (!fs.existsSync(BUILD_DIR)) {
+  const altBuild = path.join(process.cwd(), '..', 'build');
+  if (fs.existsSync(altBuild)) BUILD_DIR = altBuild;
+}
+
 
 const ALL_LANGS = [
   'fr','en','de','es','it','nl','pt','pl','cs','sk','hu','ro','bg','hr','sl','et','lv','lt','el','sv','da','fi','no'
