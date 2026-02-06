@@ -6,9 +6,9 @@ const { spawn } = require('child_process');
 const puppeteer = require('puppeteer');
 
 const PORT = process.env.PRERENDER_PORT || 4173;
-const HOST = process.env.PRERENDER_HOST || 'http://127.0.0.1';
+const HOST = process.env.PRERENDER_HOST || 'http://localhost';
 const BASE_URL = `${HOST}:${PORT}`;
-const BUILD_DIR = path.join(process.cwd(), 'build');
+const BUILD_DIR = path.join(__dirname, '..', 'build');
 
 const ALL_LANGS = [
   'fr','en','de','es','it','nl','pt','pl','cs','sk','hu','ro','bg','hr','sl','et','lv','lt','el','sv','da','fi','no'
@@ -66,7 +66,7 @@ const run = async () => {
   const npxCmd = process.platform === 'win32' ? 'npx.cmd' : 'npx';
   const preview = spawn(
     npxCmd,
-    ['vite', 'preview', '--host', '127.0.0.1', '--port', String(PORT), '--strictPort'],
+    ['vite', 'preview', '--port', String(PORT), '--strictPort'],
     { stdio: 'inherit' }
   );
 
@@ -77,13 +77,13 @@ const run = async () => {
   }
 
   const launchOptions = {
-  headless: 'new',
-  args: ['--no-sandbox', '--disable-setuid-sandbox'],
-};
-if (process.env.PUPPETEER_EXECUTABLE_PATH) {
-  launchOptions.executablePath = process.env.PUPPETEER_EXECUTABLE_PATH;
-}
-const browser = await puppeteer.launch(launchOptions);
+    headless: 'new',
+    args: ['--no-sandbox', '--disable-setuid-sandbox'],
+  };
+  if (process.env.PUPPETEER_EXECUTABLE_PATH) {
+    launchOptions.executablePath = process.env.PUPPETEER_EXECUTABLE_PATH;
+  }
+  const browser = await puppeteer.launch(launchOptions);
   const routes = [];
   for (const page of PAGES) {
     for (const lang of page.langs) {
