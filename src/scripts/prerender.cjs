@@ -9,6 +9,14 @@ const PORT = process.env.PRERENDER_PORT || 4173;
 const HOST = process.env.PRERENDER_HOST || '0.0.0.0';
 const BASE_URL = `http://127.0.0.1:${PORT}`;
 const PREVIEW_DELAY = Number(process.env.PRERENDER_PREVIEW_DELAY || 15000);
+const NAV_TIMEOUT = Number(process.env.PRERENDER_NAV_TIMEOUT || 45000);
+const SEO_TIMEOUT = Number(process.env.PRERENDER_SEO_TIMEOUT || 15000);
+const RETRY_LIMIT = Number(process.env.PRERENDER_RETRY_LIMIT || 1);
+const WAIT_UNTIL = process.env.PRERENDER_WAIT_UNTIL || 'domcontentloaded';
+const BETWEEN_DELAY = Number(process.env.PRERENDER_BETWEEN_DELAY || 0);
+const CONTINUE_ON_ERROR = ['1', 'true', 'yes'].includes(
+  String(process.env.PRERENDER_CONTINUE_ON_ERROR || '').toLowerCase()
+);
 let BUILD_DIR = path.join(process.cwd(), 'build');
 if (!fs.existsSync(BUILD_DIR)) {
   const altBuild = path.join(process.cwd(), '..', 'build');
@@ -68,6 +76,56 @@ const routeToFilePath = (route) => {
   return path.join(BUILD_DIR, normalized, 'index.html');
 };
 
+const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+
+const isTransientNavigationError = (err) => {
+  const msg = String((err && err.message) || err || '');
+  return /frame was detached|Navigation failed|Target closed|net::ERR|Protocol error/i.test(msg);
+};
+
+const renderRoute = async (browser, route, lang) => {
+  const url = `${BASE_URL}${route}`;
+  let attempt = 0;
+
+  while (attempt <= RETRY_LIMIT) {
+    const page = await browser.newPage();
+    page.setDefaultNavigationTimeout(NAV_TIMEOUT);
+    page.setDefaultTimeout(NAV_TIMEOUT);
+
+    try {
+      // Forcer la locale du navigateur pour que useLanguageManager
+      // détecte la bonne langue (évite le fallback vers EN)
+      await page.setExtraHTTPHeaders({ 'Accept-Language': `${lang}` });
+      await page.evaluateOnNewDocument((langCode) => {
+        Object.defineProperty(navigator, 'language', { get: () => langCode });
+        Object.defineProperty(navigator, 'languages', { get: () => [langCode] });
+      }, lang);
+
+      await page.goto(url, { waitUntil: WAIT_UNTIL, timeout: NAV_TIMEOUT });
+      await page.waitForFunction('window.__SEO_READY__ === true', { timeout: SEO_TIMEOUT }).catch(() => {});
+      const html = await page.content();
+      const outputPath = routeToFilePath(route);
+      fs.mkdirSync(path.dirname(outputPath), { recursive: true });
+      fs.writeFileSync(outputPath, html, 'utf8');
+      console.log(`[prerender] ${route} (${lang}) -> ${outputPath}`);
+      return true;
+    } catch (err) {
+      const message = String((err && err.message) || err || 'Unknown error');
+      const canRetry = attempt < RETRY_LIMIT && isTransientNavigationError(err);
+      const attemptLabel = `${attempt + 1}/${RETRY_LIMIT + 1}`;
+      console.warn(`[prerender] Failed attempt ${attemptLabel} for ${route} (${lang}): ${message}`);
+      if (!canRetry) throw err;
+      await sleep(1000 * (attempt + 1));
+    } finally {
+      await page.close().catch(() => {});
+    }
+
+    attempt += 1;
+  }
+
+  return false;
+};
+
 const run = async () => {
   if (!fs.existsSync(BUILD_DIR)) {
     throw new Error(`Build directory not found: ${BUILD_DIR}. Run \"vite build\" first.`);
@@ -98,41 +156,50 @@ const run = async () => {
   );
 
   console.log(`[prerender] Waiting ${PREVIEW_DELAY}ms for Vite preview to be ready...`);
-  await new Promise((r) => setTimeout(r, PREVIEW_DELAY));
+  await sleep(PREVIEW_DELAY);
 
   const launchOptions = {
     headless: 'new',
-    args: ['--no-sandbox', '--disable-setuid-sandbox'],
+    args: ['--no-sandbox', '--disable-setuid-sandbox', '--disable-dev-shm-usage'],
   };
   if (process.env.PUPPETEER_EXECUTABLE_PATH) {
     launchOptions.executablePath = process.env.PUPPETEER_EXECUTABLE_PATH;
   }
-  const browser = await puppeteer.launch(launchOptions);
+  let browser;
+  const failures = [];
 
-  for (const { route, lang } of routes) {
-    const url = `${BASE_URL}${route}`;
-    const page = await browser.newPage();
+  try {
+    browser = await puppeteer.launch(launchOptions);
+    for (const { route, lang } of routes) {
+      try {
+        await renderRoute(browser, route, lang);
+      } catch (err) {
+        failures.push({ route, lang, err });
+        if (!CONTINUE_ON_ERROR) throw err;
+      }
 
-    // Forcer la locale du navigateur pour que useLanguageManager
-    // détecte la bonne langue (évite le fallback vers EN)
-    await page.setExtraHTTPHeaders({ 'Accept-Language': `${lang}` });
-    await page.evaluateOnNewDocument((langCode) => {
-      Object.defineProperty(navigator, 'language', { get: () => langCode });
-      Object.defineProperty(navigator, 'languages', { get: () => [langCode] });
-    }, lang);
-
-    await page.goto(url, { waitUntil: 'networkidle0' });
-    await page.waitForFunction('window.__SEO_READY__ === true', { timeout: 15000 }).catch(() => {});
-    const html = await page.content();
-    const outputPath = routeToFilePath(route);
-    fs.mkdirSync(path.dirname(outputPath), { recursive: true });
-    fs.writeFileSync(outputPath, html, 'utf8');
-    await page.close();
-    console.log(`[prerender] ${route} (${lang}) -> ${outputPath}`);
+      if (BETWEEN_DELAY > 0) {
+        await sleep(BETWEEN_DELAY);
+      }
+    }
+  } finally {
+    if (browser) {
+      await browser.close().catch(() => {});
+    }
+    preview.kill('SIGTERM');
   }
 
-  await browser.close();
-  preview.kill('SIGTERM');
+  if (failures.length > 0) {
+    console.warn(`[prerender] ${failures.length} route(s) failed.`);
+    failures.forEach(({ route, lang, err }) => {
+      const message = String((err && err.message) || err || 'Unknown error');
+      console.warn(`[prerender] Failed route: ${route} (${lang}) -> ${message}`);
+    });
+
+    if (!CONTINUE_ON_ERROR) {
+      throw new Error(`[prerender] ${failures.length} route(s) failed.`);
+    }
+  }
 };
 
 run().catch((err) => {
