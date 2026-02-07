@@ -11,6 +11,8 @@
 import { useEffect } from 'react';
 import { getPageMetadata, getOrganizationSchema, getServiceSchema, type PageKey } from '../src/i18n/seo/metadata';
 import type { DevisLanguage } from '../src/i18n/devis/types';
+import { getAllLanguageCodes } from '../lib/languages';
+import { DEFAULT_LANGUAGE } from '../lib/i18nRouting';
 
 // ============================================================================
 // NOUVELLE API (pour formulaire devis et nouvelles pages)
@@ -193,8 +195,8 @@ export function SEOHead(props: SEOHeadProps) {
       schemaOrg.setAttribute('data-schema', 'organization');
       document.head.appendChild(schemaOrg);
     }
-    const baseUrl = typeof window !== 'undefined' ? window.location.origin : 'https://yojob.fr';
-    schemaOrg.textContent = JSON.stringify(getOrganizationSchema(baseUrl), null, 2);
+    const schemaBaseUrl = typeof window !== 'undefined' ? window.location.origin : 'https://yojob.fr';
+    schemaOrg.textContent = JSON.stringify(getOrganizationSchema(schemaBaseUrl), null, 2);
     
     // ========================================================================
     // SCHEMA.ORG - SERVICE (conditionnel)
@@ -220,6 +222,56 @@ export function SEOHead(props: SEOHeadProps) {
     // LANG ATTRIBUTE sur <html>
     // ========================================================================
     document.documentElement.lang = currentLang;
+
+    // ========================================================================
+    // CANONICAL URL
+    // ========================================================================
+    const baseUrl = 'https://yojob.fr';
+    const currentPath = typeof window !== 'undefined' ? window.location.pathname : '/';
+    // Retirer le prefixe de langue pour obtenir le chemin de base
+    const allLangs = getAllLanguageCodes();
+    const segments = currentPath.split('/').filter(Boolean);
+    const firstSegment = segments[0]?.toLowerCase();
+    const hasLangPrefix = firstSegment && allLangs.includes(firstSegment);
+    const basePath = hasLangPrefix ? '/' + segments.slice(1).join('/') : currentPath;
+
+    const canonicalHref = currentLang === DEFAULT_LANGUAGE
+      ? `${baseUrl}${basePath === '/' ? '' : basePath}`
+      : `${baseUrl}/${currentLang}${basePath === '/' ? '' : basePath}`;
+
+    let canonicalLink = document.querySelector('link[rel="canonical"]');
+    if (!canonicalLink) {
+      canonicalLink = document.createElement('link');
+      canonicalLink.setAttribute('rel', 'canonical');
+      document.head.appendChild(canonicalLink);
+    }
+    canonicalLink.setAttribute('href', canonicalHref || baseUrl);
+
+    // ========================================================================
+    // HREFLANG ALTERNATE LINKS
+    // ========================================================================
+    // Supprimer les anciens hreflang
+    document.querySelectorAll('link[rel="alternate"][hreflang]').forEach(el => el.remove());
+
+    // Ajouter un hreflang pour chaque langue supportee
+    for (const lang of allLangs) {
+      const href = lang === DEFAULT_LANGUAGE
+        ? `${baseUrl}${basePath === '/' ? '' : basePath}`
+        : `${baseUrl}/${lang}${basePath === '/' ? '' : basePath}`;
+
+      const link = document.createElement('link');
+      link.setAttribute('rel', 'alternate');
+      link.setAttribute('hreflang', lang);
+      link.setAttribute('href', href || baseUrl);
+      document.head.appendChild(link);
+    }
+
+    // x-default pointe vers la version francaise (langue par defaut)
+    const xDefaultLink = document.createElement('link');
+    xDefaultLink.setAttribute('rel', 'alternate');
+    xDefaultLink.setAttribute('hreflang', 'x-default');
+    xDefaultLink.setAttribute('href', `${baseUrl}${basePath === '/' ? '' : basePath}` || baseUrl);
+    document.head.appendChild(xDefaultLink);
     
     // ========================================================================
     // FAVICON LINKS
