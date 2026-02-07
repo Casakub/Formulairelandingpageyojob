@@ -1,0 +1,5 @@
+.env
+.build.log
+.last-deploy-commit
+node_modules/
+build/
