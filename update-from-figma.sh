@@ -1,12 +1,15 @@
-#!/bin/bash
+#!/usr/bin/env bash
 # =============================================================================
 # UPDATE-FROM-FIGMA.SH - Mise à jour intelligente après Figma Make
 #
-# Détecte automatiquement les changements et adapte le prerender :
-# - CSS/assets only → prerender FR minimum (car Docker rebuild = image neuve)
-# - Page spécifique → prerender ciblé (page + langue)
-# - Composant partagé → prerender FR
-# - FULL_PRERENDER=1 → toutes langues × toutes pages
+# Architecture 2 conteneurs :
+#   - yojob-landing    : Nginx (SPA + pages pré-rendues depuis volume)
+#   - yojob-prerender  : Worker Chromium (ne tourne que quand nécessaire)
+#   - volume prerender-cache : stocke les pages pré-rendues (persiste entre rebuilds)
+#
+# REGLE D'OR : les pages pré-rendues vivent dans un volume Docker persistant.
+# Un rebuild du landing page ne les supprime PLUS.
+# Le prerender ne tourne que quand du contenu change réellement.
 #
 # Usage:
 #   ./update-from-figma.sh                                    Auto-détection
@@ -16,45 +19,86 @@
 #   PRERENDER_PAGES="/,/a-propos" ./update-from-figma.sh      Pages spécifiques
 # =============================================================================
 
-set -e
+set -Eeuo pipefail
 
-GUARD_BRANCH="claude/verify-root-files-placement-B4mK1"
-BRANCH_REF="origin/$GUARD_BRANCH"
-LAST_COMMIT_FILE=".last-deploy-commit"
-
-# Fichiers d'infra à restaurer depuis la branche garde-fou
-INFRA_FILES="Dockerfile docker-compose.yml .dockerignore .env.example nginx/nginx.conf update-from-figma.sh"
-# Fichiers applicatifs protégés (modifiés manuellement, pas par Figma)
-APP_FILES="package.json .npmrc index.html src/components/SEOHead.tsx src/src/i18n/seo/metadata.ts src/scripts/prerender.cjs src/hooks/useLanguageManager.ts vite.config.ts"
-
-# ── Vérification de branche ──────────────────────────────────────────────────
-CURRENT_BRANCH=$(git rev-parse --abbrev-ref HEAD)
-if [ "$CURRENT_BRANCH" != "main" ]; then
-  echo "❌ Branche actuelle: '$CURRENT_BRANCH'. Ce script doit tourner sur 'main'."
-  echo "   → git checkout main"
+# ── Verrou anti-exécution simultanée ─────────────────────────────────────────
+SCRIPT_NAME="$(basename "$0")"
+LOCK_FILE="/tmp/${SCRIPT_NAME}.lock"
+exec 9>"$LOCK_FILE"
+if ! flock -n 9; then
+  echo "❌ Une autre exécution est en cours (${LOCK_FILE})."
   exit 1
 fi
+
+# ── Trap erreur avec numéro de ligne ─────────────────────────────────────────
+on_error() {
+  local exit_code=$?
+  echo "❌ Erreur (code=${exit_code}) à la ligne ${BASH_LINENO[0]}."
+  exit "$exit_code"
+}
+trap on_error ERR
+
+# ── Config ───────────────────────────────────────────────────────────────────
+GUARD_BRANCH="claude/verify-root-files-placement-B4mK1"
+BRANCH_REF="origin/${GUARD_BRANCH}"
+LAST_COMMIT_FILE=".last-deploy-commit"
+
+INFRA_FILES=(
+  "Dockerfile"
+  "Dockerfile.prerender"
+  "docker-compose.yml"
+  "docker-entrypoint.sh"
+  "prerender-entrypoint.sh"
+  ".dockerignore"
+  ".env.example"
+  "nginx/nginx.conf"
+  "update-from-figma.sh"
+)
+
+APP_FILES=(
+  "package.json"
+  "package-lock.json"
+  ".npmrc"
+  "index.html"
+  "src/components/SEOHead.tsx"
+  "src/src/i18n/seo/metadata.ts"
+  "src/scripts/prerender.cjs"
+  "src/hooks/useLanguageManager.ts"
+  "vite.config.ts"
+)
+
+# ── Helpers ──────────────────────────────────────────────────────────────────
+is_true() {
+  local v="${1:-}"
+  [[ "${v,,}" =~ ^(1|true|yes|on)$ ]]
+}
+
+join_unique() {
+  tr ' ' '\n' | awk 'NF' | sort -u | paste -sd ',' -
+}
+
+extract_lang() {
+  local base
+  base="$(basename "$1" .ts)"
+  if [[ "$base" =~ ^[a-z]{2}$ ]]; then
+    echo "$base"
+  fi
+}
 
 # =============================================================================
 # CLASSIFICATION DES FICHIERS MODIFIES
 # =============================================================================
-
-# Retourne: PAGE_ROUTE, "SHARED", "STYLE_ONLY", "STATIC_ONLY", ou "" (ignoré)
 classify_file() {
   local file="$1"
   case "$file" in
-
-    # ── CSS / Styles → pas besoin de prerender ──
     *.css|*.scss|*.less|tailwind.config.*|postcss.config.*)
       echo "STYLE_ONLY" ;;
-
-    # ── Assets statiques → pas besoin de prerender ──
     *.png|*.jpg|*.jpeg|*.gif|*.svg|*.ico|*.woff|*.woff2|*.ttf|*.eot|*.webp)
       echo "STATIC_ONLY" ;;
     public/*)
       echo "STATIC_ONLY" ;;
 
-    # ── Composants page → route correspondante ──
+    # Page routes
     src/App-Landing.tsx)                        echo "/" ;;
     src/APropos.tsx)                            echo "/a-propos" ;;
     src/NotreReseau.tsx)                        echo "/notre-reseau" ;;
@@ -69,7 +113,7 @@ classify_file() {
     src/Legal.tsx)                              echo "/legal" ;;
     src/CGV.tsx)                                echo "/cgv" ;;
 
-    # ── Traductions par page → route correspondante ──
+    # i18n per page
     src/src/i18n/pages/landingPage/*)          echo "/" ;;
     src/src/i18n/pages/aPropos/*)              echo "/a-propos" ;;
     src/src/i18n/pages/notreReseau/*)          echo "/notre-reseau" ;;
@@ -84,35 +128,18 @@ classify_file() {
     src/src/i18n/services/detachementPersonnel/*) echo "/services/detachement-personnel" ;;
     src/src/i18n/devis/locales/*)              echo "/devis" ;;
 
-    # ── Composants partagés (structure) → FULL prerender ──
-    src/App.tsx)                                echo "SHARED" ;;
-    src/components/SEOHead.tsx)                 echo "SHARED" ;;
-    src/components/landing/Footer.tsx)          echo "SHARED" ;;
-    src/components/landing/EuropeMap.tsx)       echo "SHARED" ;;
-    src/components/shared/*)                    echo "SHARED" ;;
-    src/src/i18n/seo/*)                        echo "SHARED" ;;
-    src/src/i18n/index.ts)                     echo "SHARED" ;;
-    src/src/i18n/types.ts)                     echo "SHARED" ;;
-    src/src/i18n/constants.ts)                 echo "SHARED" ;;
-    src/lib/i18nRouting.ts)                    echo "SHARED" ;;
-    src/src/i18n/pages/index.ts)               echo "SHARED" ;;
-    src/src/i18n/pages/usePageTranslation.ts)  echo "SHARED" ;;
-    src/src/i18n/services/index.ts)            echo "SHARED" ;;
-    src/src/i18n/services/useServiceTranslation.ts) echo "SHARED" ;;
-    vite.config.*)                             echo "SHARED" ;;
+    # Shared components → full prerender
+    src/App.tsx|src/components/SEOHead.tsx|src/components/landing/Footer.tsx|\
+src/components/landing/EuropeMap.tsx|src/components/shared/*|\
+src/src/i18n/seo/*|src/src/i18n/index.ts|src/src/i18n/types.ts|\
+src/src/i18n/constants.ts|src/lib/i18nRouting.ts|\
+src/src/i18n/pages/index.ts|src/src/i18n/pages/usePageTranslation.ts|\
+src/src/i18n/services/index.ts|src/src/i18n/services/useServiceTranslation.ts|\
+vite.config.*|src/scripts/prerender.cjs|index.html)
+      echo "SHARED" ;;
 
-    # ── Fichiers sans impact prerender ──
-    *)                                         echo "" ;;
+    *) echo "" ;;
   esac
-}
-
-# Extraire le code langue d'un fichier de traduction (ex: de.ts → de)
-extract_lang() {
-  local basename
-  basename=$(basename "$1" .ts)
-  if echo "$basename" | grep -qE '^[a-z]{2}$'; then
-    echo "$basename"
-  fi
 }
 
 # =============================================================================
@@ -121,100 +148,104 @@ extract_lang() {
 detect_changed_routes() {
   local last_commit="$1"
   local changed_files
-  changed_files=$(git diff --name-only "$last_commit"..HEAD 2>/dev/null)
+  changed_files="$(git diff --name-only "${last_commit}"..HEAD 2>/dev/null || true)"
 
-  if [ -z "$changed_files" ]; then
+  if [[ -z "$changed_files" ]]; then
     echo "NO_CHANGES"
     return
   fi
 
-  local pages=""
-  local langs=""
-  local has_shared=false
-  local has_content=false
-  local has_style_only=false
-  local has_static_only=false
+  local pages="" langs=""
+  local has_shared=false has_content=false has_style_or_static=false
 
   while IFS= read -r file; do
-    local classification
-    classification=$(classify_file "$file")
+    [[ -z "$file" ]] && continue
+    local c
+    c="$(classify_file "$file")"
 
-    case "$classification" in
-      SHARED)
-        has_shared=true
-        ;;
-      STYLE_ONLY)
-        has_style_only=true
-        ;;
-      STATIC_ONLY)
-        has_static_only=true
-        ;;
-      "")
-        # Fichier non pertinent, ignorer
-        ;;
+    case "$c" in
+      SHARED)        has_shared=true ;;
+      STYLE_ONLY|STATIC_ONLY) has_style_or_static=true ;;
+      "")            : ;;
       *)
-        # C'est une route de page
         has_content=true
-        pages="$pages $classification"
-
+        pages+=" $c"
         local lang
-        lang=$(extract_lang "$file")
-        if [ -n "$lang" ]; then
-          langs="$langs $lang"
-        fi
+        lang="$(extract_lang "$file" || true)"
+        [[ -n "${lang:-}" ]] && langs+=" $lang"
         ;;
     esac
   done <<< "$changed_files"
 
-  # Priorités de décision :
-  # 1. Composant partagé modifié → FULL (prerender FR uniquement)
-  if [ "$has_shared" = true ]; then
-    echo "FULL"
-    return
+  if [[ "$has_shared" == true ]]; then
+    echo "FULL"; return
   fi
-
-  # 2. Pages spécifiques modifiées → SMART (prerender ciblé)
-  if [ "$has_content" = true ]; then
-    local unique_pages
-    unique_pages=$(echo "$pages" | tr ' ' '\n' | sort -u | tr '\n' ',' | sed 's/^,//;s/,$//')
-    local unique_langs=""
-    if [ -n "$langs" ]; then
-      unique_langs=$(echo "$langs" | tr ' ' '\n' | sort -u | tr '\n' ',' | sed 's/^,//;s/,$//')
-    fi
-    echo "SMART|$unique_pages|$unique_langs"
-    return
+  if [[ "$has_content" == true ]]; then
+    local unique_pages unique_langs
+    unique_pages="$(echo "$pages" | join_unique)"
+    unique_langs="$(echo "$langs" | join_unique || true)"
+    echo "SMART|${unique_pages}|${unique_langs}"; return
   fi
-
-  # 3. Que du CSS/styles ou des assets statiques → pas de prerender
-  if [ "$has_style_only" = true ] || [ "$has_static_only" = true ]; then
-    echo "NO_PRERENDER"
-    return
+  if [[ "$has_style_or_static" == true ]]; then
+    echo "NO_PRERENDER"; return
   fi
-
-  # 4. Aucun fichier pertinent
   echo "NO_PRERENDER"
+}
+
+# =============================================================================
+# Restauration des fichiers protégés
+# =============================================================================
+restore_protected_files() {
+  local ref="$1"
+
+  echo "🛡️  Restoring infra files from guard branch..."
+  for file in "${INFRA_FILES[@]}"; do
+    if git cat-file -e "${ref}:${file}" 2>/dev/null; then
+      git checkout "$ref" -- "$file"
+    else
+      echo "   ⚠️  Introuvable: $file"
+    fi
+  done
+  git add -A
+  git commit -m "Restore Docker configuration files" 2>/dev/null || true
+
+  echo "🛡️  Restoring app files from guard branch..."
+  for file in "${APP_FILES[@]}"; do
+    if git cat-file -e "${ref}:${file}" 2>/dev/null; then
+      git checkout "$ref" -- "$file"
+    else
+      echo "   ⚠️  Introuvable: $file"
+    fi
+  done
+  git add -A
+  git commit -m "Restore app files from guard branch" 2>/dev/null || true
 }
 
 # =============================================================================
 # EXECUTION
 # =============================================================================
-
 echo "============================================"
 echo "  YoJob - Update from Figma Make"
 echo "============================================"
 
+CURRENT_BRANCH="$(git rev-parse --abbrev-ref HEAD)"
+if [[ "$CURRENT_BRANCH" != "main" ]]; then
+  echo "❌ Branche actuelle: '$CURRENT_BRANCH'. Ce script doit tourner sur 'main'."
+  exit 1
+fi
+
 echo ""
 echo "🔄 Fetching latest changes..."
-git fetch origin
+git fetch origin --prune
 
-# S'assurer que la branche garde-fou est disponible
-if ! git show-ref --verify --quiet "refs/remotes/$BRANCH_REF"; then
+if ! git show-ref --verify --quiet "refs/remotes/${BRANCH_REF}"; then
   echo "🔍 Guard branch not found, fetching..."
-  git fetch origin "$GUARD_BRANCH":"$GUARD_BRANCH" 2>/dev/null || true
-  if git show-ref --verify --quiet "refs/heads/$GUARD_BRANCH"; then
-    BRANCH_REF="$GUARD_BRANCH"
+  git fetch origin "${GUARD_BRANCH}:${GUARD_BRANCH}" 2>/dev/null || true
+  if git show-ref --verify --quiet "refs/heads/${GUARD_BRANCH}"; then
+    BRANCH_REF="${GUARD_BRANCH}"
   else
     BRANCH_REF=""
+    echo "⚠️  Guard branch indisponible, restauration protégée ignorée."
   fi
 fi
 
@@ -222,7 +253,7 @@ echo "📥 Merging main into current branch..."
 if ! git merge origin/main -m "Merge Figma Make updates from main" --no-edit 2>/dev/null; then
     echo "⚠️  Merge conflict, résolution automatique..."
     git checkout --theirs src/public/ 2>/dev/null || true
-    if [ -d "src/public" ]; then
+    if [[ -d "src/public" ]]; then
         mkdir -p public
         cp -r src/public/* public/ 2>/dev/null || true
         rm -rf src/public
@@ -231,31 +262,19 @@ if ! git merge origin/main -m "Merge Figma Make updates from main" --no-edit 2>/
     git commit -m "Merge Figma Make updates - auto-fix" || true
 fi
 
-# Restaurer les fichiers protégés depuis la branche garde-fou
-if [ -n "$BRANCH_REF" ]; then
-  echo "🛡️  Restoring infra files from guard branch..."
-  for file in $INFRA_FILES; do
-      git checkout "$BRANCH_REF" -- "$file" 2>/dev/null || true
-  done
-  git add -A
-  git commit -m "Restore Docker configuration files" 2>/dev/null || true
-
-  echo "🛡️  Restoring app files from guard branch..."
-  for file in $APP_FILES; do
-      git checkout "$BRANCH_REF" -- "$file" 2>/dev/null || true
-  done
-  git add -A
-  git commit -m "Restore app files from guard branch" 2>/dev/null || true
-fi
-
-# Corriger le placement des fichiers public
-if [ -d "src/public" ]; then
+if [[ -d "src/public" ]]; then
     echo "📁 Moving files from src/public/ to public/..."
     mkdir -p public
-    mv src/public/* public/ 2>/dev/null || true
+    shopt -s nullglob dotglob
+    mv src/public/* public/ || true
+    shopt -u nullglob dotglob
     rmdir src/public 2>/dev/null || true
     git add -A
     git commit -m "Fix: move static files from src/public/ to public/" || true
+fi
+
+if [[ -n "$BRANCH_REF" ]]; then
+  restore_protected_files "$BRANCH_REF"
 fi
 
 # =============================================================================
@@ -264,79 +283,119 @@ fi
 echo ""
 echo "── Prerender Decision ──────────────────────"
 
-if [ -n "$FULL_PRERENDER" ]; then
+USER_FULL="${FULL_PRERENDER:-}"
+USER_LANGS="${PRERENDER_LANGS:-}"
+USER_PAGES="${PRERENDER_PAGES:-}"
+unset PRERENDER_LANGS PRERENDER_PAGES 2>/dev/null || true
+
+NEED_PRERENDER=false
+
+if is_true "$USER_FULL"; then
   echo "🌍 Mode: COMPLET (forcé via FULL_PRERENDER=1)"
   echo "   → Toutes langues × toutes pages (~300 routes)"
+  NEED_PRERENDER=true
 
-elif [ -n "$PRERENDER_LANGS" ] || [ -n "$PRERENDER_PAGES" ]; then
-  echo "🎯 Mode: CIBLÉ (forcé via variables d'environnement)"
-  echo "   → langs=${PRERENDER_LANGS:-toutes} pages=${PRERENDER_PAGES:-toutes}"
+elif [[ -n "$USER_LANGS" || -n "$USER_PAGES" ]]; then
+  if [[ "$USER_LANGS" == "NONE" ]]; then
+    echo "⏭️  Prerender SKIP (forcé via PRERENDER_LANGS=NONE)"
+    NEED_PRERENDER=false
+    export PRERENDER_LANGS="NONE"
+  else
+    echo "🎯 Mode: CIBLÉ (forcé via variables d'environnement)"
+    echo "   → langs=${USER_LANGS:-toutes} pages=${USER_PAGES:-toutes}"
+    NEED_PRERENDER=true
+    [[ -n "$USER_LANGS" ]] && export PRERENDER_LANGS="$USER_LANGS"
+    [[ -n "$USER_PAGES" ]] && export PRERENDER_PAGES="$USER_PAGES"
+  fi
 
 else
   # ── Mode AUTO ──
-  if [ -f "$LAST_COMMIT_FILE" ]; then
-    LAST_COMMIT=$(cat "$LAST_COMMIT_FILE")
+  DETECTION="FULL"
+
+  if [[ -f "$LAST_COMMIT_FILE" ]]; then
+    LAST_COMMIT="$(cat "$LAST_COMMIT_FILE")"
     if git rev-parse --verify "$LAST_COMMIT" >/dev/null 2>&1; then
-      echo "🔍 Auto-détection des changements depuis $(echo "$LAST_COMMIT" | cut -c1-8)..."
-      DETECTION=$(detect_changed_routes "$LAST_COMMIT")
-      DETECT_MODE=$(echo "$DETECTION" | cut -d'|' -f1)
-
-      case "$DETECT_MODE" in
-        NO_CHANGES)
-          echo "✅ Aucun changement de contenu. Prerender FR minimum (rebuild Docker = image neuve)."
-          export PRERENDER_LANGS=fr
-          ;;
-        NO_PRERENDER)
-          echo "🎨 Changements CSS/assets uniquement. Prerender FR minimum (rebuild Docker = image neuve)."
-          export PRERENDER_LANGS=fr
-          ;;
-        FULL)
-          echo "🌍 Composant partagé modifié → prerender FR uniquement."
-          export PRERENDER_LANGS=fr
-          ;;
-        SMART)
-          DETECTED_PAGES=$(echo "$DETECTION" | cut -d'|' -f2)
-          DETECTED_LANGS=$(echo "$DETECTION" | cut -d'|' -f3)
-
-          if [ -n "$DETECTED_LANGS" ]; then
-            echo "🎯 Prerender ciblé: pages=$DETECTED_PAGES langs=$DETECTED_LANGS"
-            export PRERENDER_PAGES="$DETECTED_PAGES"
-            export PRERENDER_LANGS="$DETECTED_LANGS"
-          else
-            echo "🎯 Prerender ciblé: pages=$DETECTED_PAGES langs=fr"
-            export PRERENDER_PAGES="$DETECTED_PAGES"
-            export PRERENDER_LANGS=fr
-          fi
-          ;;
-      esac
+      echo "🔍 Auto-détection des changements depuis ${LAST_COMMIT:0:8}..."
+      DETECTION="$(detect_changed_routes "$LAST_COMMIT")"
     else
-      echo "⚠️  Commit de référence introuvable, prerender FR."
-      export PRERENDER_LANGS=fr
+      echo "⚠️  Commit de référence introuvable → prerender FR."
     fi
   else
-    echo "ℹ️  Premier déploiement, prerender FR."
-    export PRERENDER_LANGS=fr
+    echo "ℹ️  Premier déploiement → prerender FR."
   fi
+
+  DETECT_MODE="$(echo "$DETECTION" | cut -d'|' -f1)"
+
+  case "$DETECT_MODE" in
+    NO_CHANGES)
+      echo "✅ Aucun changement de contenu. Pages pré-rendues conservées dans le volume."
+      NEED_PRERENDER=false
+      ;;
+    NO_PRERENDER)
+      echo "🎨 Changements CSS/assets uniquement. Pages pré-rendues conservées dans le volume."
+      NEED_PRERENDER=false
+      ;;
+    FULL)
+      echo "🌍 Composant partagé modifié → prerender FR."
+      NEED_PRERENDER=true
+      export PRERENDER_LANGS=fr
+      ;;
+    SMART)
+      DETECTED_PAGES="$(echo "$DETECTION" | cut -d'|' -f2)"
+      DETECTED_LANGS="$(echo "$DETECTION" | cut -d'|' -f3)"
+      [[ -z "$DETECTED_LANGS" ]] && DETECTED_LANGS="fr"
+      echo "🎯 Prerender ciblé: pages=${DETECTED_PAGES} langs=${DETECTED_LANGS}"
+      NEED_PRERENDER=true
+      export PRERENDER_PAGES="$DETECTED_PAGES"
+      export PRERENDER_LANGS="$DETECTED_LANGS"
+      ;;
+    *)
+      echo "⚠️  Mode inconnu (${DETECT_MODE}) → prerender FR."
+      NEED_PRERENDER=true
+      export PRERENDER_LANGS=fr
+      ;;
+  esac
 fi
 
 # =============================================================================
-# DOCKER BUILD
+# DOCKER BUILD & DEPLOY
 # =============================================================================
 echo ""
 echo "── Docker Build ────────────────────────────"
-echo "   PRERENDER_LANGS=${PRERENDER_LANGS:-<all>}"
-echo "   PRERENDER_PAGES=${PRERENDER_PAGES:-<all>}"
 
-if [ -f docker-compose.yml ]; then
+if [[ ! -f docker-compose.yml ]]; then
+  echo "❌ docker-compose.yml non trouvé."
+  exit 1
+fi
+
+# STEP 1 : Rebuild et restart le landing page (rapide, sans Chromium)
+echo "🔨 Building landing page (nginx)..."
+docker compose up -d --build --remove-orphans yojob-landing
+
+# STEP 2 : Prerender si nécessaire (conteneur dédié)
+if [[ "$NEED_PRERENDER" == true ]]; then
+  echo ""
+  echo "── Prerender ───────────────────────────────"
+  echo "   PRERENDER_LANGS=${PRERENDER_LANGS:-<all>}"
+  echo "   PRERENDER_PAGES=${PRERENDER_PAGES:-<all>}"
+  echo ""
+
+  # Build et run le worker prerender (écrit dans le volume)
   PRERENDER_LANGS="${PRERENDER_LANGS:-}" \
   PRERENDER_PAGES="${PRERENDER_PAGES:-}" \
-  docker compose up -d --build
+  docker compose --profile prerender run --rm yojob-prerender
+
+  # Restart le landing page pour qu'il charge les nouvelles pages du volume
+  echo ""
+  echo "🔄 Restarting landing page to load new pre-rendered pages..."
+  docker compose up -d --force-recreate yojob-landing
 else
-  echo "⚠️  docker-compose.yml non trouvé, skip Docker."
+  echo "⏭️  Prerender non nécessaire. Pages du volume conservées."
 fi
 
 # Sauvegarder le commit déployé
-git rev-parse HEAD > "$LAST_COMMIT_FILE"
+DEPLOYED_COMMIT="$(git rev-parse HEAD)"
+echo "$DEPLOYED_COMMIT" > "$LAST_COMMIT_FILE"
 echo ""
-echo "📌 Commit déployé: $(cat "$LAST_COMMIT_FILE" | cut -c1-8)"
+echo "📌 Commit déployé: ${DEPLOYED_COMMIT:0:8}"
 echo "✅ Update complete!"
