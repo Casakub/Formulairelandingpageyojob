@@ -2,19 +2,19 @@
 # =============================================================================
 # UPDATE-FROM-FIGMA.SH - Mise à jour intelligente après Figma Make
 #
-# Détecte automatiquement les changements et adapte le prerender :
-# - CSS/assets only → prerender FR minimum (car Docker rebuild = image neuve)
-# - Page spécifique → prerender ciblé (page + langue)
-# - Composant partagé → prerender FR
-# - FULL_PRERENDER=1 → toutes langues × toutes pages
+# Architecture 2 conteneurs :
+#   - yojob-landing    : Nginx (SPA + pages pré-rendues depuis volume)
+#   - yojob-prerender  : Worker Chromium (ne tourne que quand nécessaire)
+#   - volume prerender-cache : stocke les pages pré-rendues (persiste entre rebuilds)
 #
-# REGLE D'OR : Docker rebuild = image neuve = pages pré-rendues perdues.
-# On ne met JAMAIS PRERENDER_LANGS=NONE en mode auto. Minimum = FR.
+# REGLE D'OR : les pages pré-rendues vivent dans un volume Docker persistant.
+# Un rebuild du landing page ne les supprime PLUS.
+# Le prerender ne tourne que quand du contenu change réellement.
 #
 # Usage:
 #   ./update-from-figma.sh                                    Auto-détection
 #   PRERENDER_LANGS=fr,en ./update-from-figma.sh              FR + EN
-#   PRERENDER_LANGS=NONE ./update-from-figma.sh               Skip prerender (manuel)
+#   PRERENDER_LANGS=NONE ./update-from-figma.sh               Skip prerender
 #   FULL_PRERENDER=1 ./update-from-figma.sh                   Toutes langues x pages
 #   PRERENDER_PAGES="/,/a-propos" ./update-from-figma.sh      Pages spécifiques
 # =============================================================================
@@ -43,17 +43,18 @@ GUARD_BRANCH="claude/verify-root-files-placement-B4mK1"
 BRANCH_REF="origin/${GUARD_BRANCH}"
 LAST_COMMIT_FILE=".last-deploy-commit"
 
-# Fichiers d'infra à restaurer depuis la branche garde-fou
 INFRA_FILES=(
   "Dockerfile"
+  "Dockerfile.prerender"
   "docker-compose.yml"
+  "docker-entrypoint.sh"
+  "prerender-entrypoint.sh"
   ".dockerignore"
   ".env.example"
   "nginx/nginx.conf"
   "update-from-figma.sh"
 )
 
-# Fichiers applicatifs protégés (modifiés manuellement, pas par Figma)
 APP_FILES=(
   "package.json"
   "package-lock.json"
@@ -87,22 +88,17 @@ extract_lang() {
 # =============================================================================
 # CLASSIFICATION DES FICHIERS MODIFIES
 # =============================================================================
-# Retourne: PAGE_ROUTE, "SHARED", "STYLE_ONLY", "STATIC_ONLY", ou "" (ignoré)
 classify_file() {
   local file="$1"
   case "$file" in
-
-    # ── CSS / Styles ──
     *.css|*.scss|*.less|tailwind.config.*|postcss.config.*)
       echo "STYLE_ONLY" ;;
-
-    # ── Assets statiques ──
     *.png|*.jpg|*.jpeg|*.gif|*.svg|*.ico|*.woff|*.woff2|*.ttf|*.eot|*.webp)
       echo "STATIC_ONLY" ;;
     public/*)
       echo "STATIC_ONLY" ;;
 
-    # ── Composants page → route ──
+    # Page routes
     src/App-Landing.tsx)                        echo "/" ;;
     src/APropos.tsx)                            echo "/a-propos" ;;
     src/NotreReseau.tsx)                        echo "/notre-reseau" ;;
@@ -117,7 +113,7 @@ classify_file() {
     src/Legal.tsx)                              echo "/legal" ;;
     src/CGV.tsx)                                echo "/cgv" ;;
 
-    # ── Traductions par page ──
+    # i18n per page
     src/src/i18n/pages/landingPage/*)          echo "/" ;;
     src/src/i18n/pages/aPropos/*)              echo "/a-propos" ;;
     src/src/i18n/pages/notreReseau/*)          echo "/notre-reseau" ;;
@@ -132,7 +128,7 @@ classify_file() {
     src/src/i18n/services/detachementPersonnel/*) echo "/services/detachement-personnel" ;;
     src/src/i18n/devis/locales/*)              echo "/devis" ;;
 
-    # ── Composants partagés (structure) → FULL ──
+    # Shared components → full prerender
     src/App.tsx|src/components/SEOHead.tsx|src/components/landing/Footer.tsx|\
 src/components/landing/EuropeMap.tsx|src/components/shared/*|\
 src/src/i18n/seo/*|src/src/i18n/index.ts|src/src/i18n/types.ts|\
@@ -142,8 +138,7 @@ src/src/i18n/services/index.ts|src/src/i18n/services/useServiceTranslation.ts|\
 vite.config.*|src/scripts/prerender.cjs|index.html)
       echo "SHARED" ;;
 
-    # ── Fichiers sans impact prerender ──
-    *)  echo "" ;;
+    *) echo "" ;;
   esac
 }
 
@@ -182,24 +177,18 @@ detect_changed_routes() {
     esac
   done <<< "$changed_files"
 
-  # 1. Composant partagé → FULL
   if [[ "$has_shared" == true ]]; then
     echo "FULL"; return
   fi
-
-  # 2. Pages spécifiques → SMART
   if [[ "$has_content" == true ]]; then
     local unique_pages unique_langs
     unique_pages="$(echo "$pages" | join_unique)"
     unique_langs="$(echo "$langs" | join_unique || true)"
     echo "SMART|${unique_pages}|${unique_langs}"; return
   fi
-
-  # 3. CSS/assets uniquement
   if [[ "$has_style_or_static" == true ]]; then
     echo "NO_PRERENDER"; return
   fi
-
   echo "NO_PRERENDER"
 }
 
@@ -239,7 +228,6 @@ echo "============================================"
 echo "  YoJob - Update from Figma Make"
 echo "============================================"
 
-# Vérification de branche
 CURRENT_BRANCH="$(git rev-parse --abbrev-ref HEAD)"
 if [[ "$CURRENT_BRANCH" != "main" ]]; then
   echo "❌ Branche actuelle: '$CURRENT_BRANCH'. Ce script doit tourner sur 'main'."
@@ -250,7 +238,6 @@ echo ""
 echo "🔄 Fetching latest changes..."
 git fetch origin --prune
 
-# Résoudre la branche garde-fou
 if ! git show-ref --verify --quiet "refs/remotes/${BRANCH_REF}"; then
   echo "🔍 Guard branch not found, fetching..."
   git fetch origin "${GUARD_BRANCH}:${GUARD_BRANCH}" 2>/dev/null || true
@@ -275,7 +262,6 @@ if ! git merge origin/main -m "Merge Figma Make updates from main" --no-edit 2>/
     git commit -m "Merge Figma Make updates - auto-fix" || true
 fi
 
-# Corriger le placement des fichiers public
 if [[ -d "src/public" ]]; then
     echo "📁 Moving files from src/public/ to public/..."
     mkdir -p public
@@ -287,36 +273,40 @@ if [[ -d "src/public" ]]; then
     git commit -m "Fix: move static files from src/public/ to public/" || true
 fi
 
-# Restaurer les fichiers protégés
 if [[ -n "$BRANCH_REF" ]]; then
   restore_protected_files "$BRANCH_REF"
 fi
 
 # =============================================================================
 # DETERMINATION DU MODE PRERENDER
-#
-# REGLE D'OR : Docker rebuild = image neuve = on pré-rend au minimum FR.
-# PRERENDER_LANGS=NONE n'est possible qu'en mode MANUEL explicite.
 # =============================================================================
 echo ""
 echo "── Prerender Decision ──────────────────────"
 
-# Sauvegarder les valeurs passées par l'utilisateur avant unset
 USER_FULL="${FULL_PRERENDER:-}"
 USER_LANGS="${PRERENDER_LANGS:-}"
 USER_PAGES="${PRERENDER_PAGES:-}"
 unset PRERENDER_LANGS PRERENDER_PAGES 2>/dev/null || true
 
+NEED_PRERENDER=false
+
 if is_true "$USER_FULL"; then
   echo "🌍 Mode: COMPLET (forcé via FULL_PRERENDER=1)"
   echo "   → Toutes langues × toutes pages (~300 routes)"
-  # vars non exportées = toutes langues/pages par défaut
+  NEED_PRERENDER=true
 
 elif [[ -n "$USER_LANGS" || -n "$USER_PAGES" ]]; then
-  echo "🎯 Mode: CIBLÉ (forcé via variables d'environnement)"
-  echo "   → langs=${USER_LANGS:-toutes} pages=${USER_PAGES:-toutes}"
-  [[ -n "$USER_LANGS" ]] && export PRERENDER_LANGS="$USER_LANGS"
-  [[ -n "$USER_PAGES" ]] && export PRERENDER_PAGES="$USER_PAGES"
+  if [[ "$USER_LANGS" == "NONE" ]]; then
+    echo "⏭️  Prerender SKIP (forcé via PRERENDER_LANGS=NONE)"
+    NEED_PRERENDER=false
+    export PRERENDER_LANGS="NONE"
+  else
+    echo "🎯 Mode: CIBLÉ (forcé via variables d'environnement)"
+    echo "   → langs=${USER_LANGS:-toutes} pages=${USER_PAGES:-toutes}"
+    NEED_PRERENDER=true
+    [[ -n "$USER_LANGS" ]] && export PRERENDER_LANGS="$USER_LANGS"
+    [[ -n "$USER_PAGES" ]] && export PRERENDER_PAGES="$USER_PAGES"
+  fi
 
 else
   # ── Mode AUTO ──
@@ -338,51 +328,72 @@ else
 
   case "$DETECT_MODE" in
     NO_CHANGES)
-      echo "✅ Aucun changement de contenu. Prerender FR minimum (rebuild = image neuve)."
-      export PRERENDER_LANGS=fr
+      echo "✅ Aucun changement de contenu. Pages pré-rendues conservées dans le volume."
+      NEED_PRERENDER=false
       ;;
     NO_PRERENDER)
-      echo "🎨 Changements CSS/assets uniquement. Prerender FR minimum (rebuild = image neuve)."
-      export PRERENDER_LANGS=fr
+      echo "🎨 Changements CSS/assets uniquement. Pages pré-rendues conservées dans le volume."
+      NEED_PRERENDER=false
       ;;
     FULL)
       echo "🌍 Composant partagé modifié → prerender FR."
+      NEED_PRERENDER=true
       export PRERENDER_LANGS=fr
       ;;
     SMART)
       DETECTED_PAGES="$(echo "$DETECTION" | cut -d'|' -f2)"
       DETECTED_LANGS="$(echo "$DETECTION" | cut -d'|' -f3)"
       [[ -z "$DETECTED_LANGS" ]] && DETECTED_LANGS="fr"
-
       echo "🎯 Prerender ciblé: pages=${DETECTED_PAGES} langs=${DETECTED_LANGS}"
+      NEED_PRERENDER=true
       export PRERENDER_PAGES="$DETECTED_PAGES"
       export PRERENDER_LANGS="$DETECTED_LANGS"
       ;;
     *)
-      echo "⚠️  Mode inconnu (${DETECT_MODE}) → fallback FR."
+      echo "⚠️  Mode inconnu (${DETECT_MODE}) → prerender FR."
+      NEED_PRERENDER=true
       export PRERENDER_LANGS=fr
       ;;
   esac
 fi
 
 # =============================================================================
-# DOCKER BUILD
+# DOCKER BUILD & DEPLOY
 # =============================================================================
 echo ""
 echo "── Docker Build ────────────────────────────"
-echo "   PRERENDER_LANGS=${PRERENDER_LANGS:-<all>}"
-echo "   PRERENDER_PAGES=${PRERENDER_PAGES:-<all>}"
 
 if [[ ! -f docker-compose.yml ]]; then
   echo "❌ docker-compose.yml non trouvé."
   exit 1
 fi
 
-PRERENDER_LANGS="${PRERENDER_LANGS:-}" \
-PRERENDER_PAGES="${PRERENDER_PAGES:-}" \
-docker compose up -d --build --remove-orphans
+# STEP 1 : Rebuild et restart le landing page (rapide, sans Chromium)
+echo "🔨 Building landing page (nginx)..."
+docker compose up -d --build --remove-orphans yojob-landing
 
-# Sauvegarder le commit déployé (seulement après succès Docker)
+# STEP 2 : Prerender si nécessaire (conteneur dédié)
+if [[ "$NEED_PRERENDER" == true ]]; then
+  echo ""
+  echo "── Prerender ───────────────────────────────"
+  echo "   PRERENDER_LANGS=${PRERENDER_LANGS:-<all>}"
+  echo "   PRERENDER_PAGES=${PRERENDER_PAGES:-<all>}"
+  echo ""
+
+  # Build et run le worker prerender (écrit dans le volume)
+  PRERENDER_LANGS="${PRERENDER_LANGS:-}" \
+  PRERENDER_PAGES="${PRERENDER_PAGES:-}" \
+  docker compose --profile prerender run --rm yojob-prerender
+
+  # Restart le landing page pour qu'il charge les nouvelles pages du volume
+  echo ""
+  echo "🔄 Restarting landing page to load new pre-rendered pages..."
+  docker compose up -d --force-recreate yojob-landing
+else
+  echo "⏭️  Prerender non nécessaire. Pages du volume conservées."
+fi
+
+# Sauvegarder le commit déployé
 DEPLOYED_COMMIT="$(git rev-parse HEAD)"
 echo "$DEPLOYED_COMMIT" > "$LAST_COMMIT_FILE"
 echo ""
