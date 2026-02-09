@@ -383,7 +383,7 @@ if [[ "$NEED_PRERENDER" == true ]]; then
   # Build et run le worker prerender (écrit dans le volume)
   PRERENDER_LANGS="${PRERENDER_LANGS:-}" \
   PRERENDER_PAGES="${PRERENDER_PAGES:-}" \
-  docker compose --profile prerender run --rm yojob-prerender
+  docker compose --profile prerender run --rm --build yojob-prerender
 
   # Restart le landing page pour qu'il charge les nouvelles pages du volume
   echo ""
