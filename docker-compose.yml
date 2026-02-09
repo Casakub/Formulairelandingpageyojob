@@ -1,9 +1,14 @@
 # =============================================================================
 # DOCKER COMPOSE - YoJob Landing Page
-# Configuration pour déploiement Hostinger derrière Traefik
+# 2 services : landing (nginx) + prerender (worker Chromium)
+# Le prerender ne tourne que quand déclenché via --profile prerender
 # =============================================================================
 
 services:
+  # ---------------------------------------------------------------------------
+  # Service 1 : Landing Page (Nginx)
+  # Toujours actif. Au démarrage, restaure les pages pré-rendues du volume.
+  # ---------------------------------------------------------------------------
   yojob-landing:
     container_name: yojob-landing-page
     image: yojob-landing:latest
@@ -16,14 +21,10 @@ services:
         - VITE_SUPABASE_ANON_KEY=${VITE_SUPABASE_ANON_KEY}
         - VITE_APP_ENV=${VITE_APP_ENV:-production}
         - VITE_MATOMO_TAG_MANAGER_URL=${VITE_MATOMO_TAG_MANAGER_URL}
-        # Args PRERENDER : contrôlés par update-from-figma.sh
-        # NONE = skip prerender, vide = toutes les langues/pages
-        - PRERENDER_LANGS=${PRERENDER_LANGS:-}
-        - PRERENDER_PAGES=${PRERENDER_PAGES:-}
-        - PRERENDER_CONTINUE_ON_ERROR=${PRERENDER_CONTINUE_ON_ERROR:-true}
-        - PRERENDER_NAV_TIMEOUT=${PRERENDER_NAV_TIMEOUT:-45000}
-        - PRERENDER_RETRY_LIMIT=${PRERENDER_RETRY_LIMIT:-1}
     pull_policy: build
+
+    volumes:
+      - prerender-cache:/prerender-cache:ro
 
     environment:
       - NODE_ENV=production
@@ -80,6 +81,65 @@ services:
     networks:
       - n8n-network
 
+  # ---------------------------------------------------------------------------
+  # Service 2 : Prerender Worker (Node.js + Chromium)
+  # Ne tourne que quand déclenché : docker compose --profile prerender run --rm yojob-prerender
+  # Écrit les pages pré-rendues dans le volume partagé.
+  # ---------------------------------------------------------------------------
+  yojob-prerender:
+    container_name: yojob-prerender-worker
+    image: yojob-prerender:latest
+
+    build:
+      context: .
+      dockerfile: Dockerfile.prerender
+      args:
+        - VITE_SUPABASE_URL=${VITE_SUPABASE_URL}
+        - VITE_SUPABASE_ANON_KEY=${VITE_SUPABASE_ANON_KEY}
+        - VITE_APP_ENV=${VITE_APP_ENV:-production}
+        - VITE_MATOMO_TAG_MANAGER_URL=${VITE_MATOMO_TAG_MANAGER_URL}
+
+    volumes:
+      - prerender-cache:/output
+
+    environment:
+      - PRERENDER_LANGS=${PRERENDER_LANGS:-}
+      - PRERENDER_PAGES=${PRERENDER_PAGES:-}
+      - PRERENDER_CONTINUE_ON_ERROR=${PRERENDER_CONTINUE_ON_ERROR:-true}
+      - PRERENDER_NAV_TIMEOUT=${PRERENDER_NAV_TIMEOUT:-45000}
+      - PRERENDER_RETRY_LIMIT=${PRERENDER_RETRY_LIMIT:-1}
+
+    profiles:
+      - prerender
+
+    deploy:
+      resources:
+        limits:
+          cpus: '1.0'
+          memory: 1024M
+        reservations:
+          cpus: '0.5'
+          memory: 512M
+
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+    networks:
+      - n8n-network
+
+# =============================================================================
+# VOLUMES
+# =============================================================================
+volumes:
+  prerender-cache:
+    name: yojob-prerender-cache
+
+# =============================================================================
+# NETWORKS
+# =============================================================================
 networks:
   n8n-network:
     external: true
