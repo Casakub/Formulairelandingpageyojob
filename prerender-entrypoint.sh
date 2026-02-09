@@ -23,13 +23,18 @@ fi
 echo "🔄 Starting prerender..."
 node src/scripts/prerender.cjs
 
-# Copier uniquement les index.html pré-rendues vers le volume de sortie
+# Copier les index.html pré-rendues vers le volume de sortie
+# IMPORTANT : -mindepth 2 exclut le root ./index.html qui doit rester
+# celui du build Vite (sinon les hashes d'assets ne correspondent plus)
 echo ""
 echo "📦 Syncing pre-rendered pages to output volume..."
 mkdir -p /output
 
+# Nettoyer un éventuel root index.html d'un ancien run
+rm -f /output/index.html
+
 cd build
-find . -name 'index.html' -exec cp --parents {} /output/ \;
+find . -mindepth 2 -name 'index.html' -exec cp --parents {} /output/ \;
 
 PAGE_COUNT=$(find /output -name 'index.html' | wc -l)
 echo ""
