@@ -4,14 +4,10 @@
 # =============================================================================
 
 services:
-  # ---------------------------------------------------------------------------
-  # Service principal : Application web
-  # ---------------------------------------------------------------------------
   yojob-landing:
     container_name: yojob-landing-page
     image: yojob-landing:latest
 
-    # Build configuration
     build:
       context: .
       dockerfile: Dockerfile
@@ -20,11 +16,15 @@ services:
         - VITE_SUPABASE_ANON_KEY=${VITE_SUPABASE_ANON_KEY}
         - VITE_APP_ENV=${VITE_APP_ENV:-production}
         - VITE_MATOMO_TAG_MANAGER_URL=${VITE_MATOMO_TAG_MANAGER_URL}
+        # Args PRERENDER : contrôlés par update-from-figma.sh
+        # NONE = skip prerender, vide = toutes les langues/pages
         - PRERENDER_LANGS=${PRERENDER_LANGS:-}
         - PRERENDER_PAGES=${PRERENDER_PAGES:-}
+        - PRERENDER_CONTINUE_ON_ERROR=${PRERENDER_CONTINUE_ON_ERROR:-true}
+        - PRERENDER_NAV_TIMEOUT=${PRERENDER_NAV_TIMEOUT:-45000}
+        - PRERENDER_RETRY_LIMIT=${PRERENDER_RETRY_LIMIT:-1}
     pull_policy: build
 
-    # Variables d'environnement runtime
     environment:
       - NODE_ENV=production
       - TZ=Europe/Paris
@@ -32,44 +32,29 @@ services:
 
     restart: unless-stopped
 
-    # -------------------------------------------------------------------------
-    # Traefik Configuration
-    # -------------------------------------------------------------------------
+    # ── Traefik ────────────────────────────────────────────────────────────────
     labels:
-      # Activer Traefik pour ce service
       - traefik.enable=true
-
-      # Règle de routage : domaines yojob.fr et www.yojob.fr
       - traefik.http.routers.yojob.rule=Host(`yojob.fr`) || Host(`www.yojob.fr`)
       - traefik.http.routers.yojob.entrypoints=websecure
       - traefik.http.routers.yojob.tls=true
       - traefik.http.routers.yojob.tls.certresolver=mytlschallenge
-
-      # Port du service (nginx écoute sur 80)
       - traefik.http.services.yojob.loadbalancer.server.port=80
-
-      # Réseau Docker pour Traefik
       - traefik.docker.network=n8n-network
-
-      # Redirection www vers non-www (optionnel)
+      # Redirection www → non-www
       - traefik.http.middlewares.yojob-redirect-www.redirectregex.regex=^https://www\.yojob\.fr/(.*)
       - traefik.http.middlewares.yojob-redirect-www.redirectregex.replacement=https://yojob.fr/$${1}
       - traefik.http.middlewares.yojob-redirect-www.redirectregex.permanent=true
-
-      # Headers de sécurité
+      # Headers de sécurité HSTS
       - traefik.http.middlewares.yojob-headers.headers.stsSeconds=31536000
       - traefik.http.middlewares.yojob-headers.headers.stsIncludeSubdomains=true
       - traefik.http.middlewares.yojob-headers.headers.stsPreload=true
-
-      # Appliquer les middlewares
       - traefik.http.routers.yojob.middlewares=yojob-headers
-
       # Labels informatifs
       - app.name=yojob-landing
       - app.source=figma-make
-      - app.branch=claude/docker-compose-setup-R4UoP
+      - app.branch=claude/verify-root-files-placement-B4mK1
 
-    # Healthcheck
     healthcheck:
       test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:80/"]
       interval: 30s
@@ -77,7 +62,6 @@ services:
       retries: 3
       start_period: 10s
 
-    # Limites de ressources
     deploy:
       resources:
         limits:
@@ -87,20 +71,15 @@ services:
           cpus: '0.25'
           memory: 128M
 
-    # Logging
     logging:
       driver: "json-file"
       options:
         max-size: "10m"
         max-file: "3"
 
-    # Réseau partagé avec Traefik
     networks:
       - n8n-network
 
-# =============================================================================
-# NETWORKS
-# =============================================================================
 networks:
   n8n-network:
     external: true
