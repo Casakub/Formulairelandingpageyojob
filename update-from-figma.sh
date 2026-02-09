@@ -2,8 +2,11 @@
 # =============================================================================
 # UPDATE-FROM-FIGMA.SH - Mise à jour intelligente après Figma Make
 #
-# Détecte automatiquement les changements et ne lance le prerender
-# QUE quand c'est nécessaire (changements de contenu/structure).
+# Détecte automatiquement les changements et adapte le prerender :
+# - CSS/assets only → prerender FR minimum (car Docker rebuild = image neuve)
+# - Page spécifique → prerender ciblé (page + langue)
+# - Composant partagé → prerender FR
+# - FULL_PRERENDER=1 → toutes langues × toutes pages
 #
 # Usage:
 #   ./update-from-figma.sh                                    Auto-détection
@@ -280,12 +283,12 @@ else
 
       case "$DETECT_MODE" in
         NO_CHANGES)
-          echo "✅ Aucun changement. Docker rebuild sans prerender."
-          export PRERENDER_LANGS="NONE"
+          echo "✅ Aucun changement de contenu. Prerender FR minimum (rebuild Docker = image neuve)."
+          export PRERENDER_LANGS=fr
           ;;
         NO_PRERENDER)
-          echo "🎨 Changements CSS/assets uniquement. Docker rebuild sans prerender."
-          export PRERENDER_LANGS="NONE"
+          echo "🎨 Changements CSS/assets uniquement. Prerender FR minimum (rebuild Docker = image neuve)."
+          export PRERENDER_LANGS=fr
           ;;
         FULL)
           echo "🌍 Composant partagé modifié → prerender FR uniquement."
