@@ -154,6 +154,7 @@ export default function ServiceConseilConformite() {
         description={t.meta.description}
         lang={globalLanguage as any}
         includeServiceSchema={true}
+        faqItems={t.faq.items}
         availableLanguages={AVAILABLE_LANGUAGES_CONSEIL_CONFORMITE}
       />
 

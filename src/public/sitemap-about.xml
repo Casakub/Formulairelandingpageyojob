@@ -66,6 +66,32 @@
     <xhtml:link rel="alternate" hreflang="ro" href="https://yojob.fr/ro/services/detachement-personnel" />
     <xhtml:link rel="alternate" hreflang="x-default" href="https://yojob.fr/services/detachement-personnel" />
   </url>
+  <!-- New service sub-pages -->
+  <url>
+    <loc>https://yojob.fr/services/detachement-btp</loc>
+    <lastmod>2026-02-10</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://yojob.fr/services/detachement-btp" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://yojob.fr/services/detachement-btp" />
+  </url>
+  <url>
+    <loc>https://yojob.fr/services/detachement-industrie</loc>
+    <lastmod>2026-02-10</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://yojob.fr/services/detachement-industrie" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://yojob.fr/services/detachement-industrie" />
+  </url>
+  <!-- Blog -->
+  <url>
+    <loc>https://yojob.fr/blog/directive-detachement-europe</loc>
+    <lastmod>2026-02-10</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://yojob.fr/blog/directive-detachement-europe" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://yojob.fr/blog/directive-detachement-europe" />
+  </url>
   <!-- Legal pages -->
   <url>
     <loc>https://yojob.fr/privacy</loc>

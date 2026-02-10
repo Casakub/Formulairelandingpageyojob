@@ -9,7 +9,7 @@
  */
 
 import { useEffect } from 'react';
-import { getPageMetadata, getOrganizationSchema, getServiceSchema, type PageKey } from '../src/i18n/seo/metadata';
+import { getPageMetadata, getOrganizationSchema, getServiceSchema, getWebSiteSchema, getBreadcrumbSchema, getFAQSchema, type PageKey } from '../src/i18n/seo/metadata';
 import type { DevisLanguage } from '../src/i18n/devis/types';
 import { getAllLanguageCodes } from '../lib/languages';
 import { DEFAULT_LANGUAGE } from '../lib/i18nRouting';
@@ -21,6 +21,7 @@ interface SEOHeadPropsNew {
   page: PageKey;
   lang?: DevisLanguage;
   includeServiceSchema?: boolean;
+  faqItems?: Array<{ question: string; answer: string }>;
   availableLanguages?: DevisLanguage[];
   content?: never;
   language?: never;
@@ -37,6 +38,7 @@ interface SEOHeadPropsCustom {
   description: string;
   lang?: DevisLanguage;
   includeServiceSchema?: boolean;
+  faqItems?: Array<{ question: string; answer: string }>;
   availableLanguages?: DevisLanguage[];
   page?: never;
   content?: never;
@@ -70,6 +72,22 @@ function setMeta(selector: string, attr: string, key: string, value: string) {
     document.head.appendChild(el);
   }
   el.setAttribute('content', value);
+}
+
+/** Map URL basePath → PageKey for custom API pages that don't pass `page` prop */
+const PATH_TO_PAGEKEY: Record<string, PageKey> = {
+  '/services/interim-europeen': 'interim-europeen',
+  '/services/recrutement-specialise': 'recrutement-specialise',
+  '/services/conseil-conformite': 'conseil-conformite',
+  '/services/detachement-personnel': 'detachement-personnel',
+  '/services/detachement-btp': 'detachement-btp',
+  '/services/detachement-industrie': 'detachement-industrie',
+  '/blog/directive-detachement-europe': 'blog-directive',
+  '/devis': 'devis-form',
+};
+
+function inferPageKeyFromPath(basePath: string): PageKey | null {
+  return PATH_TO_PAGEKEY[basePath] || null;
 }
 
 /**
@@ -158,7 +176,7 @@ export function SEOHead(props: SEOHeadProps) {
       'og:type': 'website',
       'og:site_name': 'YOJOB',
       'og:url': canonicalHref || baseUrl,
-      'og:image': `${baseUrl}/favicon.svg`,
+      'og:image': `${baseUrl}/og-image-yojob-1200x630.svg`,
       'og:locale': ogLocaleMap[currentLang] || 'fr_FR',
     };
 
@@ -173,7 +191,7 @@ export function SEOHead(props: SEOHeadProps) {
       'twitter:card': 'summary_large_image',
       'twitter:title': metadata.title,
       'twitter:description': metadata.description,
-      'twitter:image': `${baseUrl}/favicon.svg`,
+      'twitter:image': `${baseUrl}/og-image-yojob-1200x630.svg`,
     };
 
     for (const [name, content] of Object.entries(twitterTags)) {
@@ -196,20 +214,79 @@ export function SEOHead(props: SEOHeadProps) {
     // ========================================================================
     // SCHEMA.ORG - SERVICE (conditionnel)
     // ========================================================================
-    if (shouldIncludeServiceSchema && isNewAPI) {
-      let schemaService = document.querySelector('script[type="application/ld+json"][data-schema="service"]');
-      if (!schemaService) {
-        schemaService = document.createElement('script');
-        schemaService.setAttribute('type', 'application/ld+json');
-        schemaService.setAttribute('data-schema', 'service');
-        document.head.appendChild(schemaService);
+    if (shouldIncludeServiceSchema) {
+      // Determine PageKey: from page prop (new API) or from URL path (custom API)
+      const servicePageKey: PageKey | null = isNewAPI
+        ? (props as SEOHeadPropsNew).page
+        : inferPageKeyFromPath(basePath);
+
+      if (servicePageKey) {
+        let schemaService = document.querySelector('script[type="application/ld+json"][data-schema="service"]');
+        if (!schemaService) {
+          schemaService = document.createElement('script');
+          schemaService.setAttribute('type', 'application/ld+json');
+          schemaService.setAttribute('data-schema', 'service');
+          document.head.appendChild(schemaService);
+        }
+        schemaService.textContent = JSON.stringify(getServiceSchema(servicePageKey, currentLang), null, 2);
       }
-      schemaService.textContent = JSON.stringify(getServiceSchema(props.page as PageKey, currentLang), null, 2);
     } else {
       const existingServiceSchema = document.querySelector('script[type="application/ld+json"][data-schema="service"]');
       if (existingServiceSchema) {
         existingServiceSchema.remove();
       }
+    }
+
+    // ========================================================================
+    // SCHEMA.ORG - BREADCRUMBLIST (toujours présent sauf home)
+    // ========================================================================
+    if (basePath !== '/') {
+      let schemaBreadcrumb = document.querySelector('script[type="application/ld+json"][data-schema="breadcrumb"]');
+      if (!schemaBreadcrumb) {
+        schemaBreadcrumb = document.createElement('script');
+        schemaBreadcrumb.setAttribute('type', 'application/ld+json');
+        schemaBreadcrumb.setAttribute('data-schema', 'breadcrumb');
+        document.head.appendChild(schemaBreadcrumb);
+      }
+      schemaBreadcrumb.textContent = JSON.stringify(getBreadcrumbSchema(basePath, baseUrl), null, 2);
+    } else {
+      const existingBreadcrumb = document.querySelector('script[type="application/ld+json"][data-schema="breadcrumb"]');
+      if (existingBreadcrumb) existingBreadcrumb.remove();
+    }
+
+    // ========================================================================
+    // SCHEMA.ORG - FAQPAGE (conditionnel, si faqItems fourni)
+    // ========================================================================
+    const faqItems = (props as any).faqItems as Array<{ question: string; answer: string }> | undefined;
+    if (faqItems && faqItems.length > 0) {
+      let schemaFAQ = document.querySelector('script[type="application/ld+json"][data-schema="faq"]');
+      if (!schemaFAQ) {
+        schemaFAQ = document.createElement('script');
+        schemaFAQ.setAttribute('type', 'application/ld+json');
+        schemaFAQ.setAttribute('data-schema', 'faq');
+        document.head.appendChild(schemaFAQ);
+      }
+      schemaFAQ.textContent = JSON.stringify(getFAQSchema(faqItems), null, 2);
+    } else {
+      const existingFAQ = document.querySelector('script[type="application/ld+json"][data-schema="faq"]');
+      if (existingFAQ) existingFAQ.remove();
+    }
+
+    // ========================================================================
+    // SCHEMA.ORG - WEBSITE + SEARCHACTION (home seulement)
+    // ========================================================================
+    if (basePath === '/') {
+      let schemaWebSite = document.querySelector('script[type="application/ld+json"][data-schema="website"]');
+      if (!schemaWebSite) {
+        schemaWebSite = document.createElement('script');
+        schemaWebSite.setAttribute('type', 'application/ld+json');
+        schemaWebSite.setAttribute('data-schema', 'website');
+        document.head.appendChild(schemaWebSite);
+      }
+      schemaWebSite.textContent = JSON.stringify(getWebSiteSchema(baseUrl), null, 2);
+    } else {
+      const existingWebSite = document.querySelector('script[type="application/ld+json"][data-schema="website"]');
+      if (existingWebSite) existingWebSite.remove();
     }
 
     // ========================================================================
@@ -287,6 +364,12 @@ export function SEOHead(props: SEOHeadProps) {
       themeColor.setAttribute('content', '#1E3A8A');
       document.head.appendChild(themeColor);
     }
+
+    // ========================================================================
+    // PRE-RENDERING SIGNAL
+    // Signal to Puppeteer prerender script that SEO metadata is ready
+    // ========================================================================
+    (window as any).__SEO_READY__ = true;
 
   }, [props]);
 

@@ -23,11 +23,6 @@ export interface PageMetadata {
 
 export type PageKey =
   | 'home'
-  | 'detachement-btp'
-  | 'detachement-industrie'
-  | 'methode-a-propos'
-  | 'contact-devis'
-  | 'blog-directive'
   | 'devis-form'
   | 'a-propos'
   | 'notre-reseau'
@@ -39,7 +34,14 @@ export type PageKey =
   | 'detachement-personnel'
   | 'privacy'
   | 'legal'
-  | 'cgv';
+  | 'cgv'
+  // Pages planifiées (routes à créer - Sprint 3)
+  | 'detachement-btp'
+  | 'detachement-industrie'
+  | 'blog-directive'
+  // Deprecated: metadata exists mais sans route planifiée
+  | 'methode-a-propos'
+  | 'contact-devis';
 
 // ============================================================================
 // MÉTADONNÉES PAR PAGE ET PAR LANGUE
@@ -1557,5 +1559,95 @@ export function getServiceSchema(page: PageKey, lang: DevisLanguage = 'fr') {
       name: ['Portugal', 'Romania', 'Poland', 'France']
     },
     serviceType: page.includes('btp') ? 'Construction Worker Posting' : 'Industrial Worker Posting'
+  };
+}
+
+/**
+ * Générer le schéma WebSite + SearchAction pour la page d'accueil
+ */
+export function getWebSiteSchema(baseUrl: string = 'https://yojob.fr') {
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'WebSite',
+    name: 'YOJOB',
+    url: baseUrl,
+    description: 'Courtier en recrutement et détachement de personnel européen BTP et industrie',
+    inLanguage: 'fr',
+  };
+}
+
+/**
+ * Mapping des noms de pages FR pour les breadcrumbs
+ */
+const BREADCRUMB_LABELS_FR: Record<string, string> = {
+  '': 'Accueil',
+  'services': 'Services',
+  'interim-europeen': 'Intérim Européen',
+  'recrutement-specialise': 'Recrutement Spécialisé',
+  'conseil-conformite': 'Conseil Conformité',
+  'detachement-personnel': 'Détachement de Personnel',
+  'a-propos': 'À Propos',
+  'notre-reseau': 'Notre Réseau',
+  'nos-secteurs': 'Nos Secteurs',
+  'temoignages': 'Témoignages',
+  'devis': 'Devis',
+  'privacy': 'Politique de Confidentialité',
+  'legal': 'Mentions Légales',
+  'cgv': 'CGV',
+  'detachement-btp': 'Détachement BTP',
+  'detachement-industrie': 'Détachement Industrie',
+  'blog': 'Blog',
+  'directive-detachement-europe': 'Directive Travailleurs Détachés',
+};
+
+/**
+ * Générer le schéma BreadcrumbList basé sur le chemin courant
+ */
+export function getBreadcrumbSchema(currentPath: string, baseUrl: string = 'https://yojob.fr') {
+  const segments = currentPath.split('/').filter(Boolean);
+
+  const items = [
+    {
+      '@type': 'ListItem',
+      position: 1,
+      name: 'Accueil',
+      item: baseUrl
+    }
+  ];
+
+  let cumulativePath = '';
+  for (let i = 0; i < segments.length; i++) {
+    cumulativePath += '/' + segments[i];
+    const label = BREADCRUMB_LABELS_FR[segments[i]] || segments[i];
+    items.push({
+      '@type': 'ListItem',
+      position: i + 2,
+      name: label,
+      item: `${baseUrl}${cumulativePath}`
+    });
+  }
+
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: items
+  };
+}
+
+/**
+ * Générer le schéma FAQPage à partir d'une liste de Q/A
+ */
+export function getFAQSchema(faqs: Array<{ question: string; answer: string }>) {
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'FAQPage',
+    mainEntity: faqs.map(faq => ({
+      '@type': 'Question',
+      name: faq.question,
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: faq.answer
+      }
+    }))
   };
 }
