@@ -176,6 +176,7 @@ export default function ServiceRecrutementSpecialise() {
         description={t.meta.description}
         lang={globalLanguage as any}
         includeServiceSchema={true}
+        faqItems={t.faq.items}
         availableLanguages={AVAILABLE_LANGUAGES_RECRUTEMENT_SPECIALISE}
       />
 

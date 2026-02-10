@@ -236,6 +236,7 @@ export default function ServiceDetachementPersonnel() {
         description={t.meta.description}
         lang={globalLanguage as any}
         includeServiceSchema={true}
+        faqItems={t.faq.items}
         availableLanguages={AVAILABLE_LANGUAGES_DETACHMENT_PERSONNEL}
       />
 

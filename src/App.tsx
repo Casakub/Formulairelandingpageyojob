@@ -9,6 +9,9 @@ import ServiceInterimEuropeen from './ServiceInterimEuropeen';
 import ServiceRecrutementSpecialise from './ServiceRecrutementSpecialise';
 import ServiceConseilConformite from './ServiceConseilConformite';
 import ServiceDetachementPersonnel from './ServiceDetachementPersonnel';
+import ServiceDetachementBTP from './ServiceDetachementBTP';
+import ServiceDetachementIndustrie from './ServiceDetachementIndustrie';
+import BlogDirective from './BlogDirective';
 import DemandeDevis from './DemandeDevis';
 import ConfirmationDevis from './ConfirmationDevis';
 import RecapDevis from './RecapDevis';
@@ -174,6 +177,33 @@ export default function App() {
     return (
       <>
         <ServiceDetachementPersonnel />
+        <Toaster position="top-right" />
+      </>
+    );
+  }
+
+  if (currentPath === '/services/detachement-btp') {
+    return (
+      <>
+        <ServiceDetachementBTP />
+        <Toaster position="top-right" />
+      </>
+    );
+  }
+
+  if (currentPath === '/services/detachement-industrie') {
+    return (
+      <>
+        <ServiceDetachementIndustrie />
+        <Toaster position="top-right" />
+      </>
+    );
+  }
+
+  if (currentPath === '/blog/directive-detachement-europe') {
+    return (
+      <>
+        <BlogDirective />
         <Toaster position="top-right" />
       </>
     );

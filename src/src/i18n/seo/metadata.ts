@@ -1602,6 +1602,10 @@ const BREADCRUMB_LABELS_FR: Record<string, string> = {
   'privacy': 'Politique de Confidentialité',
   'legal': 'Mentions Légales',
   'cgv': 'CGV',
+  'detachement-btp': 'Détachement BTP',
+  'detachement-industrie': 'Détachement Industrie',
+  'blog': 'Blog',
+  'directive-detachement-europe': 'Directive Travailleurs Détachés',
 };
 
 /**

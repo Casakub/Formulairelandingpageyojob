@@ -9,7 +9,7 @@
  */
 
 import { useEffect } from 'react';
-import { getPageMetadata, getOrganizationSchema, getServiceSchema, getWebSiteSchema, getBreadcrumbSchema, type PageKey } from '../src/i18n/seo/metadata';
+import { getPageMetadata, getOrganizationSchema, getServiceSchema, getWebSiteSchema, getBreadcrumbSchema, getFAQSchema, type PageKey } from '../src/i18n/seo/metadata';
 import type { DevisLanguage } from '../src/i18n/devis/types';
 import { getAllLanguageCodes } from '../lib/languages';
 import { DEFAULT_LANGUAGE } from '../lib/i18nRouting';
@@ -21,6 +21,7 @@ interface SEOHeadPropsNew {
   page: PageKey;
   lang?: DevisLanguage;
   includeServiceSchema?: boolean;
+  faqItems?: Array<{ question: string; answer: string }>;
   availableLanguages?: DevisLanguage[];
   content?: never;
   language?: never;
@@ -37,6 +38,7 @@ interface SEOHeadPropsCustom {
   description: string;
   lang?: DevisLanguage;
   includeServiceSchema?: boolean;
+  faqItems?: Array<{ question: string; answer: string }>;
   availableLanguages?: DevisLanguage[];
   page?: never;
   content?: never;
@@ -158,7 +160,7 @@ export function SEOHead(props: SEOHeadProps) {
       'og:type': 'website',
       'og:site_name': 'YOJOB',
       'og:url': canonicalHref || baseUrl,
-      'og:image': `${baseUrl}/favicon.svg`,
+      'og:image': `${baseUrl}/og-image-yojob-1200x630.svg`,
       'og:locale': ogLocaleMap[currentLang] || 'fr_FR',
     };
 
@@ -173,7 +175,7 @@ export function SEOHead(props: SEOHeadProps) {
       'twitter:card': 'summary_large_image',
       'twitter:title': metadata.title,
       'twitter:description': metadata.description,
-      'twitter:image': `${baseUrl}/favicon.svg`,
+      'twitter:image': `${baseUrl}/og-image-yojob-1200x630.svg`,
     };
 
     for (const [name, content] of Object.entries(twitterTags)) {
@@ -227,6 +229,24 @@ export function SEOHead(props: SEOHeadProps) {
     } else {
       const existingBreadcrumb = document.querySelector('script[type="application/ld+json"][data-schema="breadcrumb"]');
       if (existingBreadcrumb) existingBreadcrumb.remove();
+    }
+
+    // ========================================================================
+    // SCHEMA.ORG - FAQPAGE (conditionnel, si faqItems fourni)
+    // ========================================================================
+    const faqItems = (props as any).faqItems as Array<{ question: string; answer: string }> | undefined;
+    if (faqItems && faqItems.length > 0) {
+      let schemaFAQ = document.querySelector('script[type="application/ld+json"][data-schema="faq"]');
+      if (!schemaFAQ) {
+        schemaFAQ = document.createElement('script');
+        schemaFAQ.setAttribute('type', 'application/ld+json');
+        schemaFAQ.setAttribute('data-schema', 'faq');
+        document.head.appendChild(schemaFAQ);
+      }
+      schemaFAQ.textContent = JSON.stringify(getFAQSchema(faqItems), null, 2);
+    } else {
+      const existingFAQ = document.querySelector('script[type="application/ld+json"][data-schema="faq"]');
+      if (existingFAQ) existingFAQ.remove();
     }
 
     // ========================================================================
