@@ -6,4 +6,3 @@ import "./index.css";
 initAnalytics();
 
 createRoot(document.getElementById("root")!).render(<App />);
-  
