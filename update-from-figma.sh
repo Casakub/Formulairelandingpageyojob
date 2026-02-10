@@ -293,6 +293,14 @@ if ! git show-ref --verify --quiet "refs/remotes/${BRANCH_REF}"; then
   fi
 fi
 
+# ── Protection du fichier .env (contient les secrets, jamais versionné) ──────
+ENV_BACKUP=""
+if [[ -f .env ]]; then
+  ENV_BACKUP="$(mktemp)"
+  cp .env "$ENV_BACKUP"
+  echo "Fichier .env sauvegardé avant merge."
+fi
+
 echo "Merging main into current branch..."
 if ! git merge origin/main -m "Merge Figma Make updates from main" --no-edit 2>/dev/null; then
     echo "Merge conflict, résolution automatique..."
@@ -319,6 +327,13 @@ fi
 
 if [[ -n "$BRANCH_REF" ]]; then
   restore_protected_files "$BRANCH_REF"
+fi
+
+# ── Restauration du fichier .env ─────────────────────────────────────────────
+if [[ -n "${ENV_BACKUP:-}" && -f "$ENV_BACKUP" ]]; then
+  cp "$ENV_BACKUP" .env
+  rm -f "$ENV_BACKUP"
+  echo "Fichier .env restauré (protégé contre le merge)."
 fi
 
 # =============================================================================
