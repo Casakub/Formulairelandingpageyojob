@@ -7,7 +7,7 @@
 export const legalSV = {
   hero: {
     badge: "Juridisk information",
-    title: "Juridisk information",
+    title: "Juridisk information & Företagsuppgifter",
     subtitle: "I enlighet med bestämmelserna i den franska lagen nr 2004-575 av den 21 juni 2004 om förtroende för den digitala ekonomin.",
     lastUpdate: "Senast uppdaterad:"
   },

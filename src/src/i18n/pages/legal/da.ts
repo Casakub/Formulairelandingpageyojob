@@ -7,7 +7,7 @@
 export const legalDA = {
   hero: {
     badge: "Juridisk information",
-    title: "Juridisk information",
+    title: "Juridiske oplysninger & Virksomhedsinfo",
     subtitle: "I overensstemmelse med bestemmelserne i den franske lov nr. 2004-575 af 21. juni 2004 om tillid til den digitale økonomi.",
     lastUpdate: "Sidst opdateret:"
   },
