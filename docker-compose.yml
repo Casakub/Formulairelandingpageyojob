@@ -1,0 +1,145 @@
+# =============================================================================
+# DOCKER COMPOSE - YoJob Landing Page
+# 2 services : landing (nginx) + prerender (worker Chromium)
+# Le prerender ne tourne que quand déclenché via --profile prerender
+# =============================================================================
+
+services:
+  # ---------------------------------------------------------------------------
+  # Service 1 : Landing Page (Nginx)
+  # Toujours actif. Au démarrage, restaure les pages pré-rendues du volume.
+  # ---------------------------------------------------------------------------
+  yojob-landing:
+    container_name: yojob-landing-page
+    image: yojob-landing:latest
+
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        - VITE_SUPABASE_URL=${VITE_SUPABASE_URL}
+        - VITE_SUPABASE_ANON_KEY=${VITE_SUPABASE_ANON_KEY}
+        - VITE_APP_ENV=${VITE_APP_ENV:-production}
+        - VITE_MATOMO_TAG_MANAGER_URL=${VITE_MATOMO_TAG_MANAGER_URL}
+    pull_policy: build
+
+    volumes:
+      - prerender-cache:/prerender-cache:ro
+
+    environment:
+      - NODE_ENV=production
+      - TZ=Europe/Paris
+      - APP_URL=https://yojob.fr
+
+    restart: unless-stopped
+
+    # ── Traefik ────────────────────────────────────────────────────────────────
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.yojob.rule=Host(`yojob.fr`) || Host(`www.yojob.fr`)
+      - traefik.http.routers.yojob.entrypoints=websecure
+      - traefik.http.routers.yojob.tls=true
+      - traefik.http.routers.yojob.tls.certresolver=mytlschallenge
+      - traefik.http.services.yojob.loadbalancer.server.port=80
+      - traefik.docker.network=n8n-network
+      # Redirection www → non-www
+      - traefik.http.middlewares.yojob-redirect-www.redirectregex.regex=^https://www\.yojob\.fr/(.*)
+      - traefik.http.middlewares.yojob-redirect-www.redirectregex.replacement=https://yojob.fr/$${1}
+      - traefik.http.middlewares.yojob-redirect-www.redirectregex.permanent=true
+      # Headers de sécurité HSTS
+      - traefik.http.middlewares.yojob-headers.headers.stsSeconds=31536000
+      - traefik.http.middlewares.yojob-headers.headers.stsIncludeSubdomains=true
+      - traefik.http.middlewares.yojob-headers.headers.stsPreload=true
+      - traefik.http.routers.yojob.middlewares=yojob-headers
+      # Labels informatifs
+      - app.name=yojob-landing
+      - app.source=figma-make
+      - app.branch=claude/verify-root-files-placement-B4mK1
+
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:80/"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+
+    deploy:
+      resources:
+        limits:
+          cpus: '1.0'
+          memory: 512M
+        reservations:
+          cpus: '0.25'
+          memory: 128M
+
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+    networks:
+      - n8n-network
+
+  # ---------------------------------------------------------------------------
+  # Service 2 : Prerender Worker (Node.js + Chromium)
+  # Ne tourne que quand déclenché : docker compose --profile prerender run --rm yojob-prerender
+  # Écrit les pages pré-rendues dans le volume partagé.
+  # ---------------------------------------------------------------------------
+  yojob-prerender:
+    container_name: yojob-prerender-worker
+    image: yojob-prerender:latest
+
+    build:
+      context: .
+      dockerfile: Dockerfile.prerender
+      args:
+        - VITE_SUPABASE_URL=${VITE_SUPABASE_URL}
+        - VITE_SUPABASE_ANON_KEY=${VITE_SUPABASE_ANON_KEY}
+        - VITE_APP_ENV=${VITE_APP_ENV:-production}
+        - VITE_MATOMO_TAG_MANAGER_URL=${VITE_MATOMO_TAG_MANAGER_URL}
+
+    volumes:
+      - prerender-cache:/output
+
+    environment:
+      - PRERENDER_LANGS=${PRERENDER_LANGS:-}
+      - PRERENDER_PAGES=${PRERENDER_PAGES:-}
+      - PRERENDER_CONTINUE_ON_ERROR=${PRERENDER_CONTINUE_ON_ERROR:-true}
+      - PRERENDER_NAV_TIMEOUT=${PRERENDER_NAV_TIMEOUT:-45000}
+      - PRERENDER_RETRY_LIMIT=${PRERENDER_RETRY_LIMIT:-1}
+
+    profiles:
+      - prerender
+
+    deploy:
+      resources:
+        limits:
+          cpus: '1.0'
+          memory: 1024M
+        reservations:
+          cpus: '0.5'
+          memory: 512M
+
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+    networks:
+      - n8n-network
+
+# =============================================================================
+# VOLUMES
+# =============================================================================
+volumes:
+  prerender-cache:
+    name: yojob-prerender-cache
+
+# =============================================================================
+# NETWORKS
+# =============================================================================
+networks:
+  n8n-network:
+    external: true
