@@ -16,7 +16,8 @@ import {
   X,
   ArrowLeft,
   ChevronLeft,
-  ChevronRight
+  ChevronRight,
+  BookOpen
 } from 'lucide-react';
 import { DashboardOverview } from './components/dashboard/DashboardOverview';
 import { DynamicResultsOverview } from './components/dashboard/DynamicResultsOverview';
@@ -28,6 +29,7 @@ import { SettingsPanel } from './components/dashboard/SettingsPanel';
 import { ProspectsPageWithTabs } from './components/dashboard/ProspectsPageWithTabs';
 import { AgendaPage } from './components/dashboard/AgendaPage';
 import { AutomationsPage } from './components/dashboard/AutomationsPage';
+import { BlogManager } from './components/dashboard/blog/BlogManager';
 import { Button } from './components/ui/button';
 import { Badge } from './components/ui/badge';
 import { TranslationProvider } from './contexts/TranslationContext';
@@ -45,7 +47,7 @@ interface DashboardAppProps {
   onBackToSurvey?: () => void;
 }
 
-type TabId = 'overview' | 'results' | 'questions' | 'translations' | 'export' | 'integrations' | 'settings' | 'prospects' | 'agenda' | 'automations';
+type TabId = 'overview' | 'results' | 'questions' | 'translations' | 'export' | 'integrations' | 'settings' | 'prospects' | 'agenda' | 'automations' | 'blog';
 
 const tabs = [
   { id: 'overview' as TabId, label: 'Vue d\'ensemble', icon: LayoutDashboard, color: 'from-blue-500 to-cyan-500' },
@@ -54,6 +56,7 @@ const tabs = [
   { id: 'questions' as TabId, label: 'Questions', icon: FileText, color: 'from-orange-500 to-amber-500' },
   { id: 'translations' as TabId, label: 'Traductions', icon: Globe, color: 'from-pink-500 to-rose-500' },
   { id: 'agenda' as TabId, label: 'Agenda', icon: Calendar, color: 'from-blue-500 to-indigo-500' },
+  { id: 'blog' as TabId, label: 'Blog', icon: BookOpen, color: 'from-emerald-500 to-teal-500' },
   { id: 'automations' as TabId, label: 'Automations', icon: Zap, color: 'from-yellow-500 to-orange-500' },
   { id: 'export' as TabId, label: 'Export/Import', icon: Download, color: 'from-teal-500 to-cyan-500' },
   { id: 'integrations' as TabId, label: 'Intégrations', icon: Zap, color: 'from-indigo-500 to-purple-500' },
@@ -383,6 +386,9 @@ export default function DashboardApp({ onBackToSurvey }: DashboardAppProps = {})
             )}
             {activeTab === 'agenda' && (
               <AgendaPage key="agenda" />
+            )}
+            {activeTab === 'blog' && (
+              <BlogManager key="blog" />
             )}
             {activeTab === 'automations' && (
               <AutomationsPage key="automations" />
