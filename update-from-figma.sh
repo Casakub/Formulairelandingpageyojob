@@ -61,6 +61,7 @@ APP_FILES=(
   ".npmrc"
   "index.html"
   "vite.config.ts"
+  "src/main.tsx" 
   # SEO core
   "src/components/SEOHead.tsx"
   "src/src/i18n/seo/metadata.ts"
