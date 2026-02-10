@@ -54,7 +54,6 @@ services:
       # Labels informatifs
       - app.name=yojob-landing
       - app.source=figma-make
-      - app.branch=claude/verify-root-files-placement-B4mK1
 
     healthcheck:
       test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:80/"]
@@ -105,7 +104,7 @@ services:
     environment:
       - PRERENDER_LANGS=${PRERENDER_LANGS:-}
       - PRERENDER_PAGES=${PRERENDER_PAGES:-}
-      - PRERENDER_CONTINUE_ON_ERROR=${PRERENDER_CONTINUE_ON_ERROR:-true}
+      - PRERENDER_CONTINUE_ON_ERROR=${PRERENDER_CONTINUE_ON_ERROR:-false}
       - PRERENDER_NAV_TIMEOUT=${PRERENDER_NAV_TIMEOUT:-45000}
       - PRERENDER_RETRY_LIMIT=${PRERENDER_RETRY_LIMIT:-1}
 
