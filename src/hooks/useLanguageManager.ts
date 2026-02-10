@@ -31,24 +31,55 @@ export interface UseLanguageManagerReturn {
 
 /**
  * Détecte la langue initiale selon les priorités :
- * 1. localStorage (choix manuel précédent)
- * 2. Paramètre URL (?lang=pl)
- * 3. Langue du navigateur (auto-détection)
- * 4. Fallback sur anglais, puis français
+ * 1. Préfixe URL (/en/..., /de/...) → langue explicite
+ * 2. Pas de préfixe URL → français (langue par défaut du site)
+ * 3. Paramètre URL (?lang=pl) → uniquement pour la page d'accueil sans préfixe
+ *
+ * IMPORTANT : L'URL est la source de vérité pour la langue.
+ * - /en/services/... → anglais (préfixe explicite)
+ * - /services/... → français (pas de préfixe = langue par défaut)
+ * - / → français (page d'accueil par défaut)
+ *
+ * Le localStorage et la langue du navigateur ne sont utilisés que
+ * pour la première visite sur la page d'accueil (/) afin de
+ * rediriger vers la bonne version linguistique.
  */
 function detectInitialLanguage(): { language: string; hasLangPrefix: boolean } {
   const supportedLangs = getAllLanguageCodes(); // 23 langues européennes
 
-  // 1. Vérifier le préfixe d'URL (/en/...)
-  if (typeof window !== 'undefined') {
-    const { lang, hasLangPrefix } = splitPathByLang(window.location.pathname);
-    if (hasLangPrefix && supportedLangs.includes(lang)) {
-      console.log('🌍 Langue détectée depuis URL (prefix):', lang);
-      return { language: lang, hasLangPrefix: true };
-    }
+  if (typeof window === 'undefined') {
+    return { language: DEFAULT_LANGUAGE, hasLangPrefix: false };
   }
 
-  // 2. Vérifier localStorage (choix manuel = priorité max)
+  const { lang, hasLangPrefix } = splitPathByLang(window.location.pathname);
+
+  // 1. URL avec préfixe de langue explicite (/en/..., /de/...) → on utilise cette langue
+  if (hasLangPrefix && supportedLangs.includes(lang)) {
+    console.log('🌍 Langue détectée depuis URL (prefix):', lang);
+    return { language: lang, hasLangPrefix: true };
+  }
+
+  // 2. URL sans préfixe → c'est la version française (langue par défaut du site)
+  //    SAUF pour la page d'accueil (/) où on peut rediriger l'utilisateur
+  const pathname = window.location.pathname.replace(/\/+$/, '') || '/';
+  const isHomepage = pathname === '/';
+
+  if (!isHomepage) {
+    // Page interne sans préfixe = français (ex: /a-propos, /services/...)
+    console.log('🌍 URL sans préfixe langue → français (défaut)');
+    return { language: DEFAULT_LANGUAGE, hasLangPrefix: false };
+  }
+
+  // 3. Page d'accueil (/) : on peut rediriger selon la préférence utilisateur
+  //    Vérifier paramètre URL (?lang=pl)
+  const urlParams = new URLSearchParams(window.location.search);
+  const langParam = urlParams.get('lang');
+  if (langParam && supportedLangs.includes(langParam)) {
+    console.log('🌍 Langue détectée depuis URL (param):', langParam);
+    return { language: langParam, hasLangPrefix: false };
+  }
+
+  //    Vérifier localStorage (choix manuel précédent)
   try {
     const savedLang = localStorage.getItem('yojob_preferred_language');
     if (savedLang && supportedLangs.includes(savedLang)) {
@@ -59,17 +90,7 @@ function detectInitialLanguage(): { language: string; hasLangPrefix: boolean } {
     console.warn('⚠️ Impossible de lire localStorage:', e);
   }
 
-  // 3. Vérifier paramètre URL (?lang=pl)
-  if (typeof window !== 'undefined') {
-    const urlParams = new URLSearchParams(window.location.search);
-    const langParam = urlParams.get('lang');
-    if (langParam && supportedLangs.includes(langParam)) {
-      console.log('🌍 Langue détectée depuis URL (param):', langParam);
-      return { language: langParam, hasLangPrefix: false };
-    }
-  }
-
-  // 4. Détecter la langue du navigateur (AUTO-DETECTION 🎯)
+  //    Détecter la langue du navigateur (AUTO-DETECTION)
   if (typeof navigator !== 'undefined') {
     const browserLang = navigator.language.split('-')[0]; // 'pl-PL' -> 'pl'
     if (supportedLangs.includes(browserLang)) {
@@ -78,15 +99,9 @@ function detectInitialLanguage(): { language: string; hasLangPrefix: boolean } {
     }
   }
 
-  // 5. Fallback sur anglais si la langue du navigateur n'est pas supportée
-  if (supportedLangs.includes('en')) {
-    console.log('🌍 Langue du navigateur non supportée, fallback sur anglais');
-    return { language: 'en', hasLangPrefix: false };
-  }
-
-  // 6. Fallback final sur français
-  console.log('🌍 Fallback final sur français');
-  return { language: 'fr', hasLangPrefix: false };
+  // 4. Fallback final sur français (langue par défaut du site)
+  console.log('🌍 Fallback sur français (langue par défaut)');
+  return { language: DEFAULT_LANGUAGE, hasLangPrefix: false };
 }
 
 /**
