@@ -44,7 +44,7 @@ import {
 import type { DevisFormData } from './types/devis';
 
 // 🎯 Import du système SEO optimisé
-import { SEOHead } from './components/SEOHead';
+import { SEOHead, useSEOH1 } from './components/SEOHead';
 
 const BASE_HORAIRE_LEGALE = 151.67;
 
@@ -68,6 +68,7 @@ export default function DemandeDevis() {
   
   // Charger les traductions pour la langue active
   const { t, isLoading: isLoadingTranslations } = useDevisTranslationStatic(lang);
+  const seoH1 = useSEOH1('devis-form', lang);
   
   // État du formulaire (doit être déclaré AVANT tout return conditionnel)
   const [formData, setFormData] = useState<DevisFormData>({
@@ -495,6 +496,11 @@ export default function DemandeDevis() {
             </div>
           </div>
         </header>
+
+        {/* H1 SEO */}
+        <div className="container mx-auto px-4 pt-6 pb-2">
+          <h1 className="text-white text-center text-[20px] font-bold max-w-3xl mx-auto">{seoH1}</h1>
+        </div>
 
         {/* Progress Bar */}
         <div className="container mx-auto px-4 py-6">
