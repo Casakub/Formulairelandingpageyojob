@@ -5,8 +5,6 @@ import { SEOHead } from './components/SEOHead';
 import { LogoSvg } from './imports/YojobLogoComplete';
 import { Footer } from './components/landing/Footer';
 import { useLanguageManager } from './hooks/useLanguageManager';
-import { footerTranslations } from './src/i18n/services/footer';
-import type { SupportedLanguage } from './src/i18n/types';
 import {
   BlogArticleWithTranslations,
   BlogTranslation,
@@ -23,7 +21,6 @@ export default function BlogPost({ slug }: BlogPostProps) {
   const [loading, setLoading] = useState(true);
   const [notFound, setNotFound] = useState(false);
 
-  const footerT = footerTranslations[lang as SupportedLanguage] || footerTranslations.fr;
   const langPrefix = lang === 'fr' ? '' : `/${lang}`;
 
   useEffect(() => {
@@ -218,7 +215,7 @@ export default function BlogPost({ slug }: BlogPostProps) {
         )}
 
         {/* Footer */}
-        <Footer translations={footerT} />
+        <Footer language={lang} />
       </div>
     </>
   );
