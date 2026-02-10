@@ -21,6 +21,12 @@ services:
         - VITE_SUPABASE_URL=${VITE_SUPABASE_URL}
         - VITE_SUPABASE_ANON_KEY=${VITE_SUPABASE_ANON_KEY}
         - VITE_APP_ENV=${VITE_APP_ENV:-production}
+        # Pre-rendering SEO (Puppeteer at build time)
+        - PRERENDER_LANGS=${PRERENDER_LANGS:-}
+        - PRERENDER_PAGES=${PRERENDER_PAGES:-}
+        - PRERENDER_CONTINUE_ON_ERROR=${PRERENDER_CONTINUE_ON_ERROR:-true}
+        - PRERENDER_NAV_TIMEOUT=${PRERENDER_NAV_TIMEOUT:-45000}
+        - PRERENDER_RETRY_LIMIT=${PRERENDER_RETRY_LIMIT:-2}
     
     # Port mapping : port_hote:port_container
     # Port 3000 (au lieu de 80 car port 80 déjà utilisé sur Hostinger)

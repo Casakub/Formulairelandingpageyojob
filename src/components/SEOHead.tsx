@@ -9,7 +9,7 @@
  */
 
 import { useEffect } from 'react';
-import { getPageMetadata, getOrganizationSchema, getServiceSchema, type PageKey } from '../src/i18n/seo/metadata';
+import { getPageMetadata, getOrganizationSchema, getServiceSchema, getWebSiteSchema, getBreadcrumbSchema, type PageKey } from '../src/i18n/seo/metadata';
 import type { DevisLanguage } from '../src/i18n/devis/types';
 import { getAllLanguageCodes } from '../lib/languages';
 import { DEFAULT_LANGUAGE } from '../lib/i18nRouting';
@@ -213,6 +213,40 @@ export function SEOHead(props: SEOHeadProps) {
     }
 
     // ========================================================================
+    // SCHEMA.ORG - BREADCRUMBLIST (toujours présent sauf home)
+    // ========================================================================
+    if (basePath !== '/') {
+      let schemaBreadcrumb = document.querySelector('script[type="application/ld+json"][data-schema="breadcrumb"]');
+      if (!schemaBreadcrumb) {
+        schemaBreadcrumb = document.createElement('script');
+        schemaBreadcrumb.setAttribute('type', 'application/ld+json');
+        schemaBreadcrumb.setAttribute('data-schema', 'breadcrumb');
+        document.head.appendChild(schemaBreadcrumb);
+      }
+      schemaBreadcrumb.textContent = JSON.stringify(getBreadcrumbSchema(basePath, baseUrl), null, 2);
+    } else {
+      const existingBreadcrumb = document.querySelector('script[type="application/ld+json"][data-schema="breadcrumb"]');
+      if (existingBreadcrumb) existingBreadcrumb.remove();
+    }
+
+    // ========================================================================
+    // SCHEMA.ORG - WEBSITE + SEARCHACTION (home seulement)
+    // ========================================================================
+    if (basePath === '/') {
+      let schemaWebSite = document.querySelector('script[type="application/ld+json"][data-schema="website"]');
+      if (!schemaWebSite) {
+        schemaWebSite = document.createElement('script');
+        schemaWebSite.setAttribute('type', 'application/ld+json');
+        schemaWebSite.setAttribute('data-schema', 'website');
+        document.head.appendChild(schemaWebSite);
+      }
+      schemaWebSite.textContent = JSON.stringify(getWebSiteSchema(baseUrl), null, 2);
+    } else {
+      const existingWebSite = document.querySelector('script[type="application/ld+json"][data-schema="website"]');
+      if (existingWebSite) existingWebSite.remove();
+    }
+
+    // ========================================================================
     // LANG ATTRIBUTE sur <html>
     // ========================================================================
     document.documentElement.lang = currentLang;
@@ -287,6 +321,12 @@ export function SEOHead(props: SEOHeadProps) {
       themeColor.setAttribute('content', '#1E3A8A');
       document.head.appendChild(themeColor);
     }
+
+    // ========================================================================
+    // PRE-RENDERING SIGNAL
+    // Signal to Puppeteer prerender script that SEO metadata is ready
+    // ========================================================================
+    (window as any).__SEO_READY__ = true;
 
   }, [props]);
 
