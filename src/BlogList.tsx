@@ -5,8 +5,6 @@ import { SEOHead } from './components/SEOHead';
 import { LogoSvg } from './imports/YojobLogoComplete';
 import { Footer } from './components/landing/Footer';
 import { useLanguageManager } from './hooks/useLanguageManager';
-import { footerTranslations } from './src/i18n/services/footer';
-import type { SupportedLanguage } from './src/i18n/types';
 import {
   BlogArticleWithTranslations,
   BlogTranslation,
@@ -17,8 +15,6 @@ export default function BlogList() {
   const { currentLanguage: lang } = useLanguageManager();
   const [articles, setArticles] = useState<BlogArticleWithTranslations[]>([]);
   const [loading, setLoading] = useState(true);
-
-  const footerT = footerTranslations[lang as SupportedLanguage] || footerTranslations.fr;
 
   useEffect(() => {
     getPublishedArticles(lang)
@@ -164,7 +160,7 @@ export default function BlogList() {
         </section>
 
         {/* Footer */}
-        <Footer translations={footerT} />
+        <Footer language={lang} />
       </div>
     </>
   );

@@ -5,8 +5,6 @@ import { Button } from './components/ui/button';
 import { LogoSvg } from './imports/YojobLogoComplete';
 import { Footer } from './components/landing/Footer';
 import { useLanguageManager } from './hooks/useLanguageManager';
-import { footerTranslations } from './src/i18n/services/footer';
-import type { SupportedLanguage } from './src/i18n/types';
 import {
   ArrowRight,
   FileText,
@@ -35,8 +33,6 @@ const content = {
 
 export default function BlogDirective() {
   const { currentLanguage: globalLanguage } = useLanguageManager();
-  const footerT = footerTranslations[globalLanguage as SupportedLanguage] || footerTranslations.fr;
-
   return (
     <>
       <SEOHead
@@ -374,7 +370,7 @@ export default function BlogDirective() {
         </section>
 
         {/* Footer */}
-        <Footer translations={footerT} />
+        <Footer language={globalLanguage} />
       </div>
     </>
   );

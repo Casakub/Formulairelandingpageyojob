@@ -226,6 +226,40 @@ export async function getPublishedArticleBySlug(
   return data as BlogArticleWithTranslations;
 }
 
+// =============================================================================
+// IMAGE UPLOAD (Supabase Storage)
+// =============================================================================
+
+const BLOG_IMAGES_BUCKET = 'blog-images';
+
+export async function uploadBlogImage(file: File): Promise<string> {
+  if (!file.type.startsWith('image/')) throw new Error('Le fichier doit être une image');
+  if (file.size > 5 * 1024 * 1024) throw new Error('L\'image ne doit pas dépasser 5 Mo');
+
+  const supabase = getAuthClient();
+  const ext = file.name.split('.').pop()?.toLowerCase() || 'jpg';
+  const path = `${Date.now()}-${Math.random().toString(36).substring(2, 8)}.${ext}`;
+
+  const { error } = await supabase.storage
+    .from(BLOG_IMAGES_BUCKET)
+    .upload(path, file, { cacheControl: '31536000', upsert: false });
+
+  if (error) throw error;
+
+  const { data } = supabase.storage.from(BLOG_IMAGES_BUCKET).getPublicUrl(path);
+  return data.publicUrl;
+}
+
+export async function deleteBlogImage(url: string): Promise<void> {
+  const supabase = getAuthClient();
+  const parts = url.split(`${BLOG_IMAGES_BUCKET}/`);
+  const path = parts[parts.length - 1];
+  if (!path) return;
+
+  const { error } = await supabase.storage.from(BLOG_IMAGES_BUCKET).remove([path]);
+  if (error) throw error;
+}
+
 // Helper: generate slug from title
 export function generateSlug(title: string): string {
   return title
