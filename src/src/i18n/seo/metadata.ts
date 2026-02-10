@@ -1650,8 +1650,4 @@ export function getFAQSchema(faqs: Array<{ question: string; answer: string }>) 
       }
     }))
   };
-<<<<<<< HEAD
 }
-=======
-}
->>>>>>> origin/main
