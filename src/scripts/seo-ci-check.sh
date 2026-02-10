@@ -9,10 +9,11 @@ set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 SRC_DIR="$(dirname "$SCRIPT_DIR")"
+ROOT_DIR="$(dirname "$SRC_DIR")"
 ERRORS=0
 
-err() { echo "✗ CI-SEO: $1"; ERRORS=$((ERRORS+1)); }
-ok()  { echo "✓ CI-SEO: $1"; }
+err() { echo "CI-SEO FAIL: $1"; ERRORS=$((ERRORS+1)); }
+ok()  { echo "CI-SEO PASS: $1"; }
 
 echo "=== YOJOB SEO CI Guard ==="
 echo ""
@@ -20,7 +21,7 @@ echo ""
 # --- 1. Check sitemap files are non-empty ---
 echo "--- Sitemap Integrity ---"
 for SM in "public/sitemap.xml" "public/sitemap-main.xml" "public/sitemap-about.xml"; do
-  FILE="$SRC_DIR/$SM"
+  FILE="$ROOT_DIR/$SM"
   if [ ! -f "$FILE" ]; then
     err "$SM does not exist"
   elif [ ! -s "$FILE" ]; then
@@ -34,7 +35,7 @@ done
 # --- 2. Verify sitemap-about contains all service routes ---
 echo ""
 echo "--- Sitemap Coverage ---"
-ABOUT_FILE="$SRC_DIR/public/sitemap-about.xml"
+ABOUT_FILE="$ROOT_DIR/public/sitemap-about.xml"
 REQUIRED_IN_SITEMAP=(
   "/services/interim-europeen"
   "/services/recrutement-specialise"
@@ -93,7 +94,7 @@ done
 # --- 5. Check index.html has essential meta tags ---
 echo ""
 echo "--- index.html SEO Shell ---"
-INDEX_FILE="$SRC_DIR/index.html"
+INDEX_FILE="$ROOT_DIR/index.html"
 for TAG in 'rel="canonical"' 'og:title' 'og:image' 'og:description' 'twitter:card'; do
   if grep -q "$TAG" "$INDEX_FILE" 2>/dev/null; then
     ok "index.html has $TAG"
@@ -106,9 +107,9 @@ done
 echo ""
 echo "==========================="
 if [ "$ERRORS" -gt 0 ]; then
-  echo "SEO CI: $ERRORS error(s) found — BUILD SHOULD FAIL"
+  echo "SEO CI: $ERRORS error(s) found -- BUILD SHOULD FAIL"
   exit 1
 else
-  echo "SEO CI: All checks passed ✓"
+  echo "SEO CI: All checks passed"
   exit 0
 fi

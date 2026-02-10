@@ -1,0 +1,47 @@
+# =============================================================================
+# DOCKERFILE.PRERENDER - YoJob Prerender Worker
+# Conteneur dédié : Node.js + Chromium + Puppeteer
+# Ne tourne que quand déclenché (via docker compose --profile prerender)
+# Écrit les pages pré-rendues dans le volume /output
+# =============================================================================
+
+FROM node:20-bullseye
+
+WORKDIR /app
+
+# Puppeteer: use system Chromium
+ENV PUPPETEER_SKIP_DOWNLOAD=true
+ENV PUPPETEER_EXECUTABLE_PATH=/usr/bin/chromium
+
+# Install Chromium
+RUN apt-get update \
+  && apt-get install -y --no-install-recommends chromium \
+  && rm -rf /var/lib/apt/lists/*
+
+# Install dependencies
+COPY package.json .npmrc ./
+RUN npm config set registry https://registry.npmjs.org/
+RUN npm install --legacy-peer-deps
+
+# Copy source
+COPY . .
+
+# Build args Vite (nécessaire pour le build)
+ARG VITE_SUPABASE_URL
+ARG VITE_SUPABASE_ANON_KEY
+ARG VITE_APP_ENV=production
+ARG VITE_MATOMO_TAG_MANAGER_URL
+
+ENV VITE_SUPABASE_URL=$VITE_SUPABASE_URL
+ENV VITE_SUPABASE_ANON_KEY=$VITE_SUPABASE_ANON_KEY
+ENV VITE_APP_ENV=$VITE_APP_ENV
+ENV VITE_MATOMO_TAG_MANAGER_URL=$VITE_MATOMO_TAG_MANAGER_URL
+
+# Build Vite (nécessaire pour vite preview utilisé par prerender.cjs)
+RUN npm run build
+
+# Entrypoint : lance le prerender et copie vers /output
+COPY prerender-entrypoint.sh /prerender-entrypoint.sh
+RUN chmod +x /prerender-entrypoint.sh
+
+ENTRYPOINT ["/prerender-entrypoint.sh"]
