@@ -9,6 +9,11 @@ import ServiceInterimEuropeen from './ServiceInterimEuropeen';
 import ServiceRecrutementSpecialise from './ServiceRecrutementSpecialise';
 import ServiceConseilConformite from './ServiceConseilConformite';
 import ServiceDetachementPersonnel from './ServiceDetachementPersonnel';
+import ServiceDetachementBTP from './ServiceDetachementBTP';
+import ServiceDetachementIndustrie from './ServiceDetachementIndustrie';
+import BlogDirective from './BlogDirective';
+import BlogList from './BlogList';
+import BlogPost from './BlogPost';
 import DemandeDevis from './DemandeDevis';
 import ConfirmationDevis from './ConfirmationDevis';
 import RecapDevis from './RecapDevis';
@@ -17,6 +22,7 @@ import NotreReseau from './NotreReseau';
 import NosSecteurs from './NosSecteurs';
 import Temoignages from './Temoignages';
 import { SignatureOnline } from './components/SignatureOnline';
+import NotFound from './NotFound';
 import { Toaster } from './components/ui/sonner';
 import { buildLocalizedPath, DEFAULT_LANGUAGE, splitPathByLang, stripLangPrefix } from './lib/i18nRouting';
 
@@ -178,6 +184,52 @@ export default function App() {
     );
   }
 
+  if (currentPath === '/services/detachement-btp') {
+    return (
+      <>
+        <ServiceDetachementBTP />
+        <Toaster position="top-right" />
+      </>
+    );
+  }
+
+  if (currentPath === '/services/detachement-industrie') {
+    return (
+      <>
+        <ServiceDetachementIndustrie />
+        <Toaster position="top-right" />
+      </>
+    );
+  }
+
+  if (currentPath === '/blog') {
+    return (
+      <>
+        <BlogList />
+        <Toaster position="top-right" />
+      </>
+    );
+  }
+
+  if (currentPath === '/blog/directive-detachement-europe') {
+    return (
+      <>
+        <BlogDirective />
+        <Toaster position="top-right" />
+      </>
+    );
+  }
+
+  if (currentPath.startsWith('/blog/')) {
+    const blogSlug = currentPath.replace('/blog/', '');
+    return (
+      <>
+        <BlogPost slug={blogSlug} />
+        <Toaster position="top-right" />
+      </>
+    );
+  }
+
   if (currentPath === '/a-propos') {
     return (
       <>
@@ -274,15 +326,7 @@ export default function App() {
   // 404
   return (
     <>
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
-        <div className="text-center">
-          <h1 className="text-4xl mb-4">404 - Page non trouvée</h1>
-          <p className="text-gray-600 mb-6">La page que vous recherchez n'existe pas.</p>
-          <a href="/" className="text-blue-600 hover:underline">
-            Retour à l'accueil
-          </a>
-        </div>
-      </div>
+      <NotFound />
       <Toaster position="top-right" />
     </>
   );
