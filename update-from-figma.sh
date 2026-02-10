@@ -87,10 +87,12 @@ APP_FILES=(
   "src/services/blogService.ts"
   "src/components/dashboard/blog/TipTapEditor.tsx"
   "src/components/dashboard/blog/BlogEditor.tsx"
+  "src/components/dashboard/blog/ImageDropZone.tsx"
   "src/components/dashboard/blog/BlogManager.tsx"
   "src/DashboardApp.tsx"
-  # Blog migration
+  # Blog migrations
   "src/supabase/migrations/18_blog_system.sql"
+  "src/supabase/migrations/19_blog_images_storage.sql"
 )
 
 # ── Helpers ──────────────────────────────────────────────────────────────────
