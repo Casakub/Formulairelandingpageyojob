@@ -157,6 +157,7 @@ detect_changed_routes() {
 
   local pages="" langs=""
   local has_shared=false has_content=false has_style_or_static=false
+  local needs_all_langs=false
 
   while IFS= read -r file; do
     [[ -z "$file" ]] && continue
@@ -172,7 +173,12 @@ detect_changed_routes() {
         pages+=" $c"
         local lang
         lang="$(extract_lang "$file" || true)"
-        [[ -n "${lang:-}" ]] && langs+=" $lang"
+        if [[ -n "${lang:-}" ]]; then
+          langs+=" $lang"
+        else
+          # Component file (.tsx) changed → all langs needed for this page
+          needs_all_langs=true
+        fi
         ;;
     esac
   done <<< "$changed_files"
@@ -183,7 +189,11 @@ detect_changed_routes() {
   if [[ "$has_content" == true ]]; then
     local unique_pages unique_langs
     unique_pages="$(echo "$pages" | join_unique)"
-    unique_langs="$(echo "$langs" | join_unique || true)"
+    if [[ "$needs_all_langs" == true ]]; then
+      unique_langs=""
+    else
+      unique_langs="$(echo "$langs" | join_unique || true)"
+    fi
     echo "SMART|${unique_pages}|${unique_langs}"; return
   fi
   if [[ "$has_style_or_static" == true ]]; then
@@ -343,11 +353,10 @@ else
     SMART)
       DETECTED_PAGES="$(echo "$DETECTION" | cut -d'|' -f2)"
       DETECTED_LANGS="$(echo "$DETECTION" | cut -d'|' -f3)"
-      [[ -z "$DETECTED_LANGS" ]] && DETECTED_LANGS="fr"
-      echo "🎯 Prerender ciblé: pages=${DETECTED_PAGES} langs=${DETECTED_LANGS}"
+      echo "🎯 Prerender ciblé: pages=${DETECTED_PAGES} langs=${DETECTED_LANGS:-toutes}"
       NEED_PRERENDER=true
       export PRERENDER_PAGES="$DETECTED_PAGES"
-      export PRERENDER_LANGS="$DETECTED_LANGS"
+      [[ -n "$DETECTED_LANGS" ]] && export PRERENDER_LANGS="$DETECTED_LANGS"
       ;;
     *)
       echo "⚠️  Mode inconnu (${DETECT_MODE}) → prerender FR."
