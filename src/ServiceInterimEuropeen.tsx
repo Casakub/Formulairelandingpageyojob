@@ -168,8 +168,6 @@ export default function ServiceInterimEuropeen() {
         title={t.meta.title}
         description={t.meta.description}
         lang={globalLanguage as any}
-        includeServiceSchema={true}
-        faqItems={t.faq.items}
         availableLanguages={AVAILABLE_LANGUAGES_INTERIM_EUROPEEN}
       />
 

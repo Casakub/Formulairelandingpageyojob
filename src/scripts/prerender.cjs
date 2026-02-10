@@ -40,9 +40,6 @@ const ALL_PAGES = [
   { path: '/services/recrutement-specialise', langs: ALL_LANGS },
   { path: '/services/conseil-conformite', langs: ALL_LANGS },
   { path: '/services/detachement-personnel', langs: ALL_LANGS },
-  { path: '/services/detachement-btp', langs: ['fr'] },
-  { path: '/services/detachement-industrie', langs: ['fr'] },
-  { path: '/blog/directive-detachement-europe', langs: ['fr'] },
   { path: '/devis', langs: DEVIS_LANGS },
   { path: '/privacy', langs: ALL_LANGS },
   { path: '/legal', langs: ALL_LANGS },
@@ -59,9 +56,10 @@ const filterPages = () => {
 
 // Filter langs by PRERENDER_LANGS env var (comma-separated lang codes)
 // Special value "NONE" = skip prerender entirely
+// Special value "ALL" = no filtering, use all langs for the page
 const filterLangs = (langs) => {
   const envLangs = process.env.PRERENDER_LANGS;
-  if (!envLangs) return langs;
+  if (!envLangs || envLangs === 'ALL') return langs;
   if (envLangs === 'NONE') return [];
   const allowed = envLangs.split(',').map((l) => l.trim());
   return langs.filter((l) => allowed.includes(l));
@@ -105,27 +103,12 @@ const renderRoute = async (browser, route, lang) => {
       }, lang);
 
       await page.goto(url, { waitUntil: WAIT_UNTIL, timeout: NAV_TIMEOUT });
-      const seoReady = await page.waitForFunction('window.__SEO_READY__ === true', { timeout: SEO_TIMEOUT })
-        .then(() => true)
-        .catch(() => false);
-      if (!seoReady) {
-        console.warn(`[prerender] WARNING: __SEO_READY__ not set within ${SEO_TIMEOUT}ms for ${route} (${lang})`);
-      }
+      await page.waitForFunction('window.__SEO_READY__ === true', { timeout: SEO_TIMEOUT }).catch(() => {});
       const html = await page.content();
-      // Validate that the rendered HTML contains essential SEO tags
-      const hasTitle = /<title>[^<]{5,}<\/title>/.test(html);
-      const hasMeta = /meta\s+name="description"/.test(html);
-      if (!hasTitle || !hasMeta) {
-        const missing = [];
-        if (!hasTitle) missing.push('<title>');
-        if (!hasMeta) missing.push('meta[description]');
-        console.warn(`[prerender] WARNING: ${route} (${lang}) missing SEO tags: ${missing.join(', ')}`);
-      }
       const outputPath = routeToFilePath(route);
       fs.mkdirSync(path.dirname(outputPath), { recursive: true });
       fs.writeFileSync(outputPath, html, 'utf8');
-      const sizeKB = (Buffer.byteLength(html, 'utf8') / 1024).toFixed(1);
-      console.log(`[prerender] ${route} (${lang}) -> ${outputPath} (${sizeKB}KB${seoReady ? '' : ' SEO_READY=timeout'})`);
+      console.log(`[prerender] ${route} (${lang}) -> ${outputPath}`);
       return true;
     } catch (err) {
       const message = String((err && err.message) || err || 'Unknown error');

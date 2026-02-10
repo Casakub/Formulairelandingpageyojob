@@ -12,6 +12,8 @@ import ServiceDetachementPersonnel from './ServiceDetachementPersonnel';
 import ServiceDetachementBTP from './ServiceDetachementBTP';
 import ServiceDetachementIndustrie from './ServiceDetachementIndustrie';
 import BlogDirective from './BlogDirective';
+import BlogList from './BlogList';
+import BlogPost from './BlogPost';
 import DemandeDevis from './DemandeDevis';
 import ConfirmationDevis from './ConfirmationDevis';
 import RecapDevis from './RecapDevis';
@@ -200,10 +202,29 @@ export default function App() {
     );
   }
 
+  if (currentPath === '/blog') {
+    return (
+      <>
+        <BlogList />
+        <Toaster position="top-right" />
+      </>
+    );
+  }
+
   if (currentPath === '/blog/directive-detachement-europe') {
     return (
       <>
         <BlogDirective />
+        <Toaster position="top-right" />
+      </>
+    );
+  }
+
+  if (currentPath.startsWith('/blog/')) {
+    const blogSlug = currentPath.replace('/blog/', '');
+    return (
+      <>
+        <BlogPost slug={blogSlug} />
         <Toaster position="top-right" />
       </>
     );

@@ -1,15 +1,15 @@
 /**
- * COMPOSANT SEO HEAD
- *
+ * 🎯 COMPOSANT SEO HEAD
+ * 
  * Injection automatique des métadonnées SEO (Title, Meta, Schema)
  * Compatible avec le système de traduction i18n
- *
- * @version 3.0.0
- * @updated 2026-02-10
+ * 
+ * @version 2.0.0
+ * @created 2025-01-05
  */
 
 import { useEffect } from 'react';
-import { getPageMetadata, getOrganizationSchema, getServiceSchema, getWebSiteSchema, getBreadcrumbSchema, getFAQSchema, type PageKey } from '../src/i18n/seo/metadata';
+import { getPageMetadata, getOrganizationSchema, getServiceSchema, type PageKey } from '../src/i18n/seo/metadata';
 import type { DevisLanguage } from '../src/i18n/devis/types';
 import { getAllLanguageCodes } from '../lib/languages';
 import { DEFAULT_LANGUAGE } from '../lib/i18nRouting';
@@ -21,8 +21,8 @@ interface SEOHeadPropsNew {
   page: PageKey;
   lang?: DevisLanguage;
   includeServiceSchema?: boolean;
-  faqItems?: Array<{ question: string; answer: string }>;
   availableLanguages?: DevisLanguage[];
+  // Marquer les anciennes props comme optionnelles pour compatibilité
   content?: never;
   language?: never;
   allContent?: never;
@@ -30,7 +30,7 @@ interface SEOHeadPropsNew {
   description?: never;
 }
 
-// ============================================================================
+// ============================================================================ 
 // API PERSONNALISÉE (title/description simples)
 // ============================================================================
 interface SEOHeadPropsCustom {
@@ -38,7 +38,6 @@ interface SEOHeadPropsCustom {
   description: string;
   lang?: DevisLanguage;
   includeServiceSchema?: boolean;
-  faqItems?: Array<{ question: string; answer: string }>;
   availableLanguages?: DevisLanguage[];
   page?: never;
   content?: never;
@@ -54,6 +53,7 @@ interface SEOHeadPropsOld {
   language: string;
   allContent?: any;
   availableLanguages?: DevisLanguage[];
+  // Marquer les nouvelles props comme optionnelles
   page?: never;
   lang?: never;
   includeServiceSchema?: never;
@@ -63,59 +63,40 @@ interface SEOHeadPropsOld {
 
 type SEOHeadProps = SEOHeadPropsNew | SEOHeadPropsOld | SEOHeadPropsCustom;
 
-/** Helper: set or create a meta tag */
-function setMeta(selector: string, attr: string, key: string, value: string) {
-  let el = document.querySelector(selector);
-  if (!el) {
-    el = document.createElement('meta');
-    el.setAttribute(attr, key);
-    document.head.appendChild(el);
-  }
-  el.setAttribute('content', value);
-}
-
-/** Map URL basePath → PageKey for custom API pages that don't pass `page` prop */
-const PATH_TO_PAGEKEY: Record<string, PageKey> = {
-  '/services/interim-europeen': 'interim-europeen',
-  '/services/recrutement-specialise': 'recrutement-specialise',
-  '/services/conseil-conformite': 'conseil-conformite',
-  '/services/detachement-personnel': 'detachement-personnel',
-  '/services/detachement-btp': 'detachement-btp',
-  '/services/detachement-industrie': 'detachement-industrie',
-  '/blog/directive-detachement-europe': 'blog-directive',
-  '/devis': 'devis-form',
-};
-
-function inferPageKeyFromPath(basePath: string): PageKey | null {
-  return PATH_TO_PAGEKEY[basePath] || null;
-}
-
 /**
  * Composant pour injecter les métadonnées SEO dans le <head>
  * Support de l'ancienne et nouvelle API pour rétrocompatibilité
  */
 export function SEOHead(props: SEOHeadProps) {
-
+  
   useEffect(() => {
     // Détecter quelle API est utilisée
     const isCustomAPI = 'title' in props && 'description' in props;
     const isNewAPI = 'page' in props && props.page !== undefined;
-
+    
     let metadata: { title: string; description: string; h1: string; keywords?: string[] };
     let currentLang: DevisLanguage = 'fr';
     let shouldIncludeServiceSchema = false;
-
+    
     if (isCustomAPI) {
+      // API PERSONNALISÉE (title/description)
       const { title, description, lang = 'fr', includeServiceSchema = false } = props as SEOHeadPropsCustom;
-      metadata = { title, description, h1: title, keywords: [] };
+      metadata = {
+        title,
+        description,
+        h1: title,
+        keywords: []
+      };
       currentLang = lang;
       shouldIncludeServiceSchema = includeServiceSchema;
     } else if (isNewAPI) {
+      // NOUVELLE API
       const { page, lang = 'fr', includeServiceSchema = false } = props as SEOHeadPropsNew;
       metadata = getPageMetadata(page, lang);
       currentLang = lang;
       shouldIncludeServiceSchema = includeServiceSchema;
     } else {
+      // ANCIENNE API (compatibilité App-Landing)
       const { content, language } = props as SEOHeadPropsOld;
       metadata = {
         title: content?.seo?.metaTitle || content?.meta?.title || 'YOJOB',
@@ -124,80 +105,86 @@ export function SEOHead(props: SEOHeadProps) {
         keywords: []
       };
       currentLang = language as DevisLanguage || 'fr';
-      shouldIncludeServiceSchema = false;
+      shouldIncludeServiceSchema = false; // Pas de schéma service pour l'ancienne API
     }
-
-    // ========================================================================
-    // URL COMPUTATION (needed by canonical, OG, hreflang)
-    // ========================================================================
-    const baseUrl = 'https://yojob.fr';
-    const currentPath = typeof window !== 'undefined' ? window.location.pathname : '/';
-    const allLangs = getAllLanguageCodes();
-    const segments = currentPath.split('/').filter(Boolean);
-    const firstSegment = segments[0]?.toLowerCase();
-    const hasLangPrefix = firstSegment && allLangs.includes(firstSegment);
-    const basePath = hasLangPrefix ? '/' + segments.slice(1).join('/') : currentPath;
-
-    const canonicalHref = currentLang === DEFAULT_LANGUAGE
-      ? `${baseUrl}${basePath === '/' ? '' : basePath}`
-      : `${baseUrl}/${currentLang}${basePath === '/' ? '' : basePath}`;
-
+    
     // ========================================================================
     // TITLE
     // ========================================================================
     document.title = metadata.title;
-
+    
     // ========================================================================
     // META DESCRIPTION
     // ========================================================================
-    setMeta('meta[name="description"]', 'name', 'description', metadata.description);
-
+    let metaDescription = document.querySelector('meta[name="description"]');
+    if (!metaDescription) {
+      metaDescription = document.createElement('meta');
+      metaDescription.setAttribute('name', 'description');
+      document.head.appendChild(metaDescription);
+    }
+    metaDescription.setAttribute('content', metadata.description);
+    
     // ========================================================================
     // META KEYWORDS (optionnel)
     // ========================================================================
     if (metadata.keywords && metadata.keywords.length > 0) {
-      setMeta('meta[name="keywords"]', 'name', 'keywords', metadata.keywords.join(', '));
+      let metaKeywords = document.querySelector('meta[name="keywords"]');
+      if (!metaKeywords) {
+        metaKeywords = document.createElement('meta');
+        metaKeywords.setAttribute('name', 'keywords');
+        document.head.appendChild(metaKeywords);
+      }
+      metaKeywords.setAttribute('content', metadata.keywords.join(', '));
     }
-
+    
     // ========================================================================
-    // OPEN GRAPH
+    // OPEN GRAPH (pour réseaux sociaux)
     // ========================================================================
-    const ogLocaleMap: Record<string, string> = {
-      fr: 'fr_FR', en: 'en_GB', de: 'de_DE', es: 'es_ES', it: 'it_IT',
-      nl: 'nl_NL', pt: 'pt_PT', pl: 'pl_PL', ro: 'ro_RO', cs: 'cs_CZ',
-      sk: 'sk_SK', hu: 'hu_HU', bg: 'bg_BG', hr: 'hr_HR', sl: 'sl_SI',
-      el: 'el_GR', sv: 'sv_SE', da: 'da_DK', fi: 'fi_FI', no: 'nb_NO',
-      lt: 'lt_LT', lv: 'lv_LV', et: 'et_EE',
-    };
-
-    const ogTags: Record<string, string> = {
-      'og:title': metadata.title,
-      'og:description': metadata.description,
-      'og:type': 'website',
-      'og:site_name': 'YOJOB',
-      'og:url': canonicalHref || baseUrl,
-      'og:image': `${baseUrl}/og-image-yojob-1200x630.svg`,
-      'og:locale': ogLocaleMap[currentLang] || 'fr_FR',
-    };
-
-    for (const [property, content] of Object.entries(ogTags)) {
-      setMeta(`meta[property="${property}"]`, 'property', property, content);
+    const ogTitle = document.querySelector('meta[property="og:title"]') || document.createElement('meta');
+    ogTitle.setAttribute('property', 'og:title');
+    ogTitle.setAttribute('content', metadata.title);
+    if (!document.querySelector('meta[property="og:title"]')) {
+      document.head.appendChild(ogTitle);
     }
-
+    
+    const ogDescription = document.querySelector('meta[property="og:description"]') || document.createElement('meta');
+    ogDescription.setAttribute('property', 'og:description');
+    ogDescription.setAttribute('content', metadata.description);
+    if (!document.querySelector('meta[property="og:description"]')) {
+      document.head.appendChild(ogDescription);
+    }
+    
+    const ogType = document.querySelector('meta[property="og:type"]') || document.createElement('meta');
+    ogType.setAttribute('property', 'og:type');
+    ogType.setAttribute('content', 'website');
+    if (!document.querySelector('meta[property="og:type"]')) {
+      document.head.appendChild(ogType);
+    }
+    
     // ========================================================================
     // TWITTER CARD
     // ========================================================================
-    const twitterTags: Record<string, string> = {
-      'twitter:card': 'summary_large_image',
-      'twitter:title': metadata.title,
-      'twitter:description': metadata.description,
-      'twitter:image': `${baseUrl}/og-image-yojob-1200x630.svg`,
-    };
-
-    for (const [name, content] of Object.entries(twitterTags)) {
-      setMeta(`meta[name="${name}"]`, 'name', name, content);
+    const twitterCard = document.querySelector('meta[name="twitter:card"]') || document.createElement('meta');
+    twitterCard.setAttribute('name', 'twitter:card');
+    twitterCard.setAttribute('content', 'summary_large_image');
+    if (!document.querySelector('meta[name="twitter:card"]')) {
+      document.head.appendChild(twitterCard);
     }
-
+    
+    const twitterTitle = document.querySelector('meta[name="twitter:title"]') || document.createElement('meta');
+    twitterTitle.setAttribute('name', 'twitter:title');
+    twitterTitle.setAttribute('content', metadata.title);
+    if (!document.querySelector('meta[name="twitter:title"]')) {
+      document.head.appendChild(twitterTitle);
+    }
+    
+    const twitterDescription = document.querySelector('meta[name="twitter:description"]') || document.createElement('meta');
+    twitterDescription.setAttribute('name', 'twitter:description');
+    twitterDescription.setAttribute('content', metadata.description);
+    if (!document.querySelector('meta[name="twitter:description"]')) {
+      document.head.appendChild(twitterDescription);
+    }
+    
     // ========================================================================
     // SCHEMA.ORG - ORGANIZATION (toujours présent)
     // ========================================================================
@@ -210,85 +197,27 @@ export function SEOHead(props: SEOHeadProps) {
     }
     const schemaBaseUrl = typeof window !== 'undefined' ? window.location.origin : 'https://yojob.fr';
     schemaOrg.textContent = JSON.stringify(getOrganizationSchema(schemaBaseUrl), null, 2);
-
+    
     // ========================================================================
     // SCHEMA.ORG - SERVICE (conditionnel)
     // ========================================================================
     if (shouldIncludeServiceSchema) {
-      // Determine PageKey: from page prop (new API) or from URL path (custom API)
-      const servicePageKey: PageKey | null = isNewAPI
-        ? (props as SEOHeadPropsNew).page
-        : inferPageKeyFromPath(basePath);
-
-      if (servicePageKey) {
-        let schemaService = document.querySelector('script[type="application/ld+json"][data-schema="service"]');
-        if (!schemaService) {
-          schemaService = document.createElement('script');
-          schemaService.setAttribute('type', 'application/ld+json');
-          schemaService.setAttribute('data-schema', 'service');
-          document.head.appendChild(schemaService);
-        }
-        schemaService.textContent = JSON.stringify(getServiceSchema(servicePageKey, currentLang), null, 2);
+      let schemaService = document.querySelector('script[type="application/ld+json"][data-schema="service"]');
+      if (!schemaService) {
+        schemaService = document.createElement('script');
+        schemaService.setAttribute('type', 'application/ld+json');
+        schemaService.setAttribute('data-schema', 'service');
+        document.head.appendChild(schemaService);
       }
+      schemaService.textContent = JSON.stringify(getServiceSchema(props.page as PageKey, currentLang), null, 2);
     } else {
+      // Supprimer le schéma Service s'il existe mais qu'on ne le veut plus
       const existingServiceSchema = document.querySelector('script[type="application/ld+json"][data-schema="service"]');
       if (existingServiceSchema) {
         existingServiceSchema.remove();
       }
     }
-
-    // ========================================================================
-    // SCHEMA.ORG - BREADCRUMBLIST (toujours présent sauf home)
-    // ========================================================================
-    if (basePath !== '/') {
-      let schemaBreadcrumb = document.querySelector('script[type="application/ld+json"][data-schema="breadcrumb"]');
-      if (!schemaBreadcrumb) {
-        schemaBreadcrumb = document.createElement('script');
-        schemaBreadcrumb.setAttribute('type', 'application/ld+json');
-        schemaBreadcrumb.setAttribute('data-schema', 'breadcrumb');
-        document.head.appendChild(schemaBreadcrumb);
-      }
-      schemaBreadcrumb.textContent = JSON.stringify(getBreadcrumbSchema(basePath, baseUrl), null, 2);
-    } else {
-      const existingBreadcrumb = document.querySelector('script[type="application/ld+json"][data-schema="breadcrumb"]');
-      if (existingBreadcrumb) existingBreadcrumb.remove();
-    }
-
-    // ========================================================================
-    // SCHEMA.ORG - FAQPAGE (conditionnel, si faqItems fourni)
-    // ========================================================================
-    const faqItems = (props as any).faqItems as Array<{ question: string; answer: string }> | undefined;
-    if (faqItems && faqItems.length > 0) {
-      let schemaFAQ = document.querySelector('script[type="application/ld+json"][data-schema="faq"]');
-      if (!schemaFAQ) {
-        schemaFAQ = document.createElement('script');
-        schemaFAQ.setAttribute('type', 'application/ld+json');
-        schemaFAQ.setAttribute('data-schema', 'faq');
-        document.head.appendChild(schemaFAQ);
-      }
-      schemaFAQ.textContent = JSON.stringify(getFAQSchema(faqItems), null, 2);
-    } else {
-      const existingFAQ = document.querySelector('script[type="application/ld+json"][data-schema="faq"]');
-      if (existingFAQ) existingFAQ.remove();
-    }
-
-    // ========================================================================
-    // SCHEMA.ORG - WEBSITE + SEARCHACTION (home seulement)
-    // ========================================================================
-    if (basePath === '/') {
-      let schemaWebSite = document.querySelector('script[type="application/ld+json"][data-schema="website"]');
-      if (!schemaWebSite) {
-        schemaWebSite = document.createElement('script');
-        schemaWebSite.setAttribute('type', 'application/ld+json');
-        schemaWebSite.setAttribute('data-schema', 'website');
-        document.head.appendChild(schemaWebSite);
-      }
-      schemaWebSite.textContent = JSON.stringify(getWebSiteSchema(baseUrl), null, 2);
-    } else {
-      const existingWebSite = document.querySelector('script[type="application/ld+json"][data-schema="website"]');
-      if (existingWebSite) existingWebSite.remove();
-    }
-
+    
     // ========================================================================
     // LANG ATTRIBUTE sur <html>
     // ========================================================================
@@ -297,6 +226,19 @@ export function SEOHead(props: SEOHeadProps) {
     // ========================================================================
     // CANONICAL URL
     // ========================================================================
+    const baseUrl = 'https://yojob.fr';
+    const currentPath = typeof window !== 'undefined' ? window.location.pathname : '/';
+    // Retirer le prefixe de langue pour obtenir le chemin de base
+    const allLangs = getAllLanguageCodes();
+    const segments = currentPath.split('/').filter(Boolean);
+    const firstSegment = segments[0]?.toLowerCase();
+    const hasLangPrefix = firstSegment && allLangs.includes(firstSegment);
+    const basePath = hasLangPrefix ? '/' + segments.slice(1).join('/') : currentPath;
+
+    const canonicalHref = currentLang === DEFAULT_LANGUAGE
+      ? `${baseUrl}${basePath === '/' ? '' : basePath}`
+      : `${baseUrl}/${currentLang}${basePath === '/' ? '' : basePath}`;
+
     let canonicalLink = document.querySelector('link[rel="canonical"]');
     if (!canonicalLink) {
       canonicalLink = document.createElement('link');
@@ -308,8 +250,10 @@ export function SEOHead(props: SEOHeadProps) {
     // ========================================================================
     // HREFLANG ALTERNATE LINKS
     // ========================================================================
+    // Supprimer les anciens hreflang
     document.querySelectorAll('link[rel="alternate"][hreflang]').forEach(el => el.remove());
 
+    // Ajouter un hreflang pour chaque langue supportee
     for (const lang of allLangs) {
       const href = lang === DEFAULT_LANGUAGE
         ? `${baseUrl}${basePath === '/' ? '' : basePath}`
@@ -322,15 +266,17 @@ export function SEOHead(props: SEOHeadProps) {
       document.head.appendChild(link);
     }
 
+    // x-default pointe vers la version francaise (langue par defaut)
     const xDefaultLink = document.createElement('link');
     xDefaultLink.setAttribute('rel', 'alternate');
     xDefaultLink.setAttribute('hreflang', 'x-default');
     xDefaultLink.setAttribute('href', `${baseUrl}${basePath === '/' ? '' : basePath}` || baseUrl);
     document.head.appendChild(xDefaultLink);
-
+    
     // ========================================================================
     // FAVICON LINKS
     // ========================================================================
+    // Favicon ICO (fallback)
     let faviconIco = document.querySelector('link[rel="icon"][type="image/x-icon"]');
     if (!faviconIco) {
       faviconIco = document.createElement('link');
@@ -339,7 +285,8 @@ export function SEOHead(props: SEOHeadProps) {
       faviconIco.setAttribute('href', '/favicon.ico');
       document.head.appendChild(faviconIco);
     }
-
+    
+    // Favicon SVG (modern browsers - prioritaire)
     let faviconSvg = document.querySelector('link[rel="icon"][type="image/svg+xml"]');
     if (!faviconSvg) {
       faviconSvg = document.createElement('link');
@@ -348,7 +295,8 @@ export function SEOHead(props: SEOHeadProps) {
       faviconSvg.setAttribute('href', '/favicon.svg');
       document.head.appendChild(faviconSvg);
     }
-
+    
+    // Web Manifest
     let manifest = document.querySelector('link[rel="manifest"]');
     if (!manifest) {
       manifest = document.createElement('link');
@@ -356,7 +304,8 @@ export function SEOHead(props: SEOHeadProps) {
       manifest.setAttribute('href', '/site.webmanifest');
       document.head.appendChild(manifest);
     }
-
+    
+    // Theme Color (pour mobile)
     let themeColor = document.querySelector('meta[name="theme-color"]');
     if (!themeColor) {
       themeColor = document.createElement('meta');
@@ -364,15 +313,10 @@ export function SEOHead(props: SEOHeadProps) {
       themeColor.setAttribute('content', '#1E3A8A');
       document.head.appendChild(themeColor);
     }
-
-    // ========================================================================
-    // PRE-RENDERING SIGNAL
-    // Signal to Puppeteer prerender script that SEO metadata is ready
-    // ========================================================================
-    (window as any).__SEO_READY__ = true;
-
+    
   }, [props]);
-
+  
+  // Ce composant n'affiche rien visuellement
   return null;
 }
 
