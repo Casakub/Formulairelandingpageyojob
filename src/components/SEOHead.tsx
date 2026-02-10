@@ -74,6 +74,22 @@ function setMeta(selector: string, attr: string, key: string, value: string) {
   el.setAttribute('content', value);
 }
 
+/** Map URL basePath → PageKey for custom API pages that don't pass `page` prop */
+const PATH_TO_PAGEKEY: Record<string, PageKey> = {
+  '/services/interim-europeen': 'interim-europeen',
+  '/services/recrutement-specialise': 'recrutement-specialise',
+  '/services/conseil-conformite': 'conseil-conformite',
+  '/services/detachement-personnel': 'detachement-personnel',
+  '/services/detachement-btp': 'detachement-btp',
+  '/services/detachement-industrie': 'detachement-industrie',
+  '/blog/directive-detachement-europe': 'blog-directive',
+  '/devis': 'devis-form',
+};
+
+function inferPageKeyFromPath(basePath: string): PageKey | null {
+  return PATH_TO_PAGEKEY[basePath] || null;
+}
+
 /**
  * Composant pour injecter les métadonnées SEO dans le <head>
  * Support de l'ancienne et nouvelle API pour rétrocompatibilité
@@ -198,15 +214,22 @@ export function SEOHead(props: SEOHeadProps) {
     // ========================================================================
     // SCHEMA.ORG - SERVICE (conditionnel)
     // ========================================================================
-    if (shouldIncludeServiceSchema && isNewAPI) {
-      let schemaService = document.querySelector('script[type="application/ld+json"][data-schema="service"]');
-      if (!schemaService) {
-        schemaService = document.createElement('script');
-        schemaService.setAttribute('type', 'application/ld+json');
-        schemaService.setAttribute('data-schema', 'service');
-        document.head.appendChild(schemaService);
+    if (shouldIncludeServiceSchema) {
+      // Determine PageKey: from page prop (new API) or from URL path (custom API)
+      const servicePageKey: PageKey | null = isNewAPI
+        ? (props as SEOHeadPropsNew).page
+        : inferPageKeyFromPath(basePath);
+
+      if (servicePageKey) {
+        let schemaService = document.querySelector('script[type="application/ld+json"][data-schema="service"]');
+        if (!schemaService) {
+          schemaService = document.createElement('script');
+          schemaService.setAttribute('type', 'application/ld+json');
+          schemaService.setAttribute('data-schema', 'service');
+          document.head.appendChild(schemaService);
+        }
+        schemaService.textContent = JSON.stringify(getServiceSchema(servicePageKey, currentLang), null, 2);
       }
-      schemaService.textContent = JSON.stringify(getServiceSchema(props.page as PageKey, currentLang), null, 2);
     } else {
       const existingServiceSchema = document.querySelector('script[type="application/ld+json"][data-schema="service"]');
       if (existingServiceSchema) {

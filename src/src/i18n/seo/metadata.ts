@@ -1573,14 +1573,6 @@ export function getWebSiteSchema(baseUrl: string = 'https://yojob.fr') {
     url: baseUrl,
     description: 'Courtier en recrutement et détachement de personnel européen BTP et industrie',
     inLanguage: 'fr',
-    potentialAction: {
-      '@type': 'SearchAction',
-      target: {
-        '@type': 'EntryPoint',
-        urlTemplate: `${baseUrl}/devis`
-      },
-      'query-input': 'required name=search_term_string'
-    }
   };
 }
 
