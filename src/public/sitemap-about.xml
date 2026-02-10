@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+        xmlns:xhtml="http://www.w3.org/1999/xhtml">
+  <!-- Services -->
+  <url>
+    <loc>https://yojob.fr/services/interim-europeen</loc>
+    <lastmod>2026-02-10</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://yojob.fr/services/interim-europeen" />
+    <xhtml:link rel="alternate" hreflang="en" href="https://yojob.fr/en/services/interim-europeen" />
+    <xhtml:link rel="alternate" hreflang="de" href="https://yojob.fr/de/services/interim-europeen" />
+    <xhtml:link rel="alternate" hreflang="es" href="https://yojob.fr/es/services/interim-europeen" />
+    <xhtml:link rel="alternate" hreflang="pt" href="https://yojob.fr/pt/services/interim-europeen" />
+    <xhtml:link rel="alternate" hreflang="it" href="https://yojob.fr/it/services/interim-europeen" />
+    <xhtml:link rel="alternate" hreflang="nl" href="https://yojob.fr/nl/services/interim-europeen" />
+    <xhtml:link rel="alternate" hreflang="pl" href="https://yojob.fr/pl/services/interim-europeen" />
+    <xhtml:link rel="alternate" hreflang="ro" href="https://yojob.fr/ro/services/interim-europeen" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://yojob.fr/services/interim-europeen" />
+  </url>
+  <url>
+    <loc>https://yojob.fr/services/recrutement-specialise</loc>
+    <lastmod>2026-02-10</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://yojob.fr/services/recrutement-specialise" />
+    <xhtml:link rel="alternate" hreflang="en" href="https://yojob.fr/en/services/recrutement-specialise" />
+    <xhtml:link rel="alternate" hreflang="de" href="https://yojob.fr/de/services/recrutement-specialise" />
+    <xhtml:link rel="alternate" hreflang="es" href="https://yojob.fr/es/services/recrutement-specialise" />
+    <xhtml:link rel="alternate" hreflang="pt" href="https://yojob.fr/pt/services/recrutement-specialise" />
+    <xhtml:link rel="alternate" hreflang="it" href="https://yojob.fr/it/services/recrutement-specialise" />
+    <xhtml:link rel="alternate" hreflang="nl" href="https://yojob.fr/nl/services/recrutement-specialise" />
+    <xhtml:link rel="alternate" hreflang="pl" href="https://yojob.fr/pl/services/recrutement-specialise" />
+    <xhtml:link rel="alternate" hreflang="ro" href="https://yojob.fr/ro/services/recrutement-specialise" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://yojob.fr/services/recrutement-specialise" />
+  </url>
+  <url>
+    <loc>https://yojob.fr/services/conseil-conformite</loc>
+    <lastmod>2026-02-10</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://yojob.fr/services/conseil-conformite" />
+    <xhtml:link rel="alternate" hreflang="en" href="https://yojob.fr/en/services/conseil-conformite" />
+    <xhtml:link rel="alternate" hreflang="de" href="https://yojob.fr/de/services/conseil-conformite" />
+    <xhtml:link rel="alternate" hreflang="es" href="https://yojob.fr/es/services/conseil-conformite" />
+    <xhtml:link rel="alternate" hreflang="pt" href="https://yojob.fr/pt/services/conseil-conformite" />
+    <xhtml:link rel="alternate" hreflang="it" href="https://yojob.fr/it/services/conseil-conformite" />
+    <xhtml:link rel="alternate" hreflang="nl" href="https://yojob.fr/nl/services/conseil-conformite" />
+    <xhtml:link rel="alternate" hreflang="pl" href="https://yojob.fr/pl/services/conseil-conformite" />
+    <xhtml:link rel="alternate" hreflang="ro" href="https://yojob.fr/ro/services/conseil-conformite" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://yojob.fr/services/conseil-conformite" />
+  </url>
+  <url>
+    <loc>https://yojob.fr/services/detachement-personnel</loc>
+    <lastmod>2026-02-10</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://yojob.fr/services/detachement-personnel" />
+    <xhtml:link rel="alternate" hreflang="en" href="https://yojob.fr/en/services/detachement-personnel" />
+    <xhtml:link rel="alternate" hreflang="de" href="https://yojob.fr/de/services/detachement-personnel" />
+    <xhtml:link rel="alternate" hreflang="es" href="https://yojob.fr/es/services/detachement-personnel" />
+    <xhtml:link rel="alternate" hreflang="pt" href="https://yojob.fr/pt/services/detachement-personnel" />
+    <xhtml:link rel="alternate" hreflang="it" href="https://yojob.fr/it/services/detachement-personnel" />
+    <xhtml:link rel="alternate" hreflang="nl" href="https://yojob.fr/nl/services/detachement-personnel" />
+    <xhtml:link rel="alternate" hreflang="pl" href="https://yojob.fr/pl/services/detachement-personnel" />
+    <xhtml:link rel="alternate" hreflang="ro" href="https://yojob.fr/ro/services/detachement-personnel" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://yojob.fr/services/detachement-personnel" />
+  </url>
+  <!-- Legal pages -->
+  <url>
+    <loc>https://yojob.fr/privacy</loc>
+    <lastmod>2026-02-10</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.3</priority>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://yojob.fr/privacy" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://yojob.fr/privacy" />
+  </url>
+  <url>
+    <loc>https://yojob.fr/legal</loc>
+    <lastmod>2026-02-10</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.3</priority>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://yojob.fr/legal" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://yojob.fr/legal" />
+  </url>
+  <url>
+    <loc>https://yojob.fr/cgv</loc>
+    <lastmod>2026-02-10</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.3</priority>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://yojob.fr/cgv" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://yojob.fr/cgv" />
+  </url>
+</urlset>

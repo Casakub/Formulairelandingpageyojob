@@ -21,7 +21,7 @@ export interface PageMetadata {
   keywords?: string[];    // Mots-clés optionnels
 }
 
-export type PageKey = 
+export type PageKey =
   | 'home'
   | 'detachement-btp'
   | 'detachement-industrie'
@@ -32,7 +32,14 @@ export type PageKey =
   | 'a-propos'
   | 'notre-reseau'
   | 'nos-secteurs'
-  | 'temoignages';
+  | 'temoignages'
+  | 'interim-europeen'
+  | 'recrutement-specialise'
+  | 'conseil-conformite'
+  | 'detachement-personnel'
+  | 'privacy'
+  | 'legal'
+  | 'cgv';
 
 // ============================================================================
 // MÉTADONNÉES PAR PAGE ET PAR LANGUE
@@ -1375,6 +1382,122 @@ export const SEO_METADATA: Record<PageKey, Record<DevisLanguage, PageMetadata>> 
       description: 'Oppdag våre kunders vitnesbyrd: casestudier Bouygues, Renault, Pierre & Vacances. 98% tilfredshet, 2000+ vellykkede oppdrag. Gjennomsnittlig vurdering 4.9/5.',
       h1: 'De stoler på oss for sin europeiske rekruttering'
     }
+  },
+
+  // --------------------------------------------------------------------------
+  // INTÉRIM EUROPÉEN (service page)
+  // --------------------------------------------------------------------------
+  'interim-europeen': {
+    'fr': {
+      title: 'Intérim Européen BTP Industrie | Travailleurs Détachés YOJOB',
+      description: 'Service d\'intérim européen pour le BTP et l\'industrie. Travailleurs qualifiés détachés depuis le Portugal, la Roumanie et la Pologne. Conformité UE garantie.',
+      h1: 'Intérim Européen : Vos Travailleurs Qualifiés en 15 Jours',
+      keywords: ['intérim européen', 'travailleurs détachés', 'BTP Europe', 'personnel européen']
+    },
+    'en': {
+      title: 'European Temporary Work Construction Industry | Posted Workers YOJOB',
+      description: 'European temporary staffing service for construction and industry. Qualified posted workers from Portugal, Romania and Poland. EU compliance guaranteed.',
+      h1: 'European Temporary Work: Your Qualified Workers in 15 Days'
+    }
+  },
+
+  // --------------------------------------------------------------------------
+  // RECRUTEMENT SPÉCIALISÉ (service page)
+  // --------------------------------------------------------------------------
+  'recrutement-specialise': {
+    'fr': {
+      title: 'Recrutement Spécialisé Europe | Talents Qualifiés BTP Industrie YOJOB',
+      description: 'Recrutement spécialisé de talents européens qualifiés pour le BTP et l\'industrie. Sélection rigoureuse, profils vérifiés, mobilisation rapide dans 27 pays.',
+      h1: 'Recrutement Spécialisé de Talents Européens Qualifiés',
+      keywords: ['recrutement spécialisé', 'talents européens', 'recrutement BTP', 'profils qualifiés Europe']
+    },
+    'en': {
+      title: 'Specialized European Recruitment | Qualified Talents Construction YOJOB',
+      description: 'Specialized recruitment of qualified European talents for construction and industry. Rigorous selection, verified profiles, rapid mobilization in 27 countries.',
+      h1: 'Specialized Recruitment of Qualified European Talents'
+    }
+  },
+
+  // --------------------------------------------------------------------------
+  // CONSEIL CONFORMITÉ (service page)
+  // --------------------------------------------------------------------------
+  'conseil-conformite': {
+    'fr': {
+      title: 'Conseil Conformité Détachement Travailleurs Europe | YOJOB',
+      description: 'Conseil en conformité pour le détachement de travailleurs européens. Directive UE, formulaire A1, obligations légales. Accompagnement expert pour employeurs.',
+      h1: 'Conseil en Conformité pour le Détachement de Travailleurs Européens',
+      keywords: ['conformité détachement', 'directive travailleurs détachés', 'formulaire A1', 'obligations légales']
+    },
+    'en': {
+      title: 'Compliance Consulting European Worker Posting | YOJOB',
+      description: 'Compliance consulting for European worker posting. EU directive, A1 form, legal obligations. Expert support for employers.',
+      h1: 'Compliance Consulting for European Worker Posting'
+    }
+  },
+
+  // --------------------------------------------------------------------------
+  // DÉTACHEMENT DE PERSONNEL (service page)
+  // --------------------------------------------------------------------------
+  'detachement-personnel': {
+    'fr': {
+      title: 'Détachement de Personnel Européen | Gestion Complète YOJOB',
+      description: 'Service complet de détachement de personnel européen. Gestion administrative, hébergement, transport. Travailleurs qualifiés BTP et industrie depuis 27 pays UE.',
+      h1: 'Détachement de Personnel Européen : Gestion Complète de A à Z',
+      keywords: ['détachement personnel', 'gestion détachement', 'personnel européen', 'travailleurs BTP Europe']
+    },
+    'en': {
+      title: 'European Staff Posting | Complete Management YOJOB',
+      description: 'Complete European staff posting service. Administrative management, accommodation, transport. Qualified construction and industry workers from 27 EU countries.',
+      h1: 'European Staff Posting: Complete A-to-Z Management'
+    }
+  },
+
+  // --------------------------------------------------------------------------
+  // PRIVACY (legal page)
+  // --------------------------------------------------------------------------
+  'privacy': {
+    'fr': {
+      title: 'Politique de Confidentialité | Protection des Données YOJOB',
+      description: 'Politique de confidentialité YOJOB. Traitement des données personnelles conforme RGPD. Droits d\'accès, de rectification et de suppression. DPO joignable.',
+      h1: 'Politique de Confidentialité et Protection des Données'
+    },
+    'en': {
+      title: 'Privacy Policy | Data Protection YOJOB',
+      description: 'YOJOB privacy policy. Personal data processing compliant with GDPR. Rights of access, rectification and deletion. DPO reachable.',
+      h1: 'Privacy Policy and Data Protection'
+    }
+  },
+
+  // --------------------------------------------------------------------------
+  // LEGAL (legal page)
+  // --------------------------------------------------------------------------
+  'legal': {
+    'fr': {
+      title: 'Mentions Légales | Informations Juridiques YOJOB',
+      description: 'Mentions légales du site yojob.fr. Éditeur, hébergeur, conditions d\'utilisation, propriété intellectuelle. YOJOB - Courtier en recrutement européen.',
+      h1: 'Mentions Légales'
+    },
+    'en': {
+      title: 'Legal Notice | Legal Information YOJOB',
+      description: 'Legal notice of yojob.fr website. Publisher, host, terms of use, intellectual property. YOJOB - European recruitment broker.',
+      h1: 'Legal Notice'
+    }
+  },
+
+  // --------------------------------------------------------------------------
+  // CGV (legal page)
+  // --------------------------------------------------------------------------
+  'cgv': {
+    'fr': {
+      title: 'Conditions Générales de Vente | CGV YOJOB',
+      description: 'Conditions générales de vente YOJOB. Prestations de courtage en intérim et détachement européen. Tarification, paiement, responsabilités, litiges.',
+      h1: 'Conditions Générales de Vente'
+    },
+    'en': {
+      title: 'General Terms and Conditions | YOJOB',
+      description: 'YOJOB general terms and conditions. European temporary work and posting brokerage services. Pricing, payment, responsibilities, disputes.',
+      h1: 'General Terms and Conditions'
+    }
   }
 };
 
@@ -1392,23 +1515,25 @@ export function getPageMetadata(page: PageKey, lang: DevisLanguage): PageMetadat
 /**
  * Générer le schéma Organization pour toutes les pages
  */
-export function getOrganizationSchema() {
+export function getOrganizationSchema(baseUrl: string = 'https://yojob.fr') {
   return {
     '@context': 'https://schema.org',
     '@type': 'Organization',
     name: 'YOJOB',
     description: 'Courtier en recrutement et détachement de personnel européen BTP et industrie',
-    url: 'https://yojob.com',
-    logo: 'https://yojob.com/logo.png',
-    areaServed: ['FR', 'PT', 'RO', 'PL', 'ES', 'IT', 'DE', 'NL', 'BE', 'LU', 'AT', 'CZ', 'SK', 'HU', 'BG', 'GR', 'HR', 'SI', 'LT', 'LV', 'EE', 'SE', 'DK', 'FI', 'NO', 'IE', 'GB'],
+    url: baseUrl,
+    logo: `${baseUrl}/favicon.svg`,
+    areaServed: ['FR', 'PT', 'RO', 'PL', 'ES', 'IT', 'DE', 'NL', 'BE', 'LU', 'AT', 'CZ', 'SK', 'HU', 'BG', 'GR', 'HR', 'SI', 'LT', 'LV', 'EE', 'SE', 'DK', 'FI', 'NO', 'IE'],
     serviceType: ['Détachement de personnel', 'Intérim européen', 'Recrutement international'],
     contactPoint: {
       '@type': 'ContactPoint',
-      telephone: '+33-X-XX-XX-XX-XX',
       contactType: 'customer service',
       areaServed: 'EU',
       availableLanguage: ['French', 'English', 'Portuguese', 'Spanish', 'German', 'Italian', 'Polish', 'Romanian']
-    }
+    },
+    sameAs: [
+      'https://www.linkedin.com/company/yojob'
+    ]
   };
 }
 
