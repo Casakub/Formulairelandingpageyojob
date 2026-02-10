@@ -68,8 +68,9 @@ APP_FILES=(
   "src/scripts/seo-ci-check.sh"
   "src/scripts/seo-validate.sh"
   "src/hooks/useLanguageManager.ts"
-  # Router (routes BTP, Industrie, Blog)
+  # Router (routes BTP, Industrie, Blog) + 404
   "src/App.tsx"
+  "src/NotFound.tsx"
   # Service pages (includeServiceSchema + faqItems)
   "src/ServiceInterimEuropeen.tsx"
   "src/ServiceRecrutementSpecialise.tsx"
@@ -79,8 +80,9 @@ APP_FILES=(
   "src/ServiceDetachementBTP.tsx"
   "src/ServiceDetachementIndustrie.tsx"
   "src/BlogDirective.tsx"
-  # Blog CMS system
+  # Blog CMS system + footer translations
   "src/BlogList.tsx"
+  "src/src/i18n/services/footer.ts"
   "src/BlogPost.tsx"
   "src/services/blogService.ts"
   "src/components/dashboard/blog/TipTapEditor.tsx"
