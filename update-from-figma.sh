@@ -60,11 +60,35 @@ APP_FILES=(
   "package-lock.json"
   ".npmrc"
   "index.html"
+  "vite.config.ts"
+  # SEO core
   "src/components/SEOHead.tsx"
   "src/src/i18n/seo/metadata.ts"
   "src/scripts/prerender.cjs"
+  "src/scripts/seo-ci-check.sh"
+  "src/scripts/seo-validate.sh"
   "src/hooks/useLanguageManager.ts"
-  "vite.config.ts"
+  # Router (routes BTP, Industrie, Blog)
+  "src/App.tsx"
+  # Service pages (includeServiceSchema + faqItems)
+  "src/ServiceInterimEuropeen.tsx"
+  "src/ServiceRecrutementSpecialise.tsx"
+  "src/ServiceConseilConformite.tsx"
+  "src/ServiceDetachementPersonnel.tsx"
+  # New pages (Phase 3)
+  "src/ServiceDetachementBTP.tsx"
+  "src/ServiceDetachementIndustrie.tsx"
+  "src/BlogDirective.tsx"
+  # Blog CMS system
+  "src/BlogList.tsx"
+  "src/BlogPost.tsx"
+  "src/services/blogService.ts"
+  "src/components/dashboard/blog/TipTapEditor.tsx"
+  "src/components/dashboard/blog/BlogEditor.tsx"
+  "src/components/dashboard/blog/BlogManager.tsx"
+  "src/DashboardApp.tsx"
+  # Blog migration
+  "src/supabase/migrations/18_blog_system.sql"
 )
 
 # ── Helpers ──────────────────────────────────────────────────────────────────
@@ -110,7 +134,9 @@ classify_file() {
     src/ServiceDetachementPersonnel.tsx)        echo "/services/detachement-personnel" ;;
     src/ServiceDetachementBTP.tsx)              echo "/services/detachement-btp" ;;
     src/ServiceDetachementIndustrie.tsx)        echo "/services/detachement-industrie" ;;
-    src/BlogDirectiveDetachement.tsx)           echo "/blog/directive-detachement-europe" ;;
+    src/BlogDirective.tsx)                      echo "/blog/directive-detachement-europe" ;;
+    src/BlogList.tsx)                            echo "/blog" ;;
+    src/BlogPost.tsx)                            echo "/blog" ;;
     src/DemandeDevis.tsx)                       echo "/devis" ;;
     src/Privacy.tsx)                            echo "/privacy" ;;
     src/Legal.tsx)                              echo "/legal" ;;
