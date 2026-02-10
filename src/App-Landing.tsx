@@ -153,6 +153,10 @@ export default function AppLanding() {
     message: '',
   });
 
+  // 🛡️ Anti-bot: honeypot field (hidden, bots fill it) + timer
+  const [honeypot, setHoneypot] = useState('');
+  const [formLoadedAt] = useState(() => Date.now());
+
   // 🌍 Hook unifié de gestion de la langue (détection auto + persistance)
   const {
     currentLanguage,
@@ -198,6 +202,26 @@ export default function AppLanding() {
 
   const handleWaitlistSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    // 🛡️ Anti-bot check: honeypot + timer (same as contact form)
+    if (honeypot) {
+      const successMsg = content.network?.waitlist?.successMessage ||
+                         (currentLanguage === 'fr' ? 'Merci ! Vous êtes inscrit à la liste d\'attente.' : 'Thank you! You are now on the waitlist.');
+      setSuccessMessage(successMsg);
+      setShowSuccessModal(true);
+      setWaitlistEmail('');
+      return;
+    }
+    const elapsed = Date.now() - formLoadedAt;
+    if (elapsed < 3000) {
+      const successMsg = content.network?.waitlist?.successMessage ||
+                         (currentLanguage === 'fr' ? 'Merci ! Vous êtes inscrit à la liste d\'attente.' : 'Thank you! You are now on the waitlist.');
+      setSuccessMessage(successMsg);
+      setShowSuccessModal(true);
+      setWaitlistEmail('');
+      return;
+    }
+
     log.formSubmit('Waitlist', { email: waitlistEmail, language: currentLanguage });
     
     try {
@@ -267,8 +291,27 @@ export default function AppLanding() {
 
   const handleContactSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    // 🛡️ Anti-bot check 1: honeypot (if filled, it's a bot)
+    if (honeypot) {
+      // Fake success to not alert the bot
+      setSuccessMessage(content.ctaForm.form.successMessage);
+      setShowSuccessModal(true);
+      setFormData({ name: '', email: '', phone: '', company: '', contactType: '', needType: '', message: '' });
+      return;
+    }
+
+    // 🛡️ Anti-bot check 2: timer (form filled in less than 3 seconds = bot)
+    const elapsed = Date.now() - formLoadedAt;
+    if (elapsed < 3000) {
+      setSuccessMessage(content.ctaForm.form.successMessage);
+      setShowSuccessModal(true);
+      setFormData({ name: '', email: '', phone: '', company: '', contactType: '', needType: '', message: '' });
+      return;
+    }
+
     log.formSubmit('Contact', { ...formData, language: currentLanguage });
-    
+
     try {
       // Envoyer au backend Prospects
       const response = await fetch(
@@ -1243,6 +1286,12 @@ export default function AppLanding() {
                       </div>
                       
                       <form onSubmit={handleWaitlistSubmit} className="space-y-4">
+                        {/* 🛡️ Honeypot: champ caché anti-bot */}
+                        <div aria-hidden="true" style={{ position: 'absolute', left: '-9999px', top: '-9999px', opacity: 0, height: 0, overflow: 'hidden' }}>
+                          <label htmlFor="company_website">Company website</label>
+                          <input type="text" id="company_website" name="company_website" tabIndex={-1} autoComplete="off"
+                            value={honeypot} onChange={(e) => setHoneypot(e.target.value)} />
+                        </div>
                         <div className="relative group">
                           <Input
                             type="email"
@@ -1574,6 +1623,19 @@ export default function AppLanding() {
             >
               <Card className="bg-white/95 backdrop-blur-xl border-2 border-white/40 shadow-2xl shadow-violet-500/20 p-5 lg:p-8 rounded-3xl">
                 <form onSubmit={handleContactSubmit} className="space-y-4 lg:space-y-5">
+                  {/* 🛡️ Honeypot: champ caché anti-bot */}
+                  <div aria-hidden="true" style={{ position: 'absolute', left: '-9999px', top: '-9999px', opacity: 0, height: 0, overflow: 'hidden' }}>
+                    <label htmlFor="website_url">Website</label>
+                    <input
+                      type="text"
+                      id="website_url"
+                      name="website_url"
+                      tabIndex={-1}
+                      autoComplete="off"
+                      value={honeypot}
+                      onChange={(e) => setHoneypot(e.target.value)}
+                    />
+                  </div>
                   <div className="grid md:grid-cols-2 gap-3 lg:gap-4">
                     <div className="space-y-1.5 lg:space-y-2">
                       <Label htmlFor="name" className="text-gray-700">{content.ctaForm.form.fields.name.label} *</Label>
