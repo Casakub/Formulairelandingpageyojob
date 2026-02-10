@@ -56,9 +56,10 @@ const filterPages = () => {
 
 // Filter langs by PRERENDER_LANGS env var (comma-separated lang codes)
 // Special value "NONE" = skip prerender entirely
+// Special value "ALL" = no filtering, use all langs for the page
 const filterLangs = (langs) => {
   const envLangs = process.env.PRERENDER_LANGS;
-  if (!envLangs) return langs;
+  if (!envLangs || envLangs === 'ALL') return langs;
   if (envLangs === 'NONE') return [];
   const allowed = envLangs.split(',').map((l) => l.trim());
   return langs.filter((l) => allowed.includes(l));
