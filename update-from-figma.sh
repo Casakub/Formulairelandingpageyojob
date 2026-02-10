@@ -39,7 +39,7 @@ on_error() {
 trap on_error ERR
 
 # ── Config ───────────────────────────────────────────────────────────────────
-GUARD_BRANCH="claude/seo-consultant-setup-C5UvK"
+GUARD_BRANCH="claude/verify-root-files-placement-B4mK1"
 BRANCH_REF="origin/${GUARD_BRANCH}"
 LAST_COMMIT_FILE=".last-deploy-commit"
 
