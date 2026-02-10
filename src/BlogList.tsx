@@ -39,8 +39,8 @@ export default function BlogList() {
   return (
     <>
       <SEOHead
-        title="Blog - YOJOB | Articles sur le recrutement européen"
-        description="Découvrez nos articles sur le détachement de travailleurs, la réglementation européenne, et les bonnes pratiques en recrutement international."
+        title="Détachement de travailleurs & recrutement européen | Blog"
+        description="Découvrez nos articles et guides sur le détachement de travailleurs en Europe, la réglementation européenne et les bonnes pratiques en recrutement international."
       />
 
       <div className="min-h-screen bg-gradient-to-br from-blue-900 via-violet-900 to-cyan-900">
