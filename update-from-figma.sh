@@ -11,9 +11,10 @@
 # Un rebuild du landing page ne les supprime PLUS.
 # Le prerender ne tourne que quand du contenu change réellement.
 #
-# CORRECTION v2: APP_FILES supprimé. Seuls les fichiers Docker/infra sont
-# restaurés depuis la guard branch. Les fichiers applicatifs viennent de main
-# (Figma Make + PRs mergées). Cela évite d'écraser les changements Figma Make.
+# CORRECTION v3: Zéro commit local. Le script fait un reset --hard sur
+# origin/main puis copie les fichiers infra SANS committer. Cela élimine
+# la divergence entre le main local du serveur et origin/main.
+# Les fichiers applicatifs (src/) viennent de main (Figma Make + PRs mergées).
 #
 # Usage:
 #   ./update-from-figma.sh                                    Auto-détection
@@ -214,26 +215,29 @@ detect_changed_routes() {
 }
 
 # =============================================================================
-# Restauration des fichiers infrastructure UNIQUEMENT
+# Restauration des fichiers infrastructure (SANS commit)
+# Copie les fichiers depuis la guard branch dans le working directory.
+# Pas de git add, pas de commit → zéro divergence avec origin/main.
 # =============================================================================
 restore_infra_files() {
   local ref="$1"
 
-  echo "Restoring infra files from guard branch..."
+  echo "Restoring infra files from guard branch (working dir only)..."
   local restored=0
   for file in "${INFRA_FILES[@]}"; do
     if git cat-file -e "${ref}:${file}" 2>/dev/null; then
-      git checkout "$ref" -- "$file"
+      # Créer le dossier parent si nécessaire
+      local dir
+      dir="$(dirname "$file")"
+      [[ "$dir" != "." ]] && mkdir -p "$dir"
+      # Copier le contenu sans staging (git show au lieu de git checkout)
+      git show "${ref}:${file}" > "$file"
       restored=$((restored + 1))
     else
       echo "   Introuvable: $file"
     fi
   done
-  if [[ $restored -gt 0 ]]; then
-    git add -A
-    git commit -m "Restore Docker/infra configuration files (${restored} files)" 2>/dev/null || true
-  fi
-  echo "   ${restored} fichier(s) infra restauré(s)."
+  echo "   ${restored} fichier(s) infra restauré(s) (non commités)."
 }
 
 # =============================================================================
@@ -264,51 +268,50 @@ if ! git show-ref --verify --quiet "refs/remotes/${BRANCH_REF}"; then
   fi
 fi
 
-# ── Protection du fichier .env (contient les secrets, jamais versionné) ──────
+# ── Sauvegarder les fichiers locaux avant reset ─────────────────────────────
 ENV_BACKUP=""
 if [[ -f .env ]]; then
   ENV_BACKUP="$(mktemp)"
   cp .env "$ENV_BACKUP"
-  echo "Fichier .env sauvegardé avant merge."
+  echo "Fichier .env sauvegardé."
 fi
 
-echo "Merging main into current branch..."
-if ! git merge origin/main -m "Merge Figma Make updates from main" --no-edit 2>/dev/null; then
-    echo "Merge conflict, résolution automatique (on accepte les changements de main)..."
-    # Accepter les changements venant de main (Figma Make) pour les conflits
-    git checkout --theirs . 2>/dev/null || true
-    # Gérer le cas src/public/ -> public/
-    if [[ -d "src/public" ]]; then
-        mkdir -p public
-        cp -r src/public/* public/ 2>/dev/null || true
-        rm -rf src/public
-    fi
-    git add -A
-    git commit -m "Merge Figma Make updates - auto-resolved (accept theirs)" || true
+LAST_DEPLOY_BACKUP=""
+if [[ -f "$LAST_COMMIT_FILE" ]]; then
+  LAST_DEPLOY_BACKUP="$(cat "$LAST_COMMIT_FILE")"
+  echo "Dernier deploy: ${LAST_DEPLOY_BACKUP:0:8}"
 fi
 
+# ── Reset local main = origin/main (zéro divergence) ────────────────────────
+echo "Synchronisation avec origin/main (reset --hard)..."
+git reset --hard origin/main
+echo "   Local main synchronisé avec origin/main ($(git rev-parse --short HEAD))"
+
+# Restaurer le fichier de tracking du dernier deploy
+if [[ -n "${LAST_DEPLOY_BACKUP:-}" ]]; then
+  echo "$LAST_DEPLOY_BACKUP" > "$LAST_COMMIT_FILE"
+fi
+
+# ── Gérer le cas src/public/ -> public/ (Figma Make artifact) ────────────────
 if [[ -d "src/public" ]]; then
     echo "Moving files from src/public/ to public/..."
     mkdir -p public
     shopt -s nullglob dotglob
-    mv src/public/* public/ || true
+    cp -r src/public/* public/ 2>/dev/null || true
     shopt -u nullglob dotglob
-    rmdir src/public 2>/dev/null || true
-    git add -A
-    git commit -m "Fix: move static files from src/public/ to public/" || true
+    rm -rf src/public
 fi
 
-# Restaurer UNIQUEMENT les fichiers infra (Docker, nginx, etc.)
-# Les fichiers applicatifs (package.json, composants, services) viennent de main
+# ── Restaurer les fichiers infra (working dir only, pas de commit) ───────────
 if [[ -n "$BRANCH_REF" ]]; then
   restore_infra_files "$BRANCH_REF"
 fi
 
-# ── Restauration du fichier .env ─────────────────────────────────────────────
+# ── Restaurer le fichier .env ────────────────────────────────────────────────
 if [[ -n "${ENV_BACKUP:-}" && -f "$ENV_BACKUP" ]]; then
   cp "$ENV_BACKUP" .env
   rm -f "$ENV_BACKUP"
-  echo "Fichier .env restauré (protégé contre le merge)."
+  echo "Fichier .env restauré."
 fi
 
 # =============================================================================
@@ -432,9 +435,10 @@ else
   echo "Prerender non nécessaire. Pages du volume conservées."
 fi
 
-# Sauvegarder le commit déployé
+# Sauvegarder le commit déployé (= HEAD de origin/main, pas de commit local)
 DEPLOYED_COMMIT="$(git rev-parse HEAD)"
 echo "$DEPLOYED_COMMIT" > "$LAST_COMMIT_FILE"
 echo ""
 echo "Commit déployé: ${DEPLOYED_COMMIT:0:8}"
+echo "Local main = origin/main (zéro divergence)"
 echo "Update complete!"
