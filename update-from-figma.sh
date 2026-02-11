@@ -401,11 +401,17 @@ if [[ ! -f docker-compose.yml ]]; then
   exit 1
 fi
 
-# STEP 1 : Rebuild et restart le landing page (rapide, sans Chromium)
+# STEP 1 : Build l'image avec cache-bust (évite que Docker serve l'ancien build)
+# Le CACHEBUST ARG dans le Dockerfile invalide le cache à partir du COPY --from=builder
 echo "Building landing page (nginx)..."
-docker compose up -d --build --remove-orphans yojob-landing
+CACHEBUST="$(date +%s)"
+docker compose build --build-arg CACHEBUST="$CACHEBUST" yojob-landing
 
-# STEP 2 : Prerender si nécessaire (conteneur dédié)
+# STEP 2 : Déployer le conteneur (toujours force-recreate pour utiliser la nouvelle image)
+echo "Deploying landing page..."
+docker compose up -d --force-recreate --remove-orphans yojob-landing
+
+# STEP 3 : Prerender si nécessaire (conteneur dédié)
 if [[ "$NEED_PRERENDER" == true ]]; then
   echo ""
   echo "-- Prerender --"
