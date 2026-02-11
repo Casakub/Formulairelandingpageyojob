@@ -260,6 +260,73 @@ export async function deleteBlogImage(url: string): Promise<void> {
   if (error) throw error;
 }
 
+// =============================================================================
+// SITEMAP GENERATION
+// =============================================================================
+
+const HREFLANG_CODES = [
+  'fr','en','de','es','it','nl','pt','pl','cs','sk','hu','ro','bg',
+  'hr','sl','et','lv','lt','el','sv','da','fi','no'
+];
+
+function generateHreflangLinks(path: string, baseUrl: string): string {
+  return HREFLANG_CODES.map((lang) => {
+    const href = lang === 'fr' ? `${baseUrl}${path}` : `${baseUrl}/${lang}${path}`;
+    return `    <xhtml:link rel="alternate" hreflang="${lang}" href="${href}" />`;
+  }).join('\n') + `\n    <xhtml:link rel="alternate" hreflang="x-default" href="${baseUrl}${path}" />`;
+}
+
+export async function generateBlogSitemap(baseUrl = 'https://yojob.fr'): Promise<string> {
+  const articles = await getPublishedArticles();
+  const now = new Date().toISOString().split('T')[0];
+
+  const urls = articles.map((article) => {
+    const path = `/blog/${article.slug}`;
+    return `  <url>
+    <loc>${baseUrl}${path}</loc>
+    <lastmod>${article.updated_at ? article.updated_at.split('T')[0] : now}</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+${generateHreflangLinks(path, baseUrl)}
+  </url>`;
+  }).join('\n');
+
+  const blogIndexUrl = `  <url>
+    <loc>${baseUrl}/blog</loc>
+    <lastmod>${now}</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+${generateHreflangLinks('/blog', baseUrl)}
+  </url>`;
+
+  return `<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+        xmlns:xhtml="http://www.w3.org/1999/xhtml">
+  <!-- Blog sitemap - Auto-generated on ${now} -->
+${blogIndexUrl}
+${urls}
+</urlset>`;
+}
+
+export function generateSitemapIndex(baseUrl = 'https://yojob.fr'): string {
+  const now = new Date().toISOString().split('T')[0];
+  return `<?xml version="1.0" encoding="UTF-8"?>
+<sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <sitemap>
+    <loc>${baseUrl}/sitemap-main.xml</loc>
+    <lastmod>${now}</lastmod>
+  </sitemap>
+  <sitemap>
+    <loc>${baseUrl}/sitemap-about.xml</loc>
+    <lastmod>${now}</lastmod>
+  </sitemap>
+  <sitemap>
+    <loc>${baseUrl}/sitemap-blog.xml</loc>
+    <lastmod>${now}</lastmod>
+  </sitemap>
+</sitemapindex>`;
+}
+
 // Helper: generate slug from title
 export function generateSlug(title: string): string {
   return title
