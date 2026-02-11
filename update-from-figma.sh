@@ -59,17 +59,17 @@ INFRA_FILES=(
   ".dockerignore"
   ".env.example"
   ".npmrc"
+  "package.json"
   "nginx/nginx.conf"
   "src/scripts/prerender.cjs"
   "src/scripts/seo-ci-check.sh"
   "src/scripts/seo-validate.sh"
 )
 
-# NOTE: APP_FILES a été SUPPRIME intentionnellement.
-# Les fichiers applicatifs (package.json, composants React, services, etc.)
-# doivent venir de main (via Figma Make ou PRs mergées).
-# Les restaurer depuis une guard branch figée les écrasait avec des versions
-# obsolètes, annulant les changements Figma Make après le merge.
+# NOTE: package.json est dans INFRA_FILES car Figma Make ne gère pas les
+# dépendances serveur (puppeteer, etc.). La version de référence est sur
+# la guard branch. Mettre à jour la guard branch si de nouvelles dépendances
+# sont nécessaires.
 
 # ── Helpers ──────────────────────────────────────────────────────────────────
 is_true() {

@@ -23,9 +23,6 @@ COPY package.json .npmrc ./
 RUN npm config set registry https://registry.npmjs.org/
 RUN npm install --legacy-peer-deps
 
-# Install puppeteer (not in Figma Make's package.json but required for prerender)
-RUN npm install puppeteer
-
 # Copy source
 COPY . .
 
