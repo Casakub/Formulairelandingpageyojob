@@ -11,6 +11,10 @@
 # Un rebuild du landing page ne les supprime PLUS.
 # Le prerender ne tourne que quand du contenu change réellement.
 #
+# CORRECTION v2: APP_FILES supprimé. Seuls les fichiers Docker/infra sont
+# restaurés depuis la guard branch. Les fichiers applicatifs viennent de main
+# (Figma Make + PRs mergées). Cela évite d'écraser les changements Figma Make.
+#
 # Usage:
 #   ./update-from-figma.sh                                    Auto-détection
 #   PRERENDER_LANGS=fr,en ./update-from-figma.sh              FR + EN
@@ -43,6 +47,9 @@ GUARD_BRANCH="claude/verify-root-files-placement-B4mK1"
 BRANCH_REF="origin/${GUARD_BRANCH}"
 LAST_COMMIT_FILE=".last-deploy-commit"
 
+# INFRA_FILES : fichiers Docker/infrastructure protégés contre les écrasements
+# par Figma Make. Ces fichiers n'existent pas sur Figma Make et doivent être
+# restaurés depuis la guard branch après chaque merge.
 INFRA_FILES=(
   "Dockerfile"
   "Dockerfile.prerender"
@@ -51,49 +58,18 @@ INFRA_FILES=(
   "prerender-entrypoint.sh"
   ".dockerignore"
   ".env.example"
-  "nginx/nginx.conf"
-  "update-from-figma.sh"
-)
-
-APP_FILES=(
-  "package.json"
-  "package-lock.json"
   ".npmrc"
-  "index.html"
-  "vite.config.ts"
-  # SEO core
-  "src/components/SEOHead.tsx"
-  "src/src/i18n/seo/metadata.ts"
+  "nginx/nginx.conf"
   "src/scripts/prerender.cjs"
   "src/scripts/seo-ci-check.sh"
   "src/scripts/seo-validate.sh"
-  "src/hooks/useLanguageManager.ts"
-  # Router (routes BTP, Industrie, Blog) + 404
-  "src/App.tsx"
-  "src/NotFound.tsx"
-  # Service pages (includeServiceSchema + faqItems)
-  "src/ServiceInterimEuropeen.tsx"
-  "src/ServiceRecrutementSpecialise.tsx"
-  "src/ServiceConseilConformite.tsx"
-  "src/ServiceDetachementPersonnel.tsx"
-  # New pages (Phase 3)
-  "src/ServiceDetachementBTP.tsx"
-  "src/ServiceDetachementIndustrie.tsx"
-  "src/BlogDirective.tsx"
-  # Blog CMS system + footer translations
-  "src/BlogList.tsx"
-  "src/src/i18n/services/footer.ts"
-  "src/BlogPost.tsx"
-  "src/services/blogService.ts"
-  "src/components/dashboard/blog/TipTapEditor.tsx"
-  "src/components/dashboard/blog/BlogEditor.tsx"
-  "src/components/dashboard/blog/ImageDropZone.tsx"
-  "src/components/dashboard/blog/BlogManager.tsx"
-  "src/DashboardApp.tsx"
-  # Blog migrations
-  "src/supabase/migrations/18_blog_system.sql"
-  "src/supabase/migrations/19_blog_images_storage.sql"
 )
+
+# NOTE: APP_FILES a été SUPPRIME intentionnellement.
+# Les fichiers applicatifs (package.json, composants React, services, etc.)
+# doivent venir de main (via Figma Make ou PRs mergées).
+# Les restaurer depuis une guard branch figée les écrasait avec des versions
+# obsolètes, annulant les changements Figma Make après le merge.
 
 # ── Helpers ──────────────────────────────────────────────────────────────────
 is_true() {
@@ -212,7 +188,6 @@ detect_changed_routes() {
         if [[ -n "${lang:-}" ]]; then
           langs+=" $lang"
         else
-          # Component file (.tsx) changed → all langs needed for this page
           needs_all_langs=true
         fi
         ;;
@@ -239,32 +214,26 @@ detect_changed_routes() {
 }
 
 # =============================================================================
-# Restauration des fichiers protégés
+# Restauration des fichiers infrastructure UNIQUEMENT
 # =============================================================================
-restore_protected_files() {
+restore_infra_files() {
   local ref="$1"
 
   echo "Restoring infra files from guard branch..."
+  local restored=0
   for file in "${INFRA_FILES[@]}"; do
     if git cat-file -e "${ref}:${file}" 2>/dev/null; then
       git checkout "$ref" -- "$file"
+      ((restored++))
     else
       echo "   Introuvable: $file"
     fi
   done
-  git add -A
-  git commit -m "Restore Docker configuration files" 2>/dev/null || true
-
-  echo "Restoring app files from guard branch..."
-  for file in "${APP_FILES[@]}"; do
-    if git cat-file -e "${ref}:${file}" 2>/dev/null; then
-      git checkout "$ref" -- "$file"
-    else
-      echo "   Introuvable: $file"
-    fi
-  done
-  git add -A
-  git commit -m "Restore app files from guard branch" 2>/dev/null || true
+  if [[ $restored -gt 0 ]]; then
+    git add -A
+    git commit -m "Restore Docker/infra configuration files (${restored} files)" 2>/dev/null || true
+  fi
+  echo "   ${restored} fichier(s) infra restauré(s)."
 }
 
 # =============================================================================
@@ -305,15 +274,17 @@ fi
 
 echo "Merging main into current branch..."
 if ! git merge origin/main -m "Merge Figma Make updates from main" --no-edit 2>/dev/null; then
-    echo "Merge conflict, résolution automatique..."
-    git checkout --theirs src/public/ 2>/dev/null || true
+    echo "Merge conflict, résolution automatique (on accepte les changements de main)..."
+    # Accepter les changements venant de main (Figma Make) pour les conflits
+    git checkout --theirs . 2>/dev/null || true
+    # Gérer le cas src/public/ -> public/
     if [[ -d "src/public" ]]; then
         mkdir -p public
         cp -r src/public/* public/ 2>/dev/null || true
         rm -rf src/public
     fi
     git add -A
-    git commit -m "Merge Figma Make updates - auto-fix" || true
+    git commit -m "Merge Figma Make updates - auto-resolved (accept theirs)" || true
 fi
 
 if [[ -d "src/public" ]]; then
@@ -327,8 +298,10 @@ if [[ -d "src/public" ]]; then
     git commit -m "Fix: move static files from src/public/ to public/" || true
 fi
 
+# Restaurer UNIQUEMENT les fichiers infra (Docker, nginx, etc.)
+# Les fichiers applicatifs (package.json, composants, services) viennent de main
 if [[ -n "$BRANCH_REF" ]]; then
-  restore_protected_files "$BRANCH_REF"
+  restore_infra_files "$BRANCH_REF"
 fi
 
 # ── Restauration du fichier .env ─────────────────────────────────────────────
