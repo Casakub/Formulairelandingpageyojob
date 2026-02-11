@@ -38,6 +38,10 @@ RUN rm -rf /usr/share/nginx/html/*
 RUN rm /etc/nginx/conf.d/default.conf
 
 COPY nginx/nginx.conf /etc/nginx/conf.d/default.conf
+
+# Cache-bust : force Docker à recopier le build même si les layers sont cached
+# Passé via --build-arg CACHEBUST=$(date +%s) dans update-from-figma.sh
+ARG CACHEBUST=0
 COPY --from=builder /app/build /usr/share/nginx/html
 
 # Entrypoint : restaure les pages pré-rendues depuis le volume cache
