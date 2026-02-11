@@ -210,6 +210,445 @@ html {
   font-size: var(--font-size);
 }
 
+/* ============================================
+ * PROSE / TYPOGRAPHY STYLES
+ * Remplace @tailwindcss/typography manquant
+ * Utilise dans TipTapEditor et BlogPost
+ * ============================================ */
+
+/* --- Base prose (editeur admin) --- */
+.prose {
+  font-size: 1rem;
+  line-height: 1.75;
+  color: #1e293b;
+  max-width: 65ch;
+}
+.prose.max-w-none { max-width: none; }
+
+/* Paragraphes */
+.prose p {
+  margin-top: 1.25em;
+  margin-bottom: 1.25em;
+}
+
+/* Titres */
+.prose h1 {
+  font-size: 2.25em;
+  font-weight: 800;
+  margin-top: 0;
+  margin-bottom: 0.9em;
+  line-height: 1.1;
+}
+.prose h2 {
+  font-size: 1.5em;
+  font-weight: 700;
+  margin-top: 2em;
+  margin-bottom: 1em;
+  line-height: 1.33;
+}
+.prose h3 {
+  font-size: 1.25em;
+  font-weight: 600;
+  margin-top: 1.6em;
+  margin-bottom: 0.6em;
+  line-height: 1.6;
+}
+
+/* Gras & Italique */
+.prose strong { font-weight: 700; }
+.prose em { font-style: italic; }
+
+/* --- LISTES (correctif puces) --- */
+.prose ul {
+  list-style-type: disc;
+  padding-left: 1.625em;
+  margin-top: 1.25em;
+  margin-bottom: 1.25em;
+}
+.prose ol {
+  list-style-type: decimal;
+  padding-left: 1.625em;
+  margin-top: 1.25em;
+  margin-bottom: 1.25em;
+}
+.prose li {
+  margin-top: 0.5em;
+  margin-bottom: 0.5em;
+}
+.prose li p {
+  margin-top: 0.25em;
+  margin-bottom: 0.25em;
+}
+.prose ul > li::marker {
+  color: #6b7280;
+}
+.prose ol > li::marker {
+  color: #6b7280;
+  font-weight: 400;
+}
+/* Listes imbriquees */
+.prose ul ul, .prose ol ul {
+  list-style-type: circle;
+  margin-top: 0.5em;
+  margin-bottom: 0.5em;
+}
+.prose ul ul ul, .prose ol ul ul {
+  list-style-type: square;
+}
+.prose ol ol, .prose ul ol {
+  list-style-type: lower-alpha;
+  margin-top: 0.5em;
+  margin-bottom: 0.5em;
+}
+
+/* Liens */
+.prose a {
+  color: #2563eb;
+  text-decoration: underline;
+  font-weight: 500;
+}
+.prose a:hover {
+  color: #1d4ed8;
+}
+
+/* Blockquote */
+.prose blockquote {
+  border-left: 4px solid #e5e7eb;
+  padding-left: 1em;
+  margin-top: 1.6em;
+  margin-bottom: 1.6em;
+  color: #4b5563;
+  font-style: italic;
+}
+.prose blockquote p:first-child { margin-top: 0; }
+.prose blockquote p:last-child { margin-bottom: 0; }
+
+/* Code inline */
+.prose code {
+  font-size: 0.875em;
+  font-weight: 600;
+  background-color: #f1f5f9;
+  padding: 0.2em 0.4em;
+  border-radius: 0.25rem;
+}
+.prose code::before, .prose code::after { content: none; }
+
+/* Code block */
+.prose pre {
+  background-color: #1e293b;
+  color: #e2e8f0;
+  border-radius: 0.5rem;
+  padding: 1em 1.25em;
+  margin-top: 1.75em;
+  margin-bottom: 1.75em;
+  overflow-x: auto;
+  font-size: 0.875em;
+  line-height: 1.7;
+}
+.prose pre code {
+  background: none;
+  padding: 0;
+  font-weight: 400;
+  color: inherit;
+  font-size: inherit;
+}
+
+/* Images */
+.prose img {
+  margin-top: 2em;
+  margin-bottom: 2em;
+  border-radius: 0.5rem;
+  max-width: 100%;
+}
+
+/* HR */
+.prose hr {
+  border-color: #e5e7eb;
+  margin-top: 3em;
+  margin-bottom: 3em;
+}
+
+/* Tables */
+.prose table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 2em;
+  margin-bottom: 2em;
+  font-size: 0.875em;
+  line-height: 1.7;
+}
+.prose thead th {
+  font-weight: 600;
+  border-bottom: 2px solid #e5e7eb;
+  padding: 0.75em 1em;
+  text-align: left;
+  vertical-align: bottom;
+}
+.prose tbody td {
+  border-bottom: 1px solid #f1f5f9;
+  padding: 0.75em 1em;
+  vertical-align: top;
+}
+.prose tbody tr:last-child td {
+  border-bottom: none;
+}
+
+/* prose-sm (editeur compact) */
+.prose-sm {
+  font-size: 0.875rem;
+  line-height: 1.7;
+}
+
+/* prose-lg (blog post) */
+.prose-lg {
+  font-size: 1.125rem;
+  line-height: 1.78;
+}
+.prose-lg p {
+  margin-top: 1.33em;
+  margin-bottom: 1.33em;
+}
+.prose-lg h2 { font-size: 1.67em; }
+.prose-lg h3 { font-size: 1.33em; }
+.prose-lg ul, .prose-lg ol {
+  padding-left: 1.56em;
+}
+.prose-lg li {
+  margin-top: 0.67em;
+  margin-bottom: 0.67em;
+}
+
+/* --- PROSE INVERT (blog post public, fond sombre) --- */
+.prose-invert {
+  color: rgba(255,255,255,0.85);
+}
+.prose-invert h1, .prose-invert h2, .prose-invert h3, .prose-invert h4 {
+  color: #ffffff;
+}
+.prose-invert a {
+  color: #22d3ee;
+  text-decoration: none;
+}
+.prose-invert a:hover {
+  text-decoration: underline;
+}
+.prose-invert strong {
+  color: #ffffff;
+}
+.prose-invert blockquote {
+  border-left-color: rgba(6,182,212,0.5);
+  background: rgba(255,255,255,0.05);
+  border-radius: 0 0.75rem 0.75rem 0;
+  padding: 0.75rem 1.25rem;
+  color: rgba(255,255,255,0.6);
+  font-style: normal;
+}
+.prose-invert code {
+  color: #67e8f9;
+  background: rgba(255,255,255,0.1);
+}
+.prose-invert pre {
+  background: #0d1117;
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 0.75rem;
+}
+.prose-invert pre code {
+  color: #e2e8f0;
+  background: none;
+}
+.prose-invert hr {
+  border-color: rgba(255,255,255,0.1);
+}
+.prose-invert li {
+  color: rgba(255,255,255,0.75);
+}
+.prose-invert li::marker {
+  color: rgba(34,211,238,0.6);
+}
+.prose-invert img {
+  border-radius: 0.75rem;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+}
+.prose-invert table {
+  border-color: rgba(255,255,255,0.1);
+}
+.prose-invert thead th {
+  color: #ffffff;
+  border-bottom-color: rgba(255,255,255,0.2);
+}
+.prose-invert tbody td {
+  border-bottom-color: rgba(255,255,255,0.05);
+}
+
+/* Prose-invert heading specific styles (blog post) */
+.prose-invert h2 {
+  border-bottom: 1px solid rgba(255,255,255,0.1);
+  padding-bottom: 0.75rem;
+}
+.prose-invert h3 {
+  color: #67e8f9;
+}
+.prose-invert p {
+  color: rgba(255,255,255,0.75);
+  font-size: 17px;
+  line-height: 1.7;
+}
+
+/* ============================================
+ * TIPTAP / PROSEMIRROR EDITOR STYLES
+ * ============================================ */
+
+/* Editeur TipTap - styles specifiques ProseMirror */
+.ProseMirror {
+  outline: none;
+}
+.ProseMirror > *:first-child {
+  margin-top: 0;
+}
+
+/* Placeholder */
+.ProseMirror p.is-editor-empty:first-child::before {
+  content: attr(data-placeholder);
+  float: left;
+  color: #9ca3af;
+  pointer-events: none;
+  height: 0;
+}
+
+/* Listes dans l'editeur - IMPORTANT */
+.ProseMirror ul {
+  list-style-type: disc !important;
+  padding-left: 1.625em !important;
+  margin-top: 1em;
+  margin-bottom: 1em;
+}
+.ProseMirror ol {
+  list-style-type: decimal !important;
+  padding-left: 1.625em !important;
+  margin-top: 1em;
+  margin-bottom: 1em;
+}
+.ProseMirror li {
+  margin-top: 0.35em;
+  margin-bottom: 0.35em;
+}
+.ProseMirror li p {
+  margin: 0;
+}
+
+/* Titres dans l'editeur */
+.ProseMirror h1 {
+  font-size: 2em;
+  font-weight: 800;
+  margin-top: 1.5em;
+  margin-bottom: 0.5em;
+  line-height: 1.2;
+  color: #0f172a;
+}
+.ProseMirror h2 {
+  font-size: 1.5em;
+  font-weight: 700;
+  margin-top: 1.5em;
+  margin-bottom: 0.5em;
+  line-height: 1.33;
+  color: #0f172a;
+}
+.ProseMirror h3 {
+  font-size: 1.25em;
+  font-weight: 600;
+  margin-top: 1.25em;
+  margin-bottom: 0.5em;
+  color: #1e293b;
+}
+
+/* Blockquote dans l'editeur */
+.ProseMirror blockquote {
+  border-left: 4px solid #3b82f6;
+  padding-left: 1rem;
+  padding-top: 0.5rem;
+  padding-bottom: 0.5rem;
+  margin: 1.5em 0;
+  background-color: #f0f9ff;
+  border-radius: 0 0.5rem 0.5rem 0;
+  color: #334155;
+}
+
+/* Images dans l'editeur */
+.ProseMirror img {
+  max-width: 100%;
+  border-radius: 0.5rem;
+  margin: 1em 0;
+  display: block;
+}
+.ProseMirror img.ProseMirror-selectednode {
+  outline: 3px solid #3b82f6;
+  outline-offset: 2px;
+}
+
+/* Tableaux dans l'editeur */
+.ProseMirror table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 1.5em 0;
+  border: 1px solid #e2e8f0;
+  border-radius: 0.5rem;
+  overflow: hidden;
+}
+.ProseMirror th {
+  background-color: #f8fafc;
+  font-weight: 600;
+  text-align: left;
+  padding: 0.5rem 0.75rem;
+  border: 1px solid #e2e8f0;
+}
+.ProseMirror td {
+  padding: 0.5rem 0.75rem;
+  border: 1px solid #e2e8f0;
+  vertical-align: top;
+}
+.ProseMirror .selectedCell {
+  background-color: #dbeafe;
+}
+
+/* Separateur */
+.ProseMirror hr {
+  border: none;
+  border-top: 2px solid #e2e8f0;
+  margin: 2em 0;
+}
+
+/* Code dans l'editeur */
+.ProseMirror code {
+  background-color: #f1f5f9;
+  padding: 0.15em 0.35em;
+  border-radius: 0.25rem;
+  font-size: 0.9em;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, monospace;
+}
+.ProseMirror pre {
+  background: #1e293b;
+  color: #e2e8f0;
+  border-radius: 0.5rem;
+  padding: 1rem;
+  margin: 1.5em 0;
+  overflow-x: auto;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, monospace;
+  font-size: 0.875rem;
+}
+.ProseMirror pre code {
+  background: none;
+  padding: 0;
+  color: inherit;
+  font-size: inherit;
+}
+
+/* Lien dans l'editeur */
+.ProseMirror a {
+  color: #2563eb;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
 /* Custom scrollbar styles for translation tables */
 .scrollbar-thin {
   scrollbar-width: thin;
