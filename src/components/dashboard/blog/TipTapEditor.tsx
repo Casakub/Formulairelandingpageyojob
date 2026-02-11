@@ -58,6 +58,10 @@ import {
   Trash2,
   RowsIcon,
   ColumnsIcon,
+  LayoutPanelLeft,
+  GalleryHorizontalEnd,
+  RectangleHorizontal,
+  Square,
 } from 'lucide-react';
 import { Button } from '../../ui/button';
 
@@ -214,6 +218,7 @@ export function TipTapEditor({ content, onChange, placeholder, onImageUpload }: 
 
   // Block types for the inserter
   const blockTypes: BlockType[] = [
+    // --- TEXTE ---
     {
       id: 'paragraph',
       label: 'Paragraphe',
@@ -278,6 +283,7 @@ export function TipTapEditor({ content, onChange, placeholder, onImageUpload }: 
       description: 'Code source formaté',
       action: (ed) => ed.chain().focus().toggleCodeBlock().run(),
     },
+    // --- MEDIA ---
     {
       id: 'image',
       label: 'Image',
@@ -286,38 +292,81 @@ export function TipTapEditor({ content, onChange, placeholder, onImageUpload }: 
       description: 'Insérer une image',
       action: () => addImage(),
     },
+    // --- MISE EN PAGE (colonnes, media+texte, espaceur) ---
+    {
+      id: 'layout-2col',
+      label: '2 colonnes',
+      icon: Columns2,
+      category: 'Mise en page',
+      description: 'Deux colonnes côte à côte',
+      action: (ed) => ed.chain().focus().insertTable({ rows: 1, cols: 2, withHeaderRow: false }).run(),
+    },
+    {
+      id: 'layout-3col',
+      label: '3 colonnes',
+      icon: Columns3,
+      category: 'Mise en page',
+      description: 'Trois colonnes côte à côte',
+      action: (ed) => ed.chain().focus().insertTable({ rows: 1, cols: 3, withHeaderRow: false }).run(),
+    },
+    {
+      id: 'layout-media-text',
+      label: 'Média + Texte',
+      icon: LayoutPanelLeft,
+      category: 'Mise en page',
+      description: 'Image à gauche, texte à droite',
+      action: (ed) => {
+        ed.chain().focus().insertContent(
+          '<table><tbody><tr>' +
+          '<td><p><em>Glissez une image ici</em></p></td>' +
+          '<td><p><strong>Titre de la section</strong></p><p>Votre texte descriptif ici. Vous pouvez ajouter plusieurs paragraphes, des listes, des liens...</p></td>' +
+          '</tr></tbody></table>'
+        ).run();
+      },
+    },
+    {
+      id: 'layout-gallery',
+      label: 'Galerie 2 images',
+      icon: GalleryHorizontalEnd,
+      category: 'Mise en page',
+      description: 'Deux images côte à côte',
+      action: (ed) => {
+        ed.chain().focus().insertContent(
+          '<table><tbody><tr>' +
+          '<td><p><em>Image 1</em></p></td>' +
+          '<td><p><em>Image 2</em></p></td>' +
+          '</tr></tbody></table>'
+        ).run();
+      },
+    },
+    {
+      id: 'spacer',
+      label: 'Espaceur',
+      icon: RectangleHorizontal,
+      category: 'Mise en page',
+      description: 'Espace vertical entre les blocs',
+      action: (ed) => ed.chain().focus().setHorizontalRule().run(),
+    },
     {
       id: 'separator',
       label: 'Séparateur',
       icon: SeparatorHorizontal,
       category: 'Mise en page',
-      description: 'Ligne de séparation',
-      action: (ed) => ed.chain().focus().setHorizontalRule().run(),
+      description: 'Ligne de séparation visible',
+      action: (ed) => {
+        ed.chain().focus().insertContent('<hr>').run();
+      },
     },
-    {
-      id: 'table-2col',
-      label: '2 colonnes',
-      icon: Columns2,
-      category: 'Mise en page',
-      description: 'Tableau à 2 colonnes pour mise en page',
-      action: (ed) => ed.chain().focus().insertTable({ rows: 1, cols: 2, withHeaderRow: false }).run(),
-    },
-    {
-      id: 'table-3col',
-      label: '3 colonnes',
-      icon: Columns3,
-      category: 'Mise en page',
-      description: 'Tableau à 3 colonnes pour mise en page',
-      action: (ed) => ed.chain().focus().insertTable({ rows: 1, cols: 3, withHeaderRow: false }).run(),
-    },
+    // --- TABLEAUX (données) ---
     {
       id: 'table',
-      label: 'Tableau',
+      label: 'Tableau de données',
       icon: TableIcon,
-      category: 'Mise en page',
-      description: 'Tableau avec en-tête',
+      category: 'Tableaux',
+      description: 'Tableau avec en-tête (données)',
       action: (ed) => ed.chain().focus().insertTable({ rows: 3, cols: 3, withHeaderRow: true }).run(),
     },
+    // --- ENCADRÉS ---
     {
       id: 'callout-info',
       label: 'Info',
@@ -366,6 +415,19 @@ export function TipTapEditor({ content, onChange, placeholder, onImageUpload }: 
         ).run();
       },
     },
+    {
+      id: 'section-highlight',
+      label: 'Section mise en avant',
+      icon: Square,
+      category: 'Encadrés',
+      description: 'Bloc avec fond coloré pour mettre en avant',
+      action: (ed) => {
+        ed.chain().focus().insertContent(
+          '<blockquote><p><strong>&#10024; Point clé</strong></p><p>Mettez en avant un point important, une statistique ou un résumé ici.</p></blockquote>'
+        ).run();
+      },
+    },
+    // --- INTERACTIF ---
     {
       id: 'cta-button',
       label: 'Bouton CTA',

@@ -585,8 +585,8 @@ html {
   outline-offset: 2px;
 }
 
-/* Tableaux dans l'editeur */
-.ProseMirror table {
+/* ---- Tableaux de DONNEES dans l'editeur (avec <th>) ---- */
+.ProseMirror table:has(th) {
   width: 100%;
   border-collapse: collapse;
   margin: 1.5em 0;
@@ -594,20 +594,63 @@ html {
   border-radius: 0.5rem;
   overflow: hidden;
 }
-.ProseMirror th {
+.ProseMirror table:has(th) th {
   background-color: #f8fafc;
   font-weight: 600;
   text-align: left;
   padding: 0.5rem 0.75rem;
   border: 1px solid #e2e8f0;
 }
-.ProseMirror td {
+.ProseMirror table:has(th) td {
   padding: 0.5rem 0.75rem;
   border: 1px solid #e2e8f0;
   vertical-align: top;
 }
+
+/* ---- Tables LAYOUT dans l'editeur (SANS <th> = colonnes) ---- */
+.ProseMirror table:not(:has(th)) {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 12px 0;
+  margin: 1.5em -12px;
+  border: none;
+  background: transparent;
+}
+.ProseMirror table:not(:has(th)) td {
+  vertical-align: top;
+  padding: 1rem;
+  border: 2px dashed #cbd5e1;
+  border-radius: 0.5rem;
+  background-color: #f8fafc;
+  min-height: 80px;
+  transition: border-color 0.2s, background-color 0.2s;
+}
+.ProseMirror table:not(:has(th)) td:focus-within {
+  border-color: #3b82f6;
+  background-color: #eff6ff;
+}
+.ProseMirror table:not(:has(th)) td p:first-child {
+  margin-top: 0;
+}
+.ProseMirror table:not(:has(th)) td p:last-child {
+  margin-bottom: 0;
+}
+/* Label visuel "Colonne" en mode edition */
+.ProseMirror table:not(:has(th)) td::before {
+  content: 'Colonne';
+  display: block;
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: #94a3b8;
+  margin-bottom: 0.5rem;
+  user-select: none;
+}
+
 .ProseMirror .selectedCell {
-  background-color: #dbeafe;
+  background-color: #dbeafe !important;
+  border-color: #3b82f6 !important;
 }
 
 /* Separateur */
@@ -647,6 +690,79 @@ html {
   color: #2563eb;
   text-decoration: underline;
   cursor: pointer;
+}
+
+/* ============================================
+ * LAYOUT COLONNES - Rendu public (blog post)
+ * Tables sans <th> = colonnes layout
+ * ============================================ */
+
+/* Layout colonnes mode clair (prose) */
+.prose table:not(:has(th)) {
+  width: 100%;
+  border: none;
+  border-collapse: separate;
+  border-spacing: 1.5rem 0;
+  margin-left: -0.75rem;
+  margin-right: -0.75rem;
+}
+.prose table:not(:has(th)) td {
+  vertical-align: top;
+  padding: 0;
+  border: none;
+}
+.prose table:not(:has(th)) td p:first-child { margin-top: 0; }
+.prose table:not(:has(th)) td p:last-child { margin-bottom: 0; }
+
+/* Layout colonnes mode sombre (prose-invert) */
+.prose-invert table:not(:has(th)) {
+  border: none;
+  border-collapse: separate;
+  border-spacing: 1.5rem 0;
+}
+.prose-invert table:not(:has(th)) td {
+  vertical-align: top;
+  padding: 1.25rem;
+  border: none;
+  background: rgba(255,255,255,0.03);
+  border-radius: 0.75rem;
+}
+.prose-invert table:not(:has(th)) td p:first-child { margin-top: 0; }
+.prose-invert table:not(:has(th)) td p:last-child { margin-bottom: 0; }
+
+/* Images dans les colonnes layout - s'adaptent */
+.prose table:not(:has(th)) img,
+.prose-invert table:not(:has(th)) img {
+  width: 100%;
+  height: auto;
+  object-fit: cover;
+  margin: 0;
+}
+
+/* Responsive: colonnes empilees sur mobile */
+@media (max-width: 640px) {
+  .prose table:not(:has(th)),
+  .prose-invert table:not(:has(th)) {
+    display: block;
+    border-spacing: 0;
+    margin-left: 0;
+    margin-right: 0;
+  }
+  .prose table:not(:has(th)) tbody,
+  .prose-invert table:not(:has(th)) tbody {
+    display: block;
+  }
+  .prose table:not(:has(th)) tr,
+  .prose-invert table:not(:has(th)) tr {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+  .prose table:not(:has(th)) td,
+  .prose-invert table:not(:has(th)) td {
+    display: block;
+    width: 100% !important;
+  }
 }
 
 /* Custom scrollbar styles for translation tables */
