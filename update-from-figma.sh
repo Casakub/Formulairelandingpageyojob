@@ -224,7 +224,7 @@ restore_infra_files() {
   for file in "${INFRA_FILES[@]}"; do
     if git cat-file -e "${ref}:${file}" 2>/dev/null; then
       git checkout "$ref" -- "$file"
-      ((restored++))
+      restored=$((restored + 1))
     else
       echo "   Introuvable: $file"
     fi
