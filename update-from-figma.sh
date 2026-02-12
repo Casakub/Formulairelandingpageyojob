@@ -58,7 +58,6 @@ INFRA_FILES=(
   ".dockerignore"
   ".env.example"
   ".npmrc"
-  "package.json"
   "nginx/nginx.conf"
   "src/scripts/prerender.cjs"
   "src/scripts/seo-ci-check.sh"
