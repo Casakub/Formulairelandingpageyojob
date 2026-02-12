@@ -1,4 +1,42 @@
-import { BlogArticle, BlogTranslation } from '../services/blogService';
+// Compatibility module for environments that resolve absolute imports as /lib/*
+// This file is intentionally standalone (no imports/re-exports) to avoid path resolution loops.
+
+export interface BlogSource {
+  label: string;
+  url: string;
+}
+
+export interface BlogFaqItem {
+  question: string;
+  answer: string;
+}
+
+export interface BlogInternalLink {
+  label: string;
+  url: string;
+}
+
+export interface BlogArticleLike {
+  slug?: string;
+  sources?: BlogSource[];
+  last_updated_at?: string;
+}
+
+export interface BlogTranslationLike {
+  title?: string;
+  excerpt?: string;
+  content?: string;
+  seo_title?: string;
+  seo_description?: string;
+  faq_items?: BlogFaqItem[];
+  key_points?: string[];
+  checklist_items?: string[];
+  cta_mid_label?: string;
+  cta_mid_text?: string;
+  cta_end_label?: string;
+  cta_end_text?: string;
+  internal_links?: BlogInternalLink[];
+}
 
 export interface BlogQualityCheck {
   id: string;
@@ -49,8 +87,8 @@ function withinRange(value: number, min: number, max: number): boolean {
 }
 
 export function evaluateBlogQuality(
-  article: Partial<BlogArticle>,
-  translation: Partial<BlogTranslation>
+  article: Partial<BlogArticleLike>,
+  translation: Partial<BlogTranslationLike>
 ): BlogQualityResult {
   const content = translation.content || '';
   const plainText = extractTextFromHtml(content);
@@ -164,10 +202,17 @@ export function evaluateBlogQuality(
     },
   ];
 
-  const blockingIssues = checks.filter((check) => check.blocking && !check.passed).map((check) => check.label);
-  const warnings = checks.filter((check) => !check.blocking && !check.passed).map((check) => check.label);
+  const blockingIssues = checks
+    .filter((check) => check.blocking && !check.passed)
+    .map((check) => check.label);
+  const warnings = checks
+    .filter((check) => !check.blocking && !check.passed)
+    .map((check) => check.label);
 
-  const passedWeight = checks.reduce((acc, check) => acc + (check.passed ? (check.blocking ? 10 : 5) : 0), 0);
+  const passedWeight = checks.reduce(
+    (acc, check) => acc + (check.passed ? (check.blocking ? 10 : 5) : 0),
+    0
+  );
   const maxWeight = checks.reduce((acc, check) => acc + (check.blocking ? 10 : 5), 0);
   const score = Math.round((passedWeight / Math.max(1, maxWeight)) * 100);
 

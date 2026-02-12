@@ -22,10 +22,9 @@ import { Footer } from './components/landing/Footer';
 import { useLanguageManager } from './hooks/useLanguageManager';
 import {
   BlogArticleWithTranslations,
-  BlogPersonaTarget,
   BlogTranslation,
+  getPublishedArticles,
   getPublishedArticleBySlug,
-  getRelatedPublishedArticles,
 } from './services/blogService';
 import {
   Accordion,
@@ -43,6 +42,8 @@ interface HeadingItem {
   title: string;
   level: number;
 }
+
+type BlogPersonaTarget = 'enterprise' | 'agency' | 'both';
 
 const PERSONA_COPY: Record<
   BlogPersonaTarget,
@@ -104,6 +105,35 @@ function enrichContentWithHeadingIds(html: string): string {
     heading.setAttribute('id', id);
     (heading as HTMLElement).style.scrollMarginTop = '112px';
   });
+
+  return root.innerHTML;
+}
+
+function normalizeComparableText(value: string): string {
+  return value
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
+function stripLeadingTitleHeading(html: string, title: string): string {
+  if (!html || !title || typeof window === 'undefined') return html;
+
+  const parser = new DOMParser();
+  const document = parser.parseFromString(`<article>${html}</article>`, 'text/html');
+  const root = document.body.firstElementChild as HTMLElement | null;
+  if (!root) return html;
+
+  const firstHeading = root.querySelector('h1');
+  if (!firstHeading) return html;
+
+  const headingText = normalizeComparableText(firstHeading.textContent || '');
+  const titleText = normalizeComparableText(title);
+  if (headingText && titleText && headingText === titleText) {
+    firstHeading.remove();
+  }
 
   return root.innerHTML;
 }
@@ -189,8 +219,22 @@ export default function BlogPost({ slug }: BlogPostProps) {
 
   useEffect(() => {
     if (!article) return;
-    getRelatedPublishedArticles(article, lang, 3)
-      .then(setRelatedArticles)
+    getPublishedArticles(lang)
+      .then((allArticles) => {
+        const candidates = allArticles.filter((item) => item.id !== article.id);
+        const ranked = candidates
+          .map((item) => {
+            let score = 0;
+            if (article.category && item.category === article.category) score += 3;
+            const sharedTags = (item.tags || []).filter((tag) => (article.tags || []).includes(tag)).length;
+            score += sharedTags;
+            return { item, score };
+          })
+          .sort((a, b) => b.score - a.score)
+          .slice(0, 3)
+          .map(({ item }) => item);
+        setRelatedArticles(ranked);
+      })
       .catch((error) => console.error('Error loading related articles:', error));
   }, [article, lang]);
 
@@ -199,10 +243,10 @@ export default function BlogPost({ slug }: BlogPostProps) {
       article.translations.find((item) => item.language_code === 'fr')
     : undefined;
 
-  const normalizedContent = useMemo(
-    () => enrichContentWithHeadingIds(translation?.content || ''),
-    [translation?.content]
-  );
+  const normalizedContent = useMemo(() => {
+    const withIds = enrichContentWithHeadingIds(translation?.content || '');
+    return stripLeadingTitleHeading(withIds, translation?.title || '');
+  }, [translation?.content, translation?.title]);
 
   const readingTime = useMemo(
     () => (normalizedContent ? estimateReadingTime(normalizedContent) : 0),
@@ -213,26 +257,28 @@ export default function BlogPost({ slug }: BlogPostProps) {
   const splitContent = useMemo(() => splitContentForMidCta(normalizedContent), [normalizedContent]);
   const faqItems = translation?.faq_items || [];
 
-  const articleSchema = article && translation ? {
-    '@context': 'https://schema.org',
-    '@type': 'Article',
-    headline: translation.seo_title || translation.title,
-    description: translation.seo_description || translation.excerpt || '',
-    image: article.featured_image_url || 'https://yojob.fr/og-image-yojob-1200x630.svg',
-    datePublished: article.published_at,
-    dateModified: article.last_updated_at || article.updated_at,
-    author: { '@type': 'Organization', name: 'YOJOB', url: 'https://yojob.fr' },
-    publisher: {
-      '@type': 'Organization',
-      name: 'YOJOB',
-      url: 'https://yojob.fr',
-      logo: { '@type': 'ImageObject', url: 'https://yojob.fr/favicon.svg' },
-    },
-    mainEntityOfPage: {
-      '@type': 'WebPage',
-      '@id': `https://yojob.fr${langPrefix}/blog/${slug}`,
-    },
-  } : null;
+  const articleSchema = article && translation
+    ? {
+      '@context': 'https://schema.org',
+      '@type': 'Article',
+      headline: translation.seo_title || translation.title,
+      description: translation.seo_description || translation.excerpt || '',
+      image: article.featured_image_url || 'https://yojob.fr/og-image-yojob-1200x630.svg',
+      datePublished: article.published_at,
+      dateModified: article.last_updated_at || article.updated_at,
+      author: { '@type': 'Organization', name: 'YOJOB', url: 'https://yojob.fr' },
+      publisher: {
+        '@type': 'Organization',
+        name: 'YOJOB',
+        url: 'https://yojob.fr',
+        logo: { '@type': 'ImageObject', url: 'https://yojob.fr/favicon.svg' },
+      },
+      mainEntityOfPage: {
+        '@type': 'WebPage',
+        '@id': `https://yojob.fr${langPrefix}/blog/${slug}`,
+      },
+    }
+    : null;
 
   const faqSchema = faqItems.length > 0
     ? {
@@ -261,10 +307,7 @@ export default function BlogPost({ slug }: BlogPostProps) {
     if (!article) return;
 
     const handleScroll = () => {
-      const maxScrollable = Math.max(
-        1,
-        document.documentElement.scrollHeight - window.innerHeight
-      );
+      const maxScrollable = Math.max(1, document.documentElement.scrollHeight - window.innerHeight);
       const progress = Math.min(100, Math.max(0, (window.scrollY / maxScrollable) * 100));
       setReadingProgress(progress);
     };
@@ -360,364 +403,365 @@ export default function BlogPost({ slug }: BlogPostProps) {
         />
       </div>
 
-      <div className="min-h-screen bg-gradient-to-br from-[#0a0e27] via-[#1a1040] to-[#0d2847]">
-        <header className="sticky top-0 z-50 border-b border-white/10 bg-[#0a0e27]/80 backdrop-blur-xl">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="flex items-center justify-between h-16">
-              <a href={langPrefix || '/'} className="flex items-center gap-3 group">
-                <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-cyan-500 to-violet-600 p-0.5 group-hover:shadow-lg group-hover:shadow-cyan-500/20 transition-all">
-                  <div className="w-full h-full bg-[#0a0e27] rounded-[6px] flex items-center justify-center">
-                    <LogoSvg className="w-8 h-8" />
+      <div className="min-h-screen bg-white">
+        <div className="bg-gradient-to-br from-[#0a0e27] via-[#1a1040] to-[#0d2847]">
+          <header className="sticky top-0 z-50 border-b border-white/10 bg-[#0a0e27]/80 backdrop-blur-xl">
+            <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+              <div className="flex h-16 items-center justify-between">
+                <a href={langPrefix || '/'} className="group flex items-center gap-3">
+                  <div className="h-10 w-10 rounded-lg bg-gradient-to-br from-cyan-500 to-violet-600 p-0.5 transition-all group-hover:shadow-lg group-hover:shadow-cyan-500/20">
+                    <div className="flex h-full w-full items-center justify-center rounded-[6px] bg-[#0a0e27]">
+                      <LogoSvg className="h-8 w-8" />
+                    </div>
                   </div>
-                </div>
-                <span className="text-white font-bold text-lg">YOJOB</span>
-              </a>
-              <div className="flex items-center gap-3">
-                {translation && (
-                  <button
-                    onClick={handleShare}
-                    aria-label="Partager cet article"
-                    className="p-2 rounded-lg text-white/50 transition-all hover:bg-white/10 hover:text-white focus-visible:ring-2 focus-visible:ring-cyan-300"
-                    title="Partager"
-                  >
-                    <Share2 className="w-4 h-4" />
-                  </button>
-                )}
-                <a
-                  href={`${langPrefix}/blog`}
-                  className="text-white/60 hover:text-white transition-colors text-sm flex items-center gap-1.5 px-3 py-1.5 rounded-lg hover:bg-white/5"
-                >
-                  <ArrowLeft className="w-4 h-4" />
-                  Blog
+                  <span className="text-lg font-bold text-white">YOJOB</span>
                 </a>
+                <div className="flex items-center gap-3">
+                  {translation && (
+                    <button
+                      onClick={handleShare}
+                      aria-label="Partager cet article"
+                      className="rounded-lg p-2 text-white/50 transition-all hover:bg-white/10 hover:text-white focus-visible:ring-2 focus-visible:ring-cyan-300"
+                      title="Partager"
+                    >
+                      <Share2 className="h-4 w-4" />
+                    </button>
+                  )}
+                  <a
+                    href={`${langPrefix}/blog`}
+                    className="flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-sm text-white/60 transition-colors hover:bg-white/5 hover:text-white"
+                  >
+                    <ArrowLeft className="h-4 w-4" />
+                    Blog
+                  </a>
+                </div>
               </div>
             </div>
-          </div>
-        </header>
+          </header>
 
-        {loading && (
-          <div className="flex items-center justify-center py-40">
-            <Loader2 className="w-8 h-8 animate-spin text-white/50" />
-          </div>
-        )}
+          {loading && (
+            <div className="flex items-center justify-center py-40">
+              <Loader2 className="h-8 w-8 animate-spin text-white/50" />
+            </div>
+          )}
 
-        {notFound && !loading && (
-          <div className="text-center py-40 px-4">
-            <BookOpen className="w-16 h-16 text-white/20 mx-auto mb-4" />
-            <h1 className="text-2xl font-bold text-white mb-2">Article introuvable</h1>
-            <p className="text-white/50 mb-6">Cet article n&apos;existe pas ou n&apos;est pas encore publie.</p>
-            <a
-              href={`${langPrefix}/blog`}
-              className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-white/10 text-white hover:bg-white/20 transition-colors"
-            >
-              <ArrowLeft className="w-4 h-4" />
-              Retour au blog
-            </a>
-          </div>
-        )}
+          {notFound && !loading && (
+            <div className="px-4 py-40 text-center">
+              <BookOpen className="mx-auto mb-4 h-16 w-16 text-white/20" />
+              <h1 className="mb-2 text-2xl font-bold text-white">Article introuvable</h1>
+              <p className="mb-6 text-white/50">Cet article n&apos;existe pas ou n&apos;est pas encore publie.</p>
+              <a
+                href={`${langPrefix}/blog`}
+                className="inline-flex items-center gap-2 rounded-xl bg-white/10 px-6 py-3 text-white transition-colors hover:bg-white/20"
+              >
+                <ArrowLeft className="h-4 w-4" />
+                Retour au blog
+              </a>
+            </div>
+          )}
 
-        {article && translation && !loading && (
-          <>
-            <section className="pt-12 pb-8 px-4">
-              <div className="max-w-4xl mx-auto">
-                <nav className="flex items-center gap-2 text-xs text-white/40 mb-6">
-                  <a href={langPrefix || '/'} className="hover:text-white/60 transition-colors">Accueil</a>
+          {article && translation && !loading && (
+            <section className="px-4 pb-8 pt-10">
+              <div className="mx-auto max-w-6xl">
+                <nav className="mb-2 flex items-center gap-2 text-xs text-white/50">
+                  <a href={langPrefix || '/'} className="transition-colors hover:text-white/80">Accueil</a>
                   <span>/</span>
-                  <a href={`${langPrefix}/blog`} className="hover:text-white/60 transition-colors">Blog</a>
+                  <a href={`${langPrefix}/blog`} className="transition-colors hover:text-white/80">Blog</a>
                   {article.category && (
                     <>
                       <span>/</span>
-                      <span className="text-cyan-400/70">{article.category}</span>
+                      <span className="text-cyan-300/90">{article.category}</span>
                     </>
                   )}
                 </nav>
+              </div>
+            </section>
+          )}
+        </div>
 
-                <div className="rounded-2xl border border-white/10 bg-white/5 p-6 md:p-8">
-                  <div className="flex items-center gap-2 flex-wrap mb-4">
-                    {article.category && (
-                      <span className="inline-block text-xs text-cyan-300 font-semibold uppercase tracking-wider px-3 py-1 rounded-full bg-cyan-400/10 border border-cyan-400/20">
-                        {article.category}
+        {article && translation && !loading && (
+          <section className="bg-white px-4 pb-16 pt-8">
+            <div className="mx-auto max-w-6xl">
+              <div className="grid grid-cols-1 gap-10 lg:grid-cols-[minmax(0,820px)_260px] lg:justify-between">
+                <article className="w-full max-w-[820px]">
+                  <header className="mb-8 border-b border-slate-200 pb-8">
+                    <div className="mb-4 flex flex-wrap items-center gap-2">
+                      {article.category && (
+                        <span className="inline-block rounded-full border border-cyan-200 bg-cyan-50 px-3 py-1 text-xs font-semibold uppercase tracking-wider text-cyan-700">
+                          {article.category}
+                        </span>
+                      )}
+                      <span className="inline-flex items-center gap-1 rounded-full border border-slate-200 bg-slate-50 px-2 py-1 text-[11px] text-slate-600">
+                        <Building2 className="h-3 w-3" />
+                        {article.persona_target === 'enterprise'
+                          ? 'Entreprise'
+                          : article.persona_target === 'agency'
+                            ? 'Agence'
+                            : 'Entreprise + Agence'}
                       </span>
+                      <span className="inline-flex items-center gap-1 rounded-full border border-slate-200 bg-slate-50 px-2 py-1 text-[11px] text-slate-600">
+                        <Scale className="h-3 w-3" />
+                        {article.risk_level === 'high'
+                          ? 'Risque eleve'
+                          : article.risk_level === 'medium'
+                            ? 'Risque modere'
+                            : 'Risque faible'}
+                      </span>
+                    </div>
+
+                    <h1 className="mb-5 max-w-[24ch] text-3xl font-extrabold leading-tight text-slate-900 md:text-5xl">
+                      {translation.title}
+                    </h1>
+
+                    {translation.excerpt && (
+                      <p className="mb-6 max-w-3xl text-lg leading-relaxed text-slate-700 md:text-xl">
+                        {translation.excerpt}
+                      </p>
                     )}
-                    <span className="text-[11px] text-white/55 inline-flex items-center gap-1 px-2 py-1 rounded-full bg-white/5 border border-white/10">
-                      <Building2 className="w-3 h-3" />
-                      {article.persona_target === 'enterprise'
-                        ? 'Entreprise'
-                        : article.persona_target === 'agency'
-                          ? 'Agence'
-                          : 'Entreprise + Agence'}
-                    </span>
-                    <span className="text-[11px] text-white/55 inline-flex items-center gap-1 px-2 py-1 rounded-full bg-white/5 border border-white/10">
-                      <Scale className="w-3 h-3" />
-                      {article.risk_level === 'high'
-                        ? 'Risque eleve'
-                        : article.risk_level === 'medium'
-                          ? 'Risque modere'
-                          : 'Risque faible'}
-                    </span>
-                  </div>
 
-                  <h1 className="text-3xl md:text-5xl font-extrabold text-white leading-tight mb-5 max-w-[20ch]">
-                    {translation.title}
-                  </h1>
+                    <div className="flex flex-wrap items-center gap-4 text-sm text-slate-600">
+                      {article.published_at && (
+                        <span className="flex items-center gap-1.5">
+                          <Calendar className="h-4 w-4" />
+                          {new Date(article.published_at).toLocaleDateString(lang === 'fr' ? 'fr-FR' : 'en-GB', {
+                            day: 'numeric',
+                            month: 'long',
+                            year: 'numeric',
+                          })}
+                        </span>
+                      )}
+                      {readingTime > 0 && (
+                        <span className="flex items-center gap-1.5">
+                          <Clock className="h-4 w-4" />
+                          {readingTime} min de lecture
+                        </span>
+                      )}
+                      <span className="flex items-center gap-1.5">
+                        <ShieldCheck className="h-4 w-4" />
+                        Verifie par YOJOB
+                      </span>
+                    </div>
+                  </header>
 
-                  {translation.excerpt && (
-                    <p className="text-lg md:text-xl text-white/65 leading-relaxed mb-6 max-w-3xl">
-                      {translation.excerpt}
-                    </p>
+                  {article.featured_image_url && (
+                    <div className="mb-8">
+                      <motion.img
+                        initial={{ opacity: 0, scale: 0.98 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        transition={{ delay: 0.1 }}
+                        src={article.featured_image_url}
+                        alt={translation.title}
+                        className="max-h-[520px] w-full rounded-2xl object-cover shadow-xl shadow-slate-300/50"
+                      />
+                    </div>
                   )}
 
-                  <div className="flex items-center flex-wrap gap-4 text-sm text-white/40 pb-1">
-                    {article.published_at && (
-                      <span className="flex items-center gap-1.5">
-                        <Calendar className="w-4 h-4" />
-                        {new Date(article.published_at).toLocaleDateString(lang === 'fr' ? 'fr-FR' : 'en-GB', {
-                          day: 'numeric',
-                          month: 'long',
-                          year: 'numeric',
-                        })}
-                      </span>
-                    )}
-                    {readingTime > 0 && (
-                      <span className="flex items-center gap-1.5">
-                        <Clock className="w-4 h-4" />
-                        {readingTime} min de lecture
-                      </span>
-                    )}
-                    <span className="flex items-center gap-1.5">
-                      <ShieldCheck className="w-4 h-4" />
-                      Verifie par YOJOB
-                    </span>
+                  <div className="mb-8 rounded-xl border border-slate-200 bg-slate-50 p-4 lg:hidden">
+                    <p className="mb-2 text-xs uppercase tracking-wide text-slate-600">Sommaire rapide</p>
+                    <select
+                      defaultValue=""
+                      aria-label="Aller a une section de l'article"
+                      onChange={(event) => {
+                        const selectedId = event.target.value;
+                        const selected = headings.find((heading) => heading.id === selectedId);
+                        if (selected) handleTocClick(selected);
+                      }}
+                      className="min-h-11 w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-800 focus-visible:ring-2 focus-visible:ring-cyan-600 focus-visible:ring-offset-2"
+                    >
+                      <option value="">Aller a une section...</option>
+                      {headings.map((heading) => (
+                        <option key={heading.id} value={heading.id}>
+                          {heading.level === 3 ? '↳ ' : ''}
+                          {heading.title}
+                        </option>
+                      ))}
+                    </select>
                   </div>
-                </div>
-              </div>
-            </section>
 
-            {article.featured_image_url && (
-              <div className="max-w-5xl mx-auto px-4 mb-10">
-                <motion.img
-                  initial={{ opacity: 0, scale: 0.98 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  transition={{ delay: 0.15 }}
-                  src={article.featured_image_url}
-                  alt={translation.title}
-                  className="w-full rounded-2xl object-cover max-h-[520px] shadow-2xl shadow-black/30"
-                />
-              </div>
-            )}
-
-            <section className="px-4 pb-16">
-              <div className="mx-auto max-w-6xl rounded-3xl border border-slate-200 bg-white px-4 py-6 shadow-2xl shadow-slate-950/5 sm:px-6 md:px-8 md:py-8">
-                <div className="mb-8 rounded-xl border border-slate-200 bg-slate-50 p-4 lg:hidden">
-                  <p className="mb-2 text-xs uppercase tracking-wide text-slate-600">Sommaire rapide</p>
-                  <select
-                    defaultValue=""
-                    aria-label="Aller a une section de l'article"
-                    onChange={(event) => {
-                      const selectedId = event.target.value;
-                      const selected = headings.find((heading) => heading.id === selectedId);
-                      if (selected) handleTocClick(selected);
-                    }}
-                    className="min-h-11 w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-800 focus-visible:ring-2 focus-visible:ring-cyan-600 focus-visible:ring-offset-2"
-                  >
-                    <option value="">Aller a une section...</option>
-                    {headings.map((heading) => (
-                      <option key={heading.id} value={heading.id}>
-                        {heading.level === 3 ? '↳ ' : ''}
-                        {heading.title}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-
-                <div className="grid grid-cols-1 gap-10 lg:grid-cols-[minmax(0,820px)_260px] lg:justify-between">
-                  <article className="w-full max-w-[820px]">
-                    <div className="mb-8 grid gap-4 sm:grid-cols-2">
-                      {translation.key_points && translation.key_points.length > 0 && (
-                        <div className="rounded-xl border border-slate-200 bg-slate-50 p-4">
-                          <p className="mb-2 inline-flex items-center gap-1 text-xs font-semibold uppercase tracking-wide text-slate-700">
-                            <ListTree className="h-3.5 w-3.5 text-cyan-700" />
-                            Points cles
-                          </p>
-                          <ul className="space-y-2">
-                            {translation.key_points.map((point, index) => (
-                              <li key={index} className="flex gap-2 text-sm text-slate-700">
-                                <span className="mt-0.5 text-cyan-700">•</span>
-                                <span>{point}</span>
-                              </li>
-                            ))}
-                          </ul>
-                        </div>
-                      )}
-
-                      {translation.checklist_items && translation.checklist_items.length > 0 && (
-                        <div className="rounded-xl border border-slate-200 bg-slate-50 p-4">
-                          <p className="mb-2 inline-flex items-center gap-1 text-xs font-semibold uppercase tracking-wide text-slate-700">
-                            <ClipboardList className="h-3.5 w-3.5 text-emerald-700" />
-                            Checklist
-                          </p>
-                          <ul className="space-y-2">
-                            {translation.checklist_items.map((item, index) => (
-                              <li key={index} className="flex gap-2 text-sm text-slate-700">
-                                <CheckCircle2 className="mt-0.5 h-4 w-4 flex-shrink-0 text-emerald-700" />
-                                <span>{item}</span>
-                              </li>
-                            ))}
-                          </ul>
-                        </div>
-                      )}
-                    </div>
-
-                    <div className="mb-10 rounded-xl border border-slate-200 bg-slate-50 p-4">
-                      <p className="mb-2 text-xs uppercase tracking-wide text-slate-600">Fraicheur & sources</p>
-                      <div className="text-sm text-slate-700">
-                        <p className="mb-2">
-                          Derniere mise a jour:
-                          {' '}
-                          <span className="font-semibold text-slate-900">
-                            {new Date(article.last_updated_at || article.updated_at).toLocaleDateString(
-                              lang === 'fr' ? 'fr-FR' : 'en-GB',
-                              { day: 'numeric', month: 'long', year: 'numeric' }
-                            )}
-                          </span>
+                  <div className="mb-8 grid gap-4 sm:grid-cols-2">
+                    {translation.key_points && translation.key_points.length > 0 && (
+                      <div className="rounded-xl border border-slate-200 bg-slate-50 p-4">
+                        <p className="mb-2 inline-flex items-center gap-1 text-xs font-semibold uppercase tracking-wide text-slate-700">
+                          <ListTree className="h-3.5 w-3.5 text-cyan-700" />
+                          Points cles
                         </p>
-                        {article.sources && article.sources.length > 0 && (
-                          <ul className="space-y-1.5">
-                            {article.sources.map((source, index) => (
-                              <li key={`${source.url}-${index}`} className="text-sm text-slate-700">
-                                <a
-                                  href={source.url}
-                                  target="_blank"
-                                  rel="noopener noreferrer"
-                                  className="inline-flex items-center gap-1 font-medium text-cyan-700 hover:text-cyan-800 hover:underline"
-                                >
-                                  <Link2 className="h-3 w-3" />
-                                  {source.label}
-                                </a>
-                              </li>
-                            ))}
-                          </ul>
-                        )}
+                        <ul className="space-y-2">
+                          {translation.key_points.map((point, index) => (
+                            <li key={index} className="flex gap-2 text-sm text-slate-700">
+                              <span className="mt-0.5 text-cyan-700">•</span>
+                              <span>{point}</span>
+                            </li>
+                          ))}
+                        </ul>
                       </div>
-                    </div>
+                    )}
 
+                    {translation.checklist_items && translation.checklist_items.length > 0 && (
+                      <div className="rounded-xl border border-slate-200 bg-slate-50 p-4">
+                        <p className="mb-2 inline-flex items-center gap-1 text-xs font-semibold uppercase tracking-wide text-slate-700">
+                          <ClipboardList className="h-3.5 w-3.5 text-emerald-700" />
+                          Checklist
+                        </p>
+                        <ul className="space-y-2">
+                          {translation.checklist_items.map((item, index) => (
+                            <li key={index} className="flex gap-2 text-sm text-slate-700">
+                              <CheckCircle2 className="mt-0.5 h-4 w-4 flex-shrink-0 text-emerald-700" />
+                              <span>{item}</span>
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
+                  </div>
+
+                  <div className="mb-10 rounded-xl border border-slate-200 bg-slate-50 p-4">
+                    <p className="mb-2 text-xs uppercase tracking-wide text-slate-600">Fraicheur & sources</p>
+                    <div className="text-sm text-slate-700">
+                      <p className="mb-2">
+                        Derniere mise a jour:{' '}
+                        <span className="font-semibold text-slate-900">
+                          {new Date(article.last_updated_at || article.updated_at).toLocaleDateString(
+                            lang === 'fr' ? 'fr-FR' : 'en-GB',
+                            { day: 'numeric', month: 'long', year: 'numeric' }
+                          )}
+                        </span>
+                      </p>
+                      {article.sources && article.sources.length > 0 && (
+                        <ul className="space-y-1.5">
+                          {article.sources.map((source, index) => (
+                            <li key={`${source.url}-${index}`} className="text-sm text-slate-700">
+                              <a
+                                href={source.url}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="inline-flex items-center gap-1 font-medium text-cyan-700 hover:text-cyan-800 hover:underline"
+                              >
+                                <Link2 className="h-3 w-3" />
+                                {source.label}
+                              </a>
+                            </li>
+                          ))}
+                        </ul>
+                      )}
+                    </div>
+                  </div>
+
+                  <div
+                    className={articleBodyClassName}
+                    dangerouslySetInnerHTML={{ __html: splitContent.beforeHtml }}
+                  />
+
+                  {MidArticleCta}
+
+                  {splitContent.afterHtml && (
                     <div
                       className={articleBodyClassName}
-                      dangerouslySetInnerHTML={{ __html: splitContent.beforeHtml }}
+                      dangerouslySetInnerHTML={{ __html: splitContent.afterHtml }}
                     />
+                  )}
 
-                    {MidArticleCta}
+                  {faqItems.length > 0 && (
+                    <section className="mt-12 rounded-2xl border border-slate-200 bg-white p-5">
+                      <h2 className="mb-2 text-2xl font-bold text-slate-900">FAQ</h2>
+                      <p className="mb-4 text-sm text-slate-600">
+                        Questions frequentes sur les obligations de conformité et le détachement.
+                      </p>
+                      <Accordion type="single" collapsible className="w-full">
+                        {faqItems.map((faq, index) => (
+                          <AccordionItem key={index} value={`faq-${index}`} className="border-slate-200">
+                            <AccordionTrigger className="text-left text-slate-900 hover:text-cyan-700">
+                              {faq.question}
+                            </AccordionTrigger>
+                            <AccordionContent className="leading-relaxed text-slate-700">
+                              {faq.answer}
+                            </AccordionContent>
+                          </AccordionItem>
+                        ))}
+                      </Accordion>
+                    </section>
+                  )}
 
-                    {splitContent.afterHtml && (
-                      <div
-                        className={articleBodyClassName}
-                        dangerouslySetInnerHTML={{ __html: splitContent.afterHtml }}
-                      />
-                    )}
+                  <section className="mt-12 rounded-2xl border border-cyan-200 bg-gradient-to-br from-cyan-50 to-blue-50 p-6">
+                    <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-cyan-700">{personaCopy.badge}</p>
+                    <h2 className="mb-2 text-2xl font-bold text-slate-900">{personaCopy.title}</h2>
+                    <p className="mb-5 leading-relaxed text-slate-700">{endCtaText}</p>
+                    <div className="flex flex-wrap items-center gap-3">
+                      <a
+                        href={devisLink}
+                        className="inline-flex min-h-11 w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-cyan-600 to-violet-700 px-6 py-3 font-medium text-white transition-all hover:from-cyan-500 hover:to-violet-600 focus-visible:ring-2 focus-visible:ring-cyan-600 focus-visible:ring-offset-2 motion-reduce:transition-none sm:w-auto"
+                      >
+                        {endCtaLabel}
+                        <ArrowRight className="h-4 w-4" />
+                      </a>
+                      <a
+                        href={`${langPrefix}/blog`}
+                        className="inline-flex min-h-11 w-full items-center justify-center gap-2 rounded-xl border border-slate-300 px-5 py-3 text-slate-700 transition-colors hover:border-slate-400 hover:text-slate-900 focus-visible:ring-2 focus-visible:ring-cyan-600 focus-visible:ring-offset-2 sm:w-auto"
+                      >
+                        <ArrowLeft className="h-4 w-4" />
+                        Continuer la lecture
+                      </a>
+                    </div>
+                  </section>
 
-                    {faqItems.length > 0 && (
-                      <section className="mt-12 rounded-2xl border border-slate-200 bg-white p-5">
-                        <h2 className="mb-2 text-2xl font-bold text-slate-900">FAQ</h2>
-                        <p className="mb-4 text-sm text-slate-600">
-                          Questions frequentes sur les obligations de conformité et le détachement.
-                        </p>
-                        <Accordion type="single" collapsible className="w-full">
-                          {faqItems.map((faq, index) => (
-                            <AccordionItem key={index} value={`faq-${index}`} className="border-slate-200">
-                              <AccordionTrigger className="text-left text-slate-900 hover:text-cyan-700">
-                                {faq.question}
-                              </AccordionTrigger>
-                              <AccordionContent className="leading-relaxed text-slate-700">
-                                {faq.answer}
-                              </AccordionContent>
-                            </AccordionItem>
-                          ))}
-                        </Accordion>
-                      </section>
-                    )}
-
-                    <section className="mt-12 rounded-2xl border border-cyan-200 bg-gradient-to-br from-cyan-50 to-blue-50 p-6">
-                      <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-cyan-700">{personaCopy.badge}</p>
-                      <h2 className="mb-2 text-2xl font-bold text-slate-900">{personaCopy.title}</h2>
-                      <p className="mb-5 leading-relaxed text-slate-700">{endCtaText}</p>
-                      <div className="flex flex-wrap items-center gap-3">
-                        <a
-                          href={devisLink}
-                          className="inline-flex min-h-11 w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-cyan-600 to-violet-700 px-6 py-3 font-medium text-white transition-all hover:from-cyan-500 hover:to-violet-600 focus-visible:ring-2 focus-visible:ring-cyan-600 focus-visible:ring-offset-2 motion-reduce:transition-none sm:w-auto"
-                        >
-                          {endCtaLabel}
-                          <ArrowRight className="h-4 w-4" />
-                        </a>
-                        <a
-                          href={`${langPrefix}/blog`}
-                          className="inline-flex min-h-11 w-full items-center justify-center gap-2 rounded-xl border border-slate-300 px-5 py-3 text-slate-700 transition-colors hover:border-slate-400 hover:text-slate-900 focus-visible:ring-2 focus-visible:ring-cyan-600 focus-visible:ring-offset-2 sm:w-auto"
-                        >
-                          <ArrowLeft className="h-4 w-4" />
-                          Continuer la lecture
-                        </a>
+                  {relatedArticles.length > 0 && (
+                    <section className="mt-12">
+                      <h2 className="mb-4 text-2xl font-bold text-slate-900">Articles liés</h2>
+                      <div className="grid gap-4 sm:grid-cols-2">
+                        {relatedArticles.map((related) => {
+                          const relatedTranslation =
+                            related.translations.find((item) => item.language_code === lang) ||
+                            related.translations.find((item) => item.language_code === 'fr');
+                          if (!relatedTranslation) return null;
+                          return (
+                            <a
+                              key={related.id}
+                              href={`${langPrefix}/blog/${related.slug}`}
+                              className="rounded-xl border border-slate-200 bg-white p-4 transition-colors hover:border-cyan-200 hover:bg-slate-50"
+                            >
+                              <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-cyan-700">
+                                {related.category || 'Article'}
+                              </p>
+                              <h3 className="mb-1 line-clamp-2 font-semibold text-slate-900">
+                                {relatedTranslation.title}
+                              </h3>
+                              <p className="line-clamp-2 text-sm text-slate-600">
+                                {relatedTranslation.excerpt || 'Lire cet article'}
+                              </p>
+                            </a>
+                          );
+                        })}
                       </div>
                     </section>
+                  )}
+                </article>
 
-                    {relatedArticles.length > 0 && (
-                      <section className="mt-12">
-                        <h2 className="mb-4 text-2xl font-bold text-slate-900">Articles liés</h2>
-                        <div className="grid gap-4 sm:grid-cols-2">
-                          {relatedArticles.map((related) => {
-                            const relatedTranslation =
-                              related.translations.find((item) => item.language_code === lang) ||
-                              related.translations.find((item) => item.language_code === 'fr');
-                            if (!relatedTranslation) return null;
-                            return (
-                              <a
-                                key={related.id}
-                                href={`${langPrefix}/blog/${related.slug}`}
-                                className="rounded-xl border border-slate-200 bg-white p-4 transition-colors hover:border-cyan-200 hover:bg-slate-50"
-                              >
-                                <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-cyan-700">
-                                  {related.category || 'Article'}
-                                </p>
-                                <h3 className="mb-1 line-clamp-2 font-semibold text-slate-900">
-                                  {relatedTranslation.title}
-                                </h3>
-                                <p className="line-clamp-2 text-sm text-slate-600">
-                                  {relatedTranslation.excerpt || 'Lire cet article'}
-                                </p>
-                              </a>
-                            );
-                          })}
-                        </div>
-                      </section>
-                    )}
-                  </article>
-
-                  <aside className="hidden lg:block">
-                    <div className="sticky top-24 rounded-2xl border border-slate-200 bg-slate-50 p-4">
-                      <p className="mb-3 text-xs uppercase tracking-wide text-slate-600">Sommaire</p>
-                      <nav className="space-y-1.5">
-                        {headings.map((heading) => (
-                          <a
-                            key={heading.id}
-                            href={`#${heading.id}`}
-                            onClick={(event) => {
-                              event.preventDefault();
-                              handleTocClick(heading);
-                            }}
-                            className={`block rounded-md px-2 py-1.5 text-sm transition-colors focus-visible:ring-2 focus-visible:ring-cyan-600 focus-visible:ring-offset-2 ${
-                              heading.level === 3
-                                ? 'pl-5 text-slate-600 hover:text-cyan-700'
-                                : 'text-slate-800 hover:text-cyan-700'
-                            }`}
-                          >
-                            {heading.title}
-                          </a>
-                        ))}
-                      </nav>
-                    </div>
-                  </aside>
-                </div>
+                <aside className="hidden lg:block">
+                  <div className="sticky top-24 rounded-2xl border border-slate-200 bg-slate-50 p-4">
+                    <p className="mb-3 text-xs uppercase tracking-wide text-slate-600">Sommaire</p>
+                    <nav className="space-y-1.5">
+                      {headings.map((heading) => (
+                        <a
+                          key={heading.id}
+                          href={`#${heading.id}`}
+                          onClick={(event) => {
+                            event.preventDefault();
+                            handleTocClick(heading);
+                          }}
+                          className={`block rounded-md px-2 py-1.5 text-sm transition-colors focus-visible:ring-2 focus-visible:ring-cyan-600 focus-visible:ring-offset-2 ${
+                            heading.level === 3
+                              ? 'pl-5 text-slate-600 hover:text-cyan-700'
+                              : 'text-slate-800 hover:text-cyan-700'
+                          }`}
+                        >
+                          {heading.title}
+                        </a>
+                      ))}
+                    </nav>
+                  </div>
+                </aside>
               </div>
-            </section>
-          </>
+            </div>
+          </section>
         )}
 
         <Footer language={lang} />
