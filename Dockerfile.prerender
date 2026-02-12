@@ -5,7 +5,7 @@
 # Écrit les pages pré-rendues dans le volume /output
 # =============================================================================
 
-FROM node:20-bullseye
+FROM node:24-bullseye
 
 WORKDIR /app
 
@@ -18,10 +18,11 @@ RUN apt-get update \
   && apt-get install -y --no-install-recommends chromium \
   && rm -rf /var/lib/apt/lists/*
 
-# Install dependencies
-COPY package.json .npmrc ./
-RUN npm config set registry https://registry.npmjs.org/
-RUN npm install --legacy-peer-deps
+# Install dependencies (reproducible)
+COPY package.json package-lock.json .npmrc ./
+RUN test -f package-lock.json
+RUN npm config set registry https://registry.npmjs.org/ \
+  && npm ci --legacy-peer-deps
 
 # Copy source
 COPY . .
