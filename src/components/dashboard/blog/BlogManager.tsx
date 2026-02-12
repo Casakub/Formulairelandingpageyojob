@@ -19,9 +19,11 @@ import {
   getArticles,
   deleteArticle,
 } from '../../../services/blogService';
+import { evaluateBlogQuality } from '@/lib/blogQuality';
 
 const STATUS_LABELS: Record<string, { label: string; color: string }> = {
   draft: { label: 'Brouillon', color: 'bg-yellow-100 text-yellow-800 border-yellow-200' },
+  in_review: { label: 'En review', color: 'bg-blue-100 text-blue-800 border-blue-200' },
   published: { label: 'Publié', color: 'bg-green-100 text-green-800 border-green-200' },
   archived: { label: 'Archivé', color: 'bg-slate-100 text-slate-600 border-slate-200' },
 };
@@ -165,6 +167,14 @@ export function BlogManager() {
               const frTrans = article.translations?.find((t) => t.language_code === 'fr');
               const langCount = article.translations?.filter((t) => t.title)?.length || 0;
               const statusInfo = STATUS_LABELS[article.status] || STATUS_LABELS.draft;
+              const quality = evaluateBlogQuality(
+                {
+                  slug: article.slug,
+                  sources: article.sources,
+                  last_updated_at: article.last_updated_at,
+                },
+                frTrans || {}
+              );
 
               return (
                 <motion.div
@@ -212,6 +222,25 @@ export function BlogManager() {
                             {article.category}
                           </span>
                         )}
+                        <span className="px-2 py-0.5 rounded bg-slate-100 text-slate-600">
+                          {article.persona_target === 'enterprise'
+                            ? 'Entreprise'
+                            : article.persona_target === 'agency'
+                              ? 'Agence'
+                              : 'Entreprise+Agence'}
+                        </span>
+                        <span className="px-2 py-0.5 rounded bg-slate-100 text-slate-600">
+                          Risque {article.risk_level}
+                        </span>
+                        <span className={`px-2 py-0.5 rounded ${
+                          quality.score >= 80
+                            ? 'bg-green-100 text-green-700'
+                            : quality.score >= 60
+                              ? 'bg-yellow-100 text-yellow-700'
+                              : 'bg-red-100 text-red-700'
+                        }`}>
+                          Qualité {quality.score}
+                        </span>
                         <span>
                           {new Date(article.updated_at).toLocaleDateString('fr-FR')}
                         </span>
