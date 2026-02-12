@@ -50,7 +50,7 @@ services:
       - traefik.http.middlewares.yojob-headers.headers.stsSeconds=31536000
       - traefik.http.middlewares.yojob-headers.headers.stsIncludeSubdomains=true
       - traefik.http.middlewares.yojob-headers.headers.stsPreload=true
-      - traefik.http.routers.yojob.middlewares=yojob-headers
+      - traefik.http.routers.yojob.middlewares=yojob-redirect-www,yojob-headers
       # Labels informatifs
       - app.name=yojob-landing
       - app.source=figma-make
