@@ -22,6 +22,7 @@
 #   PRERENDER_LANGS=NONE ./update-from-figma.sh               Skip prerender
 #   FULL_PRERENDER=1 ./update-from-figma.sh                   Toutes langues x pages
 #   PRERENDER_PAGES="/,/a-propos" ./update-from-figma.sh      Pages spécifiques
+#   PRERENDER_FORCE=1 ./update-from-figma.sh                  Force le prerender même sans diff Git
 # =============================================================================
 
 set -Eeuo pipefail
@@ -48,9 +49,6 @@ GUARD_BRANCH="claude/verify-root-files-placement-B4mK1"
 BRANCH_REF="origin/${GUARD_BRANCH}"
 LAST_COMMIT_FILE=".last-deploy-commit"
 
-# INFRA_FILES : fichiers Docker/infrastructure protégés contre les écrasements
-# par Figma Make. Ces fichiers n'existent pas sur Figma Make et doivent être
-# restaurés depuis la guard branch après chaque merge.
 INFRA_FILES=(
   "Dockerfile"
   "Dockerfile.prerender"
@@ -67,12 +65,6 @@ INFRA_FILES=(
   "src/scripts/seo-validate.sh"
 )
 
-# NOTE: package.json est dans INFRA_FILES car Figma Make ne gère pas les
-# dépendances serveur (puppeteer, etc.). La version de référence est sur
-# la guard branch. Mettre à jour la guard branch si de nouvelles dépendances
-# sont nécessaires.
-
-# ── Helpers ──────────────────────────────────────────────────────────────────
 is_true() {
   local v="${1:-}"
   [[ "${v,,}" =~ ^(1|true|yes|on)$ ]]
@@ -90,58 +82,49 @@ extract_lang() {
   fi
 }
 
-# =============================================================================
-# CLASSIFICATION DES FICHIERS MODIFIES
-# =============================================================================
 classify_file() {
   local file="$1"
   case "$file" in
-    *.css|*.scss|*.less|tailwind.config.*|postcss.config.*)
-      echo "STYLE_ONLY" ;;
-    *.png|*.jpg|*.jpeg|*.gif|*.svg|*.ico|*.woff|*.woff2|*.ttf|*.eot|*.webp)
-      echo "STATIC_ONLY" ;;
-    public/*)
-      echo "STATIC_ONLY" ;;
+    *.css|*.scss|*.less|tailwind.config.*|postcss.config.*) echo "STYLE_ONLY" ;;
+    *.png|*.jpg|*.jpeg|*.gif|*.svg|*.ico|*.woff|*.woff2|*.ttf|*.eot|*.webp) echo "STATIC_ONLY" ;;
+    public/*) echo "STATIC_ONLY" ;;
 
-    # Page routes
-    src/App-Landing.tsx)                        echo "/" ;;
-    src/APropos.tsx)                            echo "/a-propos" ;;
-    src/NotreReseau.tsx)                        echo "/notre-reseau" ;;
-    src/NosSecteurs.tsx)                        echo "/nos-secteurs" ;;
-    src/Temoignages.tsx)                        echo "/temoignages" ;;
-    src/ServiceInterimEuropeen.tsx)             echo "/services/interim-europeen" ;;
-    src/ServiceRecrutementSpecialise.tsx)       echo "/services/recrutement-specialise" ;;
-    src/ServiceConseilConformite.tsx)           echo "/services/conseil-conformite" ;;
-    src/ServiceDetachementPersonnel.tsx)        echo "/services/detachement-personnel" ;;
-    src/ServiceDetachementBTP.tsx)              echo "/services/detachement-btp" ;;
-    src/ServiceDetachementIndustrie.tsx)        echo "/services/detachement-industrie" ;;
-    src/BlogDirective.tsx)                      echo "/blog/directive-detachement-europe" ;;
-    src/BlogList.tsx)                            echo "/blog" ;;
-    src/BlogPost.tsx)                            echo "/blog" ;;
-    src/DemandeDevis.tsx)                       echo "/devis" ;;
-    src/Privacy.tsx)                            echo "/privacy" ;;
-    src/Legal.tsx)                              echo "/legal" ;;
-    src/CGV.tsx)                                echo "/cgv" ;;
+    src/App-Landing.tsx) echo "/" ;;
+    src/APropos.tsx) echo "/a-propos" ;;
+    src/NotreReseau.tsx) echo "/notre-reseau" ;;
+    src/NosSecteurs.tsx) echo "/nos-secteurs" ;;
+    src/Temoignages.tsx) echo "/temoignages" ;;
+    src/ServiceInterimEuropeen.tsx) echo "/services/interim-europeen" ;;
+    src/ServiceRecrutementSpecialise.tsx) echo "/services/recrutement-specialise" ;;
+    src/ServiceConseilConformite.tsx) echo "/services/conseil-conformite" ;;
+    src/ServiceDetachementPersonnel.tsx) echo "/services/detachement-personnel" ;;
+    src/ServiceDetachementBTP.tsx) echo "/services/detachement-btp" ;;
+    src/ServiceDetachementIndustrie.tsx) echo "/services/detachement-industrie" ;;
+    src/BlogDirective.tsx) echo "/blog/directive-detachement-europe" ;;
+    src/BlogList.tsx) echo "/blog" ;;
+    src/BlogPost.tsx) echo "/blog" ;;
+    src/DemandeDevis.tsx) echo "/devis" ;;
+    src/Privacy.tsx) echo "/privacy" ;;
+    src/Legal.tsx) echo "/legal" ;;
+    src/CGV.tsx) echo "/cgv" ;;
 
-    # i18n per page
-    src/src/i18n/pages/landingPage/*)          echo "/" ;;
-    src/src/i18n/pages/aPropos/*)              echo "/a-propos" ;;
-    src/src/i18n/pages/notreReseau/*)          echo "/notre-reseau" ;;
-    src/src/i18n/pages/nosSecteurs/*)          echo "/nos-secteurs" ;;
-    src/src/i18n/pages/temoignages/*)          echo "/temoignages" ;;
-    src/src/i18n/pages/privacy/*)              echo "/privacy" ;;
-    src/src/i18n/pages/legal/*)                echo "/legal" ;;
-    src/src/i18n/pages/cgv/*)                  echo "/cgv" ;;
-    src/src/i18n/services/interimEuropeen/*)   echo "/services/interim-europeen" ;;
+    src/src/i18n/pages/landingPage/*) echo "/" ;;
+    src/src/i18n/pages/aPropos/*) echo "/a-propos" ;;
+    src/src/i18n/pages/notreReseau/*) echo "/notre-reseau" ;;
+    src/src/i18n/pages/nosSecteurs/*) echo "/nos-secteurs" ;;
+    src/src/i18n/pages/temoignages/*) echo "/temoignages" ;;
+    src/src/i18n/pages/privacy/*) echo "/privacy" ;;
+    src/src/i18n/pages/legal/*) echo "/legal" ;;
+    src/src/i18n/pages/cgv/*) echo "/cgv" ;;
+    src/src/i18n/services/interimEuropeen/*) echo "/services/interim-europeen" ;;
     src/src/i18n/services/recrutementSpecialise/*) echo "/services/recrutement-specialise" ;;
     src/src/i18n/services/conseilConformite/*) echo "/services/conseil-conformite" ;;
     src/src/i18n/services/detachementPersonnel/*) echo "/services/detachement-personnel" ;;
-    src/src/i18n/services/detachementBtp/*)    echo "/services/detachement-btp" ;;
+    src/src/i18n/services/detachementBtp/*) echo "/services/detachement-btp" ;;
     src/src/i18n/services/detachementIndustrie/*) echo "/services/detachement-industrie" ;;
-    src/src/i18n/blog/directiveDetachement/*)  echo "/blog/directive-detachement-europe" ;;
-    src/src/i18n/devis/locales/*)              echo "/devis" ;;
+    src/src/i18n/blog/directiveDetachement/*) echo "/blog/directive-detachement-europe" ;;
+    src/src/i18n/devis/locales/*) echo "/devis" ;;
 
-    # Shared components → full prerender
     src/App.tsx|src/components/SEOHead.tsx|src/components/landing/Footer.tsx|\
 src/components/landing/EuropeMap.tsx|src/components/shared/*|\
 src/src/i18n/seo/*|src/src/i18n/index.ts|src/src/i18n/types.ts|\
@@ -155,13 +138,19 @@ vite.config.*|src/scripts/prerender.cjs|index.html)
   esac
 }
 
-# =============================================================================
-# DETECTION INTELLIGENTE
-# =============================================================================
 detect_changed_routes() {
   local last_commit="$1"
   local changed_files
   changed_files="$(git diff --name-only "${last_commit}"..HEAD 2>/dev/null || true)"
+
+  # IMPORTANT: inclure aussi les changements non commités (ex: restore guard branch)
+  local working_tree_changes
+  working_tree_changes="$(git status --porcelain 2>/dev/null | awk '{print $2}' || true)"
+  if [[ -n "$working_tree_changes" ]]; then
+    changed_files="${changed_files}"$'\n'"${working_tree_changes}"
+  fi
+
+  changed_files="$(echo "$changed_files" | awk 'NF' | sort -u)"
 
   if [[ -z "$changed_files" ]]; then
     echo "NO_CHANGES"
@@ -178,9 +167,9 @@ detect_changed_routes() {
     c="$(classify_file "$file")"
 
     case "$c" in
-      SHARED)        has_shared=true ;;
+      SHARED) has_shared=true ;;
       STYLE_ONLY|STATIC_ONLY) has_style_or_static=true ;;
-      "")            : ;;
+      "") : ;;
       *)
         has_content=true
         pages+=" $c"
@@ -214,11 +203,6 @@ detect_changed_routes() {
   echo "NO_PRERENDER"
 }
 
-# =============================================================================
-# Restauration des fichiers infrastructure (SANS commit)
-# Copie les fichiers depuis la guard branch dans le working directory.
-# Pas de git add, pas de commit → zéro divergence avec origin/main.
-# =============================================================================
 restore_infra_files() {
   local ref="$1"
 
@@ -226,11 +210,9 @@ restore_infra_files() {
   local restored=0
   for file in "${INFRA_FILES[@]}"; do
     if git cat-file -e "${ref}:${file}" 2>/dev/null; then
-      # Créer le dossier parent si nécessaire
       local dir
       dir="$(dirname "$file")"
       [[ "$dir" != "." ]] && mkdir -p "$dir"
-      # Copier le contenu sans staging (git show au lieu de git checkout)
       git show "${ref}:${file}" > "$file"
       restored=$((restored + 1))
     else
@@ -240,9 +222,6 @@ restore_infra_files() {
   echo "   ${restored} fichier(s) infra restauré(s) (non commités)."
 }
 
-# =============================================================================
-# EXECUTION
-# =============================================================================
 echo "============================================"
 echo "  YoJob - Update from Figma Make"
 echo "============================================"
@@ -268,7 +247,6 @@ if ! git show-ref --verify --quiet "refs/remotes/${BRANCH_REF}"; then
   fi
 fi
 
-# ── Sauvegarder les fichiers locaux avant reset ─────────────────────────────
 ENV_BACKUP=""
 if [[ -f .env ]]; then
   ENV_BACKUP="$(mktemp)"
@@ -282,17 +260,14 @@ if [[ -f "$LAST_COMMIT_FILE" ]]; then
   echo "Dernier deploy: ${LAST_DEPLOY_BACKUP:0:8}"
 fi
 
-# ── Reset local main = origin/main (zéro divergence) ────────────────────────
 echo "Synchronisation avec origin/main (reset --hard)..."
 git reset --hard origin/main
 echo "   Local main synchronisé avec origin/main ($(git rev-parse --short HEAD))"
 
-# Restaurer le fichier de tracking du dernier deploy
 if [[ -n "${LAST_DEPLOY_BACKUP:-}" ]]; then
   echo "$LAST_DEPLOY_BACKUP" > "$LAST_COMMIT_FILE"
 fi
 
-# ── Gérer le cas src/public/ -> public/ (Figma Make artifact) ────────────────
 if [[ -d "src/public" ]]; then
     echo "Moving files from src/public/ to public/..."
     mkdir -p public
@@ -302,32 +277,38 @@ if [[ -d "src/public" ]]; then
     rm -rf src/public
 fi
 
-# ── Restaurer les fichiers infra (working dir only, pas de commit) ───────────
 if [[ -n "$BRANCH_REF" ]]; then
   restore_infra_files "$BRANCH_REF"
 fi
 
-# ── Restaurer le fichier .env ────────────────────────────────────────────────
 if [[ -n "${ENV_BACKUP:-}" && -f "$ENV_BACKUP" ]]; then
   cp "$ENV_BACKUP" .env
   rm -f "$ENV_BACKUP"
   echo "Fichier .env restauré."
 fi
 
-# =============================================================================
-# DETERMINATION DU MODE PRERENDER
-# =============================================================================
 echo ""
 echo "-- Prerender Decision --"
 
 USER_FULL="${FULL_PRERENDER:-}"
 USER_LANGS="${PRERENDER_LANGS:-}"
 USER_PAGES="${PRERENDER_PAGES:-}"
-unset PRERENDER_LANGS PRERENDER_PAGES 2>/dev/null || true
+USER_FORCE="${PRERENDER_FORCE:-}"
+unset PRERENDER_LANGS PRERENDER_PAGES PRERENDER_FORCE 2>/dev/null || true
 
 NEED_PRERENDER=false
 
-if is_true "$USER_FULL"; then
+if is_true "$USER_FORCE"; then
+  echo "Mode: FORCE (PRERENDER_FORCE=1)"
+  echo "   -> Prerender déclenché même sans changements détectés"
+  NEED_PRERENDER=true
+  [[ -n "$USER_LANGS" ]] && export PRERENDER_LANGS="$USER_LANGS"
+  [[ -n "$USER_PAGES" ]] && export PRERENDER_PAGES="$USER_PAGES"
+  if [[ -z "${PRERENDER_LANGS:-}" && -z "${PRERENDER_PAGES:-}" ]]; then
+    export PRERENDER_LANGS=fr
+  fi
+
+elif is_true "$USER_FULL"; then
   echo "Mode: COMPLET (forcé via FULL_PRERENDER=1)"
   echo "   -> Toutes langues x toutes pages (~300 routes)"
   NEED_PRERENDER=true
@@ -346,7 +327,6 @@ elif [[ -n "$USER_LANGS" || -n "$USER_PAGES" ]]; then
   fi
 
 else
-  # ── Mode AUTO ──
   DETECTION="FULL"
 
   if [[ -f "$LAST_COMMIT_FILE" ]]; then
@@ -393,9 +373,6 @@ else
   esac
 fi
 
-# =============================================================================
-# DOCKER BUILD & DEPLOY
-# =============================================================================
 echo ""
 echo "-- Docker Build --"
 
@@ -404,17 +381,13 @@ if [[ ! -f docker-compose.yml ]]; then
   exit 1
 fi
 
-# STEP 1 : Build l'image avec cache-bust (évite que Docker serve l'ancien build)
-# Le CACHEBUST ARG dans le Dockerfile invalide le cache à partir du COPY --from=builder
 echo "Building landing page (nginx)..."
 CACHEBUST="$(date +%s)"
 docker compose build --build-arg CACHEBUST="$CACHEBUST" yojob-landing
 
-# STEP 2 : Déployer le conteneur (toujours force-recreate pour utiliser la nouvelle image)
 echo "Deploying landing page..."
 docker compose up -d --force-recreate --remove-orphans yojob-landing
 
-# STEP 3 : Prerender si nécessaire (conteneur dédié)
 if [[ "$NEED_PRERENDER" == true ]]; then
   echo ""
   echo "-- Prerender --"
@@ -422,12 +395,10 @@ if [[ "$NEED_PRERENDER" == true ]]; then
   echo "   PRERENDER_PAGES=${PRERENDER_PAGES:-<all>}"
   echo ""
 
-  # Build et run le worker prerender (écrit dans le volume)
   PRERENDER_LANGS="${PRERENDER_LANGS:-}" \
   PRERENDER_PAGES="${PRERENDER_PAGES:-}" \
   docker compose --profile prerender run --rm --build yojob-prerender
 
-  # Restart le landing page pour qu'il charge les nouvelles pages du volume
   echo ""
   echo "Restarting landing page to load new pre-rendered pages..."
   docker compose up -d --force-recreate yojob-landing
@@ -435,7 +406,6 @@ else
   echo "Prerender non nécessaire. Pages du volume conservées."
 fi
 
-# Sauvegarder le commit déployé (= HEAD de origin/main, pas de commit local)
 DEPLOYED_COMMIT="$(git rev-parse HEAD)"
 echo "$DEPLOYED_COMMIT" > "$LAST_COMMIT_FILE"
 echo ""
