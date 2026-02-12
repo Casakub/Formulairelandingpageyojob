@@ -601,7 +601,7 @@ export default function BlogPost({ slug }: BlogPostProps) {
 
         {/* ── Article body — same max-w-4xl as hero for perfect alignment ── */}
         {article && translation && !loading && (
-          <section className="relative z-10 px-4 pb-24 pt-14 sm:px-6 lg:px-8">
+          <section className="relative z-10 px-4 pb-32 pt-14 sm:px-6 sm:pb-40 lg:px-8">
             <div className="mx-auto max-w-4xl">
               <article className="w-full">
                 {/* Key points + Checklist */}
