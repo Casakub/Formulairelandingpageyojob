@@ -287,6 +287,28 @@ if [[ -n "${ENV_BACKUP:-}" && -f "$ENV_BACKUP" ]]; then
   echo "Fichier .env restauré."
 fi
 
+# ── Garde-fous critiques avant build ─────────────────────────────────────────
+if [[ ! -f package-lock.json ]]; then
+  echo "[ERR] package-lock.json absent après sync origin/main / guard branch."
+  echo "      Corrige sur main puis relance update-from-figma.sh."
+  exit 1
+fi
+
+# Vérifie que puppeteer est bien déclaré (sinon prerender plantera)
+if ! grep -q '"puppeteer"' package.json; then
+  echo "[ERR] puppeteer absent de package.json."
+  echo "      Ajoute puppeteer dans dependencies, commit/push, puis relance."
+  exit 1
+fi
+
+# Vérifie que npm voit puppeteer dans le lockfile (cohérence package-lock)
+if ! grep -q '"node_modules/puppeteer"' package-lock.json; then
+  echo "[ERR] package-lock.json ne contient pas puppeteer."
+  echo "      Exécute: npm install --legacy-peer-deps"
+  echo "      puis commit/push package-lock.json et relance."
+  exit 1
+fi
+
 echo ""
 echo "-- Prerender Decision --"
 
