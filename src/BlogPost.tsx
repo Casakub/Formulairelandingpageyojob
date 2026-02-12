@@ -114,6 +114,7 @@ function normalizeComparableText(value: string): string {
     .toLowerCase()
     .normalize('NFD')
     .replace(/[\u0300-\u036f]/g, '')
+    .replace(/[^a-z0-9]+/g, ' ')
     .replace(/\s+/g, ' ')
     .trim();
 }
@@ -126,12 +127,21 @@ function stripLeadingTitleHeading(html: string, title: string): string {
   const root = document.body.firstElementChild as HTMLElement | null;
   if (!root) return html;
 
+  // Remove any leading H1 that matches or closely matches the article title
   const firstHeading = root.querySelector('h1');
   if (!firstHeading) return html;
 
   const headingText = normalizeComparableText(firstHeading.textContent || '');
   const titleText = normalizeComparableText(title);
-  if (headingText && titleText && headingText === titleText) {
+
+  // Match exactly, or if one contains the other (handles slight variations)
+  if (
+    headingText &&
+    titleText &&
+    (headingText === titleText ||
+      headingText.includes(titleText) ||
+      titleText.includes(headingText))
+  ) {
     firstHeading.remove();
   }
 
@@ -202,7 +212,6 @@ export default function BlogPost({ slug }: BlogPostProps) {
   const [notFound, setNotFound] = useState(false);
   const [relatedArticles, setRelatedArticles] = useState<BlogArticleWithTranslations[]>([]);
   const [readingProgress, setReadingProgress] = useState(0);
-  const [activeHeadingId, setActiveHeadingId] = useState<string>('');
 
   const langPrefix = lang === 'fr' ? '' : `/${lang}`;
 
@@ -323,29 +332,6 @@ export default function BlogPost({ slug }: BlogPostProps) {
     };
   }, [article, lang]);
 
-  // Active heading tracking for sidebar TOC
-  useEffect(() => {
-    if (!headings.length) return;
-
-    const observer = new IntersectionObserver(
-      (entries) => {
-        for (const entry of entries) {
-          if (entry.isIntersecting) {
-            setActiveHeadingId(entry.target.id);
-          }
-        }
-      },
-      { rootMargin: '-80px 0px -70% 0px', threshold: 0 }
-    );
-
-    headings.forEach((h) => {
-      const el = document.getElementById(h.id);
-      if (el) observer.observe(el);
-    });
-
-    return () => observer.disconnect();
-  }, [headings]);
-
   const handleShare = async () => {
     const url = window.location.href;
     if (navigator.share) {
@@ -367,13 +353,13 @@ export default function BlogPost({ slug }: BlogPostProps) {
   };
 
   const MidArticleCta = (
-    <div className="my-12 rounded-2xl border border-cyan-200 bg-gradient-to-br from-cyan-50 via-white to-blue-50 p-6 shadow-sm sm:p-8">
-      <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-cyan-700">{personaCopy.badge}</p>
-      <h3 className="mb-2 text-xl font-bold leading-tight text-slate-900">{midCtaLabel}</h3>
-      <p className="mb-5 text-sm leading-relaxed text-slate-600">{midCtaText}</p>
+    <div className="my-12 rounded-2xl border border-cyan-400/30 bg-gradient-to-br from-cyan-500/10 to-violet-500/10 p-6 backdrop-blur-sm sm:p-8">
+      <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-cyan-400">{personaCopy.badge}</p>
+      <h3 className="mb-2 text-xl font-bold leading-tight text-white">{midCtaLabel}</h3>
+      <p className="mb-5 text-sm leading-relaxed text-white/70">{midCtaText}</p>
       <a
         href={devisLink}
-        className="inline-flex min-h-11 w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-cyan-600 to-blue-700 px-5 py-2.5 font-medium text-white shadow-md shadow-cyan-600/20 transition-all hover:from-cyan-500 hover:to-blue-600 hover:shadow-lg hover:shadow-cyan-600/25 focus-visible:ring-2 focus-visible:ring-cyan-600 focus-visible:ring-offset-2 motion-reduce:transition-none sm:w-auto"
+        className="inline-flex min-h-11 w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-cyan-600 to-blue-700 px-5 py-2.5 font-medium text-white shadow-md shadow-cyan-600/20 transition-all hover:from-cyan-500 hover:to-blue-600 hover:shadow-lg hover:shadow-cyan-600/25 focus-visible:ring-2 focus-visible:ring-cyan-400 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0a0e27] motion-reduce:transition-none sm:w-auto"
       >
         {midCtaLabel}
         <ArrowRight className="h-4 w-4" />
@@ -381,20 +367,20 @@ export default function BlogPost({ slug }: BlogPostProps) {
     </div>
   );
 
-  const articleBodyClassName = `blog-article-content prose prose-lg max-w-none
-    prose-headings:font-bold prose-headings:tracking-tight prose-headings:text-slate-900
-    prose-h2:mb-4 prose-h2:mt-14 prose-h2:border-b prose-h2:border-slate-200 prose-h2:pb-3 prose-h2:text-[1.65rem]
-    prose-h3:mb-3 prose-h3:mt-10 prose-h3:text-[1.3rem] prose-h3:text-slate-900
-    prose-p:my-5 prose-p:text-[17px] prose-p:leading-[1.8] prose-p:text-slate-700
-    prose-a:font-medium prose-a:text-cyan-700 prose-a:underline-offset-2 hover:prose-a:underline
-    prose-strong:font-semibold prose-strong:text-slate-900
+  const articleBodyClassName = `blog-article-content prose prose-lg prose-invert max-w-none
+    prose-headings:font-bold prose-headings:tracking-tight prose-headings:text-white
+    prose-h2:mb-4 prose-h2:mt-14 prose-h2:border-b prose-h2:border-white/10 prose-h2:pb-3 prose-h2:text-[1.65rem]
+    prose-h3:mb-3 prose-h3:mt-10 prose-h3:text-[1.3rem] prose-h3:text-white
+    prose-p:my-5 prose-p:text-[17px] prose-p:leading-[1.8] prose-p:text-white/75
+    prose-a:font-medium prose-a:text-cyan-400 prose-a:underline-offset-2 hover:prose-a:text-cyan-300 hover:prose-a:underline
+    prose-strong:font-semibold prose-strong:text-white
     prose-ul:my-5 prose-ul:space-y-2 prose-ol:my-5 prose-ol:space-y-2
-    prose-li:text-slate-700 prose-li:marker:text-cyan-600
-    prose-blockquote:my-8 prose-blockquote:rounded-r-xl prose-blockquote:border-l-4 prose-blockquote:border-cyan-600 prose-blockquote:bg-cyan-50/60 prose-blockquote:px-5 prose-blockquote:py-4 prose-blockquote:not-italic prose-blockquote:text-slate-700
-    prose-img:my-8 prose-img:rounded-2xl prose-img:shadow-lg prose-img:shadow-slate-200/80
-    prose-hr:my-12 prose-hr:border-slate-200
-    prose-code:rounded prose-code:bg-slate-100 prose-code:px-1.5 prose-code:py-0.5 prose-code:text-sm prose-code:text-cyan-700
-    prose-pre:rounded-xl prose-pre:border prose-pre:border-slate-200 prose-pre:bg-slate-900`;
+    prose-li:text-white/75 prose-li:marker:text-cyan-400
+    prose-blockquote:my-8 prose-blockquote:rounded-r-xl prose-blockquote:border-l-4 prose-blockquote:border-cyan-500 prose-blockquote:bg-cyan-500/10 prose-blockquote:px-5 prose-blockquote:py-4 prose-blockquote:not-italic prose-blockquote:text-white/80
+    prose-img:my-8 prose-img:rounded-2xl prose-img:shadow-lg prose-img:shadow-black/30
+    prose-hr:my-12 prose-hr:border-white/10
+    prose-code:rounded prose-code:bg-white/10 prose-code:px-1.5 prose-code:py-0.5 prose-code:text-sm prose-code:text-cyan-400
+    prose-pre:rounded-xl prose-pre:border prose-pre:border-white/10 prose-pre:bg-black/30`;
 
   return (
     <>
@@ -428,28 +414,19 @@ export default function BlogPost({ slug }: BlogPostProps) {
         />
       </div>
 
-      <div className="min-h-screen bg-white">
+      <div className="min-h-screen bg-gradient-to-br from-[#0a0e27] via-[#1a1f3a] to-[#0a0e27]">
+        {/* Background ambient glow */}
+        <div className="pointer-events-none absolute inset-0 overflow-hidden">
+          <div className="absolute top-20 left-10 h-96 w-96 rounded-full bg-cyan-500/20 blur-3xl animate-pulse" />
+          <div className="absolute bottom-20 right-10 h-96 w-96 rounded-full bg-violet-500/20 blur-3xl animate-pulse" style={{ animationDelay: '1s' }} />
+        </div>
+
         {/* ── Dark hero zone (header + breadcrumb + article hero) ── */}
-        <div
-          className="relative"
-          style={{
-            backgroundColor: '#0a0e27',
-            backgroundImage: 'linear-gradient(135deg, #0a0e27 0%, #1a1040 48%, #0d2847 100%)',
-          }}
-        >
-          {/* Ambient glow */}
-          <div
-            className="pointer-events-none absolute inset-0"
-            aria-hidden="true"
-            style={{
-              backgroundImage:
-                'radial-gradient(circle at 25% 30%, rgba(6,182,212,0.12) 0%, transparent 50%), radial-gradient(circle at 75% 70%, rgba(124,58,237,0.1) 0%, transparent 50%)',
-            }}
-          />
+        <div className="relative">
 
           {/* ── Sticky header ── */}
           <header className="sticky top-0 z-50 border-b border-white/10 bg-[#0a0e27]/80 backdrop-blur-xl">
-            <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+            <div className="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8">
               <div className="flex h-14 items-center justify-between">
                 <a href={langPrefix || '/'} className="group flex items-center gap-3" aria-label="YOJOB — Accueil">
                   <div className="h-9 w-9 rounded-lg bg-gradient-to-br from-cyan-500 to-violet-600 p-0.5 transition-all group-hover:shadow-lg group-hover:shadow-cyan-500/20 motion-reduce:transition-none">
@@ -552,7 +529,7 @@ export default function BlogPost({ slug }: BlogPostProps) {
                   initial={{ opacity: 0, y: 16 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.4 }}
-                  className="mb-5 max-w-[28ch] text-3xl font-extrabold leading-[1.15] tracking-tight text-white sm:text-4xl md:text-5xl"
+                  className="mb-5 text-3xl font-extrabold leading-[1.15] tracking-tight text-white sm:text-4xl md:text-5xl"
                 >
                   {translation.title}
                 </motion.h1>
@@ -602,15 +579,15 @@ export default function BlogPost({ slug }: BlogPostProps) {
           )}
         </div>
 
-        {/* ── Featured image (bridge between dark hero and white content) ── */}
+        {/* ── Featured image ── */}
         {article && translation && !loading && article.featured_image_url && (
-          <div className="relative -mt-1 bg-white px-4 sm:px-6 lg:px-8">
+          <div className="relative -mt-1 px-4 sm:px-6 lg:px-8">
             <div className="mx-auto max-w-4xl">
               <motion.div
                 initial={{ opacity: 0, y: 12 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.12 }}
-                className="-mt-6 overflow-hidden rounded-2xl shadow-2xl shadow-slate-300/40 sm:-mt-8"
+                className="-mt-6 overflow-hidden rounded-2xl shadow-2xl shadow-black/30 sm:-mt-8"
               >
                 <img
                   src={article.featured_image_url}
@@ -622,56 +599,55 @@ export default function BlogPost({ slug }: BlogPostProps) {
           </div>
         )}
 
-        {/* ── Article body ── */}
+        {/* ── Article body — same max-w-4xl as hero for perfect alignment ── */}
         {article && translation && !loading && (
-          <section className="bg-white px-4 pb-16 pt-10 sm:px-6 lg:px-8">
-            <div className="mx-auto max-w-7xl">
-              <div className="grid grid-cols-1 gap-12 lg:grid-cols-[minmax(0,780px)_240px] lg:justify-between xl:grid-cols-[minmax(0,780px)_280px]">
-                {/* Main content column */}
-                <article className="w-full">
-                  {/* Key points + Checklist */}
-                  {((translation.key_points && translation.key_points.length > 0) ||
-                    (translation.checklist_items && translation.checklist_items.length > 0)) && (
-                    <div className="mb-10 grid gap-5 sm:grid-cols-2">
-                      {translation.key_points && translation.key_points.length > 0 && (
-                        <div className="rounded-xl border border-slate-200 bg-gradient-to-br from-slate-50 to-white p-5">
-                          <p className="mb-3 inline-flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wide text-slate-700">
-                            <ListTree className="h-3.5 w-3.5 text-cyan-600" />
-                            Points clés
-                          </p>
-                          <ul className="space-y-2.5">
-                            {translation.key_points.map((point, index) => (
-                              <li key={index} className="flex gap-2 text-sm leading-relaxed text-slate-700">
-                                <span className="mt-1 text-cyan-600">•</span>
-                                <span>{point}</span>
-                              </li>
-                            ))}
-                          </ul>
-                        </div>
-                      )}
+          <section className="relative z-10 px-4 pb-16 pt-10 sm:px-6 lg:px-8">
+            <div className="mx-auto max-w-4xl">
+              <article className="w-full">
+                {/* Key points + Checklist */}
+                {((translation.key_points && translation.key_points.length > 0) ||
+                  (translation.checklist_items && translation.checklist_items.length > 0)) && (
+                  <div className="mb-10 grid gap-5 sm:grid-cols-2">
+                    {translation.key_points && translation.key_points.length > 0 && (
+                      <div className="rounded-xl border border-white/10 bg-white/5 p-5 backdrop-blur-sm">
+                        <p className="mb-3 inline-flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wide text-white">
+                          <ListTree className="h-3.5 w-3.5 text-cyan-400" />
+                          Points clés
+                        </p>
+                        <ul className="space-y-2.5">
+                          {translation.key_points.map((point, index) => (
+                            <li key={index} className="flex gap-2 text-sm leading-relaxed text-white/80">
+                              <span className="mt-1 text-cyan-400">•</span>
+                              <span>{point}</span>
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
 
-                      {translation.checklist_items && translation.checklist_items.length > 0 && (
-                        <div className="rounded-xl border border-slate-200 bg-gradient-to-br from-slate-50 to-white p-5">
-                          <p className="mb-3 inline-flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wide text-slate-700">
-                            <ClipboardList className="h-3.5 w-3.5 text-emerald-600" />
-                            Checklist
-                          </p>
-                          <ul className="space-y-2.5">
-                            {translation.checklist_items.map((item, index) => (
-                              <li key={index} className="flex gap-2 text-sm leading-relaxed text-slate-700">
-                                <CheckCircle2 className="mt-0.5 h-4 w-4 flex-shrink-0 text-emerald-600" />
-                                <span>{item}</span>
-                              </li>
-                            ))}
-                          </ul>
-                        </div>
-                      )}
-                    </div>
-                  )}
+                    {translation.checklist_items && translation.checklist_items.length > 0 && (
+                      <div className="rounded-xl border border-white/10 bg-white/5 p-5 backdrop-blur-sm">
+                        <p className="mb-3 inline-flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wide text-white">
+                          <ClipboardList className="h-3.5 w-3.5 text-emerald-400" />
+                          Checklist
+                        </p>
+                        <ul className="space-y-2.5">
+                          {translation.checklist_items.map((item, index) => (
+                            <li key={index} className="flex gap-2 text-sm leading-relaxed text-white/80">
+                              <CheckCircle2 className="mt-0.5 h-4 w-4 flex-shrink-0 text-emerald-400" />
+                              <span>{item}</span>
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
+                  </div>
+                )}
 
-                  {/* Mobile TOC */}
-                  <div className="mb-8 rounded-xl border border-slate-200 bg-slate-50 p-4 lg:hidden">
-                    <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-slate-600">Sommaire</p>
+                {/* Mobile TOC */}
+                {headings.length > 0 && (
+                  <div className="mb-8 rounded-xl border border-white/10 bg-white/5 p-4 backdrop-blur-sm">
+                    <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-white/60">Sommaire</p>
                     <select
                       defaultValue=""
                       aria-label="Aller à une section de l'article"
@@ -680,7 +656,7 @@ export default function BlogPost({ slug }: BlogPostProps) {
                         const selected = headings.find((heading) => heading.id === selectedId);
                         if (selected) handleTocClick(selected);
                       }}
-                      className="min-h-11 w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-800 focus-visible:ring-2 focus-visible:ring-cyan-600 focus-visible:ring-offset-2"
+                      className="min-h-11 w-full rounded-lg border border-white/20 bg-white/10 px-3 py-2 text-sm text-white focus-visible:ring-2 focus-visible:ring-cyan-400 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0a0e27]"
                     >
                       <option value="">Aller à une section...</option>
                       {headings.map((heading) => (
@@ -691,164 +667,135 @@ export default function BlogPost({ slug }: BlogPostProps) {
                       ))}
                     </select>
                   </div>
+                )}
 
-                  {/* Sources & freshness */}
-                  <div className="mb-10 rounded-xl border border-slate-200 bg-slate-50/70 p-5">
-                    <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-slate-600">Fraîcheur & sources</p>
-                    <div className="text-sm text-slate-700">
-                      <p className="mb-2">
-                        Dernière mise à jour :{' '}
-                        <span className="font-semibold text-slate-900">
-                          {new Date(article.last_updated_at || article.updated_at).toLocaleDateString(
-                            lang === 'fr' ? 'fr-FR' : 'en-GB',
-                            { day: 'numeric', month: 'long', year: 'numeric' }
-                          )}
-                        </span>
-                      </p>
-                      {article.sources && article.sources.length > 0 && (
-                        <ul className="space-y-1.5">
-                          {article.sources.map((source, index) => (
-                            <li key={`${source.url}-${index}`} className="text-sm text-slate-700">
-                              <a
-                                href={source.url}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="inline-flex items-center gap-1 font-medium text-cyan-700 hover:text-cyan-800 hover:underline"
-                              >
-                                <Link2 className="h-3 w-3" />
-                                {source.label}
-                              </a>
-                            </li>
-                          ))}
-                        </ul>
-                      )}
-                    </div>
+                {/* Sources & freshness */}
+                <div className="mb-10 rounded-xl border border-white/10 bg-white/5 p-5 backdrop-blur-sm">
+                  <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-white/60">Fraîcheur & sources</p>
+                  <div className="text-sm text-white/80">
+                    <p className="mb-2">
+                      Dernière mise à jour :{' '}
+                      <span className="font-semibold text-white">
+                        {new Date(article.last_updated_at || article.updated_at).toLocaleDateString(
+                          lang === 'fr' ? 'fr-FR' : 'en-GB',
+                          { day: 'numeric', month: 'long', year: 'numeric' }
+                        )}
+                      </span>
+                    </p>
+                    {article.sources && article.sources.length > 0 && (
+                      <ul className="space-y-1.5">
+                        {article.sources.map((source, index) => (
+                          <li key={`${source.url}-${index}`} className="text-sm text-white/80">
+                            <a
+                              href={source.url}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="inline-flex items-center gap-1 font-medium text-cyan-400 hover:text-cyan-300 hover:underline"
+                            >
+                              <Link2 className="h-3 w-3" />
+                              {source.label}
+                            </a>
+                          </li>
+                        ))}
+                      </ul>
+                    )}
                   </div>
+                </div>
 
-                  {/* Article body (first half) */}
+                {/* Article body (first half) */}
+                <div
+                  className={articleBodyClassName}
+                  dangerouslySetInnerHTML={{ __html: splitContent.beforeHtml }}
+                />
+
+                {/* Mid-article CTA */}
+                {MidArticleCta}
+
+                {/* Article body (second half) */}
+                {splitContent.afterHtml && (
                   <div
                     className={articleBodyClassName}
-                    dangerouslySetInnerHTML={{ __html: splitContent.beforeHtml }}
+                    dangerouslySetInnerHTML={{ __html: splitContent.afterHtml }}
                   />
+                )}
 
-                  {/* Mid-article CTA */}
-                  {MidArticleCta}
+                {/* FAQ section */}
+                {faqItems.length > 0 && (
+                  <section className="mt-14 rounded-2xl border border-white/10 bg-white/5 p-6 backdrop-blur-sm" aria-labelledby="faq-heading">
+                    <h2 id="faq-heading" className="mb-1 text-2xl font-bold text-white">FAQ</h2>
+                    <p className="mb-5 text-sm text-white/50">
+                      Questions fréquentes sur les obligations de conformité et le détachement.
+                    </p>
+                    <Accordion type="single" collapsible className="w-full">
+                      {faqItems.map((faq, index) => (
+                        <AccordionItem key={index} value={`faq-${index}`} className="border-white/10">
+                          <AccordionTrigger className="text-left text-white hover:text-cyan-400 [&[data-state=open]]:text-cyan-400">
+                            {faq.question}
+                          </AccordionTrigger>
+                          <AccordionContent className="leading-relaxed text-white/70">
+                            {faq.answer}
+                          </AccordionContent>
+                        </AccordionItem>
+                      ))}
+                    </Accordion>
+                  </section>
+                )}
 
-                  {/* Article body (second half) */}
-                  {splitContent.afterHtml && (
-                    <div
-                      className={articleBodyClassName}
-                      dangerouslySetInnerHTML={{ __html: splitContent.afterHtml }}
-                    />
-                  )}
+                {/* End CTA */}
+                <section className="mt-14 overflow-hidden rounded-2xl border border-cyan-400/30 bg-gradient-to-br from-cyan-500/10 to-violet-500/10 p-6 backdrop-blur-sm sm:p-8" aria-labelledby="end-cta-heading">
+                  <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-cyan-400">{personaCopy.badge}</p>
+                  <h2 id="end-cta-heading" className="mb-3 text-2xl font-bold text-white">{personaCopy.title}</h2>
+                  <p className="mb-6 leading-relaxed text-white/70">{endCtaText}</p>
+                  <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
+                    <a
+                      href={devisLink}
+                      className="inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-cyan-600 to-violet-700 px-6 py-3 font-medium text-white shadow-md shadow-cyan-600/20 transition-all hover:from-cyan-500 hover:to-violet-600 hover:shadow-lg hover:shadow-cyan-600/25 focus-visible:ring-2 focus-visible:ring-cyan-400 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0a0e27] motion-reduce:transition-none sm:w-auto"
+                    >
+                      {endCtaLabel}
+                      <ArrowRight className="h-4 w-4" />
+                    </a>
+                    <a
+                      href={`${langPrefix}/blog`}
+                      className="inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-xl border border-white/20 px-5 py-3 text-white/80 transition-colors hover:border-white/40 hover:bg-white/10 hover:text-white focus-visible:ring-2 focus-visible:ring-cyan-400 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0a0e27] sm:w-auto"
+                    >
+                      <ArrowLeft className="h-4 w-4" />
+                      Continuer la lecture
+                    </a>
+                  </div>
+                </section>
 
-                  {/* FAQ section */}
-                  {faqItems.length > 0 && (
-                    <section className="mt-14 rounded-2xl border border-slate-200 bg-white p-6 shadow-sm" aria-labelledby="faq-heading">
-                      <h2 id="faq-heading" className="mb-1 text-2xl font-bold text-slate-900">FAQ</h2>
-                      <p className="mb-5 text-sm text-slate-500">
-                        Questions fréquentes sur les obligations de conformité et le détachement.
-                      </p>
-                      <Accordion type="single" collapsible className="w-full">
-                        {faqItems.map((faq, index) => (
-                          <AccordionItem key={index} value={`faq-${index}`} className="border-slate-200">
-                            <AccordionTrigger className="text-left text-slate-900 hover:text-cyan-700 [&[data-state=open]]:text-cyan-700">
-                              {faq.question}
-                            </AccordionTrigger>
-                            <AccordionContent className="leading-relaxed text-slate-600">
-                              {faq.answer}
-                            </AccordionContent>
-                          </AccordionItem>
-                        ))}
-                      </Accordion>
-                    </section>
-                  )}
-
-                  {/* End CTA */}
-                  <section className="mt-14 overflow-hidden rounded-2xl border border-cyan-200 bg-gradient-to-br from-cyan-50 via-white to-blue-50 p-6 shadow-sm sm:p-8" aria-labelledby="end-cta-heading">
-                    <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-cyan-700">{personaCopy.badge}</p>
-                    <h2 id="end-cta-heading" className="mb-3 text-2xl font-bold text-slate-900">{personaCopy.title}</h2>
-                    <p className="mb-6 leading-relaxed text-slate-600">{endCtaText}</p>
-                    <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
-                      <a
-                        href={devisLink}
-                        className="inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-cyan-600 to-violet-700 px-6 py-3 font-medium text-white shadow-md shadow-cyan-600/20 transition-all hover:from-cyan-500 hover:to-violet-600 hover:shadow-lg hover:shadow-cyan-600/25 focus-visible:ring-2 focus-visible:ring-cyan-600 focus-visible:ring-offset-2 motion-reduce:transition-none sm:w-auto"
-                      >
-                        {endCtaLabel}
-                        <ArrowRight className="h-4 w-4" />
-                      </a>
-                      <a
-                        href={`${langPrefix}/blog`}
-                        className="inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-xl border border-slate-300 px-5 py-3 text-slate-700 transition-colors hover:border-slate-400 hover:bg-slate-50 hover:text-slate-900 focus-visible:ring-2 focus-visible:ring-cyan-600 focus-visible:ring-offset-2 sm:w-auto"
-                      >
-                        <ArrowLeft className="h-4 w-4" />
-                        Continuer la lecture
-                      </a>
+                {/* Related articles */}
+                {relatedArticles.length > 0 && (
+                  <section className="mt-14" aria-labelledby="related-heading">
+                    <h2 id="related-heading" className="mb-5 text-2xl font-bold text-white">Articles liés</h2>
+                    <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                      {relatedArticles.map((related) => {
+                        const relatedTranslation =
+                          related.translations.find((item) => item.language_code === lang) ||
+                          related.translations.find((item) => item.language_code === 'fr');
+                        if (!relatedTranslation) return null;
+                        return (
+                          <a
+                            key={related.id}
+                            href={`${langPrefix}/blog/${related.slug}`}
+                            className="group rounded-xl border border-white/10 bg-white/5 p-5 backdrop-blur-sm transition-all hover:border-cyan-400/30 hover:bg-white/10 focus-visible:ring-2 focus-visible:ring-cyan-400 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0a0e27]"
+                          >
+                            <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-cyan-400">
+                              {related.category || 'Article'}
+                            </p>
+                            <h3 className="mb-1 line-clamp-2 font-semibold text-white transition-colors group-hover:text-cyan-400">
+                              {relatedTranslation.title}
+                            </h3>
+                            <p className="line-clamp-2 text-sm text-white/50">
+                              {relatedTranslation.excerpt || 'Lire cet article'}
+                            </p>
+                          </a>
+                        );
+                      })}
                     </div>
                   </section>
-
-                  {/* Related articles */}
-                  {relatedArticles.length > 0 && (
-                    <section className="mt-14" aria-labelledby="related-heading">
-                      <h2 id="related-heading" className="mb-5 text-2xl font-bold text-slate-900">Articles liés</h2>
-                      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-                        {relatedArticles.map((related) => {
-                          const relatedTranslation =
-                            related.translations.find((item) => item.language_code === lang) ||
-                            related.translations.find((item) => item.language_code === 'fr');
-                          if (!relatedTranslation) return null;
-                          return (
-                            <a
-                              key={related.id}
-                              href={`${langPrefix}/blog/${related.slug}`}
-                              className="group rounded-xl border border-slate-200 bg-white p-5 transition-all hover:border-cyan-200 hover:shadow-md hover:shadow-cyan-100/40 focus-visible:ring-2 focus-visible:ring-cyan-600 focus-visible:ring-offset-2"
-                            >
-                              <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-cyan-700">
-                                {related.category || 'Article'}
-                              </p>
-                              <h3 className="mb-1 line-clamp-2 font-semibold text-slate-900 transition-colors group-hover:text-cyan-700">
-                                {relatedTranslation.title}
-                              </h3>
-                              <p className="line-clamp-2 text-sm text-slate-500">
-                                {relatedTranslation.excerpt || 'Lire cet article'}
-                              </p>
-                            </a>
-                          );
-                        })}
-                      </div>
-                    </section>
-                  )}
-                </article>
-
-                {/* ── Sidebar TOC (desktop) ── */}
-                <aside className="hidden lg:block" aria-label="Table des matières">
-                  <div className="sticky top-20 rounded-2xl border border-slate-200 bg-slate-50/80 p-5">
-                    <p className="mb-3 text-xs font-semibold uppercase tracking-wide text-slate-500">Sommaire</p>
-                    <nav className="space-y-0.5" aria-label="Table des matières">
-                      {headings.map((heading) => (
-                        <a
-                          key={heading.id}
-                          href={`#${heading.id}`}
-                          onClick={(event) => {
-                            event.preventDefault();
-                            handleTocClick(heading);
-                          }}
-                          className={`block rounded-md px-2.5 py-1.5 text-[13px] leading-snug transition-colors focus-visible:ring-2 focus-visible:ring-cyan-600 focus-visible:ring-offset-2 ${
-                            heading.level === 3 ? 'pl-5' : ''
-                          } ${
-                            activeHeadingId === heading.id
-                              ? 'bg-cyan-50 font-medium text-cyan-700'
-                              : 'text-slate-600 hover:bg-white hover:text-cyan-700'
-                          }`}
-                          aria-current={activeHeadingId === heading.id ? 'location' : undefined}
-                        >
-                          {heading.title}
-                        </a>
-                      ))}
-                    </nav>
-                  </div>
-                </aside>
-              </div>
+                )}
+              </article>
             </div>
           </section>
         )}
