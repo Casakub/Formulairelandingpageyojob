@@ -2,11 +2,15 @@ import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react-swc';
 import path from 'path';
 
-export default defineConfig({
+export default defineConfig(({ mode }) => ({
   plugins: [react()],
+
   resolve: {
-    extensions: ['.js', '.jsx', '.ts', '.tsx', '.json'],
     alias: {
+      // Alias app
+      '@': path.resolve(__dirname, './src'),
+
+      // Nettoyage alias libs (garder uniquement le nom canonique)
       'vaul@1.1.2': 'vaul',
       'sonner@2.0.3': 'sonner',
       'recharts@2.15.2': 'recharts',
@@ -14,22 +18,23 @@ export default defineConfig({
       'react-hook-form@7.55.0': 'react-hook-form',
       'react-day-picker@8.10.1': 'react-day-picker',
       'pdf-lib@1.17.1': 'pdf-lib',
+      // ⚠️ nodemailer côté front déconseillé ; garder seulement si import strictement server-only
       'nodemailer@6.9.13': 'nodemailer',
       'lucide-react@0.487.0': 'lucide-react',
       'input-otp@1.4.2': 'input-otp',
       'hono@4.0.2': 'hono',
       'hono@4': 'hono',
-      'figma:asset/ebf8bc5c8d897e610c9819ee634ab69c86ed8174.png': path.resolve(__dirname, './src/assets/ebf8bc5c8d897e610c9819ee634ab69c86ed8174.png'),
-      'figma:asset/adf361f82f12a400b268e62835fee4f4a9769596.png': path.resolve(__dirname, './src/assets/adf361f82f12a400b268e62835fee4f4a9769596.png'),
-      'figma:asset/7bc64bc144937599502bd68c77ec76315b36d1f0.png': path.resolve(__dirname, './src/assets/7bc64bc144937599502bd68c77ec76315b36d1f0.png'),
-      'figma:asset/574527319065f95f49256ff809cb233053b2e54a.png': path.resolve(__dirname, './src/assets/574527319065f95f49256ff809cb233053b2e54a.png'),
-      'figma:asset/37c5275834309d3d9730ef10771e70aa4a174eba.png': path.resolve(__dirname, './src/assets/37c5275834309d3d9730ef10771e70aa4a174eba.png'),
       'embla-carousel-react@8.6.0': 'embla-carousel-react',
       'cmdk@1.1.1': 'cmdk',
       'class-variance-authority@0.7.1': 'class-variance-authority',
+
+      // Supabase: garde UNE seule cible canonique
       '@supabase/supabase-js@2.39.7': '@supabase/supabase-js',
       '@supabase/supabase-js@2.39.3': '@supabase/supabase-js',
       '@supabase/supabase-js@2': '@supabase/supabase-js',
+      '@jsr/supabase__supabase-js@2.49.8': '@supabase/supabase-js',
+
+      // Radix (tu peux conserver ceux réellement utilisés)
       '@radix-ui/react-tooltip@1.1.8': '@radix-ui/react-tooltip',
       '@radix-ui/react-toggle@1.1.2': '@radix-ui/react-toggle',
       '@radix-ui/react-toggle-group@1.1.2': '@radix-ui/react-toggle-group',
@@ -54,17 +59,44 @@ export default defineConfig({
       '@radix-ui/react-aspect-ratio@1.1.2': '@radix-ui/react-aspect-ratio',
       '@radix-ui/react-alert-dialog@1.1.6': '@radix-ui/react-alert-dialog',
       '@radix-ui/react-accordion@1.2.3': '@radix-ui/react-accordion',
-      '@jsr/supabase__supabase-js@2.49.8': '@jsr/supabase__supabase-js',
+
       '@anthropic-ai/sdk@0.32.1': '@anthropic-ai/sdk',
-      '@': path.resolve(__dirname, './src'),
+
+      // Assets Figma
+      'figma:asset/ebf8bc5c8d897e610c9819ee634ab69c86ed8174.png': path.resolve(__dirname, './src/assets/ebf8bc5c8d897e610c9819ee634ab69c86ed8174.png'),
+      'figma:asset/adf361f82f12a400b268e62835fee4f4a9769596.png': path.resolve(__dirname, './src/assets/adf361f82f12a400b268e62835fee4f4a9769596.png'),
+      'figma:asset/7bc64bc144937599502bd68c77ec76315b36d1f0.png': path.resolve(__dirname, './src/assets/7bc64bc144937599502bd68c77ec76315b36d1f0.png'),
+      'figma:asset/574527319065f95f49256ff809cb233053b2e54a.png': path.resolve(__dirname, './src/assets/574527319065f95f49256ff809cb233053b2e54a.png'),
+      'figma:asset/37c5275834309d3d9730ef10771e70aa4a174eba.png': path.resolve(__dirname, './src/assets/37c5275834309d3d9730ef10771e70aa4a174eba.png'),
     },
   },
+
   build: {
-    target: 'esnext',
+    target: 'es2020',
     outDir: 'build',
+    sourcemap: mode !== 'production',
+    chunkSizeWarningLimit: 900,
+    rollupOptions: {
+      output: {
+        manualChunks(id) {
+          if (id.includes('node_modules')) {
+            if (id.includes('react') || id.includes('scheduler')) return 'vendor-react';
+            if (id.includes('@radix-ui')) return 'vendor-radix';
+            if (id.includes('@supabase')) return 'vendor-supabase';
+            if (id.includes('lucide-react')) return 'vendor-icons';
+            return 'vendor';
+          }
+        },
+      },
+    },
   },
+
   server: {
     port: 3000,
     open: true,
   },
-});
+
+  preview: {
+    port: 4173,
+  },
+}));
