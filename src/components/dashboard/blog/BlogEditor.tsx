@@ -146,9 +146,9 @@ export function BlogEditor({ article, onBack, onSaved }: BlogEditorProps) {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
-        {/* Main editor (3 cols) */}
-        <div className="lg:col-span-3 space-y-5">
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-[minmax(0,1fr)_280px]">
+        {/* Main editor */}
+        <div className="space-y-5">
           {/* Language tabs */}
           <div className="flex items-center gap-2 flex-wrap p-3 rounded-xl bg-slate-50 border border-slate-100">
             <Globe className="w-4 h-4 text-slate-400" />
@@ -185,21 +185,21 @@ export function BlogEditor({ article, onBack, onSaved }: BlogEditorProps) {
 
           {/* Title */}
           <div>
-            <label className="block text-sm font-medium text-slate-700 mb-1.5">
+            <label className="block text-sm font-semibold text-slate-700 mb-1.5">
               Titre {langInfo?.flag} {activeLang.toUpperCase()}
             </label>
             <input
               type="text"
               value={currentT.title}
               onChange={(e) => updateTranslation(activeLang, 'title', e.target.value)}
-              className="w-full px-4 py-3 rounded-xl border border-slate-200 text-lg font-semibold focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+              className="w-full px-4 py-2.5 rounded-xl border border-slate-200 text-lg font-semibold focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
               placeholder="Titre de l'article..."
             />
           </div>
 
           {/* Excerpt */}
           <div>
-            <label className="block text-sm font-medium text-slate-700 mb-1.5">
+            <label className="block text-sm font-semibold text-slate-700 mb-1.5">
               Extrait {activeLang.toUpperCase()}
             </label>
             <textarea
@@ -213,7 +213,7 @@ export function BlogEditor({ article, onBack, onSaved }: BlogEditorProps) {
 
           {/* WYSIWYG Editor */}
           <div>
-            <label className="block text-sm font-medium text-slate-700 mb-1.5">
+            <label className="block text-sm font-semibold text-slate-700 mb-1.5">
               Contenu {activeLang.toUpperCase()}
             </label>
             <TipTapEditor
@@ -260,7 +260,7 @@ export function BlogEditor({ article, onBack, onSaved }: BlogEditorProps) {
                   value={currentT.seo_title || ''}
                   onChange={(e) => updateTranslation(activeLang, 'seo_title', e.target.value)}
                   maxLength={60}
-                  className="w-full px-3 py-2 rounded-lg border border-slate-200 text-sm focus:ring-2 focus:ring-blue-400 focus:border-transparent"
+                  className="w-full px-3 py-2.5 rounded-lg border border-slate-200 text-sm focus:ring-2 focus:ring-blue-400 focus:border-transparent"
                   placeholder={currentT.title || 'Titre SEO...'}
                 />
               </div>
@@ -272,7 +272,7 @@ export function BlogEditor({ article, onBack, onSaved }: BlogEditorProps) {
                   value={currentT.seo_description || ''}
                   onChange={(e) => updateTranslation(activeLang, 'seo_description', e.target.value)}
                   maxLength={160}
-                  className="w-full px-3 py-2 rounded-lg border border-slate-200 text-sm focus:ring-2 focus:ring-blue-400 focus:border-transparent resize-none"
+                  className="w-full px-3 py-2.5 rounded-lg border border-slate-200 text-sm focus:ring-2 focus:ring-blue-400 focus:border-transparent resize-none"
                   rows={2}
                   placeholder={currentT.excerpt || 'Description pour les moteurs de recherche...'}
                 />
@@ -282,7 +282,7 @@ export function BlogEditor({ article, onBack, onSaved }: BlogEditorProps) {
         </div>
 
         {/* Sidebar */}
-        <div className="space-y-4">
+        <div className="space-y-5">
           {/* Status */}
           <div className="p-4 rounded-xl border border-slate-200 bg-white">
             <label className="block text-sm font-semibold text-slate-700 mb-2">Statut</label>
@@ -313,7 +313,7 @@ export function BlogEditor({ article, onBack, onSaved }: BlogEditorProps) {
               <Link2 className="w-3.5 h-3.5 inline mr-1" />
               URL
             </label>
-            <div className="flex items-center gap-1 bg-slate-50 rounded-lg px-2 py-1.5 border border-slate-100">
+            <div className="flex items-center gap-1 bg-slate-50 rounded-lg px-3 py-2.5 border border-slate-100">
               <span className="text-xs text-slate-400 flex-shrink-0">/blog/</span>
               <input
                 type="text"
@@ -335,7 +335,7 @@ export function BlogEditor({ article, onBack, onSaved }: BlogEditorProps) {
               type="text"
               value={category}
               onChange={(e) => setCategory(e.target.value)}
-              className="w-full px-3 py-2 rounded-lg border border-slate-200 text-sm focus:ring-2 focus:ring-blue-400 focus:border-transparent"
+              className="w-full px-3 py-2.5 rounded-lg border border-slate-200 text-sm focus:ring-2 focus:ring-blue-400 focus:border-transparent"
               placeholder="ex: Réglementation"
             />
           </div>
