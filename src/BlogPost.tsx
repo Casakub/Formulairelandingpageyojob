@@ -12,7 +12,7 @@ import {
   CheckCircle2,
   ClipboardList,
   ShieldCheck,
-  Link2,
+
   Building2,
   Scale,
 } from 'lucide-react';
@@ -601,7 +601,7 @@ export default function BlogPost({ slug }: BlogPostProps) {
 
         {/* ── Article body — same max-w-4xl as hero for perfect alignment ── */}
         {article && translation && !loading && (
-          <section className="relative z-10 px-4 pb-16 pt-10 sm:px-6 lg:px-8">
+          <section className="relative z-10 px-4 pb-24 pt-14 sm:px-6 lg:px-8">
             <div className="mx-auto max-w-4xl">
               <article className="w-full">
                 {/* Key points + Checklist */}
@@ -668,39 +668,6 @@ export default function BlogPost({ slug }: BlogPostProps) {
                     </select>
                   </div>
                 )}
-
-                {/* Sources & freshness */}
-                <div className="mb-10 rounded-xl border border-white/10 bg-white/5 p-5 backdrop-blur-sm">
-                  <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-white/60">Fraîcheur & sources</p>
-                  <div className="text-sm text-white/80">
-                    <p className="mb-2">
-                      Dernière mise à jour :{' '}
-                      <span className="font-semibold text-white">
-                        {new Date(article.last_updated_at || article.updated_at).toLocaleDateString(
-                          lang === 'fr' ? 'fr-FR' : 'en-GB',
-                          { day: 'numeric', month: 'long', year: 'numeric' }
-                        )}
-                      </span>
-                    </p>
-                    {article.sources && article.sources.length > 0 && (
-                      <ul className="space-y-1.5">
-                        {article.sources.map((source, index) => (
-                          <li key={`${source.url}-${index}`} className="text-sm text-white/80">
-                            <a
-                              href={source.url}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="inline-flex items-center gap-1 font-medium text-cyan-400 hover:text-cyan-300 hover:underline"
-                            >
-                              <Link2 className="h-3 w-3" />
-                              {source.label}
-                            </a>
-                          </li>
-                        ))}
-                      </ul>
-                    )}
-                  </div>
-                </div>
 
                 {/* Article body (first half) */}
                 <div
