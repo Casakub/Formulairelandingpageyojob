@@ -126,7 +126,7 @@ const discoverBlogRoutes = async (browser, lang = 'fr') => {
     await page.goto(url, { waitUntil: WAIT_UNTIL, timeout: NAV_TIMEOUT });
 
     // Petit délai pour laisser les cards se charger (si fetch async)
-    await page.waitForTimeout(1500);
+    await sleep(1500);
 
     const links = await page.$$eval('a[href]', (anchors) =>
       anchors.map((a) => a.getAttribute('href') || '').filter(Boolean)
