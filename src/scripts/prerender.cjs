@@ -2,7 +2,6 @@
 const fs = require('fs');
 const path = require('path');
 const { spawn } = require('child_process');
-
 const puppeteer = require('puppeteer');
 
 const PORT = process.env.PRERENDER_PORT || 4173;
@@ -14,9 +13,14 @@ const SEO_TIMEOUT = Number(process.env.PRERENDER_SEO_TIMEOUT || 15000);
 const RETRY_LIMIT = Number(process.env.PRERENDER_RETRY_LIMIT || 1);
 const WAIT_UNTIL = process.env.PRERENDER_WAIT_UNTIL || 'domcontentloaded';
 const BETWEEN_DELAY = Number(process.env.PRERENDER_BETWEEN_DELAY || 0);
+const AUTO_BLOG_DISCOVERY = ['1', 'true', 'yes'].includes(
+  String(process.env.PRERENDER_AUTO_BLOG_DISCOVERY || 'true').toLowerCase()
+);
+const BLOG_DISCOVERY_LIMIT = Number(process.env.PRERENDER_BLOG_DISCOVERY_LIMIT || 200);
 const CONTINUE_ON_ERROR = ['1', 'true', 'yes'].includes(
   String(process.env.PRERENDER_CONTINUE_ON_ERROR || '').toLowerCase()
 );
+
 let BUILD_DIR = path.join(process.cwd(), 'build');
 if (!fs.existsSync(BUILD_DIR)) {
   const altBuild = path.join(process.cwd(), '..', 'build');
@@ -29,6 +33,7 @@ const ALL_LANGS = [
 const DEVIS_LANGS = [
   'fr','en','de','es','pl','ro','it','pt','nl','bg','hu','cs','sk','hr','sl','et','lt','lv','el','fi','sv','da'
 ];
+const BLOG_LANGS = ['fr']; // adapte si blog multilingue
 
 const ALL_PAGES = [
   { path: '/', langs: ALL_LANGS },
@@ -42,23 +47,41 @@ const ALL_PAGES = [
   { path: '/services/detachement-personnel', langs: ALL_LANGS },
   { path: '/services/detachement-btp', langs: ['fr'] },
   { path: '/services/detachement-industrie', langs: ['fr'] },
-  { path: '/blog/directive-detachement-europe', langs: ['fr'] },
+
+  // Blog index toujours présent
+  { path: '/blog', langs: BLOG_LANGS },
+
+  // Legacy / pages fixes utiles
+  { path: '/blog/directive-detachement-europe', langs: BLOG_LANGS },
+
   { path: '/devis', langs: DEVIS_LANGS },
   { path: '/privacy', langs: ALL_LANGS },
   { path: '/legal', langs: ALL_LANGS },
   { path: '/cgv', langs: ALL_LANGS },
 ];
 
-// Filter pages by PRERENDER_PAGES env var (comma-separated paths)
-const filterPages = () => {
-  const envPages = process.env.PRERENDER_PAGES;
-  if (!envPages) return ALL_PAGES;
-  const allowed = envPages.split(',').map((p) => p.trim());
-  return ALL_PAGES.filter((page) => allowed.includes(page.path));
+// Optionnel : slugs injectés via env
+// PRERENDER_BLOG_SLUGS="slug-1,slug-2"
+const getBlogPagesFromEnv = () => {
+  const raw = process.env.PRERENDER_BLOG_SLUGS;
+  if (!raw) return [];
+  return raw
+    .split(',')
+    .map((s) => s.trim())
+    .filter(Boolean)
+    .map((slug) => ({
+      path: `/blog/${slug.replace(/^\/+/, '').replace(/^blog\//, '')}`,
+      langs: BLOG_LANGS,
+    }));
 };
 
-// Filter langs by PRERENDER_LANGS env var (comma-separated lang codes)
-// Special value "NONE" = skip prerender entirely
+const filterPages = (pages) => {
+  const envPages = process.env.PRERENDER_PAGES;
+  if (!envPages) return pages;
+  const allowed = envPages.split(',').map((p) => p.trim()).filter(Boolean);
+  return pages.filter((page) => allowed.includes(page.path));
+};
+
 const filterLangs = (langs) => {
   const envLangs = process.env.PRERENDER_LANGS;
   if (!envLangs) return langs;
@@ -86,6 +109,62 @@ const isTransientNavigationError = (err) => {
   return /frame was detached|Navigation failed|Target closed|net::ERR|Protocol error/i.test(msg);
 };
 
+const discoverBlogRoutes = async (browser, lang = 'fr') => {
+  const route = localizedRoute('/blog', lang);
+  const url = `${BASE_URL}${route}`;
+  const page = await browser.newPage();
+  page.setDefaultNavigationTimeout(NAV_TIMEOUT);
+  page.setDefaultTimeout(NAV_TIMEOUT);
+
+  try {
+    await page.setExtraHTTPHeaders({ 'Accept-Language': `${lang}` });
+    await page.evaluateOnNewDocument((langCode) => {
+      Object.defineProperty(navigator, 'language', { get: () => langCode });
+      Object.defineProperty(navigator, 'languages', { get: () => [langCode] });
+    }, lang);
+
+    await page.goto(url, { waitUntil: WAIT_UNTIL, timeout: NAV_TIMEOUT });
+
+    // Petit délai pour laisser les cards se charger (si fetch async)
+    await page.waitForTimeout(1500);
+
+    const links = await page.$$eval('a[href]', (anchors) =>
+      anchors.map((a) => a.getAttribute('href') || '').filter(Boolean)
+    );
+
+    const found = new Set();
+    for (const href of links) {
+      // Support liens absolus + relatifs
+      let pathOnly = href;
+      try {
+        const u = new URL(href, 'http://dummy.local');
+        pathOnly = u.pathname;
+      } catch (_) {}
+
+      // Normalisation trailing slash
+      pathOnly = pathOnly.replace(/\/+$/, '') || '/';
+
+      // Routes blog article (évite /blog et /blog/directive... si tu veux conserver)
+      if (/^\/blog\/[^/]+$/.test(pathOnly)) {
+        found.add(pathOnly);
+      }
+
+      // Si blog multilingue activé plus tard : /en/blog/slug etc.
+      if (/^\/[a-z]{2}\/blog\/[^/]+$/.test(pathOnly)) {
+        found.add(pathOnly);
+      }
+    }
+
+    const routes = Array.from(found).slice(0, BLOG_DISCOVERY_LIMIT);
+    console.log(`[prerender] Blog discovery: ${routes.length} article route(s) found from ${route}`);
+    routes.forEach((r) => console.log(`[prerender]   + ${r}`));
+
+    return routes;
+  } finally {
+    await page.close().catch(() => {});
+  }
+};
+
 const renderRoute = async (browser, route, lang) => {
   const url = `${BASE_URL}${route}`;
   let attempt = 0;
@@ -96,8 +175,6 @@ const renderRoute = async (browser, route, lang) => {
     page.setDefaultTimeout(NAV_TIMEOUT);
 
     try {
-      // Forcer la locale du navigateur pour que useLanguageManager
-      // détecte la bonne langue (évite le fallback vers EN)
       await page.setExtraHTTPHeaders({ 'Accept-Language': `${lang}` });
       await page.evaluateOnNewDocument((langCode) => {
         Object.defineProperty(navigator, 'language', { get: () => langCode });
@@ -105,14 +182,18 @@ const renderRoute = async (browser, route, lang) => {
       }, lang);
 
       await page.goto(url, { waitUntil: WAIT_UNTIL, timeout: NAV_TIMEOUT });
-      const seoReady = await page.waitForFunction('window.__SEO_READY__ === true', { timeout: SEO_TIMEOUT })
+
+      const seoReady = await page
+        .waitForFunction('window.__SEO_READY__ === true', { timeout: SEO_TIMEOUT })
         .then(() => true)
         .catch(() => false);
+
       if (!seoReady) {
         console.warn(`[prerender] WARNING: __SEO_READY__ not set within ${SEO_TIMEOUT}ms for ${route} (${lang})`);
       }
+
       const html = await page.content();
-      // Validate that the rendered HTML contains essential SEO tags
+
       const hasTitle = /<title>[^<]{5,}<\/title>/.test(html);
       const hasMeta = /meta\s+name="description"/.test(html);
       if (!hasTitle || !hasMeta) {
@@ -121,9 +202,11 @@ const renderRoute = async (browser, route, lang) => {
         if (!hasMeta) missing.push('meta[description]');
         console.warn(`[prerender] WARNING: ${route} (${lang}) missing SEO tags: ${missing.join(', ')}`);
       }
+
       const outputPath = routeToFilePath(route);
       fs.mkdirSync(path.dirname(outputPath), { recursive: true });
       fs.writeFileSync(outputPath, html, 'utf8');
+
       const sizeKB = (Buffer.byteLength(html, 'utf8') / 1024).toFixed(1);
       console.log(`[prerender] ${route} (${lang}) -> ${outputPath} (${sizeKB}KB${seoReady ? '' : ' SEO_READY=timeout'})`);
       return true;
@@ -146,25 +229,22 @@ const renderRoute = async (browser, route, lang) => {
 
 const run = async () => {
   if (!fs.existsSync(BUILD_DIR)) {
-    throw new Error(`Build directory not found: ${BUILD_DIR}. Run \"vite build\" first.`);
+    throw new Error(`Build directory not found: ${BUILD_DIR}. Run "vite build" first.`);
   }
 
-  const pages = filterPages();
-  const routes = [];
-  for (const pageEntry of pages) {
+  const mergedPages = [...ALL_PAGES, ...getBlogPagesFromEnv()];
+  const filteredPages = filterPages(mergedPages);
+
+  const staticRoutes = [];
+  for (const pageEntry of filteredPages) {
     for (const lang of filterLangs(pageEntry.langs)) {
-      routes.push({ route: localizedRoute(pageEntry.path, lang), lang });
+      staticRoutes.push({ route: localizedRoute(pageEntry.path, lang), lang });
     }
   }
 
-  console.log(`[prerender] ${routes.length} routes to render`);
+  console.log(`[prerender] ${staticRoutes.length} static route(s) to render`);
   if (process.env.PRERENDER_LANGS) console.log(`[prerender] Langs filter: ${process.env.PRERENDER_LANGS}`);
   if (process.env.PRERENDER_PAGES) console.log(`[prerender] Pages filter: ${process.env.PRERENDER_PAGES}`);
-
-  if (routes.length === 0) {
-    console.log('[prerender] No routes to render, skipping.');
-    return;
-  }
 
   const npxCmd = process.platform === 'win32' ? 'npx.cmd' : 'npx';
   const preview = spawn(
@@ -183,27 +263,66 @@ const run = async () => {
   if (process.env.PUPPETEER_EXECUTABLE_PATH) {
     launchOptions.executablePath = process.env.PUPPETEER_EXECUTABLE_PATH;
   }
+
   let browser;
   const failures = [];
 
   try {
     browser = await puppeteer.launch(launchOptions);
-    for (const { route, lang } of routes) {
+
+    // 1) Render statique
+    for (const { route, lang } of staticRoutes) {
       try {
         await renderRoute(browser, route, lang);
       } catch (err) {
         failures.push({ route, lang, err });
         if (!CONTINUE_ON_ERROR) throw err;
       }
+      if (BETWEEN_DELAY > 0) await sleep(BETWEEN_DELAY);
+    }
 
-      if (BETWEEN_DELAY > 0) {
-        await sleep(BETWEEN_DELAY);
+    // 2) Auto-discovery blog
+    if (AUTO_BLOG_DISCOVERY) {
+      const blogLangs = filterLangs(BLOG_LANGS);
+      const discovered = [];
+
+      for (const lang of blogLangs) {
+        try {
+          const routes = await discoverBlogRoutes(browser, lang);
+          for (const r of routes) discovered.push({ route: r, lang });
+        } catch (err) {
+          const message = String((err && err.message) || err || 'Unknown error');
+          console.warn(`[prerender] Blog discovery failed for lang=${lang}: ${message}`);
+          if (!CONTINUE_ON_ERROR) throw err;
+        }
+      }
+
+      // unique + retire déjà rendues
+      const already = new Set(staticRoutes.map((r) => r.route));
+      const uniqueDiscovered = [];
+      const seen = new Set();
+
+      for (const item of discovered) {
+        if (already.has(item.route)) continue;
+        if (seen.has(item.route)) continue;
+        seen.add(item.route);
+        uniqueDiscovered.push(item);
+      }
+
+      console.log(`[prerender] ${uniqueDiscovered.length} discovered blog route(s) to render`);
+
+      for (const { route, lang } of uniqueDiscovered) {
+        try {
+          await renderRoute(browser, route, lang);
+        } catch (err) {
+          failures.push({ route, lang, err });
+          if (!CONTINUE_ON_ERROR) throw err;
+        }
+        if (BETWEEN_DELAY > 0) await sleep(BETWEEN_DELAY);
       }
     }
   } finally {
-    if (browser) {
-      await browser.close().catch(() => {});
-    }
+    if (browser) await browser.close().catch(() => {});
     preview.kill('SIGTERM');
   }
 
