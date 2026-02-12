@@ -96,9 +96,9 @@ export function BlogManager() {
   }
 
   return (
-    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
+    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-4">
       {/* Header */}
-      <div className="flex items-center justify-between mb-6">
+      <div className="mb-2 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <h2 className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-cyan-500 bg-clip-text text-transparent">
             Blog
@@ -107,33 +107,37 @@ export function BlogManager() {
             {articles.length} article{articles.length !== 1 ? 's' : ''}
           </p>
         </div>
-        <Button onClick={() => setEditingArticle('new')}>
+        <Button onClick={() => setEditingArticle('new')} className="min-h-11 w-full sm:w-auto">
           <Plus className="w-4 h-4 mr-2" />
           Nouvel article
         </Button>
       </div>
 
       {/* Search */}
-      <div className="relative mb-4">
+      <div className="relative">
+        <label htmlFor="blog-manager-search" className="sr-only">
+          Rechercher un article
+        </label>
         <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
         <input
+          id="blog-manager-search"
           type="text"
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
           placeholder="Rechercher un article..."
-          className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-slate-200 bg-white text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+          className="h-11 w-full rounded-xl border border-slate-200 bg-white pl-10 pr-4 text-sm text-slate-800 shadow-sm focus-visible:ring-2 focus-visible:ring-blue-500/40 focus-visible:border-blue-500"
         />
       </div>
 
       {/* Error */}
       {error && (
-        <div className="mb-4 p-4 rounded-xl bg-red-50 border border-red-200 flex items-center gap-3">
+        <div className="flex flex-col gap-3 rounded-xl border border-red-200 bg-red-50 p-4 sm:flex-row sm:items-center">
           <AlertCircle className="w-5 h-5 text-red-500 flex-shrink-0" />
           <div>
             <p className="text-red-800 font-medium text-sm">Erreur de chargement</p>
             <p className="text-red-600 text-xs mt-0.5">{error}</p>
           </div>
-          <Button variant="outline" size="sm" className="ml-auto" onClick={fetchArticles}>
+          <Button variant="outline" size="sm" className="sm:ml-auto" onClick={fetchArticles}>
             Réessayer
           </Button>
         </div>
@@ -183,56 +187,56 @@ export function BlogManager() {
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: -10 }}
-                  className="p-4 rounded-xl border border-slate-200 bg-white hover:shadow-md transition-shadow"
+                  className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm transition-shadow hover:shadow-md sm:p-5"
                 >
-                  <div className="flex items-start gap-4">
+                  <div className="flex flex-col gap-4 sm:flex-row sm:items-start">
                     {/* Image thumbnail */}
                     {article.featured_image_url ? (
                       <img
                         src={article.featured_image_url}
                         alt=""
-                        className="w-20 h-14 rounded-lg object-cover flex-shrink-0"
+                        className="h-36 w-full rounded-lg object-cover sm:h-14 sm:w-20 sm:flex-shrink-0"
                       />
                     ) : (
-                      <div className="w-20 h-14 rounded-lg bg-gradient-to-br from-blue-100 to-cyan-100 flex items-center justify-center flex-shrink-0">
+                      <div className="flex h-36 w-full items-center justify-center rounded-lg bg-gradient-to-br from-blue-100 to-cyan-100 sm:h-14 sm:w-20 sm:flex-shrink-0">
                         <FileText className="w-6 h-6 text-blue-400" />
                       </div>
                     )}
 
                     {/* Content */}
                     <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-2 mb-1">
-                        <h3 className="font-medium text-slate-900 truncate">
+                      <div className="mb-1 flex flex-wrap items-center gap-2">
+                        <h3 className="font-semibold text-slate-900">
                           {frTrans?.title || article.slug}
                         </h3>
                         <Badge className={`text-xs border ${statusInfo.color}`}>
                           {statusInfo.label}
                         </Badge>
                       </div>
-                      <p className="text-sm text-slate-500 truncate mb-2">
+                      <p className="mb-2 text-sm text-slate-500">
                         {frTrans?.excerpt || '/blog/' + article.slug}
                       </p>
-                      <div className="flex items-center gap-3 text-xs text-slate-400">
+                      <div className="flex flex-wrap items-center gap-2 text-xs text-slate-500">
                         <span className="flex items-center gap-1">
                           <Globe className="w-3 h-3" />
                           {langCount}/23 langues
                         </span>
                         {article.category && (
-                          <span className="px-2 py-0.5 rounded bg-slate-100 text-slate-600">
+                          <span className="rounded-full bg-slate-100 px-2 py-0.5 text-slate-700">
                             {article.category}
                           </span>
                         )}
-                        <span className="px-2 py-0.5 rounded bg-slate-100 text-slate-600">
+                        <span className="rounded-full bg-slate-100 px-2 py-0.5 text-slate-700">
                           {article.persona_target === 'enterprise'
                             ? 'Entreprise'
                             : article.persona_target === 'agency'
                               ? 'Agence'
                               : 'Entreprise+Agence'}
                         </span>
-                        <span className="px-2 py-0.5 rounded bg-slate-100 text-slate-600">
+                        <span className="rounded-full bg-slate-100 px-2 py-0.5 text-slate-700">
                           Risque {article.risk_level}
                         </span>
-                        <span className={`px-2 py-0.5 rounded ${
+                        <span className={`rounded-full px-2 py-0.5 ${
                           quality.score >= 80
                             ? 'bg-green-100 text-green-700'
                             : quality.score >= 60
@@ -248,13 +252,14 @@ export function BlogManager() {
                     </div>
 
                     {/* Actions */}
-                    <div className="flex items-center gap-1 flex-shrink-0">
+                    <div className="flex items-center gap-1 self-end sm:self-start">
                       {article.status === 'published' && (
                         <Button
                           variant="ghost"
                           size="sm"
-                          className="h-8 w-8 p-0"
+                          className="h-11 w-11 p-0 sm:h-9 sm:w-9"
                           onClick={() => window.open(`/blog/${article.slug}`, '_blank')}
+                          aria-label="Voir l'article publié"
                           title="Voir"
                         >
                           <Eye className="w-4 h-4 text-slate-500" />
@@ -263,8 +268,9 @@ export function BlogManager() {
                       <Button
                         variant="ghost"
                         size="sm"
-                        className="h-8 w-8 p-0"
+                        className="h-11 w-11 p-0 sm:h-9 sm:w-9"
                         onClick={() => setEditingArticle(article)}
+                        aria-label="Modifier cet article"
                         title="Modifier"
                       >
                         <Pencil className="w-4 h-4 text-slate-500" />
@@ -272,9 +278,10 @@ export function BlogManager() {
                       <Button
                         variant="ghost"
                         size="sm"
-                        className="h-8 w-8 p-0"
+                        className="h-11 w-11 p-0 sm:h-9 sm:w-9"
                         onClick={() => handleDelete(article.id)}
                         disabled={deletingId === article.id}
+                        aria-label="Supprimer cet article"
                         title="Supprimer"
                       >
                         {deletingId === article.id ? (

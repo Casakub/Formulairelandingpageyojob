@@ -293,24 +293,40 @@ export default function BlogPost({ slug }: BlogPostProps) {
   const handleTocClick = (heading: HeadingItem) => {
     const target = document.getElementById(heading.id);
     if (!target) return;
-    target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    target.scrollIntoView({ behavior: reduceMotion ? 'auto' : 'smooth', block: 'start' });
     window.history.replaceState({}, '', `#${heading.id}`);
   };
 
   const MidArticleCta = (
-    <div className="my-10 rounded-2xl border border-cyan-400/30 bg-cyan-400/10 p-6">
-      <p className="text-xs uppercase tracking-wide text-cyan-300 mb-2">{personaCopy.badge}</p>
-      <h3 className="text-xl font-semibold text-white mb-2">{midCtaLabel}</h3>
-      <p className="text-white/70 text-sm mb-5">{midCtaText}</p>
+    <div className="my-10 rounded-2xl border border-cyan-200 bg-gradient-to-br from-cyan-50 to-blue-50 p-6">
+      <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-cyan-700">{personaCopy.badge}</p>
+      <h3 className="mb-2 text-xl font-semibold leading-tight text-slate-900">{midCtaLabel}</h3>
+      <p className="mb-5 text-sm leading-relaxed text-slate-700">{midCtaText}</p>
       <a
         href={devisLink}
-        className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-gradient-to-r from-cyan-500 to-blue-600 text-white font-medium hover:from-cyan-400 hover:to-blue-500 transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-300"
+        className="inline-flex min-h-11 w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-cyan-600 to-blue-700 px-5 py-2.5 font-medium text-white transition-all hover:from-cyan-500 hover:to-blue-600 focus-visible:ring-2 focus-visible:ring-cyan-600 focus-visible:ring-offset-2 motion-reduce:transition-none sm:w-auto"
       >
         {midCtaLabel}
         <ArrowRight className="w-4 h-4" />
       </a>
     </div>
   );
+
+  const articleBodyClassName = `blog-article-content prose prose-lg max-w-none
+    prose-headings:font-bold prose-headings:tracking-tight prose-headings:text-slate-900
+    prose-h2:mb-4 prose-h2:mt-12 prose-h2:border-b prose-h2:border-slate-200 prose-h2:pb-3 prose-h2:text-[1.65rem]
+    prose-h3:mb-3 prose-h3:mt-8 prose-h3:text-[1.3rem] prose-h3:text-slate-900
+    prose-p:my-4 prose-p:text-[17px] prose-p:leading-8 prose-p:text-slate-800
+    prose-a:font-medium prose-a:text-cyan-700 prose-a:underline-offset-2 hover:prose-a:underline
+    prose-strong:font-semibold prose-strong:text-slate-900
+    prose-ul:my-5 prose-ul:space-y-2 prose-ol:my-5 prose-ol:space-y-2
+    prose-li:text-slate-800 prose-li:marker:text-cyan-700
+    prose-blockquote:my-6 prose-blockquote:rounded-r-xl prose-blockquote:border-l-4 prose-blockquote:border-cyan-600 prose-blockquote:bg-cyan-50 prose-blockquote:px-5 prose-blockquote:py-3 prose-blockquote:not-italic prose-blockquote:text-slate-700
+    prose-img:my-8 prose-img:rounded-xl prose-img:shadow-lg prose-img:shadow-slate-300/50
+    prose-hr:my-10 prose-hr:border-slate-200
+    prose-code:rounded prose-code:bg-slate-100 prose-code:px-1.5 prose-code:py-0.5 prose-code:text-sm prose-code:text-cyan-700
+    prose-pre:rounded-xl prose-pre:border prose-pre:border-slate-200 prose-pre:bg-slate-900`;
 
   return (
     <>
@@ -360,7 +376,8 @@ export default function BlogPost({ slug }: BlogPostProps) {
                 {translation && (
                   <button
                     onClick={handleShare}
-                    className="p-2 rounded-lg text-white/50 hover:text-white hover:bg-white/10 transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-300"
+                    aria-label="Partager cet article"
+                    className="p-2 rounded-lg text-white/50 transition-all hover:bg-white/10 hover:text-white focus-visible:ring-2 focus-visible:ring-cyan-300"
                     title="Partager"
                   >
                     <Share2 className="w-4 h-4" />
@@ -489,233 +506,215 @@ export default function BlogPost({ slug }: BlogPostProps) {
               </div>
             )}
 
-            <section className="max-w-7xl mx-auto px-4 pb-16">
-              <div className="lg:hidden mb-6 rounded-xl border border-white/10 bg-white/5 p-4">
-                <p className="text-xs uppercase tracking-wide text-white/50 mb-2">Sommaire rapide</p>
-                <select
-                  defaultValue=""
-                  onChange={(event) => {
-                    const selectedId = event.target.value;
-                    const selected = headings.find((heading) => heading.id === selectedId);
-                    if (selected) handleTocClick(selected);
-                  }}
-                  className="w-full rounded-lg border border-white/15 bg-[#070b1e]/80 px-3 py-2 text-sm text-white focus:outline-none focus:ring-2 focus:ring-cyan-300"
-                >
-                  <option value="">Aller a une section...</option>
-                  {headings.map((heading) => (
-                    <option key={heading.id} value={heading.id}>
-                      {heading.level === 3 ? '↳ ' : ''}{heading.title}
-                    </option>
-                  ))}
-                </select>
-              </div>
+            <section className="px-4 pb-16">
+              <div className="mx-auto max-w-6xl rounded-3xl border border-slate-200 bg-white px-4 py-6 shadow-2xl shadow-slate-950/5 sm:px-6 md:px-8 md:py-8">
+                <div className="mb-8 rounded-xl border border-slate-200 bg-slate-50 p-4 lg:hidden">
+                  <p className="mb-2 text-xs uppercase tracking-wide text-slate-600">Sommaire rapide</p>
+                  <select
+                    defaultValue=""
+                    aria-label="Aller a une section de l'article"
+                    onChange={(event) => {
+                      const selectedId = event.target.value;
+                      const selected = headings.find((heading) => heading.id === selectedId);
+                      if (selected) handleTocClick(selected);
+                    }}
+                    className="min-h-11 w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-800 focus-visible:ring-2 focus-visible:ring-cyan-600 focus-visible:ring-offset-2"
+                  >
+                    <option value="">Aller a une section...</option>
+                    {headings.map((heading) => (
+                      <option key={heading.id} value={heading.id}>
+                        {heading.level === 3 ? '↳ ' : ''}
+                        {heading.title}
+                      </option>
+                    ))}
+                  </select>
+                </div>
 
-              <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_260px] gap-10">
-                <article className="max-w-3xl">
-                  <div className="grid sm:grid-cols-2 gap-4 mb-6">
-                    {translation.key_points && translation.key_points.length > 0 && (
-                      <div className="rounded-xl border border-cyan-400/25 bg-cyan-400/10 p-4">
-                        <p className="text-xs uppercase tracking-wide text-cyan-300 mb-2 inline-flex items-center gap-1">
-                          <ListTree className="w-3.5 h-3.5" />
-                          Points cles
-                        </p>
-                        <ul className="space-y-2">
-                          {translation.key_points.map((point, index) => (
-                            <li key={index} className="text-sm text-white/80 flex gap-2">
-                              <span className="text-cyan-300 mt-0.5">•</span>
-                              <span>{point}</span>
-                            </li>
-                          ))}
-                        </ul>
-                      </div>
-                    )}
+                <div className="grid grid-cols-1 gap-10 lg:grid-cols-[minmax(0,820px)_260px] lg:justify-between">
+                  <article className="w-full max-w-[820px]">
+                    <div className="mb-8 grid gap-4 sm:grid-cols-2">
+                      {translation.key_points && translation.key_points.length > 0 && (
+                        <div className="rounded-xl border border-slate-200 bg-slate-50 p-4">
+                          <p className="mb-2 inline-flex items-center gap-1 text-xs font-semibold uppercase tracking-wide text-slate-700">
+                            <ListTree className="h-3.5 w-3.5 text-cyan-700" />
+                            Points cles
+                          </p>
+                          <ul className="space-y-2">
+                            {translation.key_points.map((point, index) => (
+                              <li key={index} className="flex gap-2 text-sm text-slate-700">
+                                <span className="mt-0.5 text-cyan-700">•</span>
+                                <span>{point}</span>
+                              </li>
+                            ))}
+                          </ul>
+                        </div>
+                      )}
 
-                    {translation.checklist_items && translation.checklist_items.length > 0 && (
-                      <div className="rounded-xl border border-emerald-400/25 bg-emerald-400/10 p-4">
-                        <p className="text-xs uppercase tracking-wide text-emerald-300 mb-2 inline-flex items-center gap-1">
-                          <ClipboardList className="w-3.5 h-3.5" />
-                          Checklist
-                        </p>
-                        <ul className="space-y-2">
-                          {translation.checklist_items.map((item, index) => (
-                            <li key={index} className="text-sm text-white/80 flex gap-2">
-                              <CheckCircle2 className="w-4 h-4 text-emerald-300 mt-0.5 flex-shrink-0" />
-                              <span>{item}</span>
-                            </li>
-                          ))}
-                        </ul>
-                      </div>
-                    )}
-                  </div>
-
-                  <div className="mb-8 rounded-xl border border-white/10 bg-white/5 p-4">
-                    <p className="text-xs uppercase tracking-wide text-white/50 mb-2">Fraicheur & sources</p>
-                    <div className="text-sm text-white/80">
-                      <p className="mb-2">
-                        Derniere mise a jour:
-                        {' '}
-                        <span className="font-semibold text-white">
-                          {new Date(article.last_updated_at || article.updated_at).toLocaleDateString(
-                            lang === 'fr' ? 'fr-FR' : 'en-GB',
-                            { day: 'numeric', month: 'long', year: 'numeric' }
-                          )}
-                        </span>
-                      </p>
-                      {article.sources && article.sources.length > 0 && (
-                        <ul className="space-y-1.5">
-                          {article.sources.map((source, index) => (
-                            <li key={`${source.url}-${index}`} className="text-white/70 text-sm">
-                              <a
-                                href={source.url}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="inline-flex items-center gap-1 text-cyan-300 hover:text-cyan-200 hover:underline"
-                              >
-                                <Link2 className="w-3 h-3" />
-                                {source.label}
-                              </a>
-                            </li>
-                          ))}
-                        </ul>
+                      {translation.checklist_items && translation.checklist_items.length > 0 && (
+                        <div className="rounded-xl border border-slate-200 bg-slate-50 p-4">
+                          <p className="mb-2 inline-flex items-center gap-1 text-xs font-semibold uppercase tracking-wide text-slate-700">
+                            <ClipboardList className="h-3.5 w-3.5 text-emerald-700" />
+                            Checklist
+                          </p>
+                          <ul className="space-y-2">
+                            {translation.checklist_items.map((item, index) => (
+                              <li key={index} className="flex gap-2 text-sm text-slate-700">
+                                <CheckCircle2 className="mt-0.5 h-4 w-4 flex-shrink-0 text-emerald-700" />
+                                <span>{item}</span>
+                              </li>
+                            ))}
+                          </ul>
+                        </div>
                       )}
                     </div>
-                  </div>
 
-                  <div
-                    className="blog-article-content prose prose-invert prose-lg max-w-none
-                      prose-headings:text-white prose-headings:font-bold prose-headings:mt-10 prose-headings:mb-4
-                      prose-h2:text-2xl prose-h2:border-b prose-h2:border-white/10 prose-h2:pb-3
-                      prose-h3:text-xl prose-h3:text-cyan-300
-                      prose-p:text-white/75 prose-p:leading-relaxed prose-p:text-[17px]
-                      prose-a:text-cyan-400 prose-a:no-underline hover:prose-a:underline prose-a:font-medium
-                      prose-strong:text-white prose-strong:font-semibold
-                      prose-blockquote:border-l-4 prose-blockquote:border-cyan-500/50 prose-blockquote:bg-white/5 prose-blockquote:rounded-r-xl prose-blockquote:py-3 prose-blockquote:px-5 prose-blockquote:text-white/60 prose-blockquote:not-italic
-                      prose-li:text-white/75 prose-li:marker:text-cyan-400/60
-                      prose-img:rounded-xl prose-img:shadow-xl prose-img:shadow-black/20
-                      prose-hr:border-white/10
-                      prose-code:text-cyan-300 prose-code:bg-white/10 prose-code:px-1.5 prose-code:py-0.5 prose-code:rounded prose-code:text-sm
-                      prose-pre:bg-[#0d1117] prose-pre:border prose-pre:border-white/10 prose-pre:rounded-xl"
-                    dangerouslySetInnerHTML={{ __html: splitContent.beforeHtml }}
-                  />
-
-                  {MidArticleCta}
-
-                  {splitContent.afterHtml && (
-                    <div
-                      className="blog-article-content prose prose-invert prose-lg max-w-none
-                        prose-headings:text-white prose-headings:font-bold prose-headings:mt-10 prose-headings:mb-4
-                        prose-h2:text-2xl prose-h2:border-b prose-h2:border-white/10 prose-h2:pb-3
-                        prose-h3:text-xl prose-h3:text-cyan-300
-                        prose-p:text-white/75 prose-p:leading-relaxed prose-p:text-[17px]
-                        prose-a:text-cyan-400 prose-a:no-underline hover:prose-a:underline prose-a:font-medium
-                        prose-strong:text-white prose-strong:font-semibold
-                        prose-blockquote:border-l-4 prose-blockquote:border-cyan-500/50 prose-blockquote:bg-white/5 prose-blockquote:rounded-r-xl prose-blockquote:py-3 prose-blockquote:px-5 prose-blockquote:text-white/60 prose-blockquote:not-italic
-                        prose-li:text-white/75 prose-li:marker:text-cyan-400/60
-                        prose-img:rounded-xl prose-img:shadow-xl prose-img:shadow-black/20
-                        prose-hr:border-white/10
-                        prose-code:text-cyan-300 prose-code:bg-white/10 prose-code:px-1.5 prose-code:py-0.5 prose-code:rounded prose-code:text-sm
-                        prose-pre:bg-[#0d1117] prose-pre:border prose-pre:border-white/10 prose-pre:rounded-xl"
-                      dangerouslySetInnerHTML={{ __html: splitContent.afterHtml }}
-                    />
-                  )}
-
-                  {faqItems.length > 0 && (
-                    <section className="mt-12 rounded-2xl border border-white/10 bg-white/5 p-5">
-                      <h2 className="text-2xl font-bold text-white mb-2">FAQ</h2>
-                      <p className="text-sm text-white/60 mb-4">
-                        Questions frequentes sur les obligations de conformité et le détachement.
-                      </p>
-                      <Accordion type="single" collapsible className="w-full">
-                        {faqItems.map((faq, index) => (
-                          <AccordionItem key={index} value={`faq-${index}`} className="border-white/10">
-                            <AccordionTrigger className="text-white hover:text-cyan-200">
-                              {faq.question}
-                            </AccordionTrigger>
-                            <AccordionContent className="text-white/70 leading-relaxed">
-                              {faq.answer}
-                            </AccordionContent>
-                          </AccordionItem>
-                        ))}
-                      </Accordion>
-                    </section>
-                  )}
-
-                  <section className="mt-12 rounded-2xl border border-cyan-400/20 bg-cyan-400/10 p-6">
-                    <p className="text-xs uppercase tracking-wide text-cyan-300 mb-2">{personaCopy.badge}</p>
-                    <h2 className="text-2xl font-bold text-white mb-2">{personaCopy.title}</h2>
-                    <p className="text-white/70 mb-5">{endCtaText}</p>
-                    <div className="flex items-center gap-3 flex-wrap">
-                      <a
-                        href={devisLink}
-                        className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-gradient-to-r from-cyan-500 to-violet-600 text-white font-medium hover:from-cyan-400 hover:to-violet-500 transition-all"
-                      >
-                        {endCtaLabel}
-                        <ArrowRight className="w-4 h-4" />
-                      </a>
-                      <a
-                        href={`${langPrefix}/blog`}
-                        className="inline-flex items-center gap-2 px-5 py-3 rounded-xl border border-white/20 text-white/75 hover:text-white hover:border-white/40 transition-all"
-                      >
-                        <ArrowLeft className="w-4 h-4" />
-                        Continuer la lecture
-                      </a>
+                    <div className="mb-10 rounded-xl border border-slate-200 bg-slate-50 p-4">
+                      <p className="mb-2 text-xs uppercase tracking-wide text-slate-600">Fraicheur & sources</p>
+                      <div className="text-sm text-slate-700">
+                        <p className="mb-2">
+                          Derniere mise a jour:
+                          {' '}
+                          <span className="font-semibold text-slate-900">
+                            {new Date(article.last_updated_at || article.updated_at).toLocaleDateString(
+                              lang === 'fr' ? 'fr-FR' : 'en-GB',
+                              { day: 'numeric', month: 'long', year: 'numeric' }
+                            )}
+                          </span>
+                        </p>
+                        {article.sources && article.sources.length > 0 && (
+                          <ul className="space-y-1.5">
+                            {article.sources.map((source, index) => (
+                              <li key={`${source.url}-${index}`} className="text-sm text-slate-700">
+                                <a
+                                  href={source.url}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="inline-flex items-center gap-1 font-medium text-cyan-700 hover:text-cyan-800 hover:underline"
+                                >
+                                  <Link2 className="h-3 w-3" />
+                                  {source.label}
+                                </a>
+                              </li>
+                            ))}
+                          </ul>
+                        )}
+                      </div>
                     </div>
-                  </section>
 
-                  {relatedArticles.length > 0 && (
-                    <section className="mt-12">
-                      <h2 className="text-2xl font-bold text-white mb-4">Articles liés</h2>
-                      <div className="grid sm:grid-cols-2 gap-4">
-                        {relatedArticles.map((related) => {
-                          const relatedTranslation =
-                            related.translations.find((item) => item.language_code === lang) ||
-                            related.translations.find((item) => item.language_code === 'fr');
-                          if (!relatedTranslation) return null;
-                          return (
-                            <a
-                              key={related.id}
-                              href={`${langPrefix}/blog/${related.slug}`}
-                              className="rounded-xl border border-white/10 bg-white/5 p-4 hover:bg-white/10 transition-colors"
-                            >
-                              <p className="text-xs uppercase tracking-wide text-cyan-300 mb-2">
-                                {related.category || 'Article'}
-                              </p>
-                              <h3 className="text-white font-semibold mb-1 line-clamp-2">
-                                {relatedTranslation.title}
-                              </h3>
-                              <p className="text-sm text-white/60 line-clamp-2">
-                                {relatedTranslation.excerpt || 'Lire cet article'}
-                              </p>
-                            </a>
-                          );
-                        })}
+                    <div
+                      className={articleBodyClassName}
+                      dangerouslySetInnerHTML={{ __html: splitContent.beforeHtml }}
+                    />
+
+                    {MidArticleCta}
+
+                    {splitContent.afterHtml && (
+                      <div
+                        className={articleBodyClassName}
+                        dangerouslySetInnerHTML={{ __html: splitContent.afterHtml }}
+                      />
+                    )}
+
+                    {faqItems.length > 0 && (
+                      <section className="mt-12 rounded-2xl border border-slate-200 bg-white p-5">
+                        <h2 className="mb-2 text-2xl font-bold text-slate-900">FAQ</h2>
+                        <p className="mb-4 text-sm text-slate-600">
+                          Questions frequentes sur les obligations de conformité et le détachement.
+                        </p>
+                        <Accordion type="single" collapsible className="w-full">
+                          {faqItems.map((faq, index) => (
+                            <AccordionItem key={index} value={`faq-${index}`} className="border-slate-200">
+                              <AccordionTrigger className="text-left text-slate-900 hover:text-cyan-700">
+                                {faq.question}
+                              </AccordionTrigger>
+                              <AccordionContent className="leading-relaxed text-slate-700">
+                                {faq.answer}
+                              </AccordionContent>
+                            </AccordionItem>
+                          ))}
+                        </Accordion>
+                      </section>
+                    )}
+
+                    <section className="mt-12 rounded-2xl border border-cyan-200 bg-gradient-to-br from-cyan-50 to-blue-50 p-6">
+                      <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-cyan-700">{personaCopy.badge}</p>
+                      <h2 className="mb-2 text-2xl font-bold text-slate-900">{personaCopy.title}</h2>
+                      <p className="mb-5 leading-relaxed text-slate-700">{endCtaText}</p>
+                      <div className="flex flex-wrap items-center gap-3">
+                        <a
+                          href={devisLink}
+                          className="inline-flex min-h-11 w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-cyan-600 to-violet-700 px-6 py-3 font-medium text-white transition-all hover:from-cyan-500 hover:to-violet-600 focus-visible:ring-2 focus-visible:ring-cyan-600 focus-visible:ring-offset-2 motion-reduce:transition-none sm:w-auto"
+                        >
+                          {endCtaLabel}
+                          <ArrowRight className="h-4 w-4" />
+                        </a>
+                        <a
+                          href={`${langPrefix}/blog`}
+                          className="inline-flex min-h-11 w-full items-center justify-center gap-2 rounded-xl border border-slate-300 px-5 py-3 text-slate-700 transition-colors hover:border-slate-400 hover:text-slate-900 focus-visible:ring-2 focus-visible:ring-cyan-600 focus-visible:ring-offset-2 sm:w-auto"
+                        >
+                          <ArrowLeft className="h-4 w-4" />
+                          Continuer la lecture
+                        </a>
                       </div>
                     </section>
-                  )}
-                </article>
 
-                <aside className="hidden lg:block">
-                  <div className="sticky top-24 rounded-2xl border border-white/10 bg-white/5 p-4">
-                    <p className="text-xs uppercase tracking-wide text-white/50 mb-3">Sommaire</p>
-                    <nav className="space-y-2">
-                      {headings.map((heading) => (
-                        <a
-                          key={heading.id}
-                          href={`#${heading.id}`}
-                          onClick={(event) => {
-                            event.preventDefault();
-                            handleTocClick(heading);
-                          }}
-                          className={`block text-sm hover:text-cyan-300 transition-colors ${
-                            heading.level === 3 ? 'pl-3 text-white/55' : 'text-white/80'
-                          }`}
-                        >
-                          {heading.title}
-                        </a>
-                      ))}
-                    </nav>
-                  </div>
-                </aside>
+                    {relatedArticles.length > 0 && (
+                      <section className="mt-12">
+                        <h2 className="mb-4 text-2xl font-bold text-slate-900">Articles liés</h2>
+                        <div className="grid gap-4 sm:grid-cols-2">
+                          {relatedArticles.map((related) => {
+                            const relatedTranslation =
+                              related.translations.find((item) => item.language_code === lang) ||
+                              related.translations.find((item) => item.language_code === 'fr');
+                            if (!relatedTranslation) return null;
+                            return (
+                              <a
+                                key={related.id}
+                                href={`${langPrefix}/blog/${related.slug}`}
+                                className="rounded-xl border border-slate-200 bg-white p-4 transition-colors hover:border-cyan-200 hover:bg-slate-50"
+                              >
+                                <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-cyan-700">
+                                  {related.category || 'Article'}
+                                </p>
+                                <h3 className="mb-1 line-clamp-2 font-semibold text-slate-900">
+                                  {relatedTranslation.title}
+                                </h3>
+                                <p className="line-clamp-2 text-sm text-slate-600">
+                                  {relatedTranslation.excerpt || 'Lire cet article'}
+                                </p>
+                              </a>
+                            );
+                          })}
+                        </div>
+                      </section>
+                    )}
+                  </article>
+
+                  <aside className="hidden lg:block">
+                    <div className="sticky top-24 rounded-2xl border border-slate-200 bg-slate-50 p-4">
+                      <p className="mb-3 text-xs uppercase tracking-wide text-slate-600">Sommaire</p>
+                      <nav className="space-y-1.5">
+                        {headings.map((heading) => (
+                          <a
+                            key={heading.id}
+                            href={`#${heading.id}`}
+                            onClick={(event) => {
+                              event.preventDefault();
+                              handleTocClick(heading);
+                            }}
+                            className={`block rounded-md px-2 py-1.5 text-sm transition-colors focus-visible:ring-2 focus-visible:ring-cyan-600 focus-visible:ring-offset-2 ${
+                              heading.level === 3
+                                ? 'pl-5 text-slate-600 hover:text-cyan-700'
+                                : 'text-slate-800 hover:text-cyan-700'
+                            }`}
+                          >
+                            {heading.title}
+                          </a>
+                        ))}
+                      </nav>
+                    </div>
+                  </aside>
+                </div>
               </div>
             </section>
           </>

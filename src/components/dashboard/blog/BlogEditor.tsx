@@ -50,6 +50,10 @@ const STATUS_OPTIONS = [
   { value: 'published', label: 'Publie', color: 'bg-green-100 text-green-800 border-green-200' },
   { value: 'archived', label: 'Archive', color: 'bg-slate-100 text-slate-800 border-slate-200' },
 ];
+const PANEL_CLASS = 'rounded-xl border border-slate-200 bg-white p-4 shadow-sm';
+const FIELD_CLASS = 'w-full min-h-11 rounded-lg border border-slate-200 bg-white px-3 text-sm text-slate-800 shadow-sm transition-colors focus-visible:ring-2 focus-visible:ring-blue-500/40 focus-visible:border-blue-500';
+const TEXTAREA_CLASS = `${FIELD_CLASS} py-2.5 resize-none`;
+const FIELD_LABEL_CLASS = 'mb-1.5 block text-sm font-medium text-slate-700';
 
 function createEmptyTranslation(languageCode: string): BlogTranslation {
   return {
@@ -340,8 +344,8 @@ export function BlogEditor({ article, onBack, onSaved }: BlogEditorProps) {
   const langInfo = EUROPEAN_LANGUAGES.find((language) => language.code === activeLang);
 
   return (
-    <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
-      <div className="flex items-center justify-between mb-6">
+    <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="space-y-5">
+      <div className="mb-1 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div className="flex items-center gap-3">
           <Button variant="ghost" size="sm" onClick={onBack} className="text-slate-500 hover:text-slate-700">
             <ArrowLeft className="w-4 h-4 mr-2" />
@@ -359,7 +363,7 @@ export function BlogEditor({ article, onBack, onSaved }: BlogEditorProps) {
         <Button
           onClick={handleSave}
           disabled={saving || !canSave}
-          className={status === 'published' ? 'bg-green-600 hover:bg-green-700' : 'bg-blue-600 hover:bg-blue-700'}
+          className={`min-h-11 w-full sm:w-auto ${status === 'published' ? 'bg-green-600 hover:bg-green-700' : 'bg-blue-600 hover:bg-blue-700'}`}
         >
           {saving ? (
             <Loader2 className="w-4 h-4 mr-2 animate-spin" />
@@ -370,9 +374,9 @@ export function BlogEditor({ article, onBack, onSaved }: BlogEditorProps) {
         </Button>
       </div>
 
-      <div className="grid grid-cols-1 xl:grid-cols-[minmax(0,1fr)_360px] gap-6">
+      <div className="grid grid-cols-1 gap-5 xl:grid-cols-[minmax(0,1fr)_360px]">
         <div className="space-y-5">
-          <div className="flex items-center gap-2 flex-wrap p-3 rounded-xl bg-slate-50 border border-slate-100">
+          <div className="flex flex-wrap items-center gap-2 rounded-xl border border-slate-200 bg-slate-50 p-3">
             <Globe className="w-4 h-4 text-slate-400" />
             {Object.keys(translations).map((lang) => {
               const hasContent = Boolean(translations[lang]?.title);
@@ -381,7 +385,7 @@ export function BlogEditor({ article, onBack, onSaved }: BlogEditorProps) {
                 <button
                   key={lang}
                   onClick={() => setActiveLang(lang)}
-                  className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-all ${
+                  className={`min-h-11 rounded-lg px-3 py-1.5 text-sm font-medium transition-all ${
                     activeLang === lang
                       ? 'bg-blue-600 text-white shadow-md shadow-blue-200'
                       : hasContent
@@ -394,7 +398,7 @@ export function BlogEditor({ article, onBack, onSaved }: BlogEditorProps) {
               );
             })}
             <select
-              className="px-2 py-1.5 rounded-lg text-sm border border-dashed border-slate-300 bg-white text-slate-500 cursor-pointer hover:border-blue-400 transition-colors"
+              className="min-h-11 rounded-lg border border-dashed border-slate-300 bg-white px-2 text-sm text-slate-600 shadow-sm transition-colors hover:border-blue-400 focus-visible:ring-2 focus-visible:ring-blue-500/40 focus-visible:border-blue-500"
               value=""
               onChange={(event) => event.target.value && addLanguage(event.target.value)}
             >
@@ -407,28 +411,28 @@ export function BlogEditor({ article, onBack, onSaved }: BlogEditorProps) {
             </select>
           </div>
 
-          <div className="rounded-xl border border-slate-200 bg-white p-4 space-y-4">
+          <div className={`${PANEL_CLASS} space-y-4`}>
             <div>
-              <label className="block text-sm font-semibold text-slate-700 mb-1.5">
+              <label className={FIELD_LABEL_CLASS}>
                 Titre {langInfo?.flag} {activeLang.toUpperCase()} *
               </label>
               <input
                 type="text"
                 value={currentTranslation.title}
                 onChange={(event) => updateTranslation(activeLang, { title: event.target.value })}
-                className="w-full px-4 py-3 rounded-xl border border-slate-200 text-lg font-semibold focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                className={`${FIELD_CLASS} px-4 text-lg font-semibold`}
                 placeholder="Titre de l'article..."
               />
             </div>
 
             <div>
-              <label className="block text-sm font-semibold text-slate-700 mb-1.5">
+              <label className={FIELD_LABEL_CLASS}>
                 Excerpt *
               </label>
               <textarea
                 value={currentTranslation.excerpt || ''}
                 onChange={(event) => updateTranslation(activeLang, { excerpt: event.target.value })}
-                className="w-full px-4 py-2.5 rounded-xl border border-slate-200 text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all resize-none"
+                className={`${TEXTAREA_CLASS} px-4`}
                 rows={3}
                 placeholder="Résumé utile de l'article..."
               />
@@ -436,7 +440,7 @@ export function BlogEditor({ article, onBack, onSaved }: BlogEditorProps) {
 
             <div className="grid sm:grid-cols-2 gap-3">
               <div>
-                <label className="block text-xs font-semibold text-slate-600 mb-1">
+                <label className="mb-1 block text-xs font-semibold text-slate-600">
                   Meta title * ({(currentTranslation.seo_title || '').length}/60)
                 </label>
                 <input
@@ -444,19 +448,19 @@ export function BlogEditor({ article, onBack, onSaved }: BlogEditorProps) {
                   value={currentTranslation.seo_title || ''}
                   maxLength={60}
                   onChange={(event) => updateTranslation(activeLang, { seo_title: event.target.value })}
-                  className="w-full px-3 py-2 rounded-lg border border-slate-200 text-sm focus:ring-2 focus:ring-blue-400 focus:border-transparent"
+                  className={FIELD_CLASS}
                   placeholder={currentTranslation.title || 'Meta title...'}
                 />
               </div>
               <div>
-                <label className="block text-xs font-semibold text-slate-600 mb-1">
+                <label className="mb-1 block text-xs font-semibold text-slate-600">
                   Meta description * ({(currentTranslation.seo_description || '').length}/160)
                 </label>
                 <textarea
                   value={currentTranslation.seo_description || ''}
                   maxLength={160}
                   onChange={(event) => updateTranslation(activeLang, { seo_description: event.target.value })}
-                  className="w-full px-3 py-2 rounded-lg border border-slate-200 text-sm focus:ring-2 focus:ring-blue-400 focus:border-transparent resize-none"
+                  className={TEXTAREA_CLASS}
                   rows={2}
                   placeholder={currentTranslation.excerpt || 'Meta description...'}
                 />
@@ -464,13 +468,13 @@ export function BlogEditor({ article, onBack, onSaved }: BlogEditorProps) {
             </div>
           </div>
 
-          <div className="rounded-xl border border-slate-200 bg-white p-4 space-y-4">
+          <div className={`${PANEL_CLASS} space-y-4`}>
             <h3 className="font-semibold text-slate-800">Blocs structurés</h3>
 
             <div>
               <div className="flex items-center justify-between mb-2">
                 <label className="text-sm font-medium text-slate-700">Points clés</label>
-                <Button type="button" size="sm" variant="outline" onClick={() => addArrayItem('key_points')}>
+                <Button type="button" size="sm" variant="outline" className="min-h-11" onClick={() => addArrayItem('key_points')}>
                   <Plus className="w-3.5 h-3.5 mr-1" />
                   Ajouter
                 </Button>
@@ -482,10 +486,10 @@ export function BlogEditor({ article, onBack, onSaved }: BlogEditorProps) {
                       type="text"
                       value={item}
                       onChange={(event) => setArrayItem('key_points', index, event.target.value)}
-                      className="flex-1 px-3 py-2 rounded-lg border border-slate-200 text-sm"
+                      className={`flex-1 ${FIELD_CLASS}`}
                       placeholder="Point clé..."
                     />
-                    <Button type="button" size="icon" variant="ghost" onClick={() => removeArrayItem('key_points', index)}>
+                    <Button type="button" size="icon" variant="ghost" className="h-11 w-11 md:h-9 md:w-9" onClick={() => removeArrayItem('key_points', index)}>
                       <X className="w-4 h-4 text-slate-500" />
                     </Button>
                   </div>
@@ -496,7 +500,7 @@ export function BlogEditor({ article, onBack, onSaved }: BlogEditorProps) {
             <div>
               <div className="flex items-center justify-between mb-2">
                 <label className="text-sm font-medium text-slate-700">Checklist</label>
-                <Button type="button" size="sm" variant="outline" onClick={() => addArrayItem('checklist_items')}>
+                <Button type="button" size="sm" variant="outline" className="min-h-11" onClick={() => addArrayItem('checklist_items')}>
                   <Plus className="w-3.5 h-3.5 mr-1" />
                   Ajouter
                 </Button>
@@ -508,10 +512,10 @@ export function BlogEditor({ article, onBack, onSaved }: BlogEditorProps) {
                       type="text"
                       value={item}
                       onChange={(event) => setArrayItem('checklist_items', index, event.target.value)}
-                      className="flex-1 px-3 py-2 rounded-lg border border-slate-200 text-sm"
+                      className={`flex-1 ${FIELD_CLASS}`}
                       placeholder="Etape checklist..."
                     />
-                    <Button type="button" size="icon" variant="ghost" onClick={() => removeArrayItem('checklist_items', index)}>
+                    <Button type="button" size="icon" variant="ghost" className="h-11 w-11 md:h-9 md:w-9" onClick={() => removeArrayItem('checklist_items', index)}>
                       <X className="w-4 h-4 text-slate-500" />
                     </Button>
                   </div>
@@ -522,30 +526,30 @@ export function BlogEditor({ article, onBack, onSaved }: BlogEditorProps) {
             <div>
               <div className="flex items-center justify-between mb-2">
                 <label className="text-sm font-medium text-slate-700">FAQ *</label>
-                <Button type="button" size="sm" variant="outline" onClick={addFaqItem}>
+                <Button type="button" size="sm" variant="outline" className="min-h-11" onClick={addFaqItem}>
                   <Plus className="w-3.5 h-3.5 mr-1" />
                   Ajouter Q/R
                 </Button>
               </div>
               <div className="space-y-3">
                 {(currentTranslation.faq_items || []).map((faq, index) => (
-                  <div key={index} className="rounded-lg border border-slate-200 p-3 space-y-2">
+                  <div key={index} className="rounded-lg border border-slate-200 bg-slate-50 p-3 space-y-2">
                     <input
                       type="text"
                       value={faq.question}
                       onChange={(event) => setFaqItem(index, 'question', event.target.value)}
-                      className="w-full px-3 py-2 rounded-lg border border-slate-200 text-sm"
+                      className={FIELD_CLASS}
                       placeholder="Question"
                     />
                     <textarea
                       value={faq.answer}
                       onChange={(event) => setFaqItem(index, 'answer', event.target.value)}
-                      className="w-full px-3 py-2 rounded-lg border border-slate-200 text-sm resize-none"
+                      className={TEXTAREA_CLASS}
                       rows={3}
                       placeholder="Réponse"
                     />
                     <div className="text-right">
-                      <Button type="button" size="sm" variant="ghost" onClick={() => removeFaqItem(index)}>
+                      <Button type="button" size="sm" variant="ghost" className="min-h-11" onClick={() => removeFaqItem(index)}>
                         <X className="w-3.5 h-3.5 mr-1" />
                         Retirer
                       </Button>
@@ -562,13 +566,13 @@ export function BlogEditor({ article, onBack, onSaved }: BlogEditorProps) {
                   type="text"
                   value={currentTranslation.cta_mid_label || ''}
                   onChange={(event) => updateTranslation(activeLang, { cta_mid_label: event.target.value })}
-                  className="w-full px-3 py-2 rounded-lg border border-slate-200 text-sm"
+                  className={FIELD_CLASS}
                   placeholder="Ex: Demander un audit conformité"
                 />
                 <textarea
                   value={currentTranslation.cta_mid_text || ''}
                   onChange={(event) => updateTranslation(activeLang, { cta_mid_text: event.target.value })}
-                  className="mt-2 w-full px-3 py-2 rounded-lg border border-slate-200 text-sm resize-none"
+                  className={`mt-2 ${TEXTAREA_CLASS}`}
                   rows={2}
                   placeholder="Texte de contexte CTA mid"
                 />
@@ -579,13 +583,13 @@ export function BlogEditor({ article, onBack, onSaved }: BlogEditorProps) {
                   type="text"
                   value={currentTranslation.cta_end_label || ''}
                   onChange={(event) => updateTranslation(activeLang, { cta_end_label: event.target.value })}
-                  className="w-full px-3 py-2 rounded-lg border border-slate-200 text-sm"
+                  className={FIELD_CLASS}
                   placeholder="Ex: Demander un devis personnalisé"
                 />
                 <textarea
                   value={currentTranslation.cta_end_text || ''}
                   onChange={(event) => updateTranslation(activeLang, { cta_end_text: event.target.value })}
-                  className="mt-2 w-full px-3 py-2 rounded-lg border border-slate-200 text-sm resize-none"
+                  className={`mt-2 ${TEXTAREA_CLASS}`}
                   rows={2}
                   placeholder="Texte de contexte CTA fin"
                 />
@@ -595,7 +599,7 @@ export function BlogEditor({ article, onBack, onSaved }: BlogEditorProps) {
             <div>
               <div className="flex items-center justify-between mb-2">
                 <label className="text-sm font-medium text-slate-700">Maillage interne (semi-auto)</label>
-                <Button type="button" size="sm" variant="outline" onClick={addInternalLink}>
+                <Button type="button" size="sm" variant="outline" className="min-h-11" onClick={addInternalLink}>
                   <Plus className="w-3.5 h-3.5 mr-1" />
                   Ajouter lien
                 </Button>
@@ -607,17 +611,17 @@ export function BlogEditor({ article, onBack, onSaved }: BlogEditorProps) {
                       type="text"
                       value={link.label}
                       onChange={(event) => setInternalLink(index, 'label', event.target.value)}
-                      className="px-3 py-2 rounded-lg border border-slate-200 text-sm"
+                      className={FIELD_CLASS}
                       placeholder="Ancre"
                     />
                     <input
                       type="text"
                       value={link.url}
                       onChange={(event) => setInternalLink(index, 'url', event.target.value)}
-                      className="px-3 py-2 rounded-lg border border-slate-200 text-sm"
+                      className={FIELD_CLASS}
                       placeholder="/blog/..."
                     />
-                    <Button type="button" size="icon" variant="ghost" onClick={() => removeInternalLink(index)}>
+                    <Button type="button" size="icon" variant="ghost" className="h-11 w-11 md:h-9 md:w-9" onClick={() => removeInternalLink(index)}>
                       <X className="w-4 h-4 text-slate-500" />
                     </Button>
                   </div>
@@ -641,7 +645,7 @@ export function BlogEditor({ article, onBack, onSaved }: BlogEditorProps) {
         </div>
 
         <aside className="space-y-4">
-          <div className="rounded-xl border border-slate-200 bg-white p-4">
+          <div className={PANEL_CLASS}>
             <div className="flex items-center justify-between mb-3">
               <p className="text-sm font-semibold text-slate-800">Score qualite</p>
               <Badge className={quality.score >= 80 ? 'bg-green-100 text-green-700' : quality.score >= 60 ? 'bg-yellow-100 text-yellow-700' : 'bg-red-100 text-red-700'}>
@@ -675,14 +679,14 @@ export function BlogEditor({ article, onBack, onSaved }: BlogEditorProps) {
             )}
           </div>
 
-          <div className="rounded-xl border border-slate-200 bg-white p-4 space-y-3">
+          <div className={`${PANEL_CLASS} space-y-3`}>
             <label className="block text-sm font-semibold text-slate-700">Workflow</label>
             <div className="grid grid-cols-2 gap-2">
               {STATUS_OPTIONS.map((option) => (
                 <button
                   key={option.value}
                   onClick={() => setStatus(option.value)}
-                  className={`px-3 py-2 rounded-lg border text-xs font-medium ${
+                  className={`min-h-11 rounded-lg border px-3 py-2 text-xs font-medium ${
                     status === option.value ? option.color : 'border-slate-200 text-slate-500 hover:bg-slate-50'
                   }`}
                 >
@@ -692,12 +696,12 @@ export function BlogEditor({ article, onBack, onSaved }: BlogEditorProps) {
             </div>
           </div>
 
-          <div className="rounded-xl border border-slate-200 bg-white p-4 space-y-3">
+          <div className={`${PANEL_CLASS} space-y-3`}>
             <label className="block text-sm font-semibold text-slate-700">
               <Link2 className="w-3.5 h-3.5 inline mr-1" />
               Slug *
             </label>
-            <div className="flex items-center gap-1 bg-slate-50 rounded-lg px-2 py-1.5 border border-slate-100">
+            <div className="flex min-h-11 items-center gap-1 rounded-lg border border-slate-200 bg-slate-50 px-2 py-1.5 shadow-sm focus-within:border-blue-500 focus-within:ring-2 focus-within:ring-blue-500/40">
               <span className="text-xs text-slate-400 flex-shrink-0">/blog/</span>
               <input
                 type="text"
@@ -716,13 +720,13 @@ export function BlogEditor({ article, onBack, onSaved }: BlogEditorProps) {
                 type="text"
                 value={category}
                 onChange={(event) => setCategory(event.target.value)}
-                className="w-full px-3 py-2 rounded-lg border border-slate-200 text-sm"
+                className={FIELD_CLASS}
                 placeholder="ex: Réglementation"
               />
             </div>
           </div>
 
-          <div className="rounded-xl border border-slate-200 bg-white p-4 space-y-3">
+          <div className={`${PANEL_CLASS} space-y-3`}>
             <div>
               <label className="block text-xs font-semibold text-slate-600 mb-1">
                 <Building2 className="w-3.5 h-3.5 inline mr-1" />
@@ -731,7 +735,7 @@ export function BlogEditor({ article, onBack, onSaved }: BlogEditorProps) {
               <select
                 value={personaTarget}
                 onChange={(event) => setPersonaTarget(event.target.value as BlogPersonaTarget)}
-                className="w-full px-3 py-2 rounded-lg border border-slate-200 text-sm"
+                className={FIELD_CLASS}
               >
                 <option value="enterprise">Entreprise</option>
                 <option value="agency">Agence</option>
@@ -746,7 +750,7 @@ export function BlogEditor({ article, onBack, onSaved }: BlogEditorProps) {
               <select
                 value={riskLevel}
                 onChange={(event) => setRiskLevel(event.target.value as BlogRiskLevel)}
-                className="w-full px-3 py-2 rounded-lg border border-slate-200 text-sm"
+                className={FIELD_CLASS}
               >
                 <option value="low">Faible</option>
                 <option value="medium">Modere</option>
@@ -760,7 +764,7 @@ export function BlogEditor({ article, onBack, onSaved }: BlogEditorProps) {
               <select
                 value={ctaPersona}
                 onChange={(event) => setCtaPersona(event.target.value as BlogPersonaTarget)}
-                className="w-full px-3 py-2 rounded-lg border border-slate-200 text-sm"
+                className={FIELD_CLASS}
               >
                 <option value="enterprise">Entreprise</option>
                 <option value="agency">Agence</option>
@@ -776,15 +780,15 @@ export function BlogEditor({ article, onBack, onSaved }: BlogEditorProps) {
                 type="date"
                 value={lastUpdatedAt}
                 onChange={(event) => setLastUpdatedAt(event.target.value)}
-                className="w-full px-3 py-2 rounded-lg border border-slate-200 text-sm"
+                className={FIELD_CLASS}
               />
             </div>
           </div>
 
-          <div className="rounded-xl border border-slate-200 bg-white p-4">
+          <div className={PANEL_CLASS}>
             <div className="flex items-center justify-between mb-2">
               <label className="text-sm font-semibold text-slate-700">Sources officielles *</label>
-              <Button type="button" size="sm" variant="outline" onClick={addSource}>
+              <Button type="button" size="sm" variant="outline" className="min-h-11" onClick={addSource}>
                 <Plus className="w-3.5 h-3.5 mr-1" />
                 Ajouter
               </Button>
@@ -796,17 +800,17 @@ export function BlogEditor({ article, onBack, onSaved }: BlogEditorProps) {
                     type="text"
                     value={source.label}
                     onChange={(event) => updateSource(index, 'label', event.target.value)}
-                    className="px-2 py-2 rounded-lg border border-slate-200 text-xs"
+                    className={FIELD_CLASS}
                     placeholder="Organisme"
                   />
                   <input
                     type="url"
                     value={source.url}
                     onChange={(event) => updateSource(index, 'url', event.target.value)}
-                    className="px-2 py-2 rounded-lg border border-slate-200 text-xs"
+                    className={FIELD_CLASS}
                     placeholder="https://..."
                   />
-                  <Button type="button" size="icon" variant="ghost" onClick={() => removeSource(index)}>
+                  <Button type="button" size="icon" variant="ghost" className="h-11 w-11 md:h-9 md:w-9" onClick={() => removeSource(index)}>
                     <X className="w-4 h-4 text-slate-500" />
                   </Button>
                 </div>
@@ -814,14 +818,14 @@ export function BlogEditor({ article, onBack, onSaved }: BlogEditorProps) {
             </div>
           </div>
 
-          <div className="rounded-xl border border-slate-200 bg-white p-4">
+          <div className={PANEL_CLASS}>
             <label className="block text-sm font-semibold text-slate-700 mb-2">
               Image de couverture
             </label>
             <ImageDropZone value={featuredImage} onChange={setFeaturedImage} compact />
           </div>
 
-          <div className="rounded-xl border border-slate-200 bg-white p-4">
+          <div className={PANEL_CLASS}>
             <div className="flex items-center justify-between mb-2">
               <label className="text-sm font-semibold text-slate-700 flex items-center gap-1">
                 <Eye className="w-4 h-4" />
@@ -832,6 +836,7 @@ export function BlogEditor({ article, onBack, onSaved }: BlogEditorProps) {
                   type="button"
                   size="sm"
                   variant={previewMode === 'desktop' ? 'default' : 'outline'}
+                  className="min-h-11"
                   onClick={() => setPreviewMode('desktop')}
                 >
                   <Monitor className="w-3.5 h-3.5 mr-1" />
@@ -841,6 +846,7 @@ export function BlogEditor({ article, onBack, onSaved }: BlogEditorProps) {
                   type="button"
                   size="sm"
                   variant={previewMode === 'mobile' ? 'default' : 'outline'}
+                  className="min-h-11"
                   onClick={() => setPreviewMode('mobile')}
                 >
                   <Smartphone className="w-3.5 h-3.5 mr-1" />
@@ -868,7 +874,7 @@ export function BlogEditor({ article, onBack, onSaved }: BlogEditorProps) {
             </div>
           </div>
 
-          <div className="rounded-xl border border-slate-200 bg-white p-4">
+          <div className={PANEL_CLASS}>
             <label className="block text-sm font-semibold text-slate-700 mb-2">
               <Globe className="w-3.5 h-3.5 inline mr-1" />
               Traductions

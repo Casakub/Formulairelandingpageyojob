@@ -35,6 +35,8 @@ const RISK_LABELS: Record<BlogRiskLevel, string> = {
 };
 
 type DateFilter = 'all' | '30d' | '90d' | '365d';
+const FILTER_LABEL_CLASS = 'text-xs font-medium text-slate-200';
+const FILTER_CONTROL_CLASS = 'mt-1 min-h-11 w-full rounded-xl border border-slate-200 bg-white px-3 text-sm text-slate-800 shadow-sm focus-visible:ring-2 focus-visible:ring-cyan-300 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-900';
 
 export default function BlogList() {
   const { currentLanguage: lang } = useLanguageManager();
@@ -105,7 +107,7 @@ export default function BlogList() {
         description="Guides pratiques YOJOB: conformité détachement, obligations employeur, checklists et FAQ pour entreprises et agences de staffing."
       />
 
-      <div className="min-h-screen bg-gradient-to-br from-blue-900 via-violet-900 to-cyan-900">
+      <div className="min-h-screen bg-gradient-to-br from-[#111c46] via-[#2a1f63] to-[#213b72]">
         <header className="relative z-50 border-b border-white/10 bg-white/5 backdrop-blur-md">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="flex items-center justify-between h-16">
@@ -125,12 +127,12 @@ export default function BlogList() {
           </div>
         </header>
 
-        <section className="pt-14 pb-10 px-4">
+        <section className="px-4 pb-10 pt-14">
           <div className="max-w-5xl mx-auto text-center">
             <motion.h1
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              className="text-4xl md:text-5xl font-bold text-white mb-4"
+              className="mb-4 text-4xl font-bold text-white md:text-5xl"
             >
               Blog conformité & détachement YOJOB
             </motion.h1>
@@ -138,7 +140,7 @@ export default function BlogList() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.1 }}
-              className="text-lg text-white/70 max-w-3xl mx-auto"
+              className="mx-auto max-w-3xl text-lg text-white/80"
             >
               Articles actionnables pour sécuriser vos opérations en Europe, avec points clés, FAQ et passerelles vers un devis personnalisé.
             </motion.p>
@@ -146,33 +148,34 @@ export default function BlogList() {
         </section>
 
         <section className="px-4 pb-6">
-          <div className="max-w-5xl mx-auto rounded-2xl border border-white/10 bg-white/5 backdrop-blur-sm p-4 sm:p-5">
-            <div className="flex items-center gap-2 text-white/80 mb-3">
+          <div className="mx-auto max-w-5xl rounded-2xl border border-white/15 bg-slate-900/45 p-4 shadow-lg shadow-black/15 backdrop-blur-sm sm:p-5">
+            <div className="mb-3 flex items-center gap-2 text-white">
               <Filter className="w-4 h-4" />
-              <p className="text-sm font-medium">Filtres de lecture qualifiee</p>
+              <p className="text-sm font-semibold">Filtres de lecture qualifiee</p>
             </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-3">
-              <label className="lg:col-span-2">
+            <div className="grid grid-cols-1 gap-3 md:grid-cols-2 lg:grid-cols-5">
+              <label className="lg:col-span-2" htmlFor="blog-search">
                 <span className="sr-only">Recherche</span>
-                <div className="flex items-center gap-2 rounded-xl border border-white/15 bg-[#070b1e]/70 px-3 py-2">
-                  <Search className="w-4 h-4 text-white/40" />
+                <div className="flex min-h-11 items-center gap-2 rounded-xl border border-slate-200 bg-white px-3 shadow-sm focus-within:ring-2 focus-within:ring-cyan-300 focus-within:ring-offset-2 focus-within:ring-offset-slate-900">
+                  <Search className="h-4 w-4 text-slate-500" />
                   <input
+                    id="blog-search"
                     value={searchQuery}
                     onChange={(event) => setSearchQuery(event.target.value)}
                     placeholder="Recherche par sujet..."
-                    className="w-full bg-transparent text-sm text-white placeholder:text-white/40 focus:outline-none"
+                    className="w-full bg-transparent text-sm text-slate-900 placeholder:text-slate-500 focus:outline-none"
                   />
                 </div>
               </label>
 
-              <label className="text-xs text-white/60">
+              <label className={FILTER_LABEL_CLASS}>
                 Theme
                 <select
                   value={themeFilter}
                   onChange={(event) => {
                     setThemeFilter(event.target.value);
                   }}
-                  className="mt-1 w-full rounded-xl border border-white/15 bg-[#070b1e]/70 px-3 py-2 text-sm text-white focus:outline-none focus:ring-2 focus:ring-cyan-400/60"
+                  className={FILTER_CONTROL_CLASS}
                 >
                   <option value="all">Tous</option>
                   {themes.map((theme) => (
@@ -183,7 +186,7 @@ export default function BlogList() {
                 </select>
               </label>
 
-              <label className="text-xs text-white/60">
+              <label className={FILTER_LABEL_CLASS}>
                 Persona
                 <select
                   value={personaFilter}
@@ -191,7 +194,7 @@ export default function BlogList() {
                     const value = event.target.value as 'all' | BlogPersonaTarget;
                     setPersonaFilter(value);
                   }}
-                  className="mt-1 w-full rounded-xl border border-white/15 bg-[#070b1e]/70 px-3 py-2 text-sm text-white focus:outline-none focus:ring-2 focus:ring-cyan-400/60"
+                  className={FILTER_CONTROL_CLASS}
                 >
                   <option value="all">Tous</option>
                   <option value="enterprise">Entreprise</option>
@@ -200,7 +203,7 @@ export default function BlogList() {
                 </select>
               </label>
 
-              <label className="text-xs text-white/60">
+              <label className={FILTER_LABEL_CLASS}>
                 Niveau de risque
                 <select
                   value={riskFilter}
@@ -208,7 +211,7 @@ export default function BlogList() {
                     const value = event.target.value as 'all' | BlogRiskLevel;
                     setRiskFilter(value);
                   }}
-                  className="mt-1 w-full rounded-xl border border-white/15 bg-[#070b1e]/70 px-3 py-2 text-sm text-white focus:outline-none focus:ring-2 focus:ring-cyan-400/60"
+                  className={FILTER_CONTROL_CLASS}
                 >
                   <option value="all">Tous</option>
                   <option value="low">Faible</option>
@@ -217,7 +220,7 @@ export default function BlogList() {
                 </select>
               </label>
 
-              <label className="text-xs text-white/60">
+              <label className={FILTER_LABEL_CLASS}>
                 Fraicheur
                 <select
                   value={dateFilter}
@@ -225,7 +228,7 @@ export default function BlogList() {
                     const value = event.target.value as DateFilter;
                     setDateFilter(value);
                   }}
-                  className="mt-1 w-full rounded-xl border border-white/15 bg-[#070b1e]/70 px-3 py-2 text-sm text-white focus:outline-none focus:ring-2 focus:ring-cyan-400/60"
+                  className={FILTER_CONTROL_CLASS}
                 >
                   <option value="all">Toutes dates</option>
                   <option value="30d">30 derniers jours</option>
@@ -241,14 +244,14 @@ export default function BlogList() {
           <div className="max-w-5xl mx-auto">
             {loading && (
               <div className="flex items-center justify-center py-20">
-                <Loader2 className="w-8 h-8 animate-spin text-white/50" />
+                <Loader2 className="h-8 w-8 animate-spin text-white/70" />
               </div>
             )}
 
             {!loading && filteredArticles.length === 0 && (
               <div className="text-center py-20">
-                <BookOpen className="w-16 h-16 text-white/20 mx-auto mb-4" />
-                <p className="text-white/60 text-lg">Aucun article correspondant a vos filtres.</p>
+                <BookOpen className="mx-auto mb-4 h-16 w-16 text-white/25" />
+                <p className="text-lg text-white/80">Aucun article correspondant a vos filtres.</p>
               </div>
             )}
 
@@ -264,56 +267,56 @@ export default function BlogList() {
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: index * 0.05 }}
-                    className="block group"
+                    className="block group rounded-2xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-300 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-900"
                   >
-                    <div className="p-6 rounded-2xl bg-white/5 border border-white/10 backdrop-blur-sm hover:bg-white/10 transition-all">
-                      <div className="flex gap-6">
+                    <div className="rounded-2xl border border-white/20 bg-slate-900/45 p-5 shadow-sm shadow-black/20 transition-all hover:border-cyan-300/40 hover:bg-slate-900/55 sm:p-6">
+                      <div className="flex flex-col gap-4 sm:flex-row sm:gap-5">
                         {article.featured_image_url && (
                           <img
                             src={article.featured_image_url}
                             alt={translation.title}
-                            className="w-48 h-32 rounded-xl object-cover flex-shrink-0 hidden sm:block"
+                            className="h-40 w-full rounded-xl object-cover sm:h-32 sm:w-52 sm:flex-shrink-0"
                             loading="lazy"
                           />
                         )}
                         <div className="flex-1 min-w-0">
-                          <div className="flex items-center gap-2 flex-wrap mb-2">
+                          <div className="mb-2 flex flex-wrap items-center gap-2">
                             {article.category && (
-                              <span className="text-xs text-cyan-300 font-medium uppercase tracking-wider">
+                              <span className="text-xs font-semibold uppercase tracking-wider text-cyan-300">
                                 {article.category}
                               </span>
                             )}
-                            <span className="text-[11px] text-white/55 inline-flex items-center gap-1 px-2 py-1 rounded-full bg-white/5 border border-white/10">
-                              <Building2 className="w-3 h-3" />
+                            <span className="inline-flex items-center gap-1 rounded-full border border-white/20 bg-white/10 px-2 py-1 text-[11px] text-slate-100">
+                              <Building2 className="h-3 w-3" />
                               {PERSONA_LABELS[article.persona_target]}
                             </span>
-                            <span className="text-[11px] text-white/55 inline-flex items-center gap-1 px-2 py-1 rounded-full bg-white/5 border border-white/10">
-                              <ShieldAlert className="w-3 h-3" />
+                            <span className="inline-flex items-center gap-1 rounded-full border border-white/20 bg-white/10 px-2 py-1 text-[11px] text-slate-100">
+                              <ShieldAlert className="h-3 w-3" />
                               {RISK_LABELS[article.risk_level]}
                             </span>
                           </div>
 
-                          <h2 className="text-xl font-semibold text-white mt-1 mb-2 group-hover:text-cyan-300 transition-colors">
+                          <h2 className="mb-2 mt-1 text-xl font-semibold text-white transition-colors group-hover:text-cyan-200">
                             {translation.title}
                           </h2>
 
                           {translation.excerpt && (
-                            <p className="text-white/60 text-sm line-clamp-2 mb-3">{translation.excerpt}</p>
+                            <p className="mb-3 line-clamp-2 text-sm text-slate-100/85">{translation.excerpt}</p>
                           )}
 
-                          <div className="flex items-center gap-4 text-xs text-white/40">
+                          <div className="flex flex-wrap items-center gap-4 text-xs text-slate-200/85">
                             {article.published_at && (
                               <span className="flex items-center gap-1">
-                                <Calendar className="w-3 h-3" />
+                                <Calendar className="h-3 w-3" />
                                 {new Date(article.published_at).toLocaleDateString(
                                   lang === 'fr' ? 'fr-FR' : 'en-GB',
                                   { day: 'numeric', month: 'long', year: 'numeric' }
                                 )}
                               </span>
                             )}
-                            <span className="flex items-center gap-1 text-cyan-400/70 group-hover:text-cyan-400 transition-colors">
+                            <span className="flex items-center gap-1 text-cyan-200 transition-colors group-hover:text-cyan-100">
                               Lire l'article
-                              <ArrowRight className="w-3 h-3" />
+                              <ArrowRight className="h-3 w-3" />
                             </span>
                           </div>
                         </div>
