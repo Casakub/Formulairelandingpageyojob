@@ -42,15 +42,20 @@ services:
       - traefik.http.routers.yojob.tls.certresolver=mytlschallenge
       - traefik.http.services.yojob.loadbalancer.server.port=80
       - traefik.docker.network=n8n-network
+
       # Redirection www → non-www
-      - traefik.http.middlewares.yojob-redirect-www.redirectregex.regex=^https://www\.yojob\.fr/(.*)
+      - traefik.http.middlewares.yojob-redirect-www.redirectregex.regex=^https://www\.yojob\.fr/?(.*)
       - traefik.http.middlewares.yojob-redirect-www.redirectregex.replacement=https://yojob.fr/$${1}
       - traefik.http.middlewares.yojob-redirect-www.redirectregex.permanent=true
+
       # Headers de sécurité HSTS
       - traefik.http.middlewares.yojob-headers.headers.stsSeconds=31536000
       - traefik.http.middlewares.yojob-headers.headers.stsIncludeSubdomains=true
       - traefik.http.middlewares.yojob-headers.headers.stsPreload=true
+
+      # IMPORTANT : appliquer les 2 middlewares
       - traefik.http.routers.yojob.middlewares=yojob-redirect-www,yojob-headers
+
       # Labels informatifs
       - app.name=yojob-landing
       - app.source=figma-make
