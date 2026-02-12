@@ -19,11 +19,9 @@ import {
   getArticles,
   deleteArticle,
 } from '../../../services/blogService';
-import { evaluateBlogQuality } from '@/lib/blogQuality';
 
 const STATUS_LABELS: Record<string, { label: string; color: string }> = {
   draft: { label: 'Brouillon', color: 'bg-yellow-100 text-yellow-800 border-yellow-200' },
-  in_review: { label: 'En review', color: 'bg-blue-100 text-blue-800 border-blue-200' },
   published: { label: 'Publié', color: 'bg-green-100 text-green-800 border-green-200' },
   archived: { label: 'Archivé', color: 'bg-slate-100 text-slate-600 border-slate-200' },
 };
@@ -96,9 +94,9 @@ export function BlogManager() {
   }
 
   return (
-    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-4">
+    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
       {/* Header */}
-      <div className="mb-2 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+      <div className="flex items-center justify-between mb-6">
         <div>
           <h2 className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-cyan-500 bg-clip-text text-transparent">
             Blog
@@ -107,37 +105,33 @@ export function BlogManager() {
             {articles.length} article{articles.length !== 1 ? 's' : ''}
           </p>
         </div>
-        <Button onClick={() => setEditingArticle('new')} className="min-h-11 w-full sm:w-auto">
+        <Button onClick={() => setEditingArticle('new')}>
           <Plus className="w-4 h-4 mr-2" />
           Nouvel article
         </Button>
       </div>
 
       {/* Search */}
-      <div className="relative">
-        <label htmlFor="blog-manager-search" className="sr-only">
-          Rechercher un article
-        </label>
+      <div className="relative mb-4">
         <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
         <input
-          id="blog-manager-search"
           type="text"
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
           placeholder="Rechercher un article..."
-          className="h-11 w-full rounded-xl border border-slate-200 bg-white pl-10 pr-4 text-sm text-slate-800 shadow-sm focus-visible:ring-2 focus-visible:ring-blue-500/40 focus-visible:border-blue-500"
+          className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-slate-200 bg-white text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent"
         />
       </div>
 
       {/* Error */}
       {error && (
-        <div className="flex flex-col gap-3 rounded-xl border border-red-200 bg-red-50 p-4 sm:flex-row sm:items-center">
+        <div className="mb-4 p-4 rounded-xl bg-red-50 border border-red-200 flex items-center gap-3">
           <AlertCircle className="w-5 h-5 text-red-500 flex-shrink-0" />
           <div>
             <p className="text-red-800 font-medium text-sm">Erreur de chargement</p>
             <p className="text-red-600 text-xs mt-0.5">{error}</p>
           </div>
-          <Button variant="outline" size="sm" className="sm:ml-auto" onClick={fetchArticles}>
+          <Button variant="outline" size="sm" className="ml-auto" onClick={fetchArticles}>
             Réessayer
           </Button>
         </div>
@@ -171,14 +165,6 @@ export function BlogManager() {
               const frTrans = article.translations?.find((t) => t.language_code === 'fr');
               const langCount = article.translations?.filter((t) => t.title)?.length || 0;
               const statusInfo = STATUS_LABELS[article.status] || STATUS_LABELS.draft;
-              const quality = evaluateBlogQuality(
-                {
-                  slug: article.slug,
-                  sources: article.sources,
-                  last_updated_at: article.last_updated_at,
-                },
-                frTrans || {}
-              );
 
               return (
                 <motion.div
@@ -187,64 +173,56 @@ export function BlogManager() {
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: -10 }}
-                  className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm transition-shadow hover:shadow-md sm:p-5"
+                  className="p-4 rounded-xl border border-slate-200 bg-white hover:shadow-md transition-shadow"
                 >
-                  <div className="flex flex-col gap-4 sm:flex-row sm:items-start">
+                  <div
+                    className="items-start gap-4"
+                    style={{
+                      display: 'grid',
+                      gridTemplateColumns: '80px minmax(0, 1fr) auto',
+                      columnGap: '1rem',
+                    }}
+                  >
                     {/* Image thumbnail */}
                     {article.featured_image_url ? (
                       <img
                         src={article.featured_image_url}
                         alt=""
-                        className="h-36 w-full rounded-lg object-cover sm:h-14 sm:w-20 sm:flex-shrink-0"
+                        className="rounded-lg object-cover"
+                        style={{ width: 80, height: 56 }}
                       />
                     ) : (
-                      <div className="flex h-36 w-full items-center justify-center rounded-lg bg-gradient-to-br from-blue-100 to-cyan-100 sm:h-14 sm:w-20 sm:flex-shrink-0">
+                      <div
+                        className="rounded-lg bg-gradient-to-br from-blue-100 to-cyan-100 flex items-center justify-center"
+                        style={{ width: 80, height: 56 }}
+                      >
                         <FileText className="w-6 h-6 text-blue-400" />
                       </div>
                     )}
 
                     {/* Content */}
-                    <div className="flex-1 min-w-0">
-                      <div className="mb-1 flex flex-wrap items-center gap-2">
-                        <h3 className="font-semibold text-slate-900">
+                    <div className="min-w-0">
+                      <div className="flex items-center gap-2 mb-1">
+                        <h3 className="font-medium text-slate-900 truncate leading-snug">
                           {frTrans?.title || article.slug}
                         </h3>
                         <Badge className={`text-xs border ${statusInfo.color}`}>
                           {statusInfo.label}
                         </Badge>
                       </div>
-                      <p className="mb-2 text-sm text-slate-500">
+                      <p className="text-sm text-slate-500 truncate mb-2">
                         {frTrans?.excerpt || '/blog/' + article.slug}
                       </p>
-                      <div className="flex flex-wrap items-center gap-2 text-xs text-slate-500">
+                      <div className="flex flex-wrap items-center gap-2 text-xs text-slate-400">
                         <span className="flex items-center gap-1">
                           <Globe className="w-3 h-3" />
                           {langCount}/23 langues
                         </span>
                         {article.category && (
-                          <span className="rounded-full bg-slate-100 px-2 py-0.5 text-slate-700">
+                          <span className="px-2 py-0.5 rounded bg-slate-100 text-slate-600">
                             {article.category}
                           </span>
                         )}
-                        <span className="rounded-full bg-slate-100 px-2 py-0.5 text-slate-700">
-                          {article.persona_target === 'enterprise'
-                            ? 'Entreprise'
-                            : article.persona_target === 'agency'
-                              ? 'Agence'
-                              : 'Entreprise+Agence'}
-                        </span>
-                        <span className="rounded-full bg-slate-100 px-2 py-0.5 text-slate-700">
-                          Risque {article.risk_level}
-                        </span>
-                        <span className={`rounded-full px-2 py-0.5 ${
-                          quality.score >= 80
-                            ? 'bg-green-100 text-green-700'
-                            : quality.score >= 60
-                              ? 'bg-yellow-100 text-yellow-700'
-                              : 'bg-red-100 text-red-700'
-                        }`}>
-                          Qualité {quality.score}
-                        </span>
                         <span>
                           {new Date(article.updated_at).toLocaleDateString('fr-FR')}
                         </span>
@@ -252,14 +230,13 @@ export function BlogManager() {
                     </div>
 
                     {/* Actions */}
-                    <div className="flex items-center gap-1 self-end sm:self-start">
+                    <div className="flex items-center gap-1 self-start">
                       {article.status === 'published' && (
                         <Button
                           variant="ghost"
                           size="sm"
-                          className="h-11 w-11 p-0 sm:h-9 sm:w-9"
+                          className="h-8 w-8 p-0"
                           onClick={() => window.open(`/blog/${article.slug}`, '_blank')}
-                          aria-label="Voir l'article publié"
                           title="Voir"
                         >
                           <Eye className="w-4 h-4 text-slate-500" />
@@ -268,9 +245,8 @@ export function BlogManager() {
                       <Button
                         variant="ghost"
                         size="sm"
-                        className="h-11 w-11 p-0 sm:h-9 sm:w-9"
+                        className="h-8 w-8 p-0"
                         onClick={() => setEditingArticle(article)}
-                        aria-label="Modifier cet article"
                         title="Modifier"
                       >
                         <Pencil className="w-4 h-4 text-slate-500" />
@@ -278,10 +254,9 @@ export function BlogManager() {
                       <Button
                         variant="ghost"
                         size="sm"
-                        className="h-11 w-11 p-0 sm:h-9 sm:w-9"
+                        className="h-8 w-8 p-0"
                         onClick={() => handleDelete(article.id)}
                         disabled={deletingId === article.id}
-                        aria-label="Supprimer cet article"
                         title="Supprimer"
                       >
                         {deletingId === article.id ? (
