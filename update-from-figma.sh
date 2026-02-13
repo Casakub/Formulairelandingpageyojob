@@ -297,17 +297,55 @@ fi
 # Injecte puppeteer si absent (Figma Make ne l'inclut pas, prerender en a besoin)
 if ! grep -q '"puppeteer"' package.json; then
   echo "puppeteer absent de package.json, injection automatique..."
-  # Insère puppeteer dans les dependencies via sed (après la première ligne "dependencies")
   sed -i '/"dependencies":\s*{/a\        "puppeteer": "^24.0.0",' package.json
   echo "   puppeteer injecté dans package.json."
 fi
 
-# Régénère package-lock.json si puppeteer n'y figure pas
-if ! grep -q '"node_modules/puppeteer"' package-lock.json; then
-  echo "package-lock.json ne contient pas puppeteer, exécution de npm install..."
+# ── Tailwind CSS v4 : Figma Make pré-compile le CSS mais le VPS a besoin ─────
+# du pipeline complet pour générer les classes dynamiques (blog, nouveaux composants)
+NEED_NPM_INSTALL=false
+
+# 1. Injecte tailwindcss + @tailwindcss/vite dans devDependencies
+if ! grep -q '"tailwindcss"' package.json; then
+  echo "tailwindcss absent de package.json, injection automatique..."
+  if grep -q '"devDependencies"' package.json; then
+    sed -i '/"devDependencies":\s*{/a\        "tailwindcss": "^4.1.3",\n        "@tailwindcss/vite": "^4.1.3",' package.json
+  else
+    # Ajoute devDependencies si absent
+    sed -i '/"dependencies":\s*{/i\    "devDependencies": {\n        "tailwindcss": "^4.1.3",\n        "@tailwindcss/vite": "^4.1.3"\n    },' package.json
+  fi
+  NEED_NPM_INSTALL=true
+  echo "   tailwindcss + @tailwindcss/vite injectés."
+fi
+
+# 2. Patch vite.config.ts : ajoute le plugin tailwindcss s'il manque
+if [[ -f src/vite.config.ts ]] && ! grep -q '@tailwindcss/vite' src/vite.config.ts; then
+  echo "Patch vite.config.ts : ajout du plugin @tailwindcss/vite..."
+  # Ajoute l'import en tête de fichier
+  sed -i "1i import tailwindcss from '@tailwindcss/vite';" src/vite.config.ts
+  # Ajoute tailwindcss() avant react() dans le tableau plugins
+  sed -i 's/plugins:\s*\[react()/plugins: [tailwindcss(), react()/' src/vite.config.ts
+  echo "   vite.config.ts patché."
+fi
+# Même patch pour vite.config.ts à la racine si présent
+if [[ -f vite.config.ts ]] && ! grep -q '@tailwindcss/vite' vite.config.ts; then
+  sed -i "1i import tailwindcss from '@tailwindcss/vite';" vite.config.ts
+  sed -i 's/plugins:\s*\[react()/plugins: [tailwindcss(), react()/' vite.config.ts
+fi
+
+# 3. Remplace index.css pré-compilé par l'import Tailwind v4
+if [[ -f src/index.css ]] && head -1 src/index.css | grep -q 'tailwindcss'; then
+  echo "Remplacement index.css pré-compilé par @import tailwindcss..."
+  echo '@import "tailwindcss";' > src/index.css
+  echo "   index.css remplacé (Tailwind v4 générera les classes au build)."
+fi
+
+# Régénère package-lock.json si puppeteer ou tailwindcss manquent
+if ! grep -q '"node_modules/puppeteer"' package-lock.json || [[ "$NEED_NPM_INSTALL" == "true" ]]; then
+  echo "package-lock.json incomplet, exécution de npm install..."
   npm config set registry https://registry.npmjs.org/
   npm install --legacy-peer-deps
-  echo "   package-lock.json mis à jour avec puppeteer."
+  echo "   package-lock.json mis à jour."
 fi
 
 echo ""
