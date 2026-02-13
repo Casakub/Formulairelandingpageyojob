@@ -45,7 +45,7 @@ on_error() {
 trap on_error ERR
 
 # ── Config ───────────────────────────────────────────────────────────────────
-GUARD_BRANCH="claude/verify-root-files-placement-B4mK1"
+GUARD_BRANCH="claude/verify-root-files-placement-P5Fjk"
 BRANCH_REF="origin/${GUARD_BRANCH}"
 LAST_COMMIT_FILE=".last-deploy-commit"
 
@@ -294,19 +294,20 @@ if [[ ! -f package-lock.json ]]; then
   exit 1
 fi
 
-# Vérifie que puppeteer est bien déclaré (sinon prerender plantera)
+# Injecte puppeteer si absent (Figma Make ne l'inclut pas, prerender en a besoin)
 if ! grep -q '"puppeteer"' package.json; then
-  echo "[ERR] puppeteer absent de package.json."
-  echo "      Ajoute puppeteer dans dependencies, commit/push, puis relance."
-  exit 1
+  echo "puppeteer absent de package.json, injection automatique..."
+  # Insère puppeteer dans les dependencies via sed (après la première ligne "dependencies")
+  sed -i '/"dependencies":\s*{/a\        "puppeteer": "^24.0.0",' package.json
+  echo "   puppeteer injecté dans package.json."
 fi
 
-# Vérifie que npm voit puppeteer dans le lockfile (cohérence package-lock)
+# Régénère package-lock.json si puppeteer n'y figure pas
 if ! grep -q '"node_modules/puppeteer"' package-lock.json; then
-  echo "[ERR] package-lock.json ne contient pas puppeteer."
-  echo "      Exécute: npm install --legacy-peer-deps"
-  echo "      puis commit/push package-lock.json et relance."
-  exit 1
+  echo "package-lock.json ne contient pas puppeteer, exécution de npm install..."
+  npm config set registry https://registry.npmjs.org/
+  npm install --legacy-peer-deps
+  echo "   package-lock.json mis à jour avec puppeteer."
 fi
 
 echo ""
