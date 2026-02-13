@@ -499,9 +499,9 @@ export function TipTapEditor({ content, onChange, placeholder, onImageUpload }: 
   };
 
   return (
-    <div className={`border rounded-xl overflow-hidden bg-white shadow-sm transition-all ${dragOverEditor ? 'border-blue-400 ring-2 ring-blue-100' : 'border-slate-200'}`}>
-      {/* Main Toolbar */}
-      <div className="flex flex-wrap items-center gap-0.5 px-3 py-2 border-b border-slate-100 bg-slate-50/80">
+    <div className={`border rounded-xl bg-white shadow-sm transition-all ${dragOverEditor ? 'border-blue-400 ring-2 ring-blue-100' : 'border-slate-200'}`}>
+      {/* Main Toolbar - sticky so it follows on scroll */}
+      <div className="flex flex-wrap items-center gap-0.5 px-3 py-2 border-b border-slate-100 bg-slate-50/80 sticky top-0 z-30 rounded-t-xl">
         {/* Block inserter button */}
         <div className="relative">
           <ToolbarButton
