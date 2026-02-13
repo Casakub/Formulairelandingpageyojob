@@ -261,48 +261,84 @@ export async function deleteBlogImage(url: string): Promise<void> {
 }
 
 // =============================================================================
-// SITEMAP GENERATION
+// SITEMAP GENERATION (dynamique selon les traductions effectives)
 // =============================================================================
 
-const HREFLANG_CODES = [
-  'fr','en','de','es','it','nl','pt','pl','cs','sk','hu','ro','bg',
-  'hr','sl','et','lv','lt','el','sv','da','fi','no'
-];
-
-function generateHreflangLinks(path: string, baseUrl: string): string {
-  return HREFLANG_CODES.map((lang) => {
-    const href = lang === 'fr' ? `${baseUrl}${path}` : `${baseUrl}/${lang}${path}`;
+/**
+ * Genere les liens hreflang uniquement pour les langues disponibles
+ */
+function generateDynamicHreflangLinks(
+  urlPath: string,
+  availableLangs: string[],
+  baseUrl: string
+): string {
+  const links = availableLangs.map((lang) => {
+    const href = lang === 'fr' ? `${baseUrl}${urlPath}` : `${baseUrl}/${lang}${urlPath}`;
     return `    <xhtml:link rel="alternate" hreflang="${lang}" href="${href}" />`;
-  }).join('\n') + `\n    <xhtml:link rel="alternate" hreflang="x-default" href="${baseUrl}${path}" />`;
+  });
+
+  // x-default pointe vers la version FR (ou premiere langue dispo)
+  const defaultLang = availableLangs.includes('fr') ? 'fr' : availableLangs[0];
+  const defaultHref =
+    defaultLang === 'fr'
+      ? `${baseUrl}${urlPath}`
+      : `${baseUrl}/${defaultLang}${urlPath}`;
+  links.push(
+    `    <xhtml:link rel="alternate" hreflang="x-default" href="${defaultHref}" />`
+  );
+
+  return links.join('\n');
 }
 
 export async function generateBlogSitemap(baseUrl = 'https://yojob.fr'): Promise<string> {
+  // Fetch tous les articles avec TOUTES les traductions (pas de filtre langue)
   const articles = await getPublishedArticles();
   const now = new Date().toISOString().split('T')[0];
 
-  const urls = articles.map((article) => {
-    const path = `/blog/${article.slug}`;
-    return `  <url>
-    <loc>${baseUrl}${path}</loc>
-    <lastmod>${article.updated_at ? article.updated_at.split('T')[0] : now}</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.7</priority>
-${generateHreflangLinks(path, baseUrl)}
-  </url>`;
-  }).join('\n');
+  // Collecte toutes les langues ayant au moins un article
+  const allBlogLangs = new Set<string>();
+  for (const article of articles) {
+    for (const t of article.translations) {
+      allBlogLangs.add(t.language_code);
+    }
+  }
+  const blogIndexLangs = Array.from(allBlogLangs).sort();
 
+  // Blog index : hreflang pour toutes les langues qui ont du contenu
   const blogIndexUrl = `  <url>
     <loc>${baseUrl}/blog</loc>
     <lastmod>${now}</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.8</priority>
-${generateHreflangLinks('/blog', baseUrl)}
+${generateDynamicHreflangLinks('/blog', blogIndexLangs.length > 0 ? blogIndexLangs : ['fr'], baseUrl)}
   </url>`;
+
+  // Articles : hreflang seulement pour les langues avec traduction effective
+  const urls = articles
+    .map((article) => {
+      const articleLangs = article.translations
+        .map((t) => t.language_code)
+        .sort();
+
+      if (articleLangs.length === 0) return '';
+
+      const path = `/blog/${article.slug}`;
+      return `  <url>
+    <loc>${baseUrl}${path}</loc>
+    <lastmod>${article.updated_at ? article.updated_at.split('T')[0] : now}</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+${generateDynamicHreflangLinks(path, articleLangs, baseUrl)}
+  </url>`;
+    })
+    .filter(Boolean)
+    .join('\n');
 
   return `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
         xmlns:xhtml="http://www.w3.org/1999/xhtml">
   <!-- Blog sitemap - Auto-generated on ${now} -->
+  <!-- Langues incluses dynamiquement selon les traductions effectives -->
 ${blogIndexUrl}
 ${urls}
 </urlset>`;

@@ -19,6 +19,7 @@ import {
 import { SEOHead } from './components/SEOHead';
 import { LogoSvg } from './imports/YojobLogoComplete';
 import { Footer } from './components/landing/Footer';
+import { LanguageSelector } from './components/shared/LanguageSelector';
 import { useLanguageManager } from './hooks/useLanguageManager';
 import {
   BlogArticleWithTranslations,
@@ -206,7 +207,7 @@ function getPersonaFromArticle(article: BlogArticleWithTranslations | null): Blo
 }
 
 export default function BlogPost({ slug }: BlogPostProps) {
-  const { currentLanguage: lang } = useLanguageManager();
+  const { currentLanguage: lang, setLanguage } = useLanguageManager();
   const [article, setArticle] = useState<BlogArticleWithTranslations | null>(null);
   const [loading, setLoading] = useState(true);
   const [notFound, setNotFound] = useState(false);
@@ -215,21 +216,36 @@ export default function BlogPost({ slug }: BlogPostProps) {
 
   const langPrefix = lang === 'fr' ? '' : `/${lang}`;
 
+  // Fetch article avec TOUTES les traductions (pas de filtre langue)
+  // pour pouvoir determiner les langues disponibles
   useEffect(() => {
     setLoading(true);
     setNotFound(false);
-    getPublishedArticleBySlug(slug, lang)
+    getPublishedArticleBySlug(slug)
       .then((data) => {
         if (!data) setNotFound(true);
         else setArticle(data);
       })
       .catch(() => setNotFound(true))
       .finally(() => setLoading(false));
-  }, [slug, lang]);
+  }, [slug]);
+
+  // Langues disponibles pour cet article (basees sur les traductions effectives)
+  const availableLanguages = useMemo(() => {
+    if (!article) return ['fr'];
+    const langs = article.translations.map((t) => t.language_code);
+    // Toujours inclure 'fr' en premier si present
+    const sorted = langs.sort((a, b) => {
+      if (a === 'fr') return -1;
+      if (b === 'fr') return 1;
+      return a.localeCompare(b);
+    });
+    return sorted.length > 0 ? sorted : ['fr'];
+  }, [article]);
 
   useEffect(() => {
     if (!article) return;
-    getPublishedArticles(lang)
+    getPublishedArticles()
       .then((allArticles) => {
         const candidates = allArticles.filter((item) => item.id !== article.id);
         const ranked = candidates
@@ -437,6 +453,14 @@ export default function BlogPost({ slug }: BlogPostProps) {
                   <span className="text-base font-bold text-white">YOJOB</span>
                 </a>
                 <div className="flex items-center gap-2">
+                  {/* Selecteur de langue dynamique (visible uniquement si > 1 langue) */}
+                  {availableLanguages.length > 1 && (
+                    <LanguageSelector
+                      currentLanguage={lang}
+                      onLanguageChange={setLanguage}
+                      availableLanguages={availableLanguages}
+                    />
+                  )}
                   {translation && (
                     <button
                       onClick={handleShare}

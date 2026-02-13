@@ -13,6 +13,7 @@ import {
 import { SEOHead } from './components/SEOHead';
 import { LogoSvg } from './imports/YojobLogoComplete';
 import { Footer } from './components/landing/Footer';
+import { LanguageSelector } from './components/shared/LanguageSelector';
 import { useLanguageManager } from './hooks/useLanguageManager';
 import {
   BlogArticleWithTranslations,
@@ -29,19 +30,21 @@ function estimateReadingTime(html: string): number {
 }
 
 export default function BlogList() {
-  const { currentLanguage: lang } = useLanguageManager();
+  const { currentLanguage: lang, setLanguage } = useLanguageManager();
   const [articles, setArticles] = useState<BlogArticleWithTranslations[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string>('');
   const [visibleCount, setVisibleCount] = useState(ARTICLES_PER_PAGE);
 
+  // Fetch TOUTES les traductions (sans filtre langue)
+  // pour determiner les langues disponibles pour le selecteur
   useEffect(() => {
-    getPublishedArticles(lang)
+    getPublishedArticles()
       .then(setArticles)
       .catch((err) => console.error('Error loading blog articles:', err))
       .finally(() => setLoading(false));
-  }, [lang]);
+  }, []);
 
   const getTranslation = (
     article: BlogArticleWithTranslations,
@@ -51,6 +54,20 @@ export default function BlogList() {
       article.translations.find((t) => t.language_code === 'fr')
     );
   };
+
+  // Langues disponibles dans le blog (toutes langues ayant au moins un article)
+  const availableLanguages = useMemo(() => {
+    const langs = new Set<string>();
+    articles.forEach((a) => {
+      a.translations.forEach((t) => langs.add(t.language_code));
+    });
+    const sorted = Array.from(langs).sort((a, b) => {
+      if (a === 'fr') return -1;
+      if (b === 'fr') return 1;
+      return a.localeCompare(b);
+    });
+    return sorted.length > 0 ? sorted : ['fr'];
+  }, [articles]);
 
   const categories = useMemo(() => {
     const cats = new Set<string>();
@@ -124,6 +141,14 @@ export default function BlogList() {
               </a>
 
               <nav className="flex items-center gap-2" aria-label="Navigation blog">
+                {/* Selecteur de langue dynamique (visible si > 1 langue) */}
+                {availableLanguages.length > 1 && (
+                  <LanguageSelector
+                    currentLanguage={lang}
+                    onLanguageChange={setLanguage}
+                    availableLanguages={availableLanguages}
+                  />
+                )}
                 <a
                   href={`${langPrefix}/blog`}
                   className="rounded-lg px-3 py-1.5 text-sm font-medium text-white/90 transition-colors hover:bg-white/10 focus-visible:ring-2 focus-visible:ring-cyan-400 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0a0e27]"
