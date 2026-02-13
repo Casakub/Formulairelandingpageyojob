@@ -1,17 +1,20 @@
+# ============================================================
+# FICHIER: /docker/yojob/public/robots.txt
+# ============================================================
+
 # robots.txt pour YOJOB - Courtage en recrutement europeen
 # https://yojob.fr
 
-# Regles pour tous les robots
 User-agent: *
 Allow: /
 
-# Bloquer les pages de dashboard et d'administration
+# Pages privees / back-office
 Disallow: /dashboard
 Disallow: /dashboard-*
 Disallow: /admin
 Disallow: /api/
 
-# Bloquer les pages de confirmation et de traitement
+# Pages de traitement
 Disallow: /confirmation-devis
 Disallow: /recap-devis
 Disallow: /signer/
@@ -25,32 +28,25 @@ Disallow: /*/confirmation-devis
 Disallow: /*/recap-devis
 Disallow: /*/signer/
 
-# Bloquer les fichiers techniques et de test
+# Anti crawl-loop / taxonomies parasites
+Disallow: /category/
+Disallow: /*/category/
+Disallow: /*?*utm_
+Disallow: /*?*fbclid=
+Disallow: /*?*gclid=
+
+# Fichiers techniques/sensibles
 Disallow: /*.sql$
 Disallow: /*.md$
 Disallow: /test-*.html$
 Disallow: /.git/
 Disallow: /node_modules/
-
-# Bloquer les fichiers sensibles
 Disallow: /supabase/
 Disallow: /.env
 Disallow: /package.json
 Disallow: /tsconfig.json
 
-# Autoriser specifiquement les ressources importantes pour le SEO
-Allow: /
-Allow: /a-propos
-Allow: /notre-reseau
-Allow: /nos-secteurs
-Allow: /temoignages
-Allow: /services/
-Allow: /devis
-Allow: /privacy
-Allow: /legal
-Allow: /cgv
-
-# Autoriser les ressources statiques
+# Ressources statiques
 Allow: /assets/
 Allow: /images/
 Allow: /styles/
@@ -63,7 +59,7 @@ Allow: /*.gif$
 Allow: /*.svg$
 Allow: /*.webp$
 
-# Regles specifiques pour les principaux moteurs de recherche
+# Moteurs principaux
 User-agent: Googlebot
 Allow: /
 Disallow: /dashboard
@@ -83,7 +79,7 @@ Allow: /
 Disallow: /dashboard
 Disallow: /api/
 
-# Bloquer les scrapers et bots indesirables
+# Bots SEO agressifs (tu peux adapter selon ta strategie)
 User-agent: AhrefsBot
 Crawl-delay: 10
 
@@ -96,5 +92,4 @@ Disallow: /
 User-agent: DotBot
 Disallow: /
 
-# Sitemap
 Sitemap: https://yojob.fr/sitemap.xml

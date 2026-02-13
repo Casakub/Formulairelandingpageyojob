@@ -604,6 +604,31 @@ export default function BlogPost({ slug }: BlogPostProps) {
           <section className="relative z-10 px-4 pb-32 pt-14 sm:px-6 sm:pb-40 lg:px-8">
             <div className="mx-auto max-w-4xl">
               <article className="w-full">
+                {/* Mobile TOC */}
+                {headings.length > 0 && (
+                  <div className="-mt-6 mb-8 rounded-xl border border-white/10 bg-white/5 p-4 backdrop-blur-sm">
+                    <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-white/60">Sommaire</p>
+                    <select
+                      defaultValue=""
+                      aria-label="Aller à une section de l'article"
+                      onChange={(event) => {
+                        const selectedId = event.target.value;
+                        const selected = headings.find((heading) => heading.id === selectedId);
+                        if (selected) handleTocClick(selected);
+                      }}
+                      className="min-h-11 w-full rounded-lg border border-white/20 bg-white/10 px-3 py-2 text-sm text-white focus-visible:ring-2 focus-visible:ring-cyan-400 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0a0e27]"
+                    >
+                      <option value="">Aller à une section...</option>
+                      {headings.map((heading) => (
+                        <option key={heading.id} value={heading.id}>
+                          {heading.level === 3 ? '  ↳ ' : ''}
+                          {heading.title}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                )}
+
                 {/* Key points + Checklist */}
                 {((translation.key_points && translation.key_points.length > 0) ||
                   (translation.checklist_items && translation.checklist_items.length > 0)) && (
@@ -641,31 +666,6 @@ export default function BlogPost({ slug }: BlogPostProps) {
                         </ul>
                       </div>
                     )}
-                  </div>
-                )}
-
-                {/* Mobile TOC */}
-                {headings.length > 0 && (
-                  <div className="mb-8 rounded-xl border border-white/10 bg-white/5 p-4 backdrop-blur-sm">
-                    <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-white/60">Sommaire</p>
-                    <select
-                      defaultValue=""
-                      aria-label="Aller à une section de l'article"
-                      onChange={(event) => {
-                        const selectedId = event.target.value;
-                        const selected = headings.find((heading) => heading.id === selectedId);
-                        if (selected) handleTocClick(selected);
-                      }}
-                      className="min-h-11 w-full rounded-lg border border-white/20 bg-white/10 px-3 py-2 text-sm text-white focus-visible:ring-2 focus-visible:ring-cyan-400 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0a0e27]"
-                    >
-                      <option value="">Aller à une section...</option>
-                      {headings.map((heading) => (
-                        <option key={heading.id} value={heading.id}>
-                          {heading.level === 3 ? '  ↳ ' : ''}
-                          {heading.title}
-                        </option>
-                      ))}
-                    </select>
                   </div>
                 )}
 
