@@ -62,6 +62,7 @@ INFRA_FILES=(
   "src/scripts/prerender.cjs"
   "src/scripts/seo-ci-check.sh"
   "src/scripts/seo-validate.sh"
+  "package-lock.json"
 )
 
 is_true() {
