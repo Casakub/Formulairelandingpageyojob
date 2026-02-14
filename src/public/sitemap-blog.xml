@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+        xmlns:xhtml="http://www.w3.org/1999/xhtml">
+  <!-- Blog sitemap - Auto-generated on 2026-02-14 -->
+  <!-- Langues incluses dynamiquement selon les traductions effectives -->
+  <url>
+    <loc>https://yojob.fr/blog</loc>
+    <lastmod>2026-02-14</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://yojob.fr/blog" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://yojob.fr/blog" />
+  </url>
+  <url>
+    <loc>https://yojob.fr/blog/e-declaration-ue-detachement-preparation</loc>
+    <lastmod>2026-02-13</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://yojob.fr/blog/e-declaration-ue-detachement-preparation" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://yojob.fr/blog/e-declaration-ue-detachement-preparation" />
+  </url>
+  <url>
+    <loc>https://yojob.fr/blog/a1-securite-sociale-et-detachement-ue-guide</loc>
+    <lastmod>2026-02-13</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://yojob.fr/blog/a1-securite-sociale-et-detachement-ue-guide" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://yojob.fr/blog/a1-securite-sociale-et-detachement-ue-guide" />
+  </url>
+  <url>
+    <loc>https://yojob.fr/blog/detachement-salaries-france-checklist-conformite</loc>
+    <lastmod>2026-02-13</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://yojob.fr/blog/detachement-salaries-france-checklist-conformite" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://yojob.fr/blog/detachement-salaries-france-checklist-conformite" />
+  </url>
+</urlset>
