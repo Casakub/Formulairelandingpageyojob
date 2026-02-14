@@ -45,6 +45,7 @@ export const hrLandingPage: LandingPageContent = {
       home: "Početna",
       services: "Usluge",
       network: "Mreža",
+      blog: "Blog",
       contact: "Kontakt"
     },
     cta: "Zatražite ponudu",

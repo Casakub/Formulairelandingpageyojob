@@ -215,6 +215,7 @@ export interface LandingPageContent {
       home: string;
       services: string;
       network: string;
+      blog?: string;
       contact: string;
     };
     cta: string;

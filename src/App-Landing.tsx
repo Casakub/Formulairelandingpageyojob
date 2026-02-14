@@ -475,6 +475,9 @@ export default function AppLanding() {
               <a href="#network" className={`transition-colors ${isScrolled ? 'text-gray-700 hover:text-blue-600' : 'text-white hover:text-blue-200'}`}>
                 {content.header?.nav.network || 'Notre réseau'}
               </a>
+              <a href="/blog" className={`transition-colors ${isScrolled ? 'text-gray-700 hover:text-blue-600' : 'text-white hover:text-blue-200'}`}>
+                {content.header?.nav.blog || 'Blog'}
+              </a>
               <a href="#contact" className={`transition-colors ${isScrolled ? 'text-gray-700 hover:text-blue-600' : 'text-white hover:text-blue-200'}`}>
                 {content.header?.nav.contact || 'Contact'}
               </a>
@@ -554,6 +557,13 @@ export default function AppLanding() {
                   onClick={() => setIsMenuOpen(false)}
                 >
                   {content.header?.nav.network || 'Notre réseau'}
+                </a>
+                <a
+                  href="/blog"
+                  className="text-white hover:text-cyan-300 transition-all py-3 px-4 rounded-xl hover:bg-white/10 backdrop-blur-sm border border-transparent hover:border-white/20"
+                  onClick={() => setIsMenuOpen(false)}
+                >
+                  {content.header?.nav.blog || 'Blog'}
                 </a>
                 <a
                   href="/nos-secteurs"

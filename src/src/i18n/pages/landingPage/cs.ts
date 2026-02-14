@@ -45,6 +45,7 @@ export const csLandingPage: LandingPageContent = {
       home: "Domů",
       services: "Služby",
       network: "Síť",
+      blog: "Blog",
       contact: "Kontakt"
     },
     cta: "Požádat o nabídku",

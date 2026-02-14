@@ -45,6 +45,7 @@ export const bgLandingPage: LandingPageContent = {
       home: "Начало",
       services: "Услуги",
       network: "Мрежа",
+      blog: "Блог",
       contact: "Контакт"
     },
     cta: "Поискайте оферта",

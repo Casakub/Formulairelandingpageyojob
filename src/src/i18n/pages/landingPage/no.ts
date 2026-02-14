@@ -45,6 +45,7 @@ export const noLandingPage: LandingPageContent = {
       home: "Hjem",
       services: "Tjenester",
       network: "Nettverk",
+      blog: "Blog",
       contact: "Kontakt"
     },
     cta: "Be om tilbud",

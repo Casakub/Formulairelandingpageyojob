@@ -45,6 +45,7 @@ export const ltLandingPage: LandingPageContent = {
       home: "Pradžia",
       services: "Paslaugos",
       network: "Tinklas",
+      blog: "Blog",
       contact: "Kontaktai"
     },
     cta: "Prašyti pasiūlymo",

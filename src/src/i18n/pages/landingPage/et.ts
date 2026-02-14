@@ -45,6 +45,7 @@ export const etLandingPage: LandingPageContent = {
       home: "Avaleht",
       services: "Teenused",
       network: "Võrgustik",
+      blog: "Blog",
       contact: "Kontakt"
     },
     cta: "Küsi pakkumist",

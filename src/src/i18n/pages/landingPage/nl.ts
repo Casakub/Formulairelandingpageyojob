@@ -45,6 +45,7 @@ export const nlLandingPage: LandingPageContent = {
       home: "Home",
       services: "Diensten",
       network: "Netwerk",
+      blog: "Blog",
       contact: "Contact"
     },
     cta: "Offerte aanvragen",
