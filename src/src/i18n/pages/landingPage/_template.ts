@@ -52,6 +52,7 @@ export const [LANGUAGE_CODE]LandingPage: LandingPageContent = {
       home: "[Traduire] Accueil",
       services: "[Traduire] Services",
       network: "[Traduire] Réseau",
+      blog: "[Traduire] Blog",
       contact: "[Traduire] Contact"
     },
     cta: "[Traduire] Demander un devis",

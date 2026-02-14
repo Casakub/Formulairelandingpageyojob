@@ -45,6 +45,7 @@ export const deLandingPage: LandingPageContent = {
       home: "Startseite",
       services: "Dienstleistungen",
       network: "Netzwerk",
+      blog: "Blog",
       contact: "Kontakt"
     },
     cta: "Angebot anfordern",

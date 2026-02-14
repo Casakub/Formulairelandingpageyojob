@@ -45,6 +45,7 @@ export const daLandingPage: LandingPageContent = {
       home: "Hjem",
       services: "Tjenester",
       network: "Netværk",
+      blog: "Blog",
       contact: "Kontakt"
     },
     cta: "Anmod om tilbud",

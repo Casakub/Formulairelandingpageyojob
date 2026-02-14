@@ -45,6 +45,7 @@ export const skLandingPage: LandingPageContent = {
       home: "Domov",
       services: "Služby",
       network: "Sieť",
+      blog: "Blog",
       contact: "Kontakt"
     },
     cta: "Požiadať o ponuku",

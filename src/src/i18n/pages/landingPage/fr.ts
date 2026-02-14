@@ -45,6 +45,7 @@ export const frLandingPage: LandingPageContent = {
       home: "Accueil",
       services: "Services",
       network: "Réseau",
+      blog: "Blog",
       contact: "Contact"
     },
     cta: "Demander un devis",

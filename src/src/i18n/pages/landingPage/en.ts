@@ -45,6 +45,7 @@ export const enLandingPage: LandingPageContent = {
       home: "Home",
       services: "Services",
       network: "Network",
+      blog: "Blog",
       contact: "Contact"
     },
     cta: "Request a quote",

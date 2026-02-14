@@ -45,6 +45,7 @@ export const huLandingPage: LandingPageContent = {
       home: "Kezdőlap",
       services: "Szolgáltatások",
       network: "Hálózat",
+      blog: "Blog",
       contact: "Kapcsolat"
     },
     cta: "Ajánlatkérés",

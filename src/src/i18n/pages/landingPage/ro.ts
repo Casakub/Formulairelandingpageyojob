@@ -45,6 +45,7 @@ export const roLandingPage: LandingPageContent = {
       home: "Acasă",
       services: "Servicii",
       network: "Rețea",
+      blog: "Blog",
       contact: "Contact"
     },
     cta: "Solicită o ofertă",

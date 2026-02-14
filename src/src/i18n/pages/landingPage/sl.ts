@@ -45,6 +45,7 @@ export const slLandingPage: LandingPageContent = {
       home: "Domov",
       services: "Storitve",
       network: "Mreža",
+      blog: "Blog",
       contact: "Kontakt"
     },
     cta: "Zahtevajte ponudbo",

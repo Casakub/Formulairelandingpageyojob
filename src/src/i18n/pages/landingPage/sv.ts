@@ -45,6 +45,7 @@ export const svLandingPage: LandingPageContent = {
       home: "Hem",
       services: "Tjänster",
       network: "Nätverk",
+      blog: "Blog",
       contact: "Kontakt"
     },
     cta: "Begär offert",

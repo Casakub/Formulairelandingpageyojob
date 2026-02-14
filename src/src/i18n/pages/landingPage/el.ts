@@ -45,6 +45,7 @@ export const elLandingPage: LandingPageContent = {
       home: "Αρχική",
       services: "Υπηρεσίες",
       network: "Δίκτυο",
+      blog: "Blog",
       contact: "Επικοινωνία"
     },
     cta: "Ζητήστε προσφορά",

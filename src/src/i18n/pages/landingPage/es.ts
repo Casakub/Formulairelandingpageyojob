@@ -45,6 +45,7 @@ export const esLandingPage: LandingPageContent = {
       home: "Inicio",
       services: "Servicios",
       network: "Red",
+      blog: "Blog",
       contact: "Contacto"
     },
     cta: "Solicitar presupuesto",
