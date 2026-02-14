@@ -45,6 +45,7 @@ export const lvLandingPage: LandingPageContent = {
       home: "Sākums",
       services: "Pakalpojumi",
       network: "Tīkls",
+      blog: "Blog",
       contact: "Kontakti"
     },
     cta: "Pieprasīt piedāvājumu",

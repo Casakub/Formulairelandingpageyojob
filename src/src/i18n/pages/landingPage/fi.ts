@@ -45,6 +45,7 @@ export const fiLandingPage: LandingPageContent = {
       home: "Etusivu",
       services: "Palvelut",
       network: "Verkosto",
+      blog: "Blog",
       contact: "Yhteystiedot"
     },
     cta: "Pyydä tarjous",
