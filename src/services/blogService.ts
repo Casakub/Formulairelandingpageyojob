@@ -294,7 +294,7 @@ export async function applySitemapsToStorage(
 
   for (const file of files) {
     const storagePath = `${SITEMAPS_STORAGE_PREFIX}/${file.name}`;
-    const blob = new Blob([file.content], { type: 'text/plain' });
+    const blob = new Blob([file.content], { type: 'application/xml' });
 
     const { error } = await supabase.storage
       .from(BLOG_IMAGES_BUCKET)
