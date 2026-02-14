@@ -10,12 +10,16 @@ import {
   Copy,
   Loader2,
   ExternalLink,
+  Upload,
+  FolderOpen,
 } from 'lucide-react';
 import { Button } from '../ui/button';
 import { Badge } from '../ui/badge';
 import {
   generateBlogSitemap,
   generateSitemapIndex,
+  applySitemapsToStorage,
+  getSitemapStorageUrl,
 } from '../../services/blogService';
 
 interface SitemapFile {
@@ -30,6 +34,8 @@ export function SitemapManager() {
   const [generated, setGenerated] = useState<SitemapFile[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [copiedIndex, setCopiedIndex] = useState<number | null>(null);
+  const [applying, setApplying] = useState(false);
+  const [applied, setApplied] = useState(false);
 
   const handleGenerate = async () => {
     setGenerating(true);
@@ -87,6 +93,25 @@ export function SitemapManager() {
     await navigator.clipboard.writeText(content);
     setCopiedIndex(index);
     setTimeout(() => setCopiedIndex(null), 2000);
+  };
+
+  const handleApply = async () => {
+    setApplying(true);
+    setError(null);
+    setApplied(false);
+    try {
+      const filesToApply = generated
+        .filter((f) => f.content)
+        .map((f) => ({ name: f.name, content: f.content! }));
+
+      await applySitemapsToStorage(filesToApply);
+      setApplied(true);
+    } catch (err: any) {
+      console.error('Erreur application sitemap:', err);
+      setError(err.message || 'Erreur lors de l\'application dans le storage');
+    } finally {
+      setApplying(false);
+    }
   };
 
   const countUrls = (xml: string): number => {
@@ -166,10 +191,31 @@ export function SitemapManager() {
               <CheckCircle className="w-5 h-5 text-green-500" />
               <h3 className="font-semibold text-slate-800">Fichiers générés</h3>
             </div>
-            <Button variant="outline" size="sm" onClick={downloadAll}>
-              <Download className="w-4 h-4 mr-2" />
-              Tout télécharger
-            </Button>
+            <div className="flex items-center gap-2">
+              <Button variant="outline" size="sm" onClick={downloadAll}>
+                <Download className="w-4 h-4 mr-2" />
+                Tout télécharger
+              </Button>
+              <Button
+                size="sm"
+                onClick={handleApply}
+                disabled={applying || applied}
+                className={
+                  applied
+                    ? 'bg-green-600 hover:bg-green-600'
+                    : 'bg-gradient-to-r from-emerald-600 to-cyan-600 hover:from-emerald-700 hover:to-cyan-700'
+                }
+              >
+                {applying ? (
+                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                ) : applied ? (
+                  <CheckCircle className="w-4 h-4 mr-2" />
+                ) : (
+                  <FolderOpen className="w-4 h-4 mr-2" />
+                )}
+                {applying ? 'Application...' : applied ? 'Appliqué !' : 'Appliquer dans public/'}
+              </Button>
+            </div>
           </div>
 
           {generated.map((file, idx) => (
@@ -222,19 +268,65 @@ export function SitemapManager() {
             </div>
           ))}
 
+          {/* Applied success message */}
+          {applied && (
+            <motion.div
+              initial={{ opacity: 0, y: 5 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="p-4 rounded-xl bg-emerald-50 border border-emerald-200"
+            >
+              <div className="flex items-start gap-3">
+                <CheckCircle className="w-5 h-5 text-emerald-600 flex-shrink-0 mt-0.5" />
+                <div>
+                  <h4 className="font-semibold text-emerald-800 text-sm mb-1">
+                    Sitemaps sauvegardés dans Supabase Storage
+                  </h4>
+                  <p className="text-xs text-emerald-700 mb-2">
+                    Les fichiers sont prêts à être déployés dans <code className="bg-emerald-100 px-1 rounded">public/</code>.
+                    Exécutez cette commande sur votre serveur :
+                  </p>
+                  <div className="bg-slate-900 rounded-lg p-3 font-mono text-xs text-emerald-400 overflow-x-auto">
+                    node src/scripts/generate-sitemaps.cjs --pull
+                  </div>
+                </div>
+              </div>
+            </motion.div>
+          )}
+
           {/* Instructions */}
           <div className="p-4 rounded-xl bg-blue-50 border border-blue-200">
             <h4 className="font-semibold text-slate-800 mb-2 text-sm">Instructions de mise à jour</h4>
-            <ol className="text-xs text-slate-600 space-y-1.5 list-decimal list-inside">
-              <li>Cliquez sur "Tout télécharger" pour récupérer les fichiers</li>
-              <li>
-                Remplacez <code className="bg-blue-100 px-1 rounded">sitemap.xml</code> et ajoutez{' '}
-                <code className="bg-blue-100 px-1 rounded">sitemap-blog.xml</code> dans le dossier{' '}
-                <code className="bg-blue-100 px-1 rounded">public/</code> de votre projet
-              </li>
-              <li>Déployez les changements</li>
-              <li>
-                Soumettez le nouveau sitemap dans{' '}
+            <div className="space-y-3">
+              <div>
+                <p className="text-xs font-medium text-slate-700 mb-1">Option 1 — Appliquer depuis le dashboard (recommandé)</p>
+                <ol className="text-xs text-slate-600 space-y-1 list-decimal list-inside">
+                  <li>Cliquez sur <strong>"Appliquer dans public/"</strong> ci-dessus</li>
+                  <li>
+                    Sur votre serveur, exécutez : <code className="bg-blue-100 px-1 rounded">node src/scripts/generate-sitemaps.cjs --pull</code>
+                  </li>
+                  <li>Les sitemaps seront téléchargés et écrits dans <code className="bg-blue-100 px-1 rounded">src/public/</code></li>
+                </ol>
+              </div>
+              <div className="border-t border-blue-200 pt-3">
+                <p className="text-xs font-medium text-slate-700 mb-1">Option 2 — Génération directe sur le serveur</p>
+                <ol className="text-xs text-slate-600 space-y-1 list-decimal list-inside">
+                  <li>
+                    Exécutez : <code className="bg-blue-100 px-1 rounded">node src/scripts/generate-sitemaps.cjs</code>
+                  </li>
+                  <li>Le script interroge Supabase et génère les sitemaps directement</li>
+                </ol>
+              </div>
+              <div className="border-t border-blue-200 pt-3">
+                <p className="text-xs font-medium text-slate-700 mb-1">Option 3 — Téléchargement manuel</p>
+                <ol className="text-xs text-slate-600 space-y-1 list-decimal list-inside">
+                  <li>Cliquez sur "Tout télécharger" pour récupérer les fichiers</li>
+                  <li>
+                    Remplacez les fichiers dans le dossier <code className="bg-blue-100 px-1 rounded">public/</code>
+                  </li>
+                </ol>
+              </div>
+              <div className="border-t border-blue-200 pt-2 text-xs text-slate-500">
+                Pensez à soumettre dans{' '}
                 <a
                   href="https://search.google.com/search-console"
                   target="_blank"
@@ -243,8 +335,8 @@ export function SitemapManager() {
                 >
                   Google Search Console <ExternalLink className="w-3 h-3" />
                 </a>
-              </li>
-            </ol>
+              </div>
+            </div>
           </div>
         </motion.div>
       )}
