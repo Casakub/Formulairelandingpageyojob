@@ -33,23 +33,40 @@ export interface BlogArticleWithTranslations extends BlogArticle {
   translations: BlogTranslation[];
 }
 
-// Client authentifié (admin dashboard)
+// Client authentifié (admin dashboard) — singleton avec cache du token
+let authClientInstance: SupabaseClient | null = null;
+let authClientToken: string | null = null;
+
 function getAuthClient(): SupabaseClient {
   const sessionStr = localStorage.getItem('yojob_session');
   if (!sessionStr) throw new Error('Non authentifié');
   const session = JSON.parse(sessionStr);
-  return createClient(supabaseUrl, publicAnonKey, {
-    global: { headers: { Authorization: `Bearer ${session.access_token}` } },
+  const token = session.access_token;
+
+  // Réutiliser l'instance si le token n'a pas changé
+  if (authClientInstance && authClientToken === token) {
+    return authClientInstance;
+  }
+
+  authClientInstance = createClient(supabaseUrl, publicAnonKey, {
+    global: { headers: { Authorization: `Bearer ${token}` } },
     auth: { persistSession: false, autoRefreshToken: false },
   });
+  authClientToken = token;
+  return authClientInstance;
 }
 
-// Client public (pages blog visiteurs)
+// Client public (pages blog visiteurs) — singleton
+let publicClientInstance: SupabaseClient | null = null;
+
 function getPublicClient(): SupabaseClient {
-  return createClient(supabaseUrl, publicAnonKey, {
+  if (publicClientInstance) return publicClientInstance;
+
+  publicClientInstance = createClient(supabaseUrl, publicAnonKey, {
     auth: { persistSession: false, autoRefreshToken: false },
     global: { headers: { Authorization: `Bearer ${publicAnonKey}` } },
   });
+  return publicClientInstance;
 }
 
 // =============================================================================
@@ -277,7 +294,7 @@ export async function applySitemapsToStorage(
 
   for (const file of files) {
     const storagePath = `${SITEMAPS_STORAGE_PREFIX}/${file.name}`;
-    const blob = new Blob([file.content], { type: 'application/xml' });
+    const blob = new Blob([file.content], { type: 'text/plain' });
 
     const { error } = await supabase.storage
       .from(BLOG_IMAGES_BUCKET)
