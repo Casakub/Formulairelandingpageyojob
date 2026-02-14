@@ -261,6 +261,43 @@ export async function deleteBlogImage(url: string): Promise<void> {
 }
 
 // =============================================================================
+// SITEMAP STORAGE (sauvegarde dans Supabase Storage pour apply dans public/)
+// =============================================================================
+
+const SITEMAPS_STORAGE_PREFIX = '_sitemaps';
+
+/**
+ * Sauvegarde les sitemaps generes dans Supabase Storage (bucket blog-images/_sitemaps/).
+ * Le script generate-sitemaps.cjs --pull peut ensuite les telecharger dans src/public/.
+ */
+export async function applySitemapsToStorage(
+  files: { name: string; content: string }[]
+): Promise<void> {
+  const supabase = getAuthClient();
+
+  for (const file of files) {
+    const storagePath = `${SITEMAPS_STORAGE_PREFIX}/${file.name}`;
+    const blob = new Blob([file.content], { type: 'application/xml' });
+
+    const { error } = await supabase.storage
+      .from(BLOG_IMAGES_BUCKET)
+      .upload(storagePath, blob, {
+        cacheControl: '0',
+        upsert: true,
+      });
+
+    if (error) throw error;
+  }
+}
+
+/**
+ * Retourne l'URL publique d'un sitemap stocke dans Supabase Storage.
+ */
+export function getSitemapStorageUrl(fileName: string): string {
+  return `https://${projectId}.supabase.co/storage/v1/object/public/${BLOG_IMAGES_BUCKET}/${SITEMAPS_STORAGE_PREFIX}/${fileName}`;
+}
+
+// =============================================================================
 // SITEMAP GENERATION (dynamique selon les traductions effectives)
 // =============================================================================
 

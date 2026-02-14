@@ -10,7 +10,9 @@
  * 5. Ecrit le tout dans src/public/
  *
  * Usage :
- *   node src/scripts/generate-sitemaps.cjs
+ *   node src/scripts/generate-sitemaps.cjs          # Generation directe depuis Supabase DB
+ *   node src/scripts/generate-sitemaps.cjs --pull    # Telecharge depuis Supabase Storage
+ *                                                     (les versions sauvees via le dashboard)
  */
 
 const fs = require('fs');
@@ -203,13 +205,60 @@ function generateSitemapIndex() {
 </sitemapindex>`;
 }
 
-// ─── Main ───
+// ─── Download helper (Supabase Storage) ───
 
-async function main() {
-  console.log('[sitemaps] Demarrage de la generation des sitemaps...');
+const BLOG_IMAGES_BUCKET = 'blog-images';
+const SITEMAPS_STORAGE_PREFIX = '_sitemaps';
+
+function downloadFromStorage(fileName) {
+  const storageUrl = `${SUPABASE_URL}/storage/v1/object/public/${BLOG_IMAGES_BUCKET}/${SITEMAPS_STORAGE_PREFIX}/${fileName}`;
+  return new Promise((resolve, reject) => {
+    https
+      .get(storageUrl, (res) => {
+        if (res.statusCode === 404) {
+          return reject(new Error(`Fichier non trouve dans le storage: ${fileName}`));
+        }
+        if (res.statusCode >= 400) {
+          return reject(new Error(`Storage HTTP ${res.statusCode} pour ${fileName}`));
+        }
+        let body = '';
+        res.on('data', (chunk) => (body += chunk));
+        res.on('end', () => resolve(body));
+      })
+      .on('error', reject);
+  });
+}
+
+// ─── Mode --pull : telecharge depuis Supabase Storage ───
+
+async function pullFromStorage() {
+  console.log('[sitemaps] Mode --pull : telechargement depuis Supabase Storage...');
   console.log(`[sitemaps] Dossier cible : ${PUBLIC_DIR}`);
 
-  // Verification que le dossier public existe
+  if (!fs.existsSync(PUBLIC_DIR)) {
+    fs.mkdirSync(PUBLIC_DIR, { recursive: true });
+  }
+
+  const filesToPull = ['sitemap.xml', 'sitemap-blog.xml'];
+
+  for (const fileName of filesToPull) {
+    console.log(`[sitemaps] Telechargement de ${fileName}...`);
+    const content = await downloadFromStorage(fileName);
+    const outputPath = path.join(PUBLIC_DIR, fileName);
+    fs.writeFileSync(outputPath, content, 'utf8');
+    const sizeKB = (Buffer.byteLength(content, 'utf8') / 1024).toFixed(1);
+    console.log(`[sitemaps] ${fileName} ecrit (${sizeKB} KB)`);
+  }
+
+  console.log('[sitemaps] Pull termine. Fichiers ecrits dans src/public/');
+}
+
+// ─── Mode par defaut : generation depuis Supabase DB ───
+
+async function generateFromDB() {
+  console.log('[sitemaps] Generation des sitemaps depuis Supabase DB...');
+  console.log(`[sitemaps] Dossier cible : ${PUBLIC_DIR}`);
+
   if (!fs.existsSync(PUBLIC_DIR)) {
     fs.mkdirSync(PUBLIC_DIR, { recursive: true });
     console.log(`[sitemaps] Dossier ${PUBLIC_DIR} cree.`);
@@ -240,6 +289,12 @@ async function main() {
 
   console.log('[sitemaps] Generation terminee.');
 }
+
+// ─── Main ───
+
+const mode = process.argv.includes('--pull') ? 'pull' : 'generate';
+
+const main = mode === 'pull' ? pullFromStorage : generateFromDB;
 
 main().catch((err) => {
   console.error('[sitemaps] Erreur:', err);
